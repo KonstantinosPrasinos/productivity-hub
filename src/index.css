@@ -15,9 +15,10 @@ body {
   height: 500px;
   position: fixed;
   top: 0;
-  left: 0;
+  left: -300px;
   border-radius: 0 0 20px 0;
   box-shadow: 0 0 20px #555555;
+  visibility: hidden;
 }
 
 .bottom-nav-bar {
@@ -31,6 +32,7 @@ body {
 .title {
   text-decoration: none;
   color: var(--background-color);
+  display: inline-block;
 }
 
 .title * {
@@ -119,6 +121,7 @@ body {
   height: 2em;
   margin-bottom: 10px;
   padding-top: 10px;
+  display: block;
 }
 .settings-line{
   border-top: 2px var(--background-color) solid;
@@ -130,6 +133,7 @@ body {
   height: 10px;
   position: absolute;
   right: 0;
+  z-index: 1;
 }
 .top-semi-circle {
   top: -10px;
@@ -158,4 +162,21 @@ body {
   height: fit-content;
   margin: 20px;
   top: 0;
+}
+
+.invisible {
+  visibility: hidden;
+}
+.accent-color-2-background {
+  background-color: #388e3d;
+}
+.collapse-side-nav-bar {
+  position:absolute;
+  right: 10px;
+  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  color: var(--background-color);
+  margin-top: 2em;
+  cursor: pointer;
 }
