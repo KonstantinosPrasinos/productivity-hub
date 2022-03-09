@@ -24,7 +24,8 @@ const NavBar = () => {
     const classes = useStyles();
 
     const [isMobileScreen, setIsMobileScreen] = useState(checkScreenWidth());
-    const [showSideBar, setShowSideBar] = useState(false);
+
+    const sideBarContainerRef = useRef();
 
 
     useEffect(() => {
@@ -49,14 +50,10 @@ const NavBar = () => {
         );
     }
 
-    const renderSideButton = () => {
-        return (
-            <button onClick={() => setShowSideBar(true)}>Click me</button>
-        )
-    }
-
     return (
-        <div>{isMobileScreen ? renderBottomBar() : (showSideBar ? <SideBar classes={classes} setShowSideBar={setShowSideBar} /> : renderSideButton())}</div>
+        <div className='side-bar-container' ref={sideBarContainerRef}>
+            {isMobileScreen ? renderBottomBar() : <SideBar classes={classes} sideBarContainerRef={sideBarContainerRef}/>}
+        </div>
     );
 }
  
