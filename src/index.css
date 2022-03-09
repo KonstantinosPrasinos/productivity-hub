@@ -165,7 +165,10 @@ body {
 }
 
 .content {
-  margin: 4em
+  margin: 4em;
+  height: 100%;
+  width: calc(100% - 300px - 8em);
+  flex-grow: 1;
 }
 
 .invisible {
@@ -178,7 +181,7 @@ body {
   position: fixed;
   color: var(--background-color);
   top: 2em;
-  left: calc(280px - 2em);
+  left: calc(280px - 3em);
 }
 .show-side-nav-bar {
   position: fixed;

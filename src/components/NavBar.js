@@ -27,7 +27,6 @@ const NavBar = () => {
 
     const sideBarContainerRef = useRef();
 
-
     useEffect(() => {
         window.addEventListener('resize', () => setIsMobileScreen(checkScreenWidth()));
     }, []);
