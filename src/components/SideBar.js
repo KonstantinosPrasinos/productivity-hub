@@ -1,4 +1,4 @@
-import {useRef, useState } from 'react';
+import {useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 
@@ -52,6 +52,13 @@ const SideBar = ({classes, sideBarContainerRef}) => {
         }
         
     }
+
+    useEffect(() => {
+        const sideBarContainer = sideBarContainerRef.current;
+        return function cleanUp() {
+            sideBarContainer.style.width = '300px';
+        }
+    }, [sideBarContainerRef])
 
     const renderSideBar = () => {
         return (
