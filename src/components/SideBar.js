@@ -88,10 +88,10 @@ const SideBar = ({navBarContainerRef}) => {
         return (
             <div className='side-nav-bar-content' ref={sideBarContentRef}>
                 <Link to='/' className='title' onClick={() => {setSelectedItem(homeRef); console.log(window.location.pathname)}}>
-                    <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text ${selectedItem && selectedItem === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
+                    <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
                 </Link>
                 <Link to='/lists' className='title' onClick={() => setSelectedItem(taskRef)}>
-                    <h1><CheckCircleIcon fontSize='1em' className='big-icon' /><p className={`title-text ${selectedItem && selectedItem === taskRef ? 'selected' : ''}`} ref={taskRef}>Task Lists</p></h1>
+                    <h1><CheckCircleIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === taskRef ? 'selected' : ''}`} ref={taskRef}>Task Lists</p></h1>
                 </Link>
                 <div className='lists-list'>
                     {listsList.map((list, index) => (
@@ -102,7 +102,7 @@ const SideBar = ({navBarContainerRef}) => {
                     <div className='new-list'>Add new +</div>
                 </Link> */}
                 <Link to='/settings' className='title settings' onClick={() => setSelectedItem(settingsRef)}>
-                    <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text ${selectedItem && selectedItem === settingsRef ? 'selected' : ''}`} ref={settingsRef}>Settings</p></h1>
+                    <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === settingsRef ? 'selected' : ''}`} ref={settingsRef}>Settings</p></h1>
                 </Link>
             </div>
         )

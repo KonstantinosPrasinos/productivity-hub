@@ -15,7 +15,7 @@ const ListItem = ({list, index, isFinal, selectedItem, setSelectedItem}) => {
                 <p className='list-line list-line-top'></p>
                 <div className='list-middle'>
                     <p className='list-circle'></p>
-                    <span className={`list-title ${selectedItem && selectedItem === listRef ? 'list-selected' : ''}`}>{list}</span>
+                    <span className={`list-title selection ${selectedItem && selectedItem === listRef ? 'selected' : ''}`}>{list}</span>
                 </div>
                 {isFinal && <p className='list-line list-line-bottom'></p>}
             </div>

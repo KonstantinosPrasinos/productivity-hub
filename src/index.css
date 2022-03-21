@@ -99,12 +99,13 @@ body {
   width: calc(100% - 1.5em - 15px);
   height: 90%;
 }
-.list-title:not(.list-selected):hover {
+.selection:not(.selected):hover {
   background-color: var(--background-color);
   border-radius: 8px;
 }
-.list-title.list-selected {
-  background-color: var(--accent-color-2);
+.selection.selected {
+  color: var(--background-color);
+  background-color: var(--accent-color-1);
   border-radius: 8px;
 }
 .new-list {
@@ -219,29 +220,5 @@ button {
 .title-text {
   text-decoration: none;
   display: inline;
+  padding: 0 10px 0 10px;
 }   
-
-.title-text:after {
-  position: absolute;
-  content: '';
-  height: 2px;
-  bottom: -2px; 
-
-  margin: 0 auto;
-  left: -100%;
-  right: 0;
-  width: 0;
-  background: var(--accent-color-1);
- 
-  transition:0.3s;
-}
-
-.title-text:hover:after {
- left: 0%;
- width: 100%;
-}
-
-.title-text.selected:after {
-  left: 0%;
-  width: 100%;
-}
