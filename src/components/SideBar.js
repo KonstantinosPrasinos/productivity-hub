@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { useLocation } from 'react-router';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -10,7 +11,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ListItem from './ListItem';
 
 const SideBar = ({navBarContainerRef}) => {
-    const listsList = ['Workout', 'Reading', 'Random Thing', 'Example'];
+    const [listsList, setListsList] = useState(['Workout', 'Reading', 'Random Thing', 'Example']);
     const [selectedItem, setSelectedItem] = useState();
     
     const sideBarContentRef = useRef();
@@ -20,9 +21,9 @@ const SideBar = ({navBarContainerRef}) => {
     const taskRef = useRef();
     const settingsRef = useRef();
 
-    let showSideBar = true;
+    const location = useLocation();
 
-    
+    let showSideBar = true;
 
     const generateObj = () => {
         const date = new Date();
@@ -37,12 +38,28 @@ const SideBar = ({navBarContainerRef}) => {
             'Push-Ups': 12,
             'Pull-Ups': 23
         };
-        console.log(obj);
     }
 
     useEffect(() => {
+        const handleLocation = () => {
+            switch (location.pathname) {
+                case '/':
+                    setSelectedItem(homeRef);
+                    break;
+                case '/lists':
+                    setSelectedItem(taskRef);
+                    break;
+                case '/settings':
+                    setSelectedItem(settingsRef);
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         generateObj();
-    });
+        handleLocation();
+    }, [location, listsList]);
 
     const collapseSideNavBar = () => {
         function setInvisible() {
@@ -87,7 +104,7 @@ const SideBar = ({navBarContainerRef}) => {
     const renderSideBar = () => {
         return (
             <div className='side-nav-bar-content' ref={sideBarContentRef}>
-                <Link to='/' className='title' onClick={() => {setSelectedItem(homeRef); console.log(window.location.pathname)}}>
+                <Link to='/' className='title' onClick={() => setSelectedItem(homeRef)}>
                     <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
                 </Link>
                 <Link to='/lists' className='title' onClick={() => setSelectedItem(taskRef)}>

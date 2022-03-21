@@ -1,4 +1,4 @@
-import {Routes, Route, BrowserRouter} from 'react-router-dom';
+import {Routes, Route, BrowserRouter, Navigate} from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './components/Home'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -24,6 +24,7 @@ function App() {
           <div className='content'>
             <Routes>
               <Route exact path='/' element={<Home />} />
+              <Route exact path='/home' element={<Navigate to='/' />} />
               <Route path='/lists' element={(<div>Lists</div>)} />
               <Route path='/lists/:id' element={<ListDetails />} />
               <Route path='/lists/new' element={(<div>New List</div>)} />
