@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -10,9 +10,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 import ListItem from './ListItem';
 
+import { useSelector } from 'react-redux';
+
+
 const SideBar = ({navBarContainerRef}) => {
-    const [listsList, setListsList] = useState(['Workout', 'Reading', 'Random Thing', 'Example']);
-    const [selectedItem, setSelectedItem] = useState();
+    const groups = useSelector((state) => state.content.groups);
+    const [selectedItem, setSelectedItem] = useState(null);
     
     const sideBarContentRef = useRef();
     const sideBarRef = useRef();
@@ -20,6 +23,7 @@ const SideBar = ({navBarContainerRef}) => {
     const homeRef = useRef();
     const taskRef = useRef();
     const settingsRef = useRef();
+    const navigate = useNavigate();
 
     const location = useLocation();
 
@@ -59,7 +63,7 @@ const SideBar = ({navBarContainerRef}) => {
         
         generateObj();
         handleLocation();
-    }, [location, listsList]);
+    }, [location, groups]);
 
     const collapseSideNavBar = () => {
         function setInvisible() {
@@ -93,6 +97,16 @@ const SideBar = ({navBarContainerRef}) => {
         }
     }
 
+    const addGroupButtons = () => {
+        return groups.map((list, index) => {
+            return <ListItem key={index} list={list} index={index} selectedItem={selectedItem} setSelectedItem={setSelectedItem} isFinal={groups.length !== index + 1 ? true : false} />
+        })
+    }
+
+    const addNewGroupButton = () => {
+        return (<div className='new-list title' onClick={() => {setSelectedItem(null); navigate('/lists/new')}}>Add new +</div>)
+    }
+
     useEffect(() => {
         const sideBarContainer = navBarContainerRef.current;
         
@@ -104,20 +118,15 @@ const SideBar = ({navBarContainerRef}) => {
     const renderSideBar = () => {
         return (
             <div className='side-nav-bar-content' ref={sideBarContentRef}>
-                <Link to='/' className='title' onClick={() => setSelectedItem(homeRef)}>
+                <Link to='/' className='title' onClick={() => setSelectedItem('home')}>
                     <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
                 </Link>
                 <Link to='/lists' className='title' onClick={() => setSelectedItem(taskRef)}>
                     <h1><CheckCircleIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === taskRef ? 'selected' : ''}`} ref={taskRef}>Task Lists</p></h1>
                 </Link>
                 <div className='lists-list'>
-                    {listsList.map((list, index) => (
-                        <ListItem key={index} list={list} index={index} isFinal={listsList.length !== index + 1 ? true : false} selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
-                    ))}
+                    {groups.length !== 0 ? addGroupButtons() : addNewGroupButton()}
                 </div>
-                {/* <Link to='/lists/new' className='title' onClick={() => setSelectedItem(null)}>
-                    <div className='new-list'>Add new +</div>
-                </Link> */}
                 <Link to='/settings' className='title settings' onClick={() => setSelectedItem(settingsRef)}>
                     <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedItem && selectedItem === settingsRef ? 'selected' : ''}`} ref={settingsRef}>Settings</p></h1>
                 </Link>

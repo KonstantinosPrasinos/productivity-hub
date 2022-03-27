@@ -1,8 +1,10 @@
 import {Routes, Route, BrowserRouter, Navigate} from 'react-router-dom';
-import NavBar from './components/NavBar';
-import Home from './components/Home'
+import NavBar from './components/navbar/NavBar';
+import Home from './components/home/Home'
+import Settings from './components/settings/Settings'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import ListDetails from './components/ListDetails';
+import GroupDetails from './components/groups/GroupDetails';
+import NewGroup from './components/groups/NewGroup';
 
 const theme = createTheme({
   palette: {
@@ -26,9 +28,9 @@ function App() {
               <Route exact path='/' element={<Home />} />
               <Route exact path='/home' element={<Navigate to='/' />} />
               <Route path='/lists' element={(<div>Lists</div>)} />
-              <Route path='/lists/:id' element={<ListDetails />} />
-              <Route path='/lists/new' element={(<div>New List</div>)} />
-              <Route path='/settings' element={(<div>Settings</div>)} />
+              <Route path='/lists/:id' element={<GroupDetails />} />
+              <Route path='/lists/new' element={<NewGroup />} />
+              <Route path='/settings' element={<Settings />} />
               <Route path='*' element={(<div>Not found</div>)} />
             </Routes>
           </div>

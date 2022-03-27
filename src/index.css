@@ -99,6 +99,9 @@ body {
   width: calc(100% - 1.5em - 15px);
   height: 90%;
 }
+.selection {
+  cursor: pointer;
+}
 .selection:not(.selected):hover {
   background-color: var(--background-color);
   border-radius: 8px;
@@ -107,7 +110,7 @@ body {
   color: var(--background-color);
   background-color: var(--accent-color-1);
   border-radius: 8px;
-  transition: background-color 200ms linear, color 100ms linear;
+  transition: background-color 200ms linear, color 200ms linear;
 }
 .new-list {
   font-size: 18px;
@@ -222,4 +225,36 @@ button {
   text-decoration: none;
   display: inline;
   padding: 0 10px 0 10px;
-}   
+}
+
+/* Home */
+.home {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.groups {
+  display: inline-block;
+  position: absolute;
+  height: calc(100% - 8em);
+  width: 50%;
+  overflow-y: auto;
+}
+.graphs {
+  display: inline-block;
+  position: absolute;
+  height: calc(100% - 8em);
+  width: 50%;
+  right: 0;
+}
+.group-card {
+  width: 100%;
+  height: 10em;
+  border-radius: 10px;
+  background-color: var(--background-color-2);
+  margin-bottom: 20px;
+  padding: 40px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

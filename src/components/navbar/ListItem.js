@@ -1,18 +1,17 @@
-import {useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 
 const ListItem = ({list, index, isFinal, selectedItem, setSelectedItem}) => {
     const listRef = useRef();
     const location = useLocation();
-
-    useEffect(() => {
-        console.log(location.pathname, `/${list.replace(/ /g, "_")}`)
-    })
-
+    const navigate = useNavigate();
+    
     return (
-        <Link to={`/lists/${list.replace(/ /g, "_")}`} onClick={() => {
+        <div onClick={() => {
+            navigate(`/lists/${list.replace(/ /g, "_")}`)
             if (listRef !== selectedItem){
-                setSelectedItem(listRef)
+                setSelectedItem(listRef);
             }
         }}>
             <div className='list' ref={listRef} id={`list-${index}`}>
@@ -24,7 +23,7 @@ const ListItem = ({list, index, isFinal, selectedItem, setSelectedItem}) => {
                 </div>
                 {isFinal && <p className='list-line list-line-bottom'></p>}
             </div>
-        </Link>
+        </div>
     );
 }
  
