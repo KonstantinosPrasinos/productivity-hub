@@ -29,6 +29,7 @@ const SideBar = ({navBarContainerRef}) => {
 
     let showSideBar = true;
 
+    // Temp
     const generateObj = () => {
         const date = new Date();
         const obj = {};
@@ -86,13 +87,13 @@ const SideBar = ({navBarContainerRef}) => {
     }
 
     const addGroupButtons = () => {
-        return groups.map((list, index) => {
-            return <ListItem key={index} list={list} index={index} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} isFinal={groups.length !== index + 1 ? true : false} />
+        return groups.map((group, index) => {
+            return <ListItem key={group.id} index={index} group={group} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} isFinal={groups.length !== index + 1 ? true : false} />
         })
     }
 
     const addNewGroupButton = () => {
-        return (<div className='new-list title' onClick={() => {setSelectedGroup(null); navigate('/groups/new')}}>Add new +</div>)
+        return (<div className='new-group title' onClick={() => {setSelectedGroup(null); navigate('/groups/new')}}>Add new +</div>)
     }
 
     useEffect(() => {
@@ -112,7 +113,7 @@ const SideBar = ({navBarContainerRef}) => {
                 <Link to='/groups' className='title' onClick={() => setSelectedGroup(taskRef)}>
                     <h1><CheckCircleIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === taskRef ? 'selected' : ''}`} ref={taskRef}>Task Groups</p></h1>
                 </Link>
-                <div className='lists-list'>
+                <div className='groups-group'>
                     {groups.length !== 0 ? addGroupButtons() : addNewGroupButton()}
                 </div>
                 <Link to='/settings' className='title settings' onClick={() => setSelectedGroup(settingsRef)}>

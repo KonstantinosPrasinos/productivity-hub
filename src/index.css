@@ -51,17 +51,17 @@ body {
   position: relative;
 }
 
-.list{
+.group{
   font-size: 22px;
 }
 
-.list {
+.group {
   height: 2em;
   position: relative;
   margin-left: 0.5em;
   color: var(--accent-color-1);
 }
-.list-circle {
+.group-circle {
   height: 0.5em;
   width: 0.5em;
   background-color: var(--accent-color-1);
@@ -72,7 +72,7 @@ body {
   bottom: 0.1em;
   position: relative;
 }
-.list-line {
+.group-line {
   height: 0.6em;
   width: 3px;
   background-color: var(--accent-color-1);
@@ -80,20 +80,20 @@ body {
   position: absolute;
   left: calc(0.25em - 1.5px);
 }
-.list-line-top {
+.group-line-top {
   top: 0;
 }
-.list-line-bottom {
+.group-line-bottom {
   bottom: 0;
 }
-.list-middle {
+.group-middle {
   position: absolute;
   margin: 0;
   bottom: 0;
   line-height: 2em;
   width: 100%;
 }
-.list-title{
+.group-title{
   position: absolute;
   margin-left: 1em;
   padding-left: 10px;
@@ -113,7 +113,7 @@ body {
   border-radius: 8px;
   transition: background-color 200ms linear, color 200ms linear;
 }
-.new-list {
+.new-group {
   font-size: 18px;
   height: 2em;
   line-height: 2em;
@@ -214,7 +214,7 @@ button {
   font-size: 1em;
 }
 
-.lists-list {
+.groups-group {
   padding-top: 1em;
 }
 
@@ -258,4 +258,55 @@ button {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+.visual-streak {
+  width: 100%;
+  height: 3.5em;
+  margin: 1em 0 1em 0;
+}
+.streak-value {
+  width: 14.28%;
+  height: 100%;
+  display: inline-block;
+  position: relative;
+}
+
+.streak-value-circle {
+  height: 2em;
+  width: 2em;
+  border-radius: 50%;
+  border: 6px solid var(--accent-color-1);
+  box-sizing: border-box;
+  display: inline-block;
+  opacity: 0.4;
+  margin-left: calc(50% - 1em);
+}
+
+.streak-value-completed {
+  opacity: 1;
+}
+
+.streak-value-bar {
+  position: absolute;
+  display: inline-block;
+  width: calc(50% - 1em);
+  height: 5px;
+  top: calc(1em - 2.5px);
+  background-color: var(--accent-color-1);
+}
+
+.streak-value-bar-left {
+  left: 0;
+}
+
+.streak-value-bar-right {
+  right: 0;
+}
+
+.streak-value-date {
+  color: var(--accent-color-1);
+  position: absolute;
+  left: calc(50% - 1em);
+  bottom: 0;
 }

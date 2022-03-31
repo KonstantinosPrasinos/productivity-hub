@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  groups: ['Workout', 'Reading', 'Random Thing', 'Example'],
+  groups: [{name: 'Workout', id: 1, recentValues: '111101'}, {name: 'Reading', id: 2, recentValues: '011001'}, {name: 'French', id: 3, recentValues: '101001'}],
 }
 
 export const contentSlice = createSlice({
@@ -17,7 +17,6 @@ export const contentSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const {addGroup, removeGroup} = contentSlice.actions
 
 export default contentSlice.reducer

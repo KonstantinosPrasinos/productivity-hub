@@ -2,26 +2,26 @@ import { useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 
-const ListItem = ({list, index, isFinal, selectedGroup, setSelectedGroup}) => {
-    const listRef = useRef();
+const ListItem = ({group, index, isFinal, selectedGroup, setSelectedGroup}) => {
+    const groupRef = useRef();
     const location = useLocation();
     const navigate = useNavigate();
     
     return (
         <div onClick={() => {
-            navigate(`/groups/${list.replace(/ /g, "_")}`)
-            if (listRef !== selectedGroup){
-                setSelectedGroup(listRef);
+            navigate(`/groups/${group.name.replace(/ /g, "_")}`)
+            if (groupRef !== selectedGroup){
+                setSelectedGroup(groupRef);
             }
         }}>
-            <div className='list' ref={listRef} id={`list-${index}`}>
-                {index === 0 && <p className='list-line temp'></p>}
-                <p className='list-line list-line-top'></p>
-                <div className='list-middle'>
-                    <p className='list-circle'></p>
-                    <span className={`list-title selection ${(selectedGroup && selectedGroup === listRef) || (location.pathname === `/groups/${list.replace(/ /g, "_")}`) ? 'selected' : ''}`}>{list}</span>
+            <div className='group' ref={groupRef} id={`group-${index}`}>
+                {index === 0 && <p className='group-line temp'></p>}
+                <p className='group-line group-line-top'></p>
+                <div className='group-middle'>
+                    <p className='group-circle'></p>
+                    <span className={`group-title selection ${(selectedGroup && selectedGroup === groupRef) || (location.pathname === `/groups/${group.name.replace(/ /g, "_")}`) ? 'selected' : ''}`}>{group.name}</span>
                 </div>
-                {isFinal && <p className='list-line list-line-bottom'></p>}
+                {isFinal && <p className='group-line group-line-bottom'></p>}
             </div>
         </div>
     );
