@@ -25,7 +25,8 @@ body {
 }
 
 .side-nav-bar {
-  width: calc(100% - 10px);
+  position: fixed;
+  width: 300px;
   height: 100%;
   display: block;
   background: var(--background-color-2);

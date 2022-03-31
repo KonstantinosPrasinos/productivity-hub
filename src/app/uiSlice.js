@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  selectedItem: null,
+  selectedGroup: null,
   screenIsMobile: null,
 }
 
@@ -9,7 +9,7 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    setSelectedItem: (state, action) => {
+    setSelectedGroup: (state, action) => {
       state.selectedItem = action.payload;
     },
     setScreenIsMobile: (state, action) => {
@@ -19,6 +19,6 @@ export const uiSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const {setSelectedItem, setScreenIsMobile} = uiSlice.actions
+export const {setSelectedGroup, setScreenIsMobile} = uiSlice.actions
 
 export default uiSlice.reducer

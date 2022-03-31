@@ -27,9 +27,9 @@ function App() {
             <Routes>
               <Route exact path='/' element={<Home />} />
               <Route exact path='/home' element={<Navigate to='/' />} />
-              <Route path='/lists' element={(<div>Lists</div>)} />
-              <Route path='/lists/:id' element={<GroupDetails />} />
-              <Route path='/lists/new' element={<NewGroup />} />
+              <Route path='/groups' element={(<div>Groups</div>)} />
+              <Route path='/groups/:id' element={<GroupDetails />} />
+              <Route path='/groups/new' element={<NewGroup />} />
               <Route path='/settings' element={<Settings />} />
               <Route path='*' element={(<div>Not found</div>)} />
             </Routes>

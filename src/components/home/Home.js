@@ -3,7 +3,7 @@ import GroupCard from './GroupCard';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 
-import { setSelectedItem } from '../../app/uiSlice';
+import { setSelectedGroup } from '../../app/uiSlice';
 
 const Home = () => {
     const groups = useSelector((state) => state.content.groups);
@@ -18,7 +18,7 @@ const Home = () => {
     }
     
     const renderNoGroups = () => {
-        return (<div className='title' onClick={() => {dispatch(setSelectedItem(null)); navigate('/lists/new')}}>
+        return (<div className='title' onClick={() => {dispatch(setSelectedGroup(null)); navigate('/groups/new')}}>
             <div className='new-list'>Add new +</div>
         </div>)
     }
