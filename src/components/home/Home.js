@@ -13,7 +13,7 @@ const Home = () => {
 
     const renderCards = () => {
         return groups.map(group => {
-            return <GroupCard group={group} key={group.id}></GroupCard>
+            return <GroupCard group={group.id} key={group.id}></GroupCard>
         })
     }
     

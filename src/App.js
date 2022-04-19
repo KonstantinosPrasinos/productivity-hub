@@ -3,23 +3,63 @@ import NavBar from './components/navbar/NavBar';
 import Home from './components/home/Home'
 import Settings from './components/settings/Settings'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline'
 import GroupDetails from './components/groups/GroupDetails';
 import NewGroup from './components/groups/NewGroup';
+import { useSelector } from 'react-redux';
+import GroupList from './components/groups/GroupList';
 
-const theme = createTheme({
+const lightTheme = createTheme({
   palette: {
+    type: 'light',
     primary: {
-      main: '#ffffff'
+      main: '#3B4252',
     },
     secondary: {
-      main: '#43A047'
+      main: '#3B4252',
+    },
+    background: {
+      default: '#ECEFF4',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#3B4252',
+    }
+  },
+  typography: {
+    fontFamily: "'Roboto', sans-serif"
+  }
+});
+
+const darkTheme = createTheme({
+  palette: {
+    type: 'dark',
+    primary: {
+      main: '#ffffff',
+    },
+    secondary: {
+      main: '#f50057',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    background: {
+      default: '#3B4252',
+      paper: '#2E3440',
+    },
+    text: {
+      primary: '#ffffff'
     }
   }
 });
 
 function App() {
+
+  const mode = useSelector((state) => state.ui.isDarkMode);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={mode ? darkTheme : lightTheme}>
+      <CssBaseline enableColorScheme />
       <BrowserRouter>
         <div className='App'>
           <NavBar />
@@ -27,7 +67,7 @@ function App() {
             <Routes>
               <Route exact path='/' element={<Home />} />
               <Route exact path='/home' element={<Navigate to='/' />} />
-              <Route path='/groups' element={(<div>Groups</div>)} />
+              <Route path='/groups' element={(<GroupList />)} />
               <Route path='/groups/:id' element={<GroupDetails />} />
               <Route path='/groups/new' element={<NewGroup />} />
               <Route path='/settings' element={<Settings />} />

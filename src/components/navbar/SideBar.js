@@ -1,5 +1,4 @@
 import {useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -7,6 +6,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { Paper } from '@mui/material';
 
 import ListItem from './ListItem';
 
@@ -106,20 +106,20 @@ const SideBar = ({navBarContainerRef}) => {
 
     const renderSideBar = () => {
         return (
-            <div className='side-nav-bar-content' ref={sideBarContentRef}>
-                <Link to='/' className='title' onClick={() => setSelectedGroup('home')}>
+            <Paper className='side-nav-bar-content' ref={sideBarContentRef}>
+                <div  className='title' onClick={() => {setSelectedGroup('home'); navigate('/')}}>
                     <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
-                </Link>
-                <Link to='/groups' className='title' onClick={() => setSelectedGroup(taskRef)}>
+                </div>
+                <div className='title' onClick={() => {setSelectedGroup(taskRef); navigate('/groups')}}>
                     <h1><CheckCircleIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === taskRef ? 'selected' : ''}`} ref={taskRef}>Task Groups</p></h1>
-                </Link>
+                </div>
                 <div className='groups-group'>
                     {groups.length !== 0 ? addGroupButtons() : addNewGroupButton()}
                 </div>
-                <Link to='/settings' className='title settings' onClick={() => setSelectedGroup(settingsRef)}>
+                <div className='title settings' onClick={() => {setSelectedGroup(settingsRef); navigate('/settings')}}>
                     <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === settingsRef ? 'selected' : ''}`} ref={settingsRef}>Settings</p></h1>
-                </Link>
-            </div>
+                </div>
+            </Paper>
         )
     }
 

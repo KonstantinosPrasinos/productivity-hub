@@ -2,8 +2,6 @@ const VisualStreak = ({streak}) => {
     const chars = streak.split('');
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    
-    console.log(date.toLocaleDateString());
 
     const renderDate = () => {
         date.setDate(date.getDate() + 1);
@@ -14,7 +12,6 @@ const VisualStreak = ({streak}) => {
     return (
         <div className="visual-streak">
             {chars.map((char, index) => {
-                console.log(char);
                 return (
                     <div className="streak-value" key={index}>
                         {index > 0 && char === '1' && chars[index - 1] === '1' && <div className="streak-value-bar streak-value-left-bar"></div>}
