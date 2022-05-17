@@ -6,7 +6,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Paper } from '@mui/material';
+import { Paper } from '@mui/material'; 
 
 import ListItem from './ListItem';
 

@@ -1,4 +1,5 @@
 import GroupCard from './GroupCard';
+import CategoriesTracker from './CategoriesTracker';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
@@ -31,10 +32,9 @@ const Home = () => {
                 </div>
             </div>
             <div className="graphs">
-
+                <CategoriesTracker />
             </div>
         </div>
-
     );
 }
  

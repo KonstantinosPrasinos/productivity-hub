@@ -5,7 +5,7 @@ import Settings from './components/settings/Settings'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline'
 import GroupDetails from './components/groups/GroupDetails';
-import NewGroup from './components/groups/NewGroup';
+import NewGroup from './components/popups/NewGroup';
 import { useSelector } from 'react-redux';
 import GroupList from './components/groups/GroupList';
 
