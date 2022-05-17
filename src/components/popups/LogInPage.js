@@ -10,25 +10,14 @@ import {
   OutlinedInput,
   IconButton,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const LogInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-  }, []);
-
   const invertShowPassword = () => {
     setShowPassword(!showPassword);
   };
-
-  const init =() => {
-      console.log('test')
-  }
-
-  const onSignIn = (googleUser) => {
-      console.log('test')
-  }
 
   return (
     <Paper
@@ -37,11 +26,14 @@ const LogInPage = () => {
         borderRadius: "10px",
         flexDirection: "column",
         rowGap: "10px",
+        display: 'flex',
         alignItems: "center",
         paddingTop: "3em",
         position: "fixed",
         width: "500px",
         height: "750px",
+        left: 'calc(50% - 250px)',
+        top: 'calc(50% - 375px)'
       }}
     >
       <script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -97,7 +89,7 @@ const LogInPage = () => {
         </tbody>
       </table>
       <h2>Or</h2>
-      <div className="g-signin2" data-onsuccess="onSignIn"></div>
+      {/* <div className="g-signin2" data-onsuccess="onSignIn"></div> */}
     </Paper>
   );
 };
