@@ -6,7 +6,7 @@ const HabitBox = ({habit}) => {
         <div className="habit-box">
             <div className="habit-input-container">
                 <div className="habit-text">{`${habit.name}:`}</div>
-                {habit.type === 'toggle' ? <input type="checkbox" /> : <TextField id="outlined-basic" variant="outlined" label={habit.name} size="small" sx={{width: '50%'}} />}
+                {habit.type === 'toggle' ? <input type="checkbox" /> : <TextField className="outlined-basic" variant="outlined" label={habit.name} size="small" sx={{width: '50%'}} />}
             </div>
             <div className="habit-goal-container">
                 <div className="habit-text">{habit.goalType === 'streak' ? 'Steak:' : 'Goal:'}</div>

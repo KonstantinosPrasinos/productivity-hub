@@ -69,7 +69,7 @@ function App() {
       dispatch(setUser(foundUser));
     } else {
       //Is commented because login in and saving info to localstorage doesn't work
-      // dispatch(setUser(false));
+      dispatch(setUser(false));
     }
   }, [dispatch]);
 
