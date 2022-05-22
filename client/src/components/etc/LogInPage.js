@@ -11,8 +11,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
-import GoogleSignInButton from "../etc/GoogleSignInButton";
+import GoogleSignInButton from "./GoogleSignInButton";
 import { useTheme } from "@emotion/react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const LogInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +21,8 @@ const LogInPage = () => {
   const [loggingIn, setLoggingIn] = useState(true);
 
   const theme = useTheme();
+  const navigate = useNavigate();
+  const {state} = useLocation();
 
   const invertShowPassword = () => {
     setShowPassword(!showPassword);
@@ -28,6 +31,10 @@ const LogInPage = () => {
   const invertShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  const handleLogin = () => {
+    navigate(state?.path || "/")
+  }
 
   return (
     <div style={{position: 'fixed', width: "100%", height: "100%", top: 0, left: 0, background: theme.palette.background.default}}>
@@ -147,7 +154,7 @@ const LogInPage = () => {
         </table>
         <h2>Or</h2>
         <GoogleSignInButton />
-        <button className="text-button">
+        <button className="text-button" onClick={() => {handleLogin()}}>
           You can also continue without logging in
         </button>
       </Paper>

@@ -9,7 +9,9 @@ import NewGroup from "./components/popups/NewGroup";
 import { useSelector } from "react-redux";
 import GroupList from "./components/groups/GroupList";
 import PopupHandler from "./components/popups/PopupHandler";
-import LogInPage from "./components/popups/LogInPage";
+import LogInPage from "./components/etc/LogInPage";
+import RequireAuth from "./components/etc/RequireAuth";
+import { useEffect } from "react";
 
 const lightTheme = createTheme({
   palette: {
@@ -67,12 +69,12 @@ function App() {
           <NavBar />
           <div className="content">
             <Routes>
-              <Route exact path="/" element={<Home />} />
-              <Route exact path="/home" element={<Navigate to="/" />} />
-              <Route path="/groups" element={<GroupList />} />
-              <Route path="/groups/:id" element={<GroupDetails />} />
-              <Route path="/groups/new" element={<NewGroup />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route exact path="/" element={<RequireAuth><Home /></RequireAuth>} />
+              <Route exact path="/home" element={<RequireAuth><Navigate to="/" /></RequireAuth>} />
+              <Route path="/groups" element={<RequireAuth><GroupList /></RequireAuth>} />
+              <Route path="/groups/:id" element={<RequireAuth><GroupDetails /></RequireAuth>} />
+              <Route path="/groups/new" element={<RequireAuth><NewGroup /></RequireAuth>} />
+              <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
               <Route path="/log-in" element={<LogInPage />} />
               <Route path="*" element={<div>Not found</div>} />
             </Routes>

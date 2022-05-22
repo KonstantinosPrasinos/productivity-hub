@@ -15,18 +15,18 @@ const Home = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
-        const loggedInUser = localStorage.getItem("user");
-        if (loggedInUser) {
-          const foundUser = JSON.parse(loggedInUser);
-          dispatch(setUser(foundUser));
-        } else {
-          //Is commented because login in and saving info to localstorage doesn't work
-          dispatch(setUser(false));
-          navigate('/log-in')
-        }
-      }, [dispatch, navigate]);
+    // useEffect(() => {
+    //     //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
+    //     const loggedInUser = localStorage.getItem("user");
+    //     if (loggedInUser) {
+    //       const foundUser = JSON.parse(loggedInUser);
+    //       dispatch(setUser(foundUser));
+    //     } else {
+    //       //Is commented because login in and saving info to localstorage doesn't work
+    //       dispatch(setUser(false));
+    //       navigate('/log-in')
+    //     }
+    //   }, [dispatch, navigate]);
 
     const renderCards = () => {
         return groups.map(group => {

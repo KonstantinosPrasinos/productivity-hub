@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import NewGroup from "./NewGroup";
 import NewTask from "./NewTask";
-import LogInPage from "./LogInPage";
 import { setShownPopup } from "../../app/uiSlice";
 import { useTheme } from "@emotion/react";
 
@@ -14,10 +13,10 @@ const PopupHandler = () => {
 
     return (
         <span className="popup-handler-container">
+            {/* needs redesign */}
             <div style={{position: 'fixed', width: '100%', height: '100%', background: theme.palette.background.default, zIndex: 10, opacity: shownPopup === 'login' ? 1 : 0.75, display: shownPopup === 'none' ? 'none' : 'block'}}>
                 {shownPopup === 'task' && <NewTask onClick />}
                 {shownPopup === 'group' && <NewGroup />}
-                {user === false && dispatch(setShownPopup('login')) && <LogInPage />}
             </div>
         </span>
     );
