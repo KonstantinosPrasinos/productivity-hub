@@ -12,6 +12,7 @@ import PopupHandler from "./components/popups/PopupHandler";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useEffect } from "react";
+import { setIsDarkMode, setUiTheme } from "./app/uiSlice";
 
 const lightTheme = createTheme({
   palette: {
@@ -57,11 +58,50 @@ const darkTheme = createTheme({
   },
 });
 
+const midnightTheme = createTheme({
+  palette: {
+    type: "midnight",
+
+  }
+})
+
 function App() {
-  const mode = useSelector((state) => state.ui.isDarkMode);
+  const theme = useSelector((state) => state.ui.uiTheme);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('ui-theme');
+    switch (storedTheme) {
+      case "default":
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+          setUiTheme('dark');
+          setIsDarkMode(true);
+        } else {
+          setUiTheme('light');
+          setIsDarkMode(false);
+        }
+        break;
+      case "dark":
+        setUiTheme('dark');
+        setIsDarkMode(true);
+        break;
+      case "midnight":
+        setUiTheme('midnight');
+        setIsDarkMode(true);
+        break;
+      case "light":
+        setUiTheme('light');
+        setIsDarkMode(false);
+        break;
+      default:
+        setUiTheme('light');
+        setIsDarkMode(false);
+        localStorage.setItem('ui-theme', 'light');
+        break;
+    }
+  }, [])
 
   return (
-    <ThemeProvider theme={mode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={theme === 'dark' ? darkTheme : (theme === 'midnight' ? midnightTheme : lightTheme)}>
       <CssBaseline enableColorScheme />
       <BrowserRouter>
         <div className="App">
