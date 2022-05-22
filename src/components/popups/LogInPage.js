@@ -2,97 +2,156 @@ import LockIcon from "@mui/icons-material/Lock";
 import EmailIcon from "@mui/icons-material/Email";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Paper,
-  FormControl,
-  InputLabel,
   InputAdornment,
-  OutlinedInput,
   IconButton,
+  Collapse,
+  TextField,
 } from "@mui/material";
 import { useState } from "react";
 import GoogleSignInButton from "../etc/GoogleSignInButton";
-import TextToggle from "../etc/TextToggle";
+import { useTheme } from "@emotion/react";
 
 const LogInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(true);
+
+  const theme = useTheme();
 
   const invertShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const invertShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   return (
-    <Paper
-      className="log-in-container"
-      sx={{
-        borderRadius: "10px",
-        flexDirection: "column",
-        rowGap: "10px",
-        display: "flex",
-        alignItems: "center",
-        paddingTop: "3em",
-        position: "fixed",
-        width: "500px",
-        height: "750px",
-        left: "calc(50% - 250px)",
-        top: "calc(50% - 375px)",
-      }}
-    >
-      <LockIcon sx={{ height: "80px", width: "80px" }} />
-      <h1>Welcome to Productivity Hub</h1>
-      <FormControl variant="outlined" sx={{ width: "60%" }}>
-        <InputLabel htmlFor="email-input-log-in">Email</InputLabel>
-        <OutlinedInput
-          sx={{ borderRadius: "10px" }}
+    <div style={{position: 'fixed', width: "100%", height: "100%", top: 0, left: 0, background: theme.palette.background.default}}>
+      <Paper
+        className="log-in-container"
+        sx={{
+          borderRadius: "10px",
+          flexDirection: "column",
+          rowGap: "10px",
+          display: "flex",
+          alignItems: "center",
+          paddingTop: "3em",
+          position: "fixed",
+          width: "500px",
+          height: "750px",
+          left: "calc(50% - 250px)",
+          top: "calc(50% - 375px)",
+        }}
+      >
+        <LockIcon sx={{ height: "80px", width: "80px" }} />
+        <h1>Welcome to Productivity Hub</h1>
+        <Collapse in={!loggingIn}>
+          <TextField
+            sx={{ width: "17em" }}
+            id="username-input-register"
+            label="Username"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon />
+                </InputAdornment>
+              ),
+            }}
+            margin="dense"
+          />
+        </Collapse>
+        <TextField
+          sx={{ width: "17em" }}
           id="email-input-log-in"
-          startAdornment={
-            <InputAdornment position="start">
-              <EmailIcon />
-            </InputAdornment>
-          }
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <EmailIcon />
+              </InputAdornment>
+            ),
+          }}
           label="Email"
         />
-      </FormControl>
-      <FormControl variant="outlined" sx={{ width: "60%" }}>
-        <InputLabel htmlFor="password-input-log-in">Password</InputLabel>
-        <OutlinedInput
-          sx={{ borderRadius: "10px" }}
-          label="password"
+        <TextField
+          sx={{ width: "17em" }}
+          label="Password"
           id="password-input-log-in"
           type={showPassword ? "text" : "password"}
-          startAdornment={
-            <InputAdornment position="start">
-              <LockIcon />
-            </InputAdornment>
-          }
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                onMouseDown={invertShowPassword}
-                aria-label="toggle password visibility"
-              >
-                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-              </IconButton>
-            </InputAdornment>
-          }
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onMouseDown={invertShowPassword}
+                  aria-label="toggle password visibility"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
         />
-      </FormControl>
-      <table>
-        <tbody>
-          <tr>
-            <th>
-              <button>Forgot your password?</button>
-            </th>
-            <th>
-              <button>Not registered yet? Sign Up</button>
-            </th>
-          </tr>
-        </tbody>
-      </table>
-      <h2>Or</h2>
-      <GoogleSignInButton />
-      <TextToggle option1="Yes" option2="No" />
-    </Paper>
+        <Collapse in={!loggingIn}>
+          <TextField
+            sx={{ width: "17em" }}
+            id="confirm-input-log-in"
+            label="Confirm Password"
+            type={showConfirmPassword ? "text" : "password"}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onMouseDown={invertShowConfirmPassword}
+                    aria-label="toggle password visibility"
+                  >
+                    {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+            margin="dense"
+          />
+        </Collapse>
+
+        <table>
+          <tbody>
+            <tr>
+              <th>
+                <button className="text-button">Forgot your password?</button>
+              </th>
+              <th>
+                <button
+                  onClick={() => setLoggingIn(!loggingIn)}
+                  className="text-button"
+                >
+                  {loggingIn
+                    ? "Not registered yet? Sign Up"
+                    : "Already a user? Log in"}
+                </button>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+        <h2>Or</h2>
+        <GoogleSignInButton />
+        <button className="text-button">
+          You can also continue without logging in
+        </button>
+      </Paper>
+    </div>
   );
 };
 

@@ -65,7 +65,7 @@ const NewTask = () => {
         <TextField variant="standard" label="Number" type="number" />
       </div>
       <div className="new-category-tracked">
-        <TextToggle />
+        <TextToggle option1="Yes" option2="No" />
       </div>
       <div className="new-category-color" style={{display: 'flex', flexDirection: 'row', columnGap: '0.75em', flexWrap: 'wrap'}}>
         {colors.map((color, index) => {

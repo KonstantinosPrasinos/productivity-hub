@@ -410,3 +410,8 @@ button {
   width: 300px;
   border-radius: 10px;
 }
+
+.text-button:hover {
+  text-decoration:underline;
+	display:inline-block;
+}

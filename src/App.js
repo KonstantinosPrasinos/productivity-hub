@@ -6,11 +6,10 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GroupDetails from "./components/groups/GroupDetails";
 import NewGroup from "./components/popups/NewGroup";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import GroupList from "./components/groups/GroupList";
 import PopupHandler from "./components/popups/PopupHandler";
-import { useEffect } from "react";
-import {setUser} from "./app/uiSlice";
+import LogInPage from "./components/popups/LogInPage";
 
 const lightTheme = createTheme({
   palette: {
@@ -59,20 +58,6 @@ const darkTheme = createTheme({
 function App() {
   const mode = useSelector((state) => state.ui.isDarkMode);
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
-    const loggedInUser = localStorage.getItem("user");
-    if (loggedInUser) {
-      const foundUser = JSON.parse(loggedInUser);
-      dispatch(setUser(foundUser));
-    } else {
-      //Is commented because login in and saving info to localstorage doesn't work
-      dispatch(setUser(false));
-    }
-  }, [dispatch]);
-
   return (
     <ThemeProvider theme={mode ? darkTheme : lightTheme}>
       <CssBaseline enableColorScheme />
@@ -88,6 +73,7 @@ function App() {
               <Route path="/groups/:id" element={<GroupDetails />} />
               <Route path="/groups/new" element={<NewGroup />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/log-in" element={<LogInPage />} />
               <Route path="*" element={<div>Not found</div>} />
             </Routes>
           </div>
