@@ -32,6 +32,7 @@ const LogInPage = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+
   const handleLogin = () => {
     navigate(state?.path || "/")
   }
@@ -155,7 +156,7 @@ const LogInPage = () => {
         <h2>Or</h2>
         <GoogleSignInButton />
         <button className="text-button" onClick={() => {handleLogin()}}>
-          You can also continue without logging in
+          Continue as Guest
         </button>
       </Paper>
     </div>

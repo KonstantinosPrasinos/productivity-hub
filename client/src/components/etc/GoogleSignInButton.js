@@ -17,7 +17,7 @@ const GoogleSignInButton = () => {
         window.google.accounts.id.renderButton(divRef.current, {theme: isDarkMode ? 'filled_black' : 'outline', size: 'large', shape: 'pill'})
 
         window.google.accounts.id.prompt();
-    })
+    }, [isDarkMode])
 
     return (<div ref={divRef}></div>);
 }

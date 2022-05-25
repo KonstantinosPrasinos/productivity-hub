@@ -18,10 +18,10 @@ const lightTheme = createTheme({
   palette: {
     type: "light",
     primary: {
-      main: "#3B4252",
+      main: "#2E3440",
     },
     secondary: {
-      main: "#3B4252",
+      main: "#2E3440",
     },
     background: {
       default: "#ECEFF4",
@@ -30,6 +30,9 @@ const lightTheme = createTheme({
     text: {
       primary: "#3B4252",
     },
+    success: {
+      main: "#26DE81"
+    }
   },
   typography: {
     fontFamily: "'Roboto', sans-serif",
@@ -55,6 +58,9 @@ const darkTheme = createTheme({
     text: {
       primary: "#ffffff",
     },
+    success: {
+      main: "#26DE81"
+    }
   },
 });
 
