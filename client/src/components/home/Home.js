@@ -8,6 +8,7 @@ import { setSelectedGroup } from '../../app/uiSlice';
 import { useEffect } from 'react';
 
 import {setUser} from "../../app/uiSlice";
+import Category from './Category';
 
 const Home = () => {
     const groups = useSelector((state) => state.content.groups);
@@ -30,7 +31,7 @@ const Home = () => {
 
     const renderCards = () => {
         return groups.map(group => {
-            return <GroupCard group={group.id} key={group.id}></GroupCard>
+            return <Category group={group.id} key={group.id}></Category>
         })
     }
     

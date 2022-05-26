@@ -106,11 +106,11 @@ const CompleteTask = ({ percentage }) => {
     <div
       style={{
         display: "block",
-        height: "5em",
-        width: "15em",
+        height: "3em",
+        width: "10.2em",
         background: "white",
         position: "relative",
-        borderRadius: "30%/100%",
+        borderRadius: "1.5em",
         overflow: "hidden",
       }}
     >
@@ -195,9 +195,9 @@ const CompleteTask = ({ percentage }) => {
         style={{
           position: "absolute",
           background: theme.palette.primary.main,
-          borderRadius: "30%/100%",
-          height: "4.5em",
-          width: "14.5em",
+          borderRadius: "1.5em",
+          height: "2.5em",
+          width: "9.7em",
           top: "0.25em",
           left: "0.25em",
         }}

@@ -21,7 +21,7 @@ const GroupCard = ({group}) => {
                 streak: 0,
                 repeatRate: '2/day',
                 recentValues: '111000',
-                visualizeStreak: false,
+                visualizeStreak: true,
                 type: 'number',
                 prevValue: '20',
                 goalType: 'number',
@@ -38,31 +38,32 @@ const GroupCard = ({group}) => {
                         value: '35'
                     }
                 ]
-            },
-            {
-                name: 'Crunches',
-                id: 1,
-                streak: 0,
-                repeatRate: '2/day',
-                recentValues: '001100',
-                visualizeStreak: false,
-                type: 'number',
-                prevValue: '20',
-                goalType: 'number',
-                goal: '100',
-                currentValue: '1',
-                average: '15',
-                values: [
-                    {
-                        date: '29/3/22',
-                        value: '20'
-                    },
-                    {
-                        date: '28/3/22',
-                        value: '35'
-                    }
-                ]
             }
+            // ,
+            // {
+            //     name: 'Crunches',
+            //     id: 1,
+            //     streak: 0,
+            //     repeatRate: '2/day',
+            //     recentValues: '001100',
+            //     visualizeStreak: false,
+            //     type: 'number',
+            //     prevValue: '20',
+            //     goalType: 'number',
+            //     goal: '100',
+            //     currentValue: '1',
+            //     average: '15',
+            //     values: [
+            //         {
+            //             date: '29/3/22',
+            //             value: '20'
+            //         },
+            //         {
+            //             date: '28/3/22',
+            //             value: '35'
+            //         }
+            //     ]
+            // }
         ]
     }
 

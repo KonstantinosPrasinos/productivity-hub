@@ -206,7 +206,7 @@ body {
 }
 
 .content {
-  padding: 4em;
+  padding: 2em;
   height: 100%;
   width: calc(100% - 300px - 8em);
   flex-grow: 1;
@@ -276,7 +276,7 @@ button {
   display: inline-block;
   position: absolute;
   height: calc(100% - 8em);
-  width: 50%;
+  width: 60%;
   overflow-y: auto;
   padding-right: 20px;
 }
@@ -284,44 +284,12 @@ button {
   display: inline-block;
   position: absolute;
   height: calc(100% - 8em);
-  width: 50%;
+  width: 40%;
   right: 0;
-}
-
-.visual-streak {
-  width: 100%;
-  height: 3.5em;
-  margin: 1em 0 1em 0;
-}
-.streak-value {
-  width: 14.28%;
-  height: 100%;
-  display: inline-block;
-  position: relative;
-}
-
-.streak-value-circle {
-  height: 2em;
-  width: 2em;
-  border-radius: 50%;
-  border: 6px solid var(--accent-color-1);
-  box-sizing: border-box;
-  display: inline-block;
-  opacity: 0.4;
-  margin-left: calc(50% - 1em);
 }
 
 .streak-value-completed {
   opacity: 1;
-}
-
-.streak-value-bar {
-  position: absolute;
-  display: inline-block;
-  width: calc(50% - 1em);
-  height: 5px;
-  top: calc(1em - 2.5px);
-  background-color: var(--accent-color-1);
 }
 
 .streak-value-bar-left {

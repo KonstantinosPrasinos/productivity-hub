@@ -6,17 +6,20 @@ import { useEffect, useRef } from 'react';
 import { setScreenIsMobile } from '../../app/uiSlice';
 
 import SideBar from './SideBar';
+import BottomBar from './BottomBar';
 import { useDispatch, useSelector } from 'react-redux';
 
 const NavBar = () => {
-    const ScreenIsMobile = useSelector((state) => state.ui.ScreenIsMobile);
+    const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
 
     const navBarContainerRef = useRef();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        window.addEventListener('resize', () => dispatch(setScreenIsMobile(checkScreenWidth())));
-    }, [dispatch]);
+        console.log('test')
+        dispatch(setScreenIsMobile(checkScreenWidth()));
+        window.addEventListener('resize', () => {dispatch(setScreenIsMobile(checkScreenWidth())); console.log(screenIsMobile)});
+    }, [dispatch, screenIsMobile]);
 
     function checkScreenWidth(){
         if (window.innerWidth > 768) return false;
@@ -38,7 +41,7 @@ const NavBar = () => {
 
     return (
         <div className='nav-bar-container' ref={navBarContainerRef}>
-            {ScreenIsMobile ? renderBottomBar() : <SideBar navBarContainerRef={navBarContainerRef}/>}
+            {screenIsMobile ? <BottomBar /> : <SideBar navBarContainerRef={navBarContainerRef}/>}
         </div>
     );
 }
