@@ -56,11 +56,6 @@ body {
   overflow: hidden;
 }
 
-.nav-bar-container {
-  height: 100%;
-  width: 300px;
-}
-
 .side-nav-bar {
   position: fixed;
   width: 300px;
@@ -204,14 +199,6 @@ body {
 .bottom-indent {
   border-radius: 0 8px 0 0;
 }
-
-.content {
-  padding: 2em;
-  height: 100%;
-  width: calc(100% - 300px - 8em);
-  flex-grow: 1;
-}
-
 .invisible {
   visibility: hidden;
 }
@@ -272,14 +259,14 @@ button {
   width: 100%;
   height: 100%;
 }
-.groups {
+/* .groups {
   display: inline-block;
   position: absolute;
   height: calc(100% - 8em);
   width: 60%;
   overflow-y: auto;
   padding-right: 20px;
-}
+} */
 .graphs {
   display: inline-block;
   position: absolute;

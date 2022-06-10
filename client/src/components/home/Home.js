@@ -6,12 +6,14 @@ import { useNavigate} from 'react-router-dom';
 
 import { setSelectedGroup } from '../../app/uiSlice';
 import { useEffect } from 'react';
+import styled from 'styled-components';
 
 import {setUser} from "../../app/uiSlice";
 import Category from './Category';
 
 const Home = () => {
     const groups = useSelector((state) => state.content.groups);
+    const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -41,16 +43,30 @@ const Home = () => {
         </div>)
     }
 
+    const TasksContainer = styled.div`
+        @media (max-width: 768px) {
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            width: 60%;
+        }
+        display: inline-block;
+        position: absolute;
+        overflow-y: auto;
+        padding-right: 20px;
+        height: 100%;
+    `;
+
     return (
         <div className='home'>
-            <div className="groups">
+            <TasksContainer>
                 <div className="groups-container">
                     {groups.length !== 0 ? renderCards() : renderNoGroups()}
                 </div>
-            </div>
-            <div className="graphs">
+            </TasksContainer>
+            {!screenIsMobile && <div className="graphs">
                 <CategoriesTracker />
-            </div>
+            </div>}
         </div>
     );
 }

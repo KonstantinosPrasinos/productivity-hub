@@ -2,7 +2,7 @@ import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import NavBar from "./components/navbar/NavBar";
 import Home from "./components/home/Home";
 import Settings from "./components/settings/Settings";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GroupDetails from "./components/groups/GroupDetails";
 import NewGroup from "./components/popups/NewGroup";
@@ -13,8 +13,12 @@ import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useEffect } from "react";
 import { setIsDarkMode, setUiTheme } from "./app/uiSlice";
+import styled from 'styled-components';
+import NewCategory from "./components/popups/NewCategory";
+import NewTask from "./components/popups/NewTask"
+import { StylesProvider } from "@mui/styles";
 
-const lightTheme = createTheme({
+let lightTheme = createTheme({
   palette: {
     type: "light",
     primary: {
@@ -36,7 +40,7 @@ const lightTheme = createTheme({
   },
   typography: {
     fontFamily: "'Roboto', sans-serif",
-  },
+  }
 });
 
 const darkTheme = createTheme({
@@ -71,8 +75,11 @@ const midnightTheme = createTheme({
   }
 })
 
+lightTheme = responsiveFontSizes(lightTheme);
+
 function App() {
   const theme = useSelector((state) => state.ui.uiTheme);
+  const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('ui-theme');
@@ -106,28 +113,47 @@ function App() {
     }
   }, [])
 
+  const ContentContainer = styled.div`
+    @media (max-width: 768px) {
+      height: calc(100% - 5em);
+      width: 100%;
+      padding: 1em 1em 2.5em 1em;
+    }
+
+    @media (min-width: 768px) {
+      width: calc(100% - 300px - 8em);
+      height: 100%;
+      padding: 2em;
+    }
+    
+    flex-grow: 1;
+  `;
+
   return (
-    <ThemeProvider theme={theme === 'dark' ? darkTheme : (theme === 'midnight' ? midnightTheme : lightTheme)}>
+    <StylesProvider injectFirst>
+      <ThemeProvider theme={theme === 'dark' ? darkTheme : (theme === 'midnight' ? midnightTheme : lightTheme)}>
       <CssBaseline enableColorScheme />
       <BrowserRouter>
         <div className="App">
-          <PopupHandler />
+          {/* <PopupHandler /> */}
           <NavBar />
-          <div className="content">
+          <ContentContainer>
             <Routes>
               <Route exact path="/" element={<RequireAuth><Home /></RequireAuth>} />
               <Route exact path="/home" element={<RequireAuth><Navigate to="/" /></RequireAuth>} />
-              <Route path="/groups" element={<RequireAuth><GroupList /></RequireAuth>} />
-              <Route path="/groups/:id" element={<RequireAuth><GroupDetails /></RequireAuth>} />
-              <Route path="/groups/new" element={<RequireAuth><NewGroup /></RequireAuth>} />
+              <Route path="/tasks" element={<RequireAuth><GroupList /></RequireAuth>} />
+              <Route path="/tasks/:id" element={<RequireAuth><GroupDetails /></RequireAuth>} />
+              <Route path="/tasks/new-category" element={<RequireAuth><NewCategory /></RequireAuth>} />
+              <Route path="/tasks/new-task" element={<RequireAuth><NewTask /></RequireAuth>} />
               <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
               <Route path="/log-in" element={<LogInPage />} />
               <Route path="*" element={<div>Not found</div>} />
             </Routes>
-          </div>
+          </ContentContainer>
         </div>
       </BrowserRouter>
     </ThemeProvider>
+    </StylesProvider>
   );
 }
 

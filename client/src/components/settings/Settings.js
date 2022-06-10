@@ -4,6 +4,7 @@ import { addGroup, removeGroup } from '../../app/contentSlice';
 
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { setIsDarkMode } from '../../app/uiSlice';
+import CategoryPicker from '../etc/CategoryPicker';
 
 const Settings = () => {
     const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const Settings = () => {
                     <MenuItem value={'Number-Text'}>Number-Text</MenuItem>
                 </Select>
             </FormControl>
+            <CategoryPicker />
         </div>
     );
 }

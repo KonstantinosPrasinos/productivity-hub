@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
+import styled from 'styled-components';
 import { useEffect, useRef } from 'react';
 
 import { setScreenIsMobile } from '../../app/uiSlice';
@@ -16,9 +17,8 @@ const NavBar = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log('test')
         dispatch(setScreenIsMobile(checkScreenWidth()));
-        window.addEventListener('resize', () => {dispatch(setScreenIsMobile(checkScreenWidth())); console.log(screenIsMobile)});
+        window.addEventListener('resize', () => {dispatch(setScreenIsMobile(checkScreenWidth()))});
     }, [dispatch, screenIsMobile]);
 
     function checkScreenWidth(){
@@ -39,10 +39,21 @@ const NavBar = () => {
         );
     }
 
+    const NavBarContainer = styled.div`
+        @media (max-width: 768px) {
+            height: 0;
+            width: 0;
+        }
+        @media (min-width: 768px) {
+            height: 100%;
+            width: 300px;
+        }
+    `;
+
     return (
-        <div className='nav-bar-container' ref={navBarContainerRef}>
+        <NavBarContainer className='nav-bar-container' ref={navBarContainerRef}>
             {screenIsMobile ? <BottomBar /> : <SideBar navBarContainerRef={navBarContainerRef}/>}
-        </div>
+        </NavBarContainer>
     );
 }
  
