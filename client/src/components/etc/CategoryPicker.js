@@ -1,4 +1,4 @@
-import { useAnimation, motion } from "framer-motion";
+import { useAnimation, motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import { withTheme } from "@mui/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -12,7 +12,7 @@ const placeholderCategory = [
 const placeholderGroup = [{ name: "Monday" }];
 
 const MainContainer = styled(motion.div)`
-  width: 10em;
+  width: 2.5em;
   height: 2.5em;
   background: white;
   border-radius: 2.5em;
@@ -20,9 +20,10 @@ const MainContainer = styled(motion.div)`
   align-items: center;
   z-index: 0;
   position: relative;
+  font-size: 1em;
 `;
 
-const Title = withTheme(styled.span`
+const Title = withTheme(styled(motion.span)`
   width: 9em;
   display: inline-block;
   font-weight: bolder;
@@ -88,12 +89,19 @@ const TitleText = styled.div`
   display: inline-block;
 `;
 
+const IconContainer = styled(motion.div)`
+  position: absolute;
+  display: inline-flex;
+`;
+
 const CategoryPicker = () => {
-  const [categoryExtended, setCategoryExtended] = useState(true);
+  const [categoryExtended, setCategoryExtended] = useState(false);
   const [groupExtended, setGroupExtended] = useState(false);
-  const [containerExtended, setContainerExtended] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Category");
-  const [selectedGroup, setSelectedGroup] = useState("Group");
+  const [containerState, setContainerState] = useState(0); //0 is fully collapsed (only the add button), 1 is semi extended (only category), 2 is fully extended (category and group), 3 is 3/4 collapsed (both category and group but with no selection) and 4 is half collapsed (only category with no selection)
+  const [selectedCategory, setSelectedCategory] = useState();
+  const [selectedGroup, setSelectedGroup] = useState();
+
+  const [delay, setDelay] = useState(0);
 
   const colorControls = useAnimation();
   const containerControls = useAnimation();
@@ -106,51 +114,115 @@ const CategoryPicker = () => {
   };
 
   const selectCategory = (category) => {
-    setSelectedCategory(category.name);
+    setSelectedCategory(category);
     setCategoryExtended(false);
-    if (!containerExtended) {
-      colorControls.start({width: "0.75em", height: "0.75em", marginLeft: "0.75em", transition: {delay: 0.3}})
+    if (containerState === 1) {
+      colorControls.start({width: "0.75em", height: "0.75em", marginLeft: "0.75em", transition: {delay: 0.3}});
+      setContainerState(2);
     } else {
       colorControls.start({backgroundColor: category.color})
     }
-    setContainerExtended(true);
     containerControls.start({width: "20.5em"});
   };
 
   const extendColor = () => {
+    const zeroPercentContainer = () => {
+      containerControls.start({width: "15em"});
+    }
+
     containerRef.current.style.overflow = "hidden";
     colorControls.start({width: 0, height: 0, marginLeft: 0, transition: {duration: 0.3}});
-    containerControls.start({fontSize: 0.5})
+    zeroPercentContainer();
   }
 
   const selectGroup = (group) => {
+    if (group === "none") {
+      setContainerState(4);
+      containerControls.start({width: "10em"});
+    } else {
+      setContainerState(3);
+    }
     setSelectedGroup(group);
     setGroupExtended(false);
     setCategoryExtended(false);
     extendColor();
   }
 
+  const nullSelections = () => {
+    setSelectedCategory(null);
+    setSelectedGroup(null);
+  }
+
+  const handleContainerClick = () => {
+    switch (containerState) {
+      case 0:
+        setDelay(0.1);
+        setContainerState(1);
+        setCategoryExtended(true);
+        nullSelections();
+        break;
+      case 3:
+        containerRef.current.style.overflow = "visible";
+        setContainerState(2);
+        setGroupExtended(true);
+        break;
+      case 4:
+        containerRef.current.style.overflow = "visible";
+        setDelay(0);
+        setContainerState(1);
+        setCategoryExtended(true);
+      break;
+      default:
+        break;
+    }
+  }
+
+  const handleNoneCategory = () => {
+    selectCategory("none");
+    setGroupExtended(false);
+    nullSelections();
+    setContainerState(0);
+  }
+
+  const containerVariants = {
+    0: {width: "2.5em", transition: {delay: 0.15, duration: 0.15}},
+    1: {width: "10em"},
+    2: {width: "20.5em"},
+    3: {width: "15em"},
+    4: {width: "10em"}
+  }
+
+  const titleVariants = {
+    hidden: {scale: 0},
+    visible: {scale: 1}
+  }
+
   return (
     <MainContainer
-      animate={containerControls}
+      animate={containerState.toString()}
+      variants={containerVariants}
       ref={containerRef}
+      onClick={handleContainerClick}
     >
-      <Title onClick={() => setCategoryExtended((current) => !current)}>
-        <TitleText>{selectedCategory}</TitleText>
-        <ColorCircle color={"red"} animate={colorControls}/>
-      </Title>
-      {containerExtended && <Separator />}
-      {containerExtended && (
-        <Title onClick={() => setGroupExtended((current) => !current)}>
-          {selectedGroup}
+      <AnimatePresence>{containerState === 0 && <IconContainer exit={{scale: 0, rotate: 180}} animate={{scale: 1, rotate: 0}} initial={{scale: 0, rotate: -180}}><AddIcon sx={{width: "2.5em", height: "2.5em", fontSize: "inherit", cursor: "pointer"}}/></IconContainer>}</AnimatePresence>
+      {containerState > 0 && <Title onClick={() => setCategoryExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
+        <TitleText>{selectedCategory ? selectedCategory.name : "Category"}</TitleText>
+        <ColorCircle color={selectedCategory ? selectedCategory.color : "white"} animate={colorControls}/>
+      </Title>}
+      {containerState > 1 && containerState < 4 && <Separator />}
+      {containerState > 1 && containerState < 4 && (
+        <Title onClick={() => setGroupExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
+          {selectedGroup ? selectedGroup.name : "Group"}
         </Title>
       )}
       <PickerContainer
         animate={categoryExtended ? "open" : "closed"}
         position="left"
         variants={pickerVariants}
+        transition={{duration: containerState === 0 ? 0.15 : 0.3, delay: delay}}
       >
         <div style={{ marginTop: "1.25em", marginBottom: "1.25em" }}>
+          <Option border onClick={() => handleNoneCategory()}>Cancel</Option>
           {placeholderCategory.map((category) => (
             <Option
               key={category.name}
@@ -169,14 +241,15 @@ const CategoryPicker = () => {
         animate={groupExtended ? "open" : "closed"}
         position="right"
         variants={pickerVariants}
+        transition={{duration: containerState === 0 ? 0.15 : 0.3}}
       >
         <div style={{ marginTop: "1.25em", marginBottom: "1.25em" }}>
-          <Option border>None</Option>
+          <Option border onClick={() => selectGroup("none")}>None</Option>
           {placeholderGroup.map((group) => (
             <Option
               key={group.name}
               border
-              onClick={() => selectGroup(group.name)}
+              onClick={() => selectGroup(group)}
             >
               {group.name}
             </Option>
@@ -186,7 +259,7 @@ const CategoryPicker = () => {
           </Option>
         </div>
       </PickerContainer>
-      {selectedGroup !== "Group" ? <ColorCircle color={"red"} $centered animate={{scale: 50}} transition={{duration: 0.3}}/> : ""}
+      {selectedGroup && selectedGroup !== "none" ? <ColorCircle color={selectedCategory ? selectedCategory.color : "white"} $centered animate={{scale: 50}} transition={{duration: 0.3}}/> : ""}
     </MainContainer>
   );
 };
