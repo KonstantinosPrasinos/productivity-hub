@@ -115,18 +115,6 @@ const CategoryPicker = () => {
     closed: { height: 0 },
   };
 
-  const selectCategory = (category) => {
-    setSelectedCategory(category);
-    setCategoryExtended(false);
-    if (containerState === 1) {
-      colorControls.start({width: "0.75em", height: "0.75em", marginLeft: "0.75em", transition: {delay: 0.3}});
-      setContainerState(2);
-    } else {
-      colorControls.start({backgroundColor: category.color})
-    }
-    containerControls.start({width: "20.5em"});
-  };
-
   const extendColor = () => {
     const zeroPercentContainer = () => {
       containerControls.start({width: "15em"});
@@ -136,6 +124,19 @@ const CategoryPicker = () => {
     colorControls.start({width: 0, height: 0, marginLeft: 0, transition: {duration: 0.3}});
     zeroPercentContainer();
   }
+
+  const selectCategory = (category) => {
+    setSelectedCategory(category);
+    setCategoryExtended(false);
+    if (containerState === 1) {
+      colorControls.start({width: "0.75em", height: "0.75em", marginLeft: "0.75em", transition: {delay: 0.3}});
+      setContainerState(2);
+      setGroupExtended(true);
+    } else {
+      colorControls.start({backgroundColor: category.color})
+    }
+    containerControls.start({width: "20.5em"});
+  };
 
   const selectGroup = (group) => {
     if (group === "none") {
