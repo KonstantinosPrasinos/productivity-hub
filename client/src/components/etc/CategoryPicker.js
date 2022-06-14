@@ -92,6 +92,7 @@ const TitleText = styled.div`
 const IconContainer = styled(motion.div)`
   position: absolute;
   display: inline-flex;
+  z-index: 3;
 `;
 
 const CategoryPicker = () => {
@@ -102,6 +103,7 @@ const CategoryPicker = () => {
   const [selectedGroup, setSelectedGroup] = useState();
 
   const [delay, setDelay] = useState(0);
+  const [containerDelay, setContainerDelay] = useState(0.15);
 
   const colorControls = useAnimation();
   const containerControls = useAnimation();
@@ -161,6 +163,9 @@ const CategoryPicker = () => {
         setCategoryExtended(true);
         nullSelections();
         break;
+      case 1:
+        setContainerDelay(0.3);
+        break;
       case 3:
         containerRef.current.style.overflow = "visible";
         setContainerState(2);
@@ -185,7 +190,7 @@ const CategoryPicker = () => {
   }
 
   const containerVariants = {
-    0: {width: "2.5em", transition: {delay: 0.15, duration: 0.15}},
+    0: {width: "2.5em", transition: {delay: containerDelay, duration: 0.15}},
     1: {width: "10em"},
     2: {width: "20.5em"},
     3: {width: "15em"},
