@@ -2,7 +2,9 @@ import { useAnimation, motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import { withTheme } from "@mui/styles";
 import AddIcon from "@mui/icons-material/Add";
+import ClearIcon from '@mui/icons-material/Clear';
 import { useRef, useState } from "react";
+import IconButton from '@mui/material/IconButton';
 
 const placeholderCategory = [
   { name: "Workout", color: "#26DE81" },
@@ -89,7 +91,7 @@ const TitleText = styled.div`
   display: inline-block;
 `;
 
-const IconContainer = styled(motion.div)`
+const IconContainer = styled(IconButton)`
   position: absolute;
   display: inline-flex;
   z-index: 3;
@@ -194,7 +196,7 @@ const CategoryPicker = () => {
     0: {width: "2.5em", transition: {delay: containerDelay, duration: 0.15}},
     1: {width: "10em"},
     2: {width: "20.5em"},
-    3: {width: "15em"},
+    3: {width: "17em"},
     4: {width: "10em"}
   }
 
@@ -210,7 +212,7 @@ const CategoryPicker = () => {
       ref={containerRef}
       onClick={handleContainerClick}
     >
-      <AnimatePresence>{containerState === 0 && <IconContainer exit={{scale: 0, rotate: 180}} animate={{scale: 1, rotate: 0}} initial={{scale: 0, rotate: -180}}><AddIcon sx={{width: "2.5em", height: "2.5em", fontSize: "inherit", cursor: "pointer"}}/></IconContainer>}</AnimatePresence>
+      <AnimatePresence>{containerState === 0 && <IconContainer  sx={{fontSize: "inherit", height: "2.5em", width: "2.5em"}} component={motion.div} exit={{scale: 0, rotate: 180}} animate={{scale: 1, rotate: 0}} initial={{scale: 0, rotate: -180}}><AddIcon sx={{width: "2.5em", height: "2.5em", fontSize: "inherit", cursor: "pointer"}}/></IconContainer>}</AnimatePresence>
       {containerState > 0 && <Title onClick={() => setCategoryExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
         <TitleText>{selectedCategory ? selectedCategory.name : "Category"}</TitleText>
         <ColorCircle color={selectedCategory ? selectedCategory.color : "white"} animate={colorControls}/>
@@ -266,6 +268,7 @@ const CategoryPicker = () => {
         </div>
       </PickerContainer>
       {selectedGroup && selectedGroup !== "none" ? <ColorCircle color={selectedCategory ? selectedCategory.color : "white"} $centered animate={{scale: 50}} transition={{duration: 0.3}}/> : ""}
+      {containerState > 2 && <IconButton sx={{zIndex: 3, padding: 0, marginRight: "0.5em"}} onClick={() => {setContainerState(0)}}><ClearIcon /></IconButton>}
     </MainContainer>
   );
 };

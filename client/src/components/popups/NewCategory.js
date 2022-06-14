@@ -7,7 +7,6 @@ import { useState } from "react";
 import TextToggle from "../etc/TextToggle";
 import { HexColorPicker } from "react-colorful";
 import styled from 'styled-components';
-import BlockButton from "../etc/BlockButton";
 
 const NewTask = () => {
   const theme = useTheme();

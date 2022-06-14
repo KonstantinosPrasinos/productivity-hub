@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^7.0.0-alpha.3",
     "@date-io/date-fns": "^2.14.0",
-    "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.4.4",
+    "@mui/styled-engine-sc": "^5.8.0",
     "@mui/styles": "^5.4.4",
     "@mui/x-date-pickers": "^5.0.0-alpha.3",
     "@reduxjs/toolkit": "^1.8.0",
@@ -25,9 +26,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
