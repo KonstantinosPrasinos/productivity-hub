@@ -213,13 +213,13 @@ const CategoryPicker = () => {
       onClick={handleContainerClick}
     >
       <AnimatePresence>{containerState === 0 && <IconContainer  sx={{fontSize: "inherit", height: "2.5em", width: "2.5em"}} component={motion.div} exit={{scale: 0, rotate: 180}} animate={{scale: 1, rotate: 0}} initial={{scale: 0, rotate: -180}}><AddIcon sx={{width: "2.5em", height: "2.5em", fontSize: "inherit", cursor: "pointer"}}/></IconContainer>}</AnimatePresence>
-      {containerState > 0 && <Title onClick={() => setCategoryExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
+      {containerState > 0 && <Title layout onClick={() => setCategoryExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
         <TitleText>{selectedCategory ? selectedCategory.name : "Category"}</TitleText>
         <ColorCircle color={selectedCategory ? selectedCategory.color : "white"} animate={colorControls}/>
       </Title>}
       {containerState > 1 && containerState < 4 && <Separator />}
       {containerState > 1 && containerState < 4 && (
-        <Title onClick={() => setGroupExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
+        <Title layout onClick={() => setGroupExtended((current) => !current)} initial="hidden" animate="visible" variants={titleVariants}>
           {selectedGroup ? selectedGroup.name : "Group"}
         </Title>
       )}
