@@ -1,9 +1,12 @@
 const express = require('express');
 
+const Category = require('./models/category');
+const userRoutes = require('./routes/user')
+
 const app = express();
 
-app.listen(3000);
+app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('<p>home page</p>');
-});
+app.use('/api/user', userRoutes);
+
+app.listen(3000);

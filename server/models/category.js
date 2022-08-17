@@ -1,27 +1,41 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const groupSchema = new Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    period: {
+        type: String,
+        required: true
+    }
+});
+
 const categorySchema = new Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
     until: {
         type: String,
     },
-    goal: {
-        type: Number,
+    entryGoal: {
+        type: String,
+    },
+    longTermGoal: {
+        type: String,
     },
     priority: {
         type: Number
     },
-    home: {
+    inHome: {
         type: Boolean
     },
     color: {
         type: String
     },
-    Groups: []
+    groups: [groupSchema]
 }, {collection: 'Categories'});
 
 const Category = mongoose.model('Category', categorySchema);
