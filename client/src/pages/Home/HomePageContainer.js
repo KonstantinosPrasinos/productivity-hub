@@ -1,15 +1,15 @@
-import GroupCard from './GroupCard';
-import CategoriesTracker from './CategoriesTracker';
+import GroupCard from '../../components/home/GroupCard';
+// import CategoriesTracker from '../components/home/CategoriesTracker';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 
-import { setSelectedGroup } from '../../app/uiSlice';
+import { setSelectedGroup } from '../../state/uiSlice';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 
-import {setUser} from "../../app/uiSlice";
-import Category from './Category';
+import {setUser} from "../../state/uiSlice";
+import Category from '../../components/home/Category';
 
 const Home = () => {
     const groups = useSelector((state) => state.content.groups);
@@ -59,13 +59,13 @@ const Home = () => {
 
     return (
         <div className='home'>
-            <TasksContainer>
+            {/* <TasksContainer>
                 <div className="groups-container">
                     {groups.length !== 0 ? renderCards() : renderNoGroups()}
                 </div>
-            </TasksContainer>
+            </TasksContainer> */}
             {!screenIsMobile && <div className="graphs">
-                <CategoriesTracker />
+                {/* <CategoriesTracker /> */}
             </div>}
         </div>
     );

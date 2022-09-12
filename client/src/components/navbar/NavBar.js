@@ -4,7 +4,7 @@ import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplica
 import styled from 'styled-components';
 import { useEffect, useRef } from 'react';
 
-import { setScreenIsMobile } from '../../app/uiSlice';
+import { setScreenIsMobile } from '../../state/uiSlice';
 
 import SideBar from './SideBar';
 import BottomBar from './BottomBar';
@@ -52,7 +52,7 @@ const NavBar = () => {
 
     return (
         <NavBarContainer className='nav-bar-container' ref={navBarContainerRef}>
-            {screenIsMobile ? <BottomBar /> : <SideBar navBarContainerRef={navBarContainerRef}/>}
+            {screenIsMobile ? '' : <SideBar navBarContainerRef={navBarContainerRef}/>}
         </NavBarContainer>
     );
 }

@@ -1,0 +1,7 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    border-radius: $button-border-radius;
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}

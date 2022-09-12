@@ -1,0 +1,13 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    background-color: var(--surface-color);
+    color: var(--on-surface-color);
+    border: $base-border;
+    border-radius: $chip-border-radius;
+
+    &.selected {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+    }
+}

@@ -1,22 +1,23 @@
 import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import NavBar from "./components/navbar/NavBar";
-import Home from "./components/home/Home";
-import Settings from "./components/settings/Settings";
+import Home from "./pages/Home/HomePageContainer";
+import Settings from "./pages/Settings/SettingsContainer";
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GroupDetails from "./components/groups/GroupDetails";
-import NewGroup from "./components/popups/NewGroup";
 import { useSelector } from "react-redux";
 import GroupList from "./components/groups/GroupList";
-import PopupHandler from "./components/popups/PopupHandler";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useEffect } from "react";
-import { setIsDarkMode, setUiTheme } from "./app/uiSlice";
+import { setIsDarkMode, setUiTheme } from "./state/uiSlice";
 import styled from 'styled-components';
 import NewCategory from "./components/popups/NewCategory";
 import NewTask from "./components/popups/NewTask"
 import { StylesProvider } from "@mui/styles";
+import TopAppBar from "./components/etc/TopAppBar/TopAppBar";
+
+import './styles/index.scss';
 
 let lightTheme = createTheme({
   palette: {
@@ -82,35 +83,36 @@ function App() {
   const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('ui-theme');
-    switch (storedTheme) {
-      case "default":
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
-          setUiTheme('dark');
-          setIsDarkMode(true);
-        } else {
-          setUiTheme('light');
-          setIsDarkMode(false);
-        }
-        break;
-      case "dark":
-        setUiTheme('dark');
-        setIsDarkMode(true);
-        break;
-      case "midnight":
-        setUiTheme('midnight');
-        setIsDarkMode(true);
-        break;
-      case "light":
-        setUiTheme('light');
-        setIsDarkMode(false);
-        break;
-      default:
-        setUiTheme('light');
-        setIsDarkMode(false);
-        localStorage.setItem('ui-theme', 'light');
-        break;
-    }
+    setUiTheme('dark');
+    // const storedTheme = localStorage.getItem('ui-theme');
+    // switch (storedTheme) {
+    //   case "default":
+    //     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+    //       setUiTheme('dark');
+    //       setIsDarkMode(true);
+    //     } else {
+    //       setUiTheme('light');
+    //       setIsDarkMode(false);
+    //     }
+    //     break;
+    //   case "dark":
+    //     setUiTheme('dark');
+    //     setIsDarkMode(true);
+    //     break;
+    //   case "midnight":
+    //     setUiTheme('midnight');
+    //     setIsDarkMode(true);
+    //     break;
+    //   case "light":
+    //     setUiTheme('light');
+    //     setIsDarkMode(false);
+    //     break;
+    //   default:
+    //     setUiTheme('light');
+    //     setIsDarkMode(false);
+    //     localStorage.setItem('ui-theme', 'light');
+    //     break;
+    // }
   }, [])
 
   const ContentContainer = styled.div`
@@ -134,9 +136,10 @@ function App() {
       <ThemeProvider theme={theme === 'dark' ? darkTheme : (theme === 'midnight' ? midnightTheme : lightTheme)}>
       <CssBaseline enableColorScheme />
       <BrowserRouter>
-        <div className="App">
+        <div className={`App light`}>
           {/* <PopupHandler /> */}
           <NavBar />
+          <TopAppBar />
           <ContentContainer>
             <Routes>
               <Route exact path="/" element={<RequireAuth><Home /></RequireAuth>} />
@@ -146,6 +149,7 @@ function App() {
               <Route path="/tasks/new-category" element={<RequireAuth><NewCategory /></RequireAuth>} />
               <Route path="/tasks/new-task" element={<RequireAuth><NewTask /></RequireAuth>} />
               <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+              <Route path="/settings/:tab" element={<RequireAuth><Settings /></RequireAuth>} />
               <Route path="/log-in" element={<LogInPage />} />
               <Route path="*" element={<div>Not found</div>} />
             </Routes>

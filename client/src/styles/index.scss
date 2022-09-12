@@ -1,0 +1,60 @@
+@import "./variables.scss";
+
+:root {
+    --background-color: #f3eff3;
+    --on-background-color: #1C1B1F;
+    --surface-color: #ffffff;
+    --on-surface-color: #1C1B1F;
+    --primary-color: #2E3440;
+    --on-primary-color: #ffffff;
+    --error-color: #B3261E;
+    --on-error-color: #ffffff;
+}
+
+.App {
+    background-color: var(--background-color);
+    &.light {
+        @include getTheme('light');
+    }
+    &.dark {
+        @include getTheme('dark');
+    }
+}
+
+.Button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: $base-gap;
+    gap: 10px;
+    cursor: pointer;
+    padding: $base-padding;
+    
+    &.disabled {
+        cursor: not-allowed;
+    }
+}
+
+.Horizontal-Flex-Container {
+    display: flex;
+    align-items: center;
+    gap: $base-gap;
+    flex-wrap: wrap;
+}
+
+.Vertical-Flex-Container {
+    display: flex;
+    gap: $base-gap;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.Label {
+    font-size: $font-s;
+    opacity: $opacity-very-low;
+}
+
+.Title {
+    font-size: $font-xxl;
+    opacity: $opacity-low;
+}

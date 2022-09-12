@@ -1,0 +1,27 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    border-radius: $button-border-radius;
+    height: 1.5em;
+    width: 2.25em;
+    background-color: var(--primary-color);
+    transition: background-color 2s;
+
+    &::before {
+        width: 1em;
+        height: 1em;
+        background-color: var(--on-primary-color);
+        content: '';
+        display: inline-block;
+        border-radius: $button-border-radius;
+        transform: translate(0.25em, 0.25em);
+        vertical-align: top;
+        transition: transform 0.2s;
+    }
+
+    &.active {
+        &::before {
+            transform: translate(1em, 0.25em);
+        }
+    }
+}

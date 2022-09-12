@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
+@media (min-width: 768px) {
+  .App {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .App {
+    flex-direction: column;
+  }
+}
+
 :root {
   --background-color: #ECEFF4;
   --background-color-2: #FFFFFF;
@@ -52,7 +64,6 @@ body {
   height: 100vh;
   display: flex;
   flex-wrap: nowrap;
-  flex-direction: row;
   overflow: hidden;
 }
 
