@@ -5,7 +5,7 @@
     height: 1.5em;
     width: 2.25em;
     background-color: var(--primary-color);
-    transition: background-color 2s;
+    cursor: pointer;
 
     &::before {
         width: 1em;
@@ -16,12 +16,32 @@
         border-radius: $button-border-radius;
         transform: translate(0.25em, 0.25em);
         vertical-align: top;
-        transition: transform 0.2s;
+        transition: transform 0.2s, width 0.2s, height 0.2s;
     }
 
     &.active {
         &::before {
             transform: translate(1em, 0.25em);
+
+            &:hover {
+                background-color: red;
+            }
+        }
+    }
+
+    &:hover {
+        &::before {
+            height: 1.1em;
+            width: 1.1em;
+            transform: translate(0.25em, 0.2em)
+        }
+        &.active {
+            &::before {
+                height: 1.1em;
+                width: 1.1em;
+                transform: translate(0.95em, 0.2em)
+            }
+            
         }
     }
 }

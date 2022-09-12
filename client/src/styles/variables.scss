@@ -1,5 +1,4 @@
 // colors
-
 @mixin getTheme($theme) {
     @if $theme == 'light' {
         --background-color: #f3eff3;

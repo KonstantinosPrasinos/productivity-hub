@@ -5,9 +5,14 @@
     color: var(--on-surface-color);
     border: $base-border;
     border-radius: $chip-border-radius;
+    transition: 0.2s background-color, 0.2s color, 0.2s filter;
 
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
+    }
+
+    &:hover {
+        filter: brightness(95%);
     }
 }
