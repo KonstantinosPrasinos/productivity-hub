@@ -85,7 +85,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className={`App light`}>
+      <div className={`App ${themeContext.state ? themeContext.state : ''}`}>
         {/* <PopupHandler /> */}
         <NavBar />
         <TopAppBar />
