@@ -13,11 +13,12 @@ import FilledButton from "../../components/buttons/FilledButton/FilledButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import { ThemeContext } from "../../context/ThemeContext";
+import { ScreenSizeContext } from "../../context/ScreenSizeContext";
 
 const Settings = () => {
   const location = useLocation();
   const [currentLocation, setCurrentLocation] = useState("account");
-  const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
+  const screenSizeContext = useContext(ScreenSizeContext);
 
   useEffect(() => {
     setCurrentLocation(
@@ -33,7 +34,7 @@ const Settings = () => {
 
   return (
     <div className={styles.settingsContainer}>
-      {(!screenIsMobile || currentLocation === "/settings") && (
+      {(screenSizeContext.state !== 'small' || currentLocation === "/settings") && (
         <div className={styles.redirectContainer}>
           <RedirectButton
             icon={<AccountCircleIcon />}
@@ -67,16 +68,16 @@ const Settings = () => {
           />
         </div>
       )}
-      {(!screenIsMobile || currentLocation !== "/settings") && (
+      {(screenSizeContext.state !== 'small' || currentLocation !== "/settings") && (
         <div className={styles.contentContainer}>
           {currentLocation}
           <FilledButton>Check Box</FilledButton>
 
-          <div className="Vertical-Flex-Container">
+          <div className="Stack-Container">
             <ToggleButton></ToggleButton>
             <div className="Title">Task Name</div>
             <span className="Label">This is a headline:</span>
-            <div className="Stack-Container">
+            <div className="Horizontal-Flex-Container">
               {group.map((item, index) => (
                 <Chip
                   selected={selected}

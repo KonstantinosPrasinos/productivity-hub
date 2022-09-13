@@ -58,3 +58,25 @@
     font-size: $font-xxl;
     opacity: $opacity-low;
 }
+
+// App.js
+
+@media (max-width: $tablet-breakpoint) {
+    .content-container {
+        height: calc(100% - 5em);
+        width: 100%;
+        padding: 1em 1em 2.5em 1em;
+    }
+}
+
+@media (min-width: $tablet-breakpoint) {
+    .content-container {
+        width: calc(100% - 300px - 8em);
+        height: 100%;
+        padding: 2em;
+    }
+}
+
+.content-container {
+    flex-grow: 1;
+}

@@ -67,29 +67,13 @@ function App() {
     }
   }, [themeContext]);
 
-  const ContentContainer = styled.div`
-    @media (max-width: 768px) {
-      height: calc(100% - 5em);
-      width: 100%;
-      padding: 1em 1em 2.5em 1em;
-    }
-
-    @media (min-width: 768px) {
-      width: calc(100% - 300px - 8em);
-      height: 100%;
-      padding: 2em;
-    }
-
-    flex-grow: 1;
-  `;
-
   return (
     <BrowserRouter>
       <div className={`App ${themeContext.state ? themeContext.state : ''}`}>
         {/* <PopupHandler /> */}
         <NavBar />
         <TopAppBar />
-        <ContentContainer>
+        <div className="content-container">
           <Routes>
             <Route
               exact
@@ -160,7 +144,7 @@ function App() {
             <Route path="/log-in" element={<LogInPage />} />
             <Route path="*" element={<div>Not found</div>} />
           </Routes>
-        </ContentContainer>
+        </div>
       </div>
     </BrowserRouter>
   );

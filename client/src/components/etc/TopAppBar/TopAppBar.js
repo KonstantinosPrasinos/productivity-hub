@@ -1,17 +1,18 @@
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { IconButton } from '@mui/material'
 
 import styles from './topAppBar.module.scss';
+import { ScreenSizeContext } from '../../../context/ScreenSizeContext';
 
 const TopAppBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
+  const screenSizeContext = useContext(ScreenSizeContext);
   const [isMainPage, setIsMainPage] = useState(false);
   const currentLocation = location.pathname.slice(location.pathname.indexOf('/', 1) + 1, location.pathname.length).replaceAll('/', '');
   const capitalizedLocation = currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1);
@@ -25,7 +26,7 @@ const TopAppBar = () => {
     }
   }, [location])
 
-  return (screenIsMobile && <div className={styles.mainContainer}>
+  return (screenSizeContext.state && <div className={styles.mainContainer}>
     {!isMainPage && <IconButton aria-label='Go back' onClick={() => navigate(-1)}><ArrowBackIosNewIcon /></IconButton>} 
     <div className={styles.locationText}>{capitalizedLocation}</div>
   </div>);
