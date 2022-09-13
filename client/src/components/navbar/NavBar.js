@@ -2,24 +2,23 @@ import { Link } from 'react-router-dom';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import styled from 'styled-components';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 
-import { setScreenIsMobile } from '../../state/uiSlice';
 
 import SideBar from './SideBar';
 import BottomBar from './BottomBar';
 import { useDispatch, useSelector } from 'react-redux';
+import { ScreenSizeContext } from '../../context/ScreenSizeContext';
 
 const NavBar = () => {
-    const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
+    const screenSizeContext = useContext(ScreenSizeContext);
 
     const navBarContainerRef = useRef();
-    const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(setScreenIsMobile(checkScreenWidth()));
-        window.addEventListener('resize', () => {dispatch(setScreenIsMobile(checkScreenWidth()))});
-    }, [dispatch, screenIsMobile]);
+        screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
+        window.addEventListener('resize', () => {screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})});
+    }, [screenSizeContext]);
 
     function checkScreenWidth(){
         if (window.innerWidth > 768) return false;
@@ -52,7 +51,7 @@ const NavBar = () => {
 
     return (
         <NavBarContainer className='nav-bar-container' ref={navBarContainerRef}>
-            {screenIsMobile ? '' : <SideBar navBarContainerRef={navBarContainerRef}/>}
+            {screenSizeContext.state === 'small' ? '' : <SideBar navBarContainerRef={navBarContainerRef}/>}
         </NavBarContainer>
     );
 }

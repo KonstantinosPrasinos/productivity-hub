@@ -6,12 +6,13 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import KeyIcon from "@mui/icons-material/Key";
 import LanguageIcon from "@mui/icons-material/Language";
 import InfoIcon from "@mui/icons-material/Info";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FilledButton from "../../components/buttons/FilledButton/FilledButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const Settings = () => {
   const location = useLocation();
@@ -75,7 +76,7 @@ const Settings = () => {
             <ToggleButton></ToggleButton>
             <div className="Title">Task Name</div>
             <span className="Label">This is a headline:</span>
-            <div className="Horizontal-Flex-Container">
+            <div className="Stack-Container">
               {group.map((item, index) => (
                 <Chip
                   selected={selected}
