@@ -9,6 +9,7 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import RedirectButton from "../../components/buttons/RedirectButton/RedirectButton";
 
 import InfoIcon from "@mui/icons-material/Info";
+import Skeleton from "../../components/indicators/Skeleton/Skeleton";
 
 const Playground = () => {
   const [selected, setSelected] = useState(0);
@@ -51,6 +52,7 @@ const Playground = () => {
             label={"About"}
             location={"/settings/about"}
           />
+        <Skeleton width="100px" height="100px" borderRadius="8px"></Skeleton>
     </div>
   );
 };
