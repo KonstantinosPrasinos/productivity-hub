@@ -8,11 +8,6 @@ import LanguageIcon from "@mui/icons-material/Language";
 import InfoIcon from "@mui/icons-material/Info";
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import FilledButton from "../../components/buttons/FilledButton/FilledButton";
-import Chip from "../../components/buttons/Chip/Chip";
-import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
-import { ThemeContext } from "../../context/ThemeContext";
 import { ScreenSizeContext } from "../../context/ScreenSizeContext";
 
 const Settings = () => {
@@ -71,24 +66,7 @@ const Settings = () => {
       {(screenSizeContext.state !== 'small' || currentLocation !== "/settings") && (
         <div className={styles.contentContainer}>
           {currentLocation}
-          <FilledButton>Check Box</FilledButton>
-
-          <div className="Stack-Container">
-            <ToggleButton></ToggleButton>
-            <div className="Title">Task Name</div>
-            <span className="Label">This is a headline:</span>
-            <div className="Horizontal-Flex-Container">
-              {group.map((item, index) => (
-                <Chip
-                  selected={selected}
-                  index={index}
-                  setSelected={setSelected}
-                >
-                  {item}
-                </Chip>
-              ))}
-            </div>
-          </div>
+          
         </div>
       )}
     </div>

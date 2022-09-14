@@ -26,9 +26,9 @@
     justify-content: center;
     align-items: center;
     gap: $base-gap;
-    gap: 10px;
     cursor: pointer;
     padding: $base-padding;
+    width: max-content;
     
     &.disabled {
         cursor: not-allowed;
@@ -40,6 +40,7 @@
     align-items: center;
     gap: $base-gap;
     flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .Stack-Container {
@@ -57,6 +58,39 @@
 .Title {
     font-size: $font-xxl;
     opacity: $opacity-low;
+    max-width: fit-content;
+}
+
+.Rounded-Container {
+    padding: $base-padding;
+    border-radius: $base-border-radius;
+    background-color: var(--surface-color);
+    box-shadow: $elevation-1;
+}
+
+input {
+    border: none;
+    background: none;
+    width: 100%;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.Title {
+        opacity: 1;
+        box-shadow: 0 2px 0 0 var(--surface-color);
+        transition: box-shadow 0.2s;
+        background-color: var(--surface-color);
+
+        &:focus {
+            box-shadow: 0 2px 0 0 var(--on-surface-color);
+        }
+    } 
+}
+
+::placeholder {
+    opacity: 0.5;
 }
 
 // App.js

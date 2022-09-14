@@ -3,9 +3,9 @@
 .container {
     background-color: var(--surface-color);
     color: var(--on-surface-color);
-    border: $base-border;
     border-radius: $chip-border-radius;
     transition: 0.2s background-color, 0.2s color, 0.2s filter;
+    box-shadow: $elevation-1;
 
     &.selected {
         background-color: var(--primary-color);

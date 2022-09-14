@@ -22,6 +22,7 @@ import TopAppBar from "./components/etc/TopAppBar/TopAppBar";
 
 import "./styles/index.scss";
 import { ThemeContext } from "./context/ThemeContext";
+import Playground from "./pages/Playground/Playground";
 
 function App() {
 
@@ -141,6 +142,7 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route path="/playground" element={<Playground />} />
             <Route path="/log-in" element={<LogInPage />} />
             <Route path="*" element={<div>Not found</div>} />
           </Routes>
