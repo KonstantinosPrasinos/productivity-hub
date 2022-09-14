@@ -5,17 +5,20 @@ import App from './App';
 import { store } from './state/store';
 import { Provider } from 'react-redux';
 import ThemeContextProvider from './context/ThemeContext';
-import ScreenSzieContextProvider from './context/ScreenSizeContext';
+import ScreenSizeContextProvider from './context/ScreenSizeContext';
+import AlertsContextProvider from './context/AlertsContext';
 
 ReactDOM.render(
   
     <React.StrictMode>
       <Provider store={store}>
-        <ScreenSzieContextProvider>
-          <ThemeContextProvider>
-            <App />
-          </ThemeContextProvider>
-        </ScreenSzieContextProvider>
+        <AlertsContextProvider>
+          <ScreenSizeContextProvider>
+            <ThemeContextProvider>
+              <App />
+            </ThemeContextProvider>
+          </ScreenSizeContextProvider>
+        </AlertsContextProvider>
       </Provider>
     </React.StrictMode>,
   document.getElementById('root')

@@ -1,0 +1,12 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    position: fixed;
+    top: 0;
+    left: calc(50% - 150px);
+    width: 300px;
+
+    display: flex;
+    flex-direction: column;
+    gap: $base-gap;
+}

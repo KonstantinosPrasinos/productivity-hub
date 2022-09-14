@@ -7,8 +7,14 @@
         --on-surface-color: #1C1B1F;
         --primary-color: #2E3440;
         --on-primary-color: #ffffff;
-        --error-color: #B3261E;
+        --error-color: #db3b21;
         --on-error-color: #ffffff;
+        --warning-color: #fc9403;
+        --on-warning-color: #ffffff;
+        --success-color: #1aaa55;
+        --on-success-color: #ffffff;
+        --info-color: #1f78d1;
+        --on-info-color: #ffffff;
     } @else if $theme == 'dark' {
         --background-color: #1C1B1F;
         --on-background-color: #ffffff;
@@ -16,8 +22,14 @@
         --on-surface-color: #1C1B1F;
         --primary-color: #2E3440;
         --on-primary-color: #ffffff;
-        --error-color: #B3261E;
+        --error-color: #db3b21;
         --on-error-color: #ffffff;
+        --warning-color: #fc9403;
+        --on-warning-color: #ffffff;
+        --success-color: #1aaa55;
+        --on-success-color: #ffffff;
+        --info-color: #1f78d1;
+        --on-info-color: #ffffff;
     }
 }
 
