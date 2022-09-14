@@ -12,6 +12,31 @@
     }
 }
 
+.inputWrapper {
+    display: block;
+    overflow-x: hidden;
+    flex: 1;
+}
+
 .input {
     font-size: $font-m;
+}
+
+.buttonsContainer {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    padding-left: 5px;
+    opacity: 0.5;
+}
+
+.button {
+    opacity: 2;
+    color: var(--primary-color);
+    width: 0.75em;
+    height: 0.75em;
+    position: relative;
+    overflow: hidden;
 }

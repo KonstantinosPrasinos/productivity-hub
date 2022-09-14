@@ -1,5 +1,5 @@
 import styles from "./settings.module.scss";
-import RedirectButton from "../../components/etc/RedirectButton/RedirectButton";
+import RedirectButton from "../../components/buttons/RedirectButton/RedirectButton";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PaletteIcon from "@mui/icons-material/Palette";

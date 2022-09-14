@@ -71,7 +71,6 @@
 input {
     border: none;
     background: none;
-    width: 100%;
 
     &:focus {
         outline: none;
@@ -113,4 +112,9 @@ input {
 
 .content-container {
     flex-grow: 1;
+}
+
+.icon {
+    position: absolute;
+    top: -0.5em;
 }
