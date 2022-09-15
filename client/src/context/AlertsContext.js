@@ -16,7 +16,7 @@ export const alertsReducer = (state, action) => {
             }
             return state;
         case 'DELETE_ALERT':
-            return state.slice(1);
+            return state.filter((alert) => alert.id !== action.payload);
         default:
             return state;
     }
