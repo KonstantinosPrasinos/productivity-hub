@@ -7,13 +7,15 @@ import FilledButton from "../../components/buttons/FilledButton/FilledButton";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 
-import Skeleton from "../../components/indicators/Skeleton/Skeleton";
+import Skeleton from "../../components/utilities/Skeleton/Skeleton";
 import AlertHandler from "../../components/utilities/AlertHandler/AlertHandler";
 import { AlertsContext } from "../../context/AlertsContext";
+import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
   const [selected, setSelected] = useState(0);
+  const [percentage, setPercentage] = useState(0);
   const chipGroup = ["Option 1", "Option 2", "Option 3"];
 
   return (
@@ -66,7 +68,10 @@ const Playground = () => {
         <Alert type={"info"} message={"You kinda suck"}></Alert> */}
         <button onClick={() => {alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Hello there this is a warning"}})}}>Add warning</button>
         <button onClick={() => {alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Hello there this is a warning"}})}}>Add error</button>
+        <button onClick={() => {setPercentage(percentage + 5)}}>Increase percentage by 5</button>
+        <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
         <AlertHandler></AlertHandler>
+        <CurrentProgress percentage={percentage}></CurrentProgress>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import CompleteTask from './CompleteTask'
+// import CompleteTask from './CompleteTask'
 
 const VisualStreak = ({ streak }) => {
   const chars = streak.split("");
@@ -80,7 +80,7 @@ const VisualStreak = ({ streak }) => {
           </div>
         );
       })}
-      <CompleteTask></CompleteTask>
+      {/* <CompleteTask></CompleteTask> */}
     </div>
   );
 };
