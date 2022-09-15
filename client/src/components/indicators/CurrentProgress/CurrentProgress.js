@@ -67,25 +67,26 @@ const CurrentProgress = ({ percentage }) => {
 
   useEffect(() => {
     const maxDuration = 0.5;
+    let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
       const toAnimate = [];
 
-      for (let i = start.index; i <= finish.index; i++) {
+      // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
+      // where the result of true indicates a forward direction and false indicates a backwards ddirection.  
+
+      for (let i = start.index; animationDirection > 0 ? i <= finish.index : i >= finish.index; animationDirection > 0 ? i++ : i--) {
         let animationDuration;
-        let localPercentage = 1;
+        let localPercentage = animationDirection > 0 ? 1 : 0;
 
         if (i === finish.index) {
           if (i === 1 || i === 4) {
-            animationDuration = ((32 - finish.remaining) / 100) * maxDuration;
-            localPercentage = (32 - finish.remaining) / 32;
+            animationDuration = animationDirection > 0 ? ((32 - finish.remaining) / 100) * maxDuration : (finish.remaining / 100) * maxDuration;
+            localPercentage = animationDirection > 0 ? (32 - finish.remaining) / 32 : finish.remaining / 32;
           } else {
-            animationDuration = ((9 - finish.remaining) / 100) * maxDuration;
-            localPercentage = (9 - finish.remaining) / 9
+            animationDuration = animationDirection > 0 ? ((9 - finish.remaining) / 100) * maxDuration : (finish.remaining / 100) * maxDuration;
+            localPercentage = animationDirection > 0 ? (9 - finish.remaining) / 9 : finish.remaining / 9;
           }
-          
-          
-          console.log(animationDuration, finish.remaining)
         } else {
           if (i === 1 || i === 4) {
             animationDuration = 0.32 * maxDuration;
@@ -94,25 +95,29 @@ const CurrentProgress = ({ percentage }) => {
           }
         }
 
-        toAnimate.push({index: i, percentage: localPercentage, duration: animationDuration});
+        toAnimate.push({index: i, percentage: localPercentage, duration: animationDuration})
       }
 
       triggerAnimations(toAnimate);
     }
   
     const findRemaining = (percentage) => {
+
+      // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
+      // where the result of true indicates a forward direction and false indicates a backwards ddirection.
+
       if (percentage < 9) {
-        return {index: 0, remaining: 9 - percentage, total: 9};
+        return {index: 0, remaining: animationDirection > 0 ? 9 - percentage : percentage, total: 9};
       } else if (percentage < 41) {
-        return {index: 1, remaining: 32 - (percentage - 9), total: 32};
+        return {index: 1, remaining: animationDirection > 0 ? 32 - (percentage - 9) : percentage - 9, total: 32};
       } else if (percentage < 50) {
-        return {index: 2, remaining: 9 - (percentage - 41), total: 9};
+        return {index: 2, remaining: animationDirection > 0 ? 9 - (percentage - 41) : percentage - 41, total: 9};
       } else if (percentage < 59) {
-        return {index: 3, remaining: 9 - (percentage - 50), total: 9};
+        return {index: 3, remaining: animationDirection > 0 ? 9 - (percentage - 50) : percentage - 50, total: 9};
       } else if (percentage < 91) {
-        return {index: 4, remaining: 32 - (percentage - 59), total: 32};
+        return {index: 4, remaining: animationDirection > 0 ? 32 - (percentage - 59) : percentage - 59, total: 32};
       } else if (percentage <= 100) {
-        return {index: 5, remaining: 9 - (percentage - 91), total: 9};
+        return {index: 5, remaining: animationDirection > 0 ? 9 - (percentage - 91) : percentage - 91, total: 9};
       } else {
         return false;
       }
@@ -122,7 +127,6 @@ const CurrentProgress = ({ percentage }) => {
       let currentDelay = 0;
 
       for (const element of toAnimate) {
-        console.log(element);
         if (element.index === 1 || element.index === 4) {
           animationControls[element.index].start({scaleX: element.percentage, transition: {duration: element.duration, delay: currentDelay, style: "tween", ease: "linear"}});
         } else {
@@ -132,13 +136,9 @@ const CurrentProgress = ({ percentage }) => {
       }
     }
 
-    // Don't forget case for prevPercentage == null
-
     if (prevPercentage !== percentage) {
-      let remaining1 = findRemaining(prevPercentage);
-      let remaining2 = findRemaining(percentage)
-      console.log(remaining1, remaining2)
-      setupAnimations(remaining1, remaining2);
+      // The following ternary statement is used to check for percentages of under 0 or over 100 and round to 0 and 100 respectively
+      setupAnimations(findRemaining(prevPercentage), findRemaining(percentage > 100 ? 100 : (percentage < 0 ? 0 : percentage)));
       setPrevPercentage(percentage);
     }
 
