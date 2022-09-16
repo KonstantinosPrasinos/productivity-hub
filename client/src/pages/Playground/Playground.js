@@ -11,6 +11,7 @@ import Skeleton from "../../components/utilities/Skeleton/Skeleton";
 import AlertHandler from "../../components/utilities/AlertHandler/AlertHandler";
 import { AlertsContext } from "../../context/AlertsContext";
 import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
+import VisualStreak from "../../components/indicators/VisualStreak/VisualStreak";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -72,6 +73,7 @@ const Playground = () => {
         <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
         <AlertHandler></AlertHandler>
         <CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>
+        <VisualStreak streak={"000111"}></VisualStreak>
     </div>
   );
 };

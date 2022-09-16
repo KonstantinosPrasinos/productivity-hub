@@ -1,9 +1,10 @@
-import VisualStreak from "./VisualStreak";
+// import VisualStreak from "./VisualStreak";
 import { TextField } from '@mui/material';
 
 const HabitBox = ({habit}) => {
     return (
         <div className="habit-box">
+            asd
             {/* <div className="habit-input-container">
                 <div className="habit-text">{`${habit.name}:`}</div>
                 {habit.type === 'toggle' ? <input type="checkbox" /> : <TextField className="outlined-basic" variant="outlined" label={habit.name} size="small" sx={{width: '50%'}} />}
@@ -16,7 +17,7 @@ const HabitBox = ({habit}) => {
                     <span className="habit-goal"> / {habit.goal}</span>
                 </div>
             </div> */}
-            {habit.recentValues !== 'no' && habit.visualizeStreak && habit.recentValues.length === 6 && <VisualStreak streak={habit.recentValues.concat(`${habit.currentValue ? '1' : '0'}`)}/>}
+            {/* {habit.recentValues !== 'no' && habit.visualizeStreak && habit.recentValues.length === 6 && <VisualStreak streak={habit.recentValues.concat(`${habit.currentValue ? '1' : '0'}`)}/>} */}
         </div>
     );
 }

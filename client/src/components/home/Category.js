@@ -1,5 +1,4 @@
 import { Paper } from "@mui/material";
-import VisualStreak from "./VisualStreak";
 
 const Category = () => {
     return (
@@ -19,7 +18,7 @@ const Category = () => {
             </div>
             <div className="task-details-container" style={{width: "100%"}}>
                 <div className="task-title" style={{fontSize: "1.5em", marginLeft: "1em"}}>Push-Ups:</div>
-                <VisualStreak streak={"000111"}></VisualStreak>
+                {/* <VisualStreak streak={"000111"}></VisualStreak> */}
             </div>
         </Paper>
     );

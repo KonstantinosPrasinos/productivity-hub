@@ -1,4 +1,3 @@
-import VisualStreak from "./VisualStreak";
 import HabitBox from "./HabitBox";
 
 import { Paper } from '@mui/material';

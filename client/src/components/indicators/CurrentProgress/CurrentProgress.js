@@ -17,7 +17,6 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
   useEffect(() => {
     const maxDuration = 0.5;
     const percentage = Math.round(current / total * 100);
-    console.log(percentage);
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
@@ -121,7 +120,7 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
       <div className={`${styles.textContainer}`}>
         <div className={`${styles.progressText}`}>{'\u00A0'.repeat(total.toString().length - current.toString().length)}{current} / {total} </div>
         <div>|</div>
-        <div onClick={() => setCurrent(current + step)} className="Button">{step > 0 ? `+${step}`: step}</div>
+        <div onClick={() => setCurrent(current + step)} className={`Button ${styles.button}`}>{step > 0 ? `+${step}`: step}</div>
       </div>
     </div>
   );
