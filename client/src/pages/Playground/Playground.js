@@ -71,7 +71,7 @@ const Playground = () => {
         <button onClick={() => {setPercentage(percentage + 5)}}>Increase percentage by 5</button>
         <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
         <AlertHandler></AlertHandler>
-        <CurrentProgress percentage={percentage}></CurrentProgress>
+        <CurrentProgress current={percentage} total={100}></CurrentProgress>
     </div>
   );
 };

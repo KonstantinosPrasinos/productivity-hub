@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
 
-const CurrentProgress = ({ percentage }) => {
+const CurrentProgress = ({ current, total }) => {
   const topLeftControls = useAnimation();
   const topControls = useAnimation();
   const topRightControls = useAnimation();
@@ -16,6 +16,8 @@ const CurrentProgress = ({ percentage }) => {
 
   useEffect(() => {
     const maxDuration = 0.5;
+    const percentage = Math.round(current / total * 100);
+    console.log(percentage);
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
@@ -91,7 +93,7 @@ const CurrentProgress = ({ percentage }) => {
       setPrevPercentage(percentage);
     }
 
-  }, [percentage, prevPercentage, animationControls])
+  }, [prevPercentage, animationControls, current, total])
 
   return (
     <div className={`${styles.container}`}>
