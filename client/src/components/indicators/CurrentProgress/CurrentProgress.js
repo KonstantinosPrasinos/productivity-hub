@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
 
-const CurrentProgress = ({ current, total }) => {
+const CurrentProgress = ({ current, total, setCurrent, step }) => {
   const topLeftControls = useAnimation();
   const topControls = useAnimation();
   const topRightControls = useAnimation();
@@ -118,7 +118,11 @@ const CurrentProgress = ({ current, total }) => {
         <motion.div className={`${styles.straightBarContainer} ${styles.bottom}`} initial={{scaleX: 0}} animate={animationControls[4]}></motion.div>
 
       </div>
-      <div className={`${styles.textContainer}`}>100 / 100 | +5</div>
+      <div className={`${styles.textContainer}`}>
+        <div className={`${styles.progressText}`}>{current} / {total} </div>
+        <div>|</div>
+        <div onClick={() => setCurrent(current + step)} className="Button">{step > 0 ? `+${step}`: step}</div>
+      </div>
     </div>
   );
 };
