@@ -119,7 +119,7 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
 
       </div>
       <div className={`${styles.textContainer}`}>
-        <div className={`${styles.progressText}`}>{current} / {total} </div>
+        <div className={`${styles.progressText}`}>{'\u00A0'.repeat(total.toString().length - current.toString().length)}{current} / {total} </div>
         <div>|</div>
         <div onClick={() => setCurrent(current + step)} className="Button">{step > 0 ? `+${step}`: step}</div>
       </div>
