@@ -15,6 +15,7 @@
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
+        --border-color: #79747E;
     } @else if $theme == 'dark' {
         --background-color: #1C1B1F;
         --on-background-color: #ffffff;
@@ -30,6 +31,7 @@
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
+        --border-color: #79747E;
     }
 }
 
@@ -41,13 +43,13 @@ $base-gap: 10px;
 $padding-symmetrical-m: 10px;
 
 // borders
-$base-border-thickness: 2px;
+$base-border-thickness: 1px;
 
 $base-border-radius: 10px;
 $button-border-radius: 100px;
 $chip-border-radius: 8px;
 
-$base-border: $base-border-thickness solid var(--primary-color);
+$base-border: $base-border-thickness solid var(--border-color);
 
 // typography
 $font-m: 16px;

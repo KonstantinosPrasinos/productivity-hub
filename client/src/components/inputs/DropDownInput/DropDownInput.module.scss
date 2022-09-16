@@ -54,7 +54,7 @@
             bottom: calc(50% - 0.875em);
             left: 0;
             opacity: 0.05;
-            border-radius: $base-border-radius / 2;
+            border-radius: calc($base-border-radius / 2);
         }
     }
 }

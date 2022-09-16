@@ -3,7 +3,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useState } from "react";
 
-const TextBoxInput = ({ placeholder, type = "text" }) => {
+const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon }) => {
     const [text, setText] = useState(null)
 
     const handleChange = (event) => {
@@ -35,6 +35,7 @@ const TextBoxInput = ({ placeholder, type = "text" }) => {
     <div
       className={`${styles.container} Horizontal-Flex-Container Rounded-Container`}
     >
+      {icon !== null && <>{icon}</>}
       <span className={styles.inputWrapper}><input type="text" className={styles.input} placeholder={placeholder} value={text !== null ? text : ""} onChange={handleChange} /></span>
       {type === "number" && (
         <div className={styles.buttonsContainer}>

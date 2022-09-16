@@ -13,6 +13,9 @@ import { AlertsContext } from "../../context/AlertsContext";
 import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 import VisualStreak from "../../components/indicators/VisualStreak/VisualStreak";
 
+import EmailIcon from '@mui/icons-material/Email';
+import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
+
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
   const [selected, setSelected] = useState(0);
@@ -48,6 +51,7 @@ const Playground = () => {
       />
       <TextBoxInput placeholder={"Number"}></TextBoxInput>
       <TextBoxInput placeholder={"Number"} type={"number"}></TextBoxInput>
+      <TextBoxInput placeholder={"Number"} icon={<EmailIcon />}></TextBoxInput>
       {/* <RedirectButton
             icon={<InfoIcon />}
             label={"About"}
@@ -74,6 +78,7 @@ const Playground = () => {
         <AlertHandler></AlertHandler>
         <CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>
         <VisualStreak streak={"010111"}></VisualStreak>
+        <InputWrapper label="Ends at:"><TextBoxInput placeholder={"Number"}></TextBoxInput></InputWrapper>
     </div>
   );
 };
