@@ -1,69 +1,18 @@
-import { useTheme } from '@mui/styles';
 import { useAnimation, motion  } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
 
 const CurrentProgress = ({ percentage }) => {
-  const maxTimeCorner = 0.018;
-  const maxTimeStraight =  0.064;
+  const topLeftControls = useAnimation();
+  const topControls = useAnimation();
+  const topRightControls = useAnimation();
+  const bottomRightControls = useAnimation();
+  const bottomControls = useAnimation();
+  const bottomLeftControls = useAnimation();
 
-  // const topLeftControls = useAnimation();
-  // const topControls = useAnimation();
-  // const topRightControls = useAnimation();
-  // const bottomRightControls = useAnimation();
-  // const bottomControls = useAnimation();
-  // const bottomLeftControls = useAnimation();
-
-  const animationControls = [useAnimation(), useAnimation(), useAnimation(), useAnimation(), useAnimation(), useAnimation()];
-
-  const [animationStack, setAnimationStack] = useState([]);
+  const animationControls = useMemo(() => {return [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]}, [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]);
   const [prevPercentage, setPrevPercentage] = useState(0);
-
-  const addToAnimationStack = (index, percentage) => {
-    setAnimationStack([...animationStack, {index, percentage}]);
-  }
-
-  const removeFromAnimationStack = () => {
-    setAnimationStack(animationStack.splice(animationStack.length - 1, 1));
-  }
-
-  const divideIntoChunks = (percentage) => {
-    let remainingPercentage = percentage;
-
-    //Checking for set cases
-    if (percentage === 0) {
-      return;
-    } else if (percentage === 100) {
-      for (let i = 0; i < 7; i++) {
-        addToAnimationStack(i, 1);
-      }
-    }
-
-    for (let i = 0; i < 7; i++) {
-      if (i === 1 || i === 4) {
-        //Straight lines
-        if (remainingPercentage <= 32) {
-          addToAnimationStack(i, remainingPercentage / 32);
-          return;
-        } else {
-          addToAnimationStack(i, 1);
-          remainingPercentage -= 32;
-        }
-      } else {
-        //Edges
-        if (remainingPercentage <= 9) {
-          addToAnimationStack(i, remainingPercentage / 9);
-          return;
-        } else {
-          addToAnimationStack(i, 1);
-          remainingPercentage -= 9;
-        }
-      }
-    }
-  }
-
-  
 
   useEffect(() => {
     const maxDuration = 0.5;
@@ -100,7 +49,7 @@ const CurrentProgress = ({ percentage }) => {
 
       triggerAnimations(toAnimate);
     }
-  
+
     const findRemaining = (percentage) => {
 
       // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
