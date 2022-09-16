@@ -57,4 +57,10 @@ $barHeight: 0.3em;
     position: absolute;
     bottom: -1.5em;
     left: -50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    &.hovered {
+        opacity: 1;
+    }
 }
