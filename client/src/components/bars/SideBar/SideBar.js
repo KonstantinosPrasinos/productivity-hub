@@ -1,17 +1,17 @@
 import {useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Paper } from '@mui/material'; 
 
-import ListItem from './ListItem';
+import ListItem from '../../navbar/ListItem';
 
 import { useSelector } from 'react-redux';
 
+import styles from './SideBar.module.scss';
 
 const SideBar = ({navBarContainerRef}) => {
     const groups = useSelector((state) => state.content.groups);
@@ -106,7 +106,7 @@ const SideBar = ({navBarContainerRef}) => {
 
     const renderSideBar = () => {
         return (
-            <Paper className='side-nav-bar-content' ref={sideBarContentRef}>
+            <div className={styles.container} ref={sideBarContentRef}>
                 <div  className='title' onClick={() => {setSelectedGroup('home'); navigate('/')}}>
                     <h1 className='home-button-title'><HomeRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === homeRef ? 'selected' : ''}`} ref={homeRef}>Home</p></h1>
                 </div>
@@ -119,7 +119,7 @@ const SideBar = ({navBarContainerRef}) => {
                 <div className='title settings' onClick={() => {setSelectedGroup(settingsRef); navigate('/settings')}}>
                     <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' className='big-icon' /><p className={`title-text selection ${selectedGroup && selectedGroup === settingsRef ? 'selected' : ''}`} ref={settingsRef}>Settings</p></h1>
                 </div>
-            </Paper>
+            </div>
         )
     }
 

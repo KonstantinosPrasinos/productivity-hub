@@ -1,0 +1,9 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  position: fixed;
+  width: 300px;
+  height: 100%;
+  display: block;
+  background: var(--surface-color);
+}

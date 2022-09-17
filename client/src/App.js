@@ -1,21 +1,13 @@
 import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
-import NavBar from "./components/navbar/NavBar";
-import Home from "./pages/Home/HomePageContainer";
+import NavBar from './components/bars/NavBar/NavBar';
+// import Home from "./pages/Home/HomePageContainer";
 import Settings from "./pages/Settings/SettingsContainer";
-import {
-  createTheme,
-  ThemeProvider,
-  responsiveFontSizes,
-} from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import GroupDetails from "./components/groups/GroupDetails";
 import { useSelector } from "react-redux";
 import GroupList from "./components/groups/GroupList";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useContext, useEffect } from "react";
-import styled from "styled-components";
-import { StylesProvider } from "@mui/styles";
 import TopAppBar from "./components/etc/TopAppBar/TopAppBar";
 
 import "./styles/index.scss";
@@ -79,9 +71,10 @@ function App() {
               exact
               path="/"
               element={
-                <RequireAuth>
-                  <Home />
-                </RequireAuth>
+                <div>test</div>
+                // <RequireAuth>
+                //   {/*<Home />*/}
+                // </RequireAuth>
               }
             />
             <Route

@@ -68,6 +68,10 @@
     border: $base-border;
     box-shadow: $elevation-1;
     display: inline-flex;
+
+    &.Symmetrical {
+        padding: $symmetrical-padding;
+    }
 }
 
 input {

@@ -1,0 +1,14 @@
+@import 'src/styles/variables.scss';
+
+@media (max-width: $tablet-breakpoint) {
+  .container {
+    height: 0;
+    width: 0;
+  }
+}
+@media (min-width: $tablet-breakpoint) {
+  .container {
+    height: 100%;
+    width: 300px;
+  }
+}

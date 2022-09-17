@@ -1,0 +1,22 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  position: relative;
+  align-items: flex-start;
+}
+
+.leftSide {
+  padding: $symmetrical-padding;
+}
+
+.rightSide {
+  padding: $symmetrical-padding;
+}
+
+.staticButtons {
+  height: calc(100% - 40px);
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  justify-content: space-between;
+}

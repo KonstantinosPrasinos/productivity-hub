@@ -1,7 +1,7 @@
 import styles from "./FilledButton.module.scss";
 
 const FilledButton = ({ onClick, children }) => {
-  return <div className={`Button ${styles.container}`}>{children}</div>;
+  return <button className={`Button ${styles.container}`}>{children}</button>;
 };
 
 export default FilledButton;

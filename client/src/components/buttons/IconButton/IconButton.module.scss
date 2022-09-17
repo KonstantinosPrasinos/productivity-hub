@@ -1,0 +1,12 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+  &:active {
+    transform: scale(0.99);
+  }
+}
