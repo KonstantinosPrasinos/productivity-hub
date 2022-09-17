@@ -15,14 +15,13 @@ import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useContext, useEffect } from "react";
 import styled from "styled-components";
-import NewCategory from "./components/popups/NewCategory";
-import NewTask from "./components/popups/NewTask";
 import { StylesProvider } from "@mui/styles";
 import TopAppBar from "./components/etc/TopAppBar/TopAppBar";
 
 import "./styles/index.scss";
 import { ThemeContext } from "./context/ThemeContext";
 import Playground from "./pages/Playground/Playground";
+import NewCategory from './components/cards/NewCategory/NewCategory';
 
 function App() {
 
@@ -111,18 +110,17 @@ function App() {
               }
             />
             <Route
-              path="/tasks/new-category"
+              path="/new-category"
               element={
                 <RequireAuth>
-                  <NewCategory />
+                  <NewCategory></NewCategory>
                 </RequireAuth>
               }
             />
             <Route
-              path="/tasks/new-task"
+              path="/new-task"
               element={
                 <RequireAuth>
-                  <NewTask />
                 </RequireAuth>
               }
             />

@@ -67,6 +67,7 @@
     background-color: var(--surface-color);
     border: $base-border;
     box-shadow: $elevation-1;
+    display: inline-flex;
 }
 
 input {
