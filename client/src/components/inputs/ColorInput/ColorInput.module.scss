@@ -1,0 +1,51 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  display: inline-flex;
+  gap: 1.2em;
+  
+}
+
+.colorContainer {
+  height: 1.5em;
+  width: 1.5em;
+  background-color: var(--surface-color);
+  border-radius: 1.5em;
+  border: 0.25em solid var(--border-color);
+  position: relative;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &.selected {
+    border-color: var(--primary-color);
+  }
+
+  &.red {
+    background-color: var(--red-color);
+  }
+
+  &.orange {
+    background-color: var(--orange-color);
+  }
+
+  &.yellow {
+    background-color: var(--yellow-color);
+  }
+
+  &.green {
+    background-color: var(--green-color);
+  }
+
+  &.lightBlue {
+    background-color: var(--light-blue-color);
+  }
+
+  &.blue {
+    background-color: var(--blue-color);
+  }
+
+  &.purple {
+    background-color: var(--purple-color);
+  }
+}

@@ -7,8 +7,12 @@
     font-size: $font-m;
     box-sizing: border-box;
 
-    &:hover {
+    &:hover:enabled {
         transform: scale(1.01);
+    }
+
+    :disabled {
+        cursor: not-allowed;
     }
 }
 

@@ -8,18 +8,21 @@ import GroupList from "./components/groups/GroupList";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import { useContext, useEffect } from "react";
-import TopAppBar from "./components/etc/TopAppBar/TopAppBar";
+import TopAppBar from "./components/bars/TopAppBar/TopAppBar";
 
 import "./styles/index.scss";
 import { ThemeContext } from "./context/ThemeContext";
 import Playground from "./pages/Playground/Playground";
-import NewCategory from './components/cards/NewCategory/NewCategory';
+import NewCategory from './pages/NewCategory/NewCategory';
+import NotFound from "./pages/NotFound/NotFound";
+import screenSizeContext, {ScreenSizeContext} from "./context/ScreenSizeContext";
 
 function App() {
 
   const themeContext = useContext(ThemeContext);
+  const screenSizeContext = useContext(ScreenSizeContext);
 
-  // useEffect(() => {
+    // useEffect(() => {
   //   //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
   //   const loggedInUser = localStorage.getItem("user");
   //   if (loggedInUser) {
@@ -58,6 +61,17 @@ function App() {
         break;
     }
   }, [themeContext]);
+
+    useEffect(() => {
+        screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
+        window.addEventListener('resize', () => {screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})});
+        console.log(screenSizeContext.state)
+    }, [screenSizeContext]);
+
+    function checkScreenWidth(){
+        if (window.innerWidth > 768) return 'big';
+        return 'small';
+    }
 
   return (
     <BrowserRouter>
@@ -135,7 +149,7 @@ function App() {
             />
             <Route path="/playground" element={<Playground />} />
             <Route path="/log-in" element={<LogInPage />} />
-            <Route path="*" element={<div>Not found</div>} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </div>

@@ -13,16 +13,6 @@ const NavBar = () => {
 
     const navBarContainerRef = useRef();
 
-    useEffect(() => {
-        screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
-        window.addEventListener('resize', () => {screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})});
-    }, [screenSizeContext]);
-
-    function checkScreenWidth(){
-        if (window.innerWidth > 768) return false;
-        return true;
-    }
-
     const renderBottomBar = () => {
         return (
             <div className={`bottom-nav-bar`}>

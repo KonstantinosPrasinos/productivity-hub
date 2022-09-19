@@ -12,7 +12,7 @@ export const screenSizeReducer = (state, action) => {
 }
 
 const ScreenSizeContextProvider = ({children}) => {
-    const [state, dispatch] = useReducer(screenSizeReducer, 'light');
+    const [state, dispatch] = useReducer(screenSizeReducer, 'small');
 
     return (
         <ScreenSizeContext.Provider value={{state, dispatch}}>
