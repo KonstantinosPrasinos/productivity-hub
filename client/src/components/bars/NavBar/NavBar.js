@@ -7,6 +7,7 @@ import styles from './NavBar.module.scss'
 
 import { ScreenSizeContext } from '../../../context/ScreenSizeContext';
 import SideBar from "../SideBar/SideBar";
+import BottomBar from "../BottomBar/BottomBar";
 
 const NavBar = () => {
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -28,7 +29,7 @@ const NavBar = () => {
 
     return (
         <div className={styles.container} ref={navBarContainerRef}>
-            {screenSizeContext.state === 'small' ? '' : <SideBar navBarContainerRef={navBarContainerRef} />}
+            {screenSizeContext.state === 'small' ? <BottomBar /> : <SideBar navBarContainerRef={navBarContainerRef} />}
         </div>
 
     );

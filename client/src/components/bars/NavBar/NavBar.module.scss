@@ -2,8 +2,7 @@
 
 @media (max-width: $tablet-breakpoint) {
   .container {
-    height: 0;
-    width: 0;
+    order: 3;
   }
 }
 @media (min-width: $tablet-breakpoint) {

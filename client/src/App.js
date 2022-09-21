@@ -76,7 +76,6 @@ function App() {
   return (
     <BrowserRouter>
       <div className={`App ${themeContext.state ? themeContext.state : ''}`}>
-        {/* <PopupHandler /> */}
         <NavBar />
         <TopAppBar />
         <div className="content-container">

@@ -4,4 +4,9 @@
     border-radius: $button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
+
+    &.square {
+        border-radius: $base-border-radius;
+        padding: 10px
+    }
 }

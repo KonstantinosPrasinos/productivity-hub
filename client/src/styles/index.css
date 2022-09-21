@@ -54,18 +54,18 @@
 }
 
 body {
-  height: 100vh;
+  /*height: 100vh;*/
   font-family: 'Roboto', sans-serif;
   margin: 0;
   background: var(--background-color-2);
   overflow-y: hidden;
 }
-.App {
-  height: 100vh;
-  display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
-}
+/*.App {*/
+/*  height: 100vh;*/
+/*  display: flex;*/
+/*  flex-wrap: nowrap;*/
+/*  overflow: hidden;*/
+/*}*/
 
 .side-nav-bar {
   position: fixed;

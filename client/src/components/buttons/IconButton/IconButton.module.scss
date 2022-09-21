@@ -1,12 +1,25 @@
 @import 'src/styles/variables.scss';
 
 .container {
-  transition: transform 0.2s;
+  transition: transform 0.2s, color 0.1s;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-l;
 
   &:hover {
     transform: scale(1.01);
   }
   &:active {
     transform: scale(0.99);
+  }
+
+  &.selected {
+    color: var(--primary-color-color);
+  }
+
+  &.notSelected {
+    color: var(--border-color)
   }
 }

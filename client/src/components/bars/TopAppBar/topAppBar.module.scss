@@ -1,3 +1,5 @@
+@import 'src/styles/variables.scss';
+
 .mainContainer {
     display: flex;
     gap: 10px;
@@ -5,4 +7,5 @@
     background-color: white;
     padding: 10px 14px;
     font-size: 24px;
+    border-bottom: $base-border;
 }

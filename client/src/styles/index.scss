@@ -20,12 +20,26 @@
 
 .App {
     background-color: var(--background-color);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     &.light {
         @include getTheme('light');
     }
     &.dark {
         @include getTheme('dark');
     }
+}
+
+body {
+    //height: 100vh; /* Fallback for browsers that do not support Custom Properties */
+    //height: calc(var(--vh, 1vh) * 100);
+    //min-height: -webkit-fill-available;
+    overflow-y: hidden;
+    position: fixed;
+    height: 100%;
 }
 
 .Button {
@@ -109,15 +123,22 @@ input {
 
 @media (max-width: $tablet-breakpoint) {
     .content-container {
-        height: calc(100% - 5em);
         width: 100vw;
+        flex-grow: 1;
+        overflow: auto;
     }
     .Page {
         box-sizing: border-box;
         border: none !important;
-        height: 100%;
+        //height: 100%;
         width: 100%;
         border-radius: 0;
+        height: 100%;
+    }
+    .App {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
     }
 }
 
