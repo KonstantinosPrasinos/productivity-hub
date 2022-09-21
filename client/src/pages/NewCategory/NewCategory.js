@@ -24,19 +24,19 @@ const NewCategory = () => {
                 <ToggleButton isToggled={isRepeatableContainer} setIsToggled={setIsRepeatableContainer}></ToggleButton>
             </InputWrapper>
         </div>
-        <div className={`Stack-Container ${styles.rightSide} ${!isRepeatableContainer ? styles.isDisabled : ''}`}>
+        <div className={`Stack-Container ${styles.rightSide} ${screenSizeContext.state === 'small' ? styles.small : ''} ${!isRepeatableContainer ? styles.isDisabled : ''}`}>
             <InputWrapper label="Priority"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput><PriorityIndicator /></InputWrapper>
             <InputWrapper label="Ends at"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
             <InputWrapper label="Entry goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
             <InputWrapper label="Long term goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
         </div>
 
-        <div className={`Stack-Container ${styles.staticButtons}`}>
+        <div className={`Stack-Container}`}>
             {
                 screenSizeContext.state === 'big' && <div className={styles.exitButton}><IconButton><CloseIcon /></IconButton></div>
             }
 
-            <div className={styles.saveButton}>
+            <div className={`${styles.saveButton} ${screenSizeContext.state === 'small' && styles.small}`}>
                 <FilledButton >Save</FilledButton>
             </div>
         </div>

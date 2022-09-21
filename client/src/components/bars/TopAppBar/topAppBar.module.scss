@@ -1,6 +1,6 @@
 @import 'src/styles/variables.scss';
 
-.mainContainer {
+.container {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -8,4 +8,10 @@
     padding: 10px 14px;
     font-size: 24px;
     border-bottom: $base-border;
+    justify-content: flex-start;
+    height: 1.5em;
+
+    &.center {
+        justify-content: center;
+    }
 }

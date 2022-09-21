@@ -4,7 +4,6 @@
   position: relative;
   align-items: flex-start;
   flex-wrap: nowrap;
-  overflow: hidden;
 }
 
 .leftSide {
@@ -19,12 +18,24 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  &.small {
+    padding-top: 0;
+    padding-bottom: 20px;
+  }
 }
 
 .saveButton {
   position: absolute;
   bottom: 20px;
   right: 20px;
+
+  &.small {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    margin-left: 10px;
+  }
 }
 
 .exitButton {

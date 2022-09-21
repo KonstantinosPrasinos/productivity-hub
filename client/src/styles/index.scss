@@ -82,6 +82,10 @@ body {
     max-width: fit-content;
 }
 
+.Headline {
+    font-size: $font-xl;
+}
+
 .Rounded-Container {
     padding: $base-padding;
     border-radius: $base-border-radius;
@@ -130,10 +134,10 @@ input {
     .Page {
         box-sizing: border-box;
         border: none !important;
-        //height: 100%;
         width: 100%;
         border-radius: 0;
         height: 100%;
+        overflow-y: auto;
     }
     .App {
         display: flex;
