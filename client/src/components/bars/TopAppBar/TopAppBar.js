@@ -24,7 +24,7 @@ const TopAppBar = () => {
     }
   }, [location])
 
-  return (screenSizeContext.state && <div className={`${styles.container} ${!isMainPage ? styles.center : ''}`}>
+  return (screenSizeContext.state === 'small' && <div className={`${styles.container} ${!isMainPage ? styles.center : ''}`}>
     {isMainPage && <IconButton onClick={() => navigate(-1)}><ArrowBackIcon /></IconButton>}
     <div className={`Headline`}>{capitalizedLocation}</div>
   </div>);

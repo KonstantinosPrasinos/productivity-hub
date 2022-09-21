@@ -2,8 +2,15 @@
 
 .container {
   position: fixed;
-  width: 300px;
+  width: 4em;
   height: 100%;
   display: block;
   background: var(--surface-color);
+  padding: 40px 0 40px 0;
+  align-items: center;
+  gap: 2em !important;
+}
+
+.buttonsContainer {
+  gap: 1.5em !important;
 }

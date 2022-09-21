@@ -1,65 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
-@media (min-width: 768px) {
-  .App {
-    flex-direction: row;
-  }
-}
-
-@media (max-width: 768px) {
-  .App {
-    flex-direction: column;
-  }
-}
-
-:root {
-  --background-color: #ECEFF4;
-  --background-color-2: #FFFFFF;
-  --accent-color-1: #3B4252;
-  --accent-color-2: #E1E1E1;
-  --falling-color: #EB5757;
-  --growing-color: #27AE60;
-}
-
-/* input[type=text] {
-  font-size: 22px;
-  width: 5em;
-  border: none;
-  border-bottom: 2px solid var(--accent-color-1);
-  text-align: center;
-} */
-/* input[type=text]:focus {
-  outline: none;
-} */
 
 
-::-webkit-scrollbar {
-  width: 8px;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 2px grey;
-  border-radius: 10px
-}
- 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--accent-color-1); 
-  border-radius: 10px;
-}
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-}
 
-body {
-  /*height: 100vh;*/
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  background: var(--background-color-2);
-  overflow-y: hidden;
-}
 /*.App {*/
 /*  height: 100vh;*/
 /*  display: flex;*/

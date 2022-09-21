@@ -6,10 +6,31 @@ import AddIcon from '@mui/icons-material/Add';
 import styles from './BottomBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
 import FilledButton from "../../buttons/FilledButton/FilledButton";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {useLocation} from "react-router-dom";
 
 const BottomBar = () => {
-    const [selected, setSelected] = useState('home');;
+    const location = useLocation();
+
+    const [selected, setSelected] = useState(null);
+
+    useEffect(() => {
+        switch (location.pathname) {
+            case '/':
+            case '/home':
+                setSelected('home')
+                break;
+            case '/timer':
+                setSelected('timer')
+                break;
+            case '/settings':
+                setSelected('settings')
+                break;
+            default:
+                break;
+        }
+    }, [location]);
+
     return (
         <div className={styles.container}>
             <IconButton onClick={() => setSelected('home')} label={'Home'} selected={selected === 'home'}><HomeIcon sx={{fontSize: '1.5em'}} /></IconButton>

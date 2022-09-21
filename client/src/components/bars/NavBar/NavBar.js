@@ -12,24 +12,9 @@ import BottomBar from "../BottomBar/BottomBar";
 const NavBar = () => {
     const screenSizeContext = useContext(ScreenSizeContext);
 
-    const navBarContainerRef = useRef();
-
-    const renderBottomBar = () => {
-        return (
-            <div className={`bottom-nav-bar`}>
-                <Link to='/' className='title'>
-                    <h1><HomeRoundedIcon fontSize='1em' /></h1>
-                </Link>
-                <Link to='/settings' className='title settings'>
-                    <h1 className='settings-content'><SettingsApplicationsRoundedIcon fontSize='1em' /></h1>
-                </Link>
-            </div>
-        );
-    }
-
     return (
-        <div className={styles.container} ref={navBarContainerRef}>
-            {screenSizeContext.state === 'small' ? <BottomBar /> : <SideBar navBarContainerRef={navBarContainerRef} />}
+        <div className={styles.container}>
+            {screenSizeContext.state === 'small' ? <BottomBar /> : <SideBar />}
         </div>
 
     );
