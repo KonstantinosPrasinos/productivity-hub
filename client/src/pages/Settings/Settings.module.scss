@@ -1,21 +1,25 @@
+@import 'src/styles/variables.scss';
+
 @media (min-width: 768px) {
     .contentContainer {
-        border-left: 2px solid black;
+        //border-left: 2px solid black;
     }
 }
 
 .settingsContainer {
     background-color: white;
     border-radius: 10px;
-    padding: 20px;
     display: flex;
 }
 
 .redirectContainer {
-    flex-grow: 1;
+    width: min-content;
     display: flex;
     gap: 10px;
     flex-direction: column;
+    border-right: $base-border;
+    border-width: 2px;
+    padding: 1em;
 }
 
 .contentContainer {

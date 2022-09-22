@@ -1,6 +1,6 @@
 import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
-import Settings from "./pages/Settings/SettingsContainer";
+import Settings from "./pages/Settings/Settings";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect} from "react";

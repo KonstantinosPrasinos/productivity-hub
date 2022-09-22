@@ -1,4 +1,4 @@
-import styles from "./settings.module.scss";
+import styles from "./Settings.module.scss";
 import RedirectButton from "../../components/buttons/RedirectButton/RedirectButton";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -9,10 +9,16 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ScreenSizeContext } from "../../context/ScreenSizeContext";
+import Account from "./Subpages/Account/Account";
+import Notifications from "./Subpages/Notifications/Notification";
+import Appearance from "./Subpages/Appearance/Appearance";
+import Integrations from "./Subpages/Integrations/Integrations";
+import About from "./Subpages/About/About";
+import Language from "./Subpages/Language/Language";
 
 const Settings = () => {
   const location = useLocation();
-  const [currentLocation, setCurrentLocation] = useState("account");
+  const [currentLocation, setCurrentLocation] = useState('account');
   const screenSizeContext = useContext(ScreenSizeContext);
 
   useEffect(() => {
@@ -27,37 +33,49 @@ const Settings = () => {
   const [group, setGroup] = useState(["Option 1", "Option 2", "Option 3"]);
   const [selected, setSelected] = useState(0);
 
+  const renderContent = () => {
+    console.log(currentLocation);
+    switch (currentLocation) {
+      case 'account':
+        return (<Account />)
+      case 'notifications':
+        return (<Notifications />)
+      case 'appearance':
+        return (<Appearance />)
+      case 'integrations':
+        return (<Integrations />)
+      case 'language':
+        return (<Language />)
+      case 'about':
+        return (<About />)
+    }
+  }
+
   return (
     <div className={styles.settingsContainer}>
       {(screenSizeContext.state !== 'small' || currentLocation === "/settings") && (
         <div className={styles.redirectContainer}>
           <RedirectButton
-            icon={<AccountCircleIcon />}
             label={"Account"}
             location={"/settings/account"}
           />
           <RedirectButton
-            icon={<NotificationsIcon />}
             label={"Notifications"}
             location={"/settings/notifications"}
           />
           <RedirectButton
-            icon={<PaletteIcon />}
             label={"Appearance"}
             location={"/settings/appearance"}
           />
           <RedirectButton
-            icon={<KeyIcon />}
             label={"Integrations"}
             location={"/settings/integrations"}
           />
           <RedirectButton
-            icon={<LanguageIcon />}
             label={"Language"}
             location={"/settings/language"}
           />
           <RedirectButton
-            icon={<InfoIcon />}
             label={"About"}
             location={"/settings/about"}
           />
@@ -65,8 +83,8 @@ const Settings = () => {
       )}
       {(screenSizeContext.state !== 'small' || currentLocation !== "/settings") && (
         <div className={styles.contentContainer}>
-          {currentLocation}
-          
+          {renderContent()}
+
         </div>
       )}
     </div>

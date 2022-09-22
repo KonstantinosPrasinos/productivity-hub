@@ -1,12 +1,15 @@
+@import 'src/styles/variables.scss';
+
 .container {
-    width: 100%;
+    flex: 1;
     height: 3em;
     display: flex;
     align-items: center;
     padding: 10px 14px;
-    font-size: 20px;
     gap: 10px;
     cursor: pointer;
+    font-size: $font-l;
+    justify-content: space-around;
 }
 
 .forwardIcon {
