@@ -1,9 +1,7 @@
 import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
-// import Home from "./pages/Home/HomePageContainer";
 import Settings from "./pages/Settings/SettingsContainer";
 import GroupDetails from "./components/groups/GroupDetails";
-import { useSelector } from "react-redux";
 import GroupList from "./components/groups/GroupList";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
@@ -15,7 +13,7 @@ import { ThemeContext } from "./context/ThemeContext";
 import Playground from "./pages/Playground/Playground";
 import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
-import screenSizeContext, {ScreenSizeContext} from "./context/ScreenSizeContext";
+import {ScreenSizeContext} from "./context/ScreenSizeContext";
 
 function App() {
 
@@ -65,7 +63,6 @@ function App() {
     useEffect(() => {
         screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
         window.addEventListener('resize', () => {screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})});
-        console.log(screenSizeContext.state)
     }, [screenSizeContext]);
 
     function checkScreenWidth(){
