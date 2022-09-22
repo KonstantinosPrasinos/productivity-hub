@@ -1,0 +1,10 @@
+@import 'src/styles/variables.scss';
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.container {
+  display: inline-flex;
+}

@@ -17,6 +17,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
+import Task from "../../components/indicators/Task/Task";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -83,6 +84,7 @@ const Playground = () => {
         <InputWrapper label="Ends at:"><TextBoxInput placeholder={"Number"}></TextBoxInput></InputWrapper>
         <PriorityIndicator></PriorityIndicator>
         <ColorInput selected={'red'} setSelected={() => {}}></ColorInput>
+        <Task tasks={[{title: 'Workout', streak: '100110'}, {title: 'Workout', streak: '100110'}]}></Task>
     </div>
   );
 };
