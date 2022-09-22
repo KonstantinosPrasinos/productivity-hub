@@ -1,0 +1,8 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  border-radius: $button-border-radius;
+  padding: 5px 10px;
+  font-size: $font-s;
+  align-items: center;
+}

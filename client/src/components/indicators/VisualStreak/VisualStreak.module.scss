@@ -1,6 +1,6 @@
 @import 'src/styles/variables.scss';
 
-$barWidth: 0.5em;
+$barWidth: 0.45em;
 $barHeight: 0.3em;
 
 .container {
@@ -26,7 +26,7 @@ $barHeight: 0.3em;
             height: $barHeight;
             position: absolute;
             background-color: var(--primary-color);
-            top: calc(50% - $barHeight + 0.125em);
+            top: calc(50% - #{$barHeight} + 0.125em);
             left: -$barWidth - 0.25em;
         }
     }
@@ -38,7 +38,7 @@ $barHeight: 0.3em;
             height: $barHeight;
             position: absolute;
             background-color: var(--primary-color);
-            top: calc(50% - $barHeight + 0.125em);
+            top: calc(50% - #{$barHeight} + 0.125em);
             right: -$barWidth - 0.25em;
         }
     }

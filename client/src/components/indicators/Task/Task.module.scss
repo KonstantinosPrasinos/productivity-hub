@@ -1,10 +1,26 @@
 @import 'src/styles/variables.scss';
 
+.container {
+  display: inline-flex;
+  width: min-content;
+  position: relative;
+
+  &.small {
+    box-shadow: none;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
 .titleContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.container {
-  display: inline-flex;
+
+.categoryContainer {
+  position: absolute;
+  top: 6px;
+  right: 12px;
 }

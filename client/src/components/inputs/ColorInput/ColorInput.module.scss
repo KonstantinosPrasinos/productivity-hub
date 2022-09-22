@@ -20,32 +20,4 @@
   &.selected {
     border: 0.25em solid var(--primary-color);
   }
-
-  &.red {
-    background-color: var(--red-color);
-  }
-
-  &.orange {
-    background-color: var(--orange-color);
-  }
-
-  &.yellow {
-    background-color: var(--yellow-color);
-  }
-
-  &.green {
-    background-color: var(--green-color);
-  }
-
-  &.lightBlue {
-    background-color: var(--light-blue-color);
-  }
-
-  &.blue {
-    background-color: var(--blue-color);
-  }
-
-  &.purple {
-    background-color: var(--purple-color);
-  }
 }

@@ -1,8 +1,6 @@
 import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/SettingsContainer";
-import GroupDetails from "./components/groups/GroupDetails";
-import GroupList from "./components/groups/GroupList";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect} from "react";
@@ -15,6 +13,7 @@ import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
 import {ScreenSizeContext} from "./context/ScreenSizeContext";
 import NewTask from "./pages/NewTask/NewTask";
+import HomePageContainer from "./pages/Home/Home";
 
 function App() {
 
@@ -84,10 +83,9 @@ function App() {
                             exact
                             path="/"
                             element={
-                                <div>test</div>
-                                // <RequireAuth>
-                                //   {/*<Home />*/}
-                                // </RequireAuth>
+                                <RequireAuth>
+                                  <HomePageContainer />
+                                </RequireAuth>
                             }
                         />
                         <Route
@@ -103,7 +101,7 @@ function App() {
                             path="/tasks"
                             element={
                                 <RequireAuth>
-                                    <GroupList/>
+                                    <div>at</div>
                                 </RequireAuth>
                             }
                         />
@@ -111,7 +109,7 @@ function App() {
                             path="/tasks/:id"
                             element={
                                 <RequireAuth>
-                                    <GroupDetails/>
+                                    <div>ads</div>
                                 </RequireAuth>
                             }
                         />
