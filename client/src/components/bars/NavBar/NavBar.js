@@ -1,7 +1,4 @@
-import { Link } from 'react-router-dom';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
-import { useEffect, useRef, useContext } from 'react';
+import { useContext } from 'react';
 
 import styles from './NavBar.module.scss'
 

@@ -1,5 +1,4 @@
-import {useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
+import {useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import HomeIcon from '@mui/icons-material/Home';
@@ -7,13 +6,8 @@ import TimerIcon from '@mui/icons-material/Timer';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
 
-import ListItem from '../../navbar/ListItem';
-
-import { useSelector } from 'react-redux';
-
 import styles from './SideBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
-import {Timer} from "@mui/icons-material";
 import FilledButton from "../../buttons/FilledButton/FilledButton";
 
 const SideBar = ({navBarContainerRef}) => {

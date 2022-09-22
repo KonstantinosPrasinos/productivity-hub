@@ -19,7 +19,7 @@ $theme: 'light';
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
-        --border-color: #79747E;
+        --border-color: #eff3f4;
     } @else if $theme == 'dark' {
         $theme: 'dark';
 

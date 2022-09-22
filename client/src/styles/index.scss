@@ -2,14 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 :root {
-    --background-color: #f3eff3;
-    --on-background-color: #1C1B1F;
-    --surface-color: #ffffff;
-    --on-surface-color: #1C1B1F;
-    --primary-color: #2E3440;
-    --on-primary-color: #ffffff;
-    --error-color: #B3261E;
-    --on-error-color: #ffffff;
     --red-color: #FC5C65;
     --orange-color: #FD9644;
     --yellow-color: #FED330;
@@ -38,9 +30,6 @@
 }
 
 body {
-    //height: 100vh; /* Fallback for browsers that do not support Custom Properties */
-    //height: calc(var(--vh, 1vh) * 100);
-    //min-height: -webkit-fill-available;
     overflow-y: hidden;
     position: fixed;
     height: 100%;
@@ -65,7 +54,6 @@ body {
     display: flex;
     align-items: center;
     gap: $base-gap;
-    //flex-wrap: wrap;
     justify-content: space-between;
 }
 
@@ -78,7 +66,7 @@ body {
 
 .Label {
     font-size: $font-s;
-    opacity: $opacity-very-low;
+    opacity: $opacity-low;
 }
 
 .Title {
@@ -129,7 +117,6 @@ input {
 }
 
 // App.js
-
 @media (max-width: $tablet-breakpoint) {
     .content-container {
         width: 100vw;

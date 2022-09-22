@@ -11,14 +11,14 @@
   width: 1.5em;
   background-color: var(--surface-color);
   border-radius: 1.5em;
-  border: 0.25em solid var(--border-color);
+  border: 0.1em solid var(--primary-color);
   position: relative;
   box-sizing: border-box;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border 0.2s;
 
   &.selected {
-    border-color: var(--primary-color);
+    border: 0.25em solid var(--primary-color);
   }
 
   &.red {
