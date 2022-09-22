@@ -36,11 +36,11 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
       className={`${styles.container} Horizontal-Flex-Container Rounded-Container`}
     >
       {icon !== null && <>{icon}</>}
-      <span className={styles.inputWrapper}><input disabled={isDisabled} type="text" className={styles.input} placeholder={placeholder} value={text !== null ? text : ""} onChange={handleChange} /></span>
+      <span className={styles.inputWrapper}><input disabled={isDisabled} type={type === 'password' ? 'password' : 'text'} className={styles.input} placeholder={placeholder} value={text !== null ? text : ""} onChange={handleChange} /></span>
       {type === "number" && (
         <div className={styles.buttonsContainer}>
-          <button disabled={isDisabled} className={`${styles.button} ${styles.buttonUp}`} onClick={increment}><ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
-          <button disabled={isDisabled} className={`${styles.button} ${styles.buttonDown}`} onClick={decrement}><ArrowDropDownIcon className={styles.icon} sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
+          <button disabled={isDisabled} className={`${styles.button}`} onClick={increment}><ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
+          <button disabled={isDisabled} className={`${styles.button}`} onClick={decrement}><ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
         </div>
       )}
     </div>
