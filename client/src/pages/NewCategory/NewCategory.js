@@ -1,46 +1,35 @@
 import InputWrapper from '../../components/utilities/InputWrapper/InputWrapper';
 import ToggleButton from '../../components/buttons/ToggleButton/ToggleButton';
 import TextBoxInput from '../../components/inputs/TextBoxInput/TextBoxInput';
-import styles from './NewCategory.module.scss';
-import {useContext, useState} from 'react';
-import FilledButton from "../../components/buttons/FilledButton/FilledButton";
-import IconButton from "../../components/buttons/IconButton/IconButton";
-import CloseIcon from '@mui/icons-material/Close';
+import {useState} from 'react';
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
-import {ScreenSizeContext} from "../../context/ScreenSizeContext";
+import InputPage from "../../components/utilities/InputPage/InputPage";
 
 const NewCategory = () => {
     const [isRepeatableContainer, setIsRepeatableContainer] = useState(true);
     const [selectedColor, setSelectedColor] = useState('red');
 
-    const screenSizeContext = useContext(ScreenSizeContext);
-
-    return (<div className={`${screenSizeContext.state === 'small' ? 'Stack-Container' : 'Horizontal-Flex-Container'} Rounded-Container Symmetrical ${styles.container} Page`}>
-        <div className={`Stack-Container ${styles.leftSide}`}>
+    return (<InputPage
+        leftSide={
+        <div className={'Stack-Container'}>
             <input type="text" className="Title Title-Input" placeholder="Add category name" />
             <InputWrapper label="Color"><ColorInput selected={selectedColor} setSelected={setSelectedColor} /></InputWrapper>
             <InputWrapper label="Act as repeatable container">
                 <ToggleButton isToggled={isRepeatableContainer} setIsToggled={setIsRepeatableContainer}></ToggleButton>
             </InputWrapper>
         </div>
-        <div className={`Stack-Container ${styles.rightSide} ${screenSizeContext.state === 'small' ? styles.small : ''} ${!isRepeatableContainer ? styles.isDisabled : ''}`}>
+        }
+        rightSide={
+        <div className={'Stack-Container'}>
             <InputWrapper label="Priority"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput><PriorityIndicator /></InputWrapper>
             <InputWrapper label="Ends at"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
             <InputWrapper label="Entry goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
             <InputWrapper label="Long term goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
         </div>
-
-        <div className={`Stack-Container}`}>
-            {
-                screenSizeContext.state === 'big' && <div className={styles.exitButton}><IconButton><CloseIcon /></IconButton></div>
-            }
-
-            <div className={`${styles.saveButton} ${screenSizeContext.state === 'small' && styles.small}`}>
-                <FilledButton >Save</FilledButton>
-            </div>
-        </div>
-    </div>);
+        }
+        toggleState={isRepeatableContainer}
+    ></InputPage>);
 }
  
 export default NewCategory;

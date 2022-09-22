@@ -5,7 +5,7 @@ import styles from "./DropDownInput.module.scss";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-const DropDownInput = ({ children, options }) => {
+const DropDownInput = ({ placeholder, options, isDisabled }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [extended, setExtended] = useState(false);
   const containerRef = useRef();
@@ -26,13 +26,13 @@ const DropDownInput = ({ children, options }) => {
   }
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div className={`${isDisabled ? styles.disabled : ''} ${styles.container}`} ref={containerRef}>
       <div
-        className={`Horizontal-Flex-Container Rounded-Container ${styles.inputContainer}`}
+        className={`Horizontal-Flex-Container Rounded-Container ${isDisabled ? styles.disabled : ''} ${styles.inputContainer}`}
         onClick={handleExtension}
 
       >
-        <div>{selectedIndex !== null ? options[selectedIndex] : children}</div>
+        <div>{selectedIndex !== null ? options[selectedIndex] : placeholder}</div>
         <ArrowDropDownIcon
           className={`${styles.arrowIndicator} ${
             extended ? styles.extended : ""
@@ -42,7 +42,7 @@ const DropDownInput = ({ children, options }) => {
         <div >
             <AnimatePresence>
 
-                {extended && (
+                {extended && !isDisabled && (
                     <motion.div
                         className={`${
                             styles.optionsContainer

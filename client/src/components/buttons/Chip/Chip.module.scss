@@ -5,7 +5,6 @@
     color: var(--on-surface-color);
     border-radius: $chip-border-radius;
     transition: 0.2s background-color, 0.2s color, 0.2s filter;
-    box-shadow: $elevation-1;
     border: $base-border;
 
     &.selected {

@@ -10,12 +10,17 @@
     transition: transform 0.2s;
     box-sizing: border-box;
     height: 2.5em;
+    box-shadow: none;
 
     &:hover {
         transform: scale(1.01);
     }
 
     cursor: pointer;
+
+    &.disabled {
+        cursor: not-allowed;
+    }
 }
 
 .arrowIndicator {

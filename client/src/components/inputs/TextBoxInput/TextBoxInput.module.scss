@@ -6,6 +6,7 @@
     height: 2.5em;
     font-size: $font-m;
     box-sizing: border-box;
+    box-shadow: none;
 
     &:hover:enabled {
         transform: scale(1.01);

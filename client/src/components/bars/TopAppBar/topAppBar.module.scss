@@ -10,6 +10,7 @@
     border-bottom: $base-border;
     justify-content: flex-start;
     height: 1.5em;
+    min-height: 1.5em;
 
     &.center {
         justify-content: center;
