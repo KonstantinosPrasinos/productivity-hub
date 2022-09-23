@@ -36,7 +36,8 @@ const BottomBar = () => {
         <div className={styles.container}>
             <IconButton
                 onClick={() => {
-                    setSelected('home'); navigate('/');
+                    setSelected('home');
+                    navigate('/', {replace: true});
                 }}
                 label={'Home'}
                 selected={selected === 'home'}
@@ -46,7 +47,7 @@ const BottomBar = () => {
             <IconButton
                 onClick={() => {
                     setSelected('timer');
-                    navigate('/timer');
+                    navigate('/timer', {replace: true});
                 }}
                 label={'Timer'}
                 selected={selected === 'timer'}
@@ -56,7 +57,7 @@ const BottomBar = () => {
             <IconButton
                 onClick={() => {
                     setSelected('settings');
-                    navigate('/settings');
+                    navigate('/settings', {replace: true});
                 }}
                 label={'Settings'}
                 selected={selected === 'settings'}
@@ -65,7 +66,7 @@ const BottomBar = () => {
             </IconButton>
             <FilledButton
                 onClick={() => {
-                    navigate('/new-task')
+                    navigate('/new-task', {replace: true})
                 }}
                 type='square'
             >

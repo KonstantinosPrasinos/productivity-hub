@@ -10,7 +10,7 @@ import styles from './SideBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
 import FilledButton from "../../buttons/FilledButton/FilledButton";
 
-const SideBar = ({navBarContainerRef}) => {
+const SideBar = () => {
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -37,11 +37,11 @@ const SideBar = ({navBarContainerRef}) => {
     return (
         <div className={`Stack-Container ${styles.container} `}>
             <div className={`Stack-Container ${styles.buttonsContainer}`}>
-                <IconButton onClick={() => navigate('/')} selected={selected === 'home'} setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}} /></IconButton>
-                <IconButton onClick={() => navigate('/timer')} selected={selected === 'timer'} setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}} /></IconButton>
-                <IconButton onClick={() => navigate('/settings')} selected={selected === 'settings'} setSelected={() => setSelected('settings')}><SettingsIcon sx={{fontSize: '1.5em'}} /></IconButton>
+                <IconButton onClick={() => navigate('/', {replace: true})} selected={selected === 'home'} setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}} /></IconButton>
+                <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'} setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}} /></IconButton>
+                <IconButton onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'} setSelected={() => setSelected('settings')}><SettingsIcon sx={{fontSize: '1.5em'}} /></IconButton>
             </div>
-            <FilledButton type='square' onClick={() => navigate('/new-task')}><AddIcon sx={{fontSize: '1.5em'}} /></FilledButton>
+            <FilledButton type='square' onClick={() => navigate('/new-task', {replace: true})}><AddIcon sx={{fontSize: '1.5em'}} /></FilledButton>
         </div>
     );
 }
