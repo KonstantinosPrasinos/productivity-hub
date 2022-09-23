@@ -31,4 +31,7 @@ const signupUser = async (req, res) => {
     }
 }
 
+const resetPassword = async (req, res) => {
+}
+
 module.exports = {signupUser, loginUser}

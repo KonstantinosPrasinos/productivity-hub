@@ -1,15 +1,11 @@
 @import 'src/styles/variables.scss';
 
-@media (min-width: 768px) {
-    .contentContainer {
-        //border-left: 2px solid black;
-    }
-}
-
-.settingsContainer {
+.container {
     background-color: white;
     border-radius: 10px;
     display: flex;
+    width: 50%;
+    height: 50%;
 }
 
 .redirectContainer {
@@ -23,6 +19,6 @@
 }
 
 .contentContainer {
-    flex-grow: 3;
+    width: 100%;
     padding: 20px
 }

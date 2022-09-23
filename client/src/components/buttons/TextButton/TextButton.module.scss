@@ -1,0 +1,15 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  display: inline;
+  font-size: $font-m;
+  color: var(--primary-color);
+  text-decoration: none;
+
+  &.important {
+    color: var(--error-color);
+  }
+  &:hover {
+    text-decoration: underline;
+  }
+}

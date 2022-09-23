@@ -30,9 +30,6 @@ const Settings = () => {
     );
   }, [location]);
 
-  const [group, setGroup] = useState(["Option 1", "Option 2", "Option 3"]);
-  const [selected, setSelected] = useState(0);
-
   const renderContent = () => {
     console.log(currentLocation);
     switch (currentLocation) {
@@ -52,7 +49,7 @@ const Settings = () => {
   }
 
   return (
-    <div className={styles.settingsContainer}>
+    <div className={styles.container}>
       {(screenSizeContext.state !== 'small' || currentLocation === "/settings") && (
         <div className={styles.redirectContainer}>
           <RedirectButton

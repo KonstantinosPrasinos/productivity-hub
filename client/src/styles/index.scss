@@ -154,7 +154,6 @@ button {
 // App.js
 @media (max-width: $tablet-breakpoint) {
     .content-container {
-        box-sizing: border-box;
         width: 100vw;
         flex-grow: 1;
         overflow: auto;
@@ -182,7 +181,10 @@ button {
 }
 
 .content-container {
+    box-sizing: border-box;
     flex-grow: 1;
+    justify-content: center;
+    display: flex;
 }
 
 .icon {
