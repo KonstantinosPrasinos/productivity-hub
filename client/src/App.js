@@ -58,7 +58,7 @@ function App() {
                 localStorage.setItem("ui-theme", "light");
                 break;
         }
-    }, [themeContext]);
+    }, []);
 
     useEffect(() => {
         screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
@@ -74,7 +74,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <div className={`App ${themeContext.state ? themeContext.state : ''}`}>
+            <div className={`App ${themeContext.state.theme ? themeContext.state.theme : ''}`}>
                 <NavBar/>
                 <TopAppBar/>
                 <div className="content-container">

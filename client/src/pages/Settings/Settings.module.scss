@@ -1,11 +1,8 @@
 @import 'src/styles/variables.scss';
 
 .container {
-    background-color: white;
-    border-radius: 10px;
-    display: flex;
-    width: 50%;
-    height: 50%;
+    width: 40%;
+    height: 100%;
 }
 
 .redirectContainer {
@@ -20,5 +17,29 @@
 
 .contentContainer {
     width: 100%;
-    padding: 20px
+    padding: 20px;
+    overflow-y: auto;
+    flex-wrap: nowrap !important;
+}
+
+.email {
+    font-size: $font-s;
+}
+
+.accountContainer {
+    justify-content: flex-start !important;
+}
+
+.segment {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    width: 100%;
+}
+
+@media (max-width: $tablet-breakpoint) {
+    .container {
+        width: 100%;
+        height: auto;
+    }
 }

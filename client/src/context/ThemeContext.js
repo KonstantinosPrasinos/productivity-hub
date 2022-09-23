@@ -5,14 +5,16 @@ export const ThemeContext = createContext();
 export const themeReducer = (state, action) => {
     switch (action.type) {
         case 'SET_THEME':
-            return action.payload;
+            return {theme: action.payload};
         default:
             return state;
     }
 }
 
 const ThemeContextProvider = ({children}) => {
-    const [state, dispatch] = useReducer(themeReducer, 'light');
+    const [state, dispatch] = useReducer(themeReducer, {theme: 'light'});
+
+    console.log(state);
 
     return (
         <ThemeContext.Provider value={{state, dispatch}}>

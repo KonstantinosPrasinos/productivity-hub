@@ -1,12 +1,12 @@
 import styles from "./Chip.module.scss";
 
-const Chip = ({ children, index, selected, setSelected }) => {
+const Chip = ({ children, value, selected, setSelected }) => {
   return (
     <div
       className={`Button ${styles.container} ${
-        index === selected ? styles.selected : ""
+        value === selected ? styles.selected : ""
       }`}
-      onClick={() => setSelected(index)}
+      onClick={() => setSelected(value)}
     >
       {children}
     </div>

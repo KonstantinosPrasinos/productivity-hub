@@ -4,6 +4,7 @@
   position: relative;
   align-items: flex-start;
   flex-wrap: nowrap;
+  height: min-content;
 }
 
 .leftSide {
@@ -42,4 +43,10 @@
   position: absolute;
   right: 20px;
   top: 20px;
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .container {
+    height: 100%;
+  }
 }

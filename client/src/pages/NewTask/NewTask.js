@@ -9,7 +9,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 
 const NewTask = () => {
     const [repeats, setRepeats] = useState(false);
-    const [selectedType, setSelectedType] = useState(0);
+    const [selectedType, setSelectedType] = useState('Number');
     const taskType = ['Number', 'Checkbox', 'Time']; //Add pomodoro for v2.0
 
     return (
@@ -23,7 +23,7 @@ const NewTask = () => {
                             <Chip
                                 selected={selectedType}
                                 setSelected={setSelectedType}
-                                index={index}
+                                value={task}
                                 key={index}
                             >
                                 {task}

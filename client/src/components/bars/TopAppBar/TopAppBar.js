@@ -25,7 +25,7 @@ const TopAppBar = () => {
         break;
       case '/settings':
         setIsMainPage(true);
-        setPageName('Timer');
+        setPageName('Settings');
         break;
       case '/timer':
         setIsMainPage(true);
