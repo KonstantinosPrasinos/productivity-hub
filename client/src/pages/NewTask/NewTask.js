@@ -32,7 +32,7 @@ const NewTask = () => {
                         }
                     </div>
                 </InputWrapper>
-                <InputWrapper label="Priority"><TextBoxInput isDisabled={!repeats} type="number"></TextBoxInput><PriorityIndicator /></InputWrapper>
+                <InputWrapper label="Priority"><TextBoxInput type="number"></TextBoxInput><PriorityIndicator /></InputWrapper>
                 <InputWrapper label="Repeats">
                     <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
                 </InputWrapper>
