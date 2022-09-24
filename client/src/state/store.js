@@ -1,8 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit'
-import contentReducer from './contentSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import tasksReducer from "./tasksSlice";
+import groupsReducer from './groupsSlice';
+import categoriesReducer from './categoriesSlice';
 
 export const store = configureStore({
   reducer: {
-      content: contentReducer,
+      tasks: tasksReducer,
+      groups: groupsReducer,
+      categories: categoriesReducer
   },
 })
