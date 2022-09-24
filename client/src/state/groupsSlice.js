@@ -38,6 +38,6 @@ export const groupsSlice = createSlice({
     }
 })
 
-export const {setCategories, emptyCategories} = groupsSlice.actions;
+export const {setGroups, emptyGroups} = groupsSlice.actions;
 
 export default groupsSlice.reducer;

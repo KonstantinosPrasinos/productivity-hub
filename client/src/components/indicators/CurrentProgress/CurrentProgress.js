@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
 
-const CurrentProgress = ({ current, total, setCurrent, step }) => {
+const CurrentProgress = ({ current, goal, setCurrent, step }) => {
   const topLeftControls = useAnimation();
   const topControls = useAnimation();
   const topRightControls = useAnimation();
@@ -16,7 +16,7 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
 
   useEffect(() => {
     const maxDuration = 0.5;
-    const percentage = Math.round(current / total * 100);
+    const percentage = Math.round(current / goal * 100);
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
@@ -54,20 +54,20 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
     const findRemaining = (percentage) => {
 
       // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
-      // where the result of true indicates a forward direction and false indicates a backwards ddirection.
+      // where the result of true indicates a forward direction and false indicates a backwards direction.
 
       if (percentage < 9) {
-        return {index: 0, remaining: animationDirection > 0 ? 9 - percentage : percentage, total: 9};
+        return {index: 0, remaining: animationDirection > 0 ? 9 - percentage : percentage, goal: 9};
       } else if (percentage < 41) {
-        return {index: 1, remaining: animationDirection > 0 ? 32 - (percentage - 9) : percentage - 9, total: 32};
+        return {index: 1, remaining: animationDirection > 0 ? 32 - (percentage - 9) : percentage - 9, goal: 32};
       } else if (percentage < 50) {
-        return {index: 2, remaining: animationDirection > 0 ? 9 - (percentage - 41) : percentage - 41, total: 9};
+        return {index: 2, remaining: animationDirection > 0 ? 9 - (percentage - 41) : percentage - 41, goal: 9};
       } else if (percentage < 59) {
-        return {index: 3, remaining: animationDirection > 0 ? 9 - (percentage - 50) : percentage - 50, total: 9};
+        return {index: 3, remaining: animationDirection > 0 ? 9 - (percentage - 50) : percentage - 50, goal: 9};
       } else if (percentage < 91) {
-        return {index: 4, remaining: animationDirection > 0 ? 32 - (percentage - 59) : percentage - 59, total: 32};
+        return {index: 4, remaining: animationDirection > 0 ? 32 - (percentage - 59) : percentage - 59, goal: 32};
       } else if (percentage <= 100) {
-        return {index: 5, remaining: animationDirection > 0 ? 9 - (percentage - 91) : percentage - 91, total: 9};
+        return {index: 5, remaining: animationDirection > 0 ? 9 - (percentage - 91) : percentage - 91, goal: 9};
       } else {
         return false;
       }
@@ -92,7 +92,9 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
       setPrevPercentage(percentage);
     }
 
-  }, [prevPercentage, animationControls, current, total])
+  }, [prevPercentage, animationControls, current, goal])
+
+  console.log(goal, current, step)
 
   return (
     <div className={`${styles.container}`}>
@@ -118,7 +120,7 @@ const CurrentProgress = ({ current, total, setCurrent, step }) => {
 
       </div>
       <div className={`${styles.textContainer}`}>
-        <div className={`${styles.progressText}`}>{'\u00A0'.repeat(total.toString().length - current.toString().length)}{current} / {total} </div>
+        <div className={`${styles.progressText}`}>{'\u00A0'.repeat(goal.toString().length - current.toString().length)}{current} / {goal} </div>
         <div>|</div>
         <div onClick={() => setCurrent(current + step)} className={`Button ${styles.button}`}>{step > 0 ? `+${step}`: step}</div>
       </div>

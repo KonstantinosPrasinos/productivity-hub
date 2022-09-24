@@ -6,7 +6,7 @@ export const categoriesSlice = createSlice({
         categories: [{
             id: '0',
             name: 'Workout',
-            color: 'green',
+            color: 'red',
             timeGroups: ['0']
         }]},
     reducers: {
