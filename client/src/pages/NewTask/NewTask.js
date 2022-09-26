@@ -9,6 +9,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import {useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid';
 import {addTask} from "../../state/tasksSlice";
+import {AnimatePresence, motion} from 'framer-motion';
 
 const NewTask = () => {
     const categories = useSelector((state) => state.categories.categories);
@@ -125,20 +126,24 @@ const NewTask = () => {
                             }
                         </div>
                     </InputWrapper>
-                    <div className={'Collapsible-Container'}>
-                        <InputWrapper label="Step">
-                            <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
-                        </InputWrapper>
-                        <InputWrapper label={"Goal"}>
-                            <DropDownInput
-                                placeholder={'Type'}
-                                options={goalTypes}
-                                selected={goalType}
-                                setSelected={setGoalType}
-                            />
-                            <TextBoxInput type="number" placeholder="Number" value={goalNumber} setValue={setGoalNumber}/>
-                        </InputWrapper>
-                    </div>
+                    <AnimatePresence>
+                        {type === 'Number' && <motion.div className={'Collapsible-Container'} initial={{height: 0}} animate={{height: 'auto'}} exit={{height: 0}}>
+                            <InputWrapper label="Step">
+                                <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+                            </InputWrapper>
+                            <InputWrapper label={"Goal"}>
+                                <DropDownInput
+                                    placeholder={'Type'}
+                                    options={goalTypes}
+                                    selected={goalType}
+                                    setSelected={setGoalType}
+                                />
+                                <TextBoxInput type="number" placeholder="Number" value={goalNumber}
+                                              setValue={setGoalNumber}/>
+                            </InputWrapper>
+                        </motion.div>}
+                    </AnimatePresence>
+
                     <InputWrapper label={"Category"}>
                         <DropDownInput
                             placeholder={'Category'}

@@ -92,6 +92,10 @@ body {
     }
 }
 
+.Collapsible-Container {
+    overflow-y: hidden;
+}
+
 .red {
     background-color: var(--red-color);
 }
