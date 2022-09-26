@@ -2,8 +2,10 @@ import { useAnimation, motion  } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
+import {useDispatch, useSelector} from "react-redux";
+import {setTaskPreviousEntry} from "../../../state/tasksSlice";
 
-const CurrentProgress = ({ current, goal, setCurrent, step }) => {
+const CurrentProgress = ({ task }) => {
   const topLeftControls = useAnimation();
   const topControls = useAnimation();
   const topRightControls = useAnimation();
@@ -11,19 +13,21 @@ const CurrentProgress = ({ current, goal, setCurrent, step }) => {
   const bottomControls = useAnimation();
   const bottomLeftControls = useAnimation();
 
+  const dispatch = useDispatch();
+
   const animationControls = useMemo(() => {return [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]}, [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]);
   const [prevPercentage, setPrevPercentage] = useState(0);
 
   useEffect(() => {
     const maxDuration = 0.5;
-    const percentage = Math.round(current / goal * 100);
+    const percentage = Math.round( task.previousEntry / task.goal.number * 100);
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
       const toAnimate = [];
 
       // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
-      // where the result of true indicates a forward direction and false indicates a backwards ddirection.  
+      // where the result of true indicates a forward direction and false indicates a backwards direction.
 
       for (let i = start.index; animationDirection > 0 ? i <= finish.index : i >= finish.index; animationDirection > 0 ? i++ : i--) {
         let animationDuration;
@@ -92,9 +96,7 @@ const CurrentProgress = ({ current, goal, setCurrent, step }) => {
       setPrevPercentage(percentage);
     }
 
-  }, [prevPercentage, animationControls, current, goal])
-
-  console.log(goal, current, step)
+  }, [prevPercentage, animationControls, task])
 
   return (
     <div className={`${styles.container}`}>
@@ -120,12 +122,13 @@ const CurrentProgress = ({ current, goal, setCurrent, step }) => {
 
       </div>
       <div className={`${styles.textContainer}`}>
-        <div className={`${styles.progressText}`}>{'\u00A0'.repeat(goal.toString().length - current.toString().length)}{current} / {goal} </div>
+        <div>{task.previousEntry} / {task.goal.number} </div>
         <div>|</div>
-        <div onClick={() => setCurrent(current + step)} className={`Button ${styles.button}`}>{step > 0 ? `+${step}`: step}</div>
+        <div onClick={() => dispatch(setTaskPreviousEntry({id: task.id, value: parseInt(task.previousEntry) + task.step}))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}`: task.step}</div>
       </div>
     </div>
   );
 };
 
 export default CurrentProgress;
+

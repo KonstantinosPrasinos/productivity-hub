@@ -15,8 +15,6 @@ const Task = ({tasks}) => {
 
     const screenSizeContext = useContext(ScreenSizeContext);
 
-    console.log(tasks, category);
-
     return (
         <div className={`Rounded-Container Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}>
             {category !== null && group !== null && <div className={styles.categoryContainer}>
@@ -31,7 +29,7 @@ const Task = ({tasks}) => {
                     <div className={styles.titleContainer}>
                         <div className={`Title`}>{task.name}</div>
                     </div>
-                    <VisualStreak streak={task.shortHistory} step={task.step} current={parseInt(task.previousEntry)} goal={task.goal.number}></VisualStreak>
+                    <VisualStreak task={task}></VisualStreak>
                 </div>
             ))}
         </div>

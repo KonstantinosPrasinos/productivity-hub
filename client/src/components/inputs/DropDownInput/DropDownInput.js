@@ -5,8 +5,7 @@ import styles from "./DropDownInput.module.scss";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-const DropDownInput = ({ placeholder, options, isDisabled }) => {
-  const [selectedIndex, setSelectedIndex] = useState(null);
+const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected }) => {
   const [extended, setExtended] = useState(false);
   const containerRef = useRef();
 
@@ -32,7 +31,7 @@ const DropDownInput = ({ placeholder, options, isDisabled }) => {
         onClick={handleExtension}
 
       >
-        <div>{selectedIndex !== null ? options[selectedIndex] : placeholder}</div>
+        <div>{selected ? selected : placeholder}</div>
         <ArrowDropDownIcon
           className={`${styles.arrowIndicator} ${
             extended ? styles.extended : ""
@@ -54,7 +53,7 @@ const DropDownInput = ({ placeholder, options, isDisabled }) => {
                     >
                         {options.map((option, index) => {
                             return (
-                                <div className={`${styles.option}`} key={index} onClick={() => {setSelectedIndex(index); handleExtension();}}>
+                                <div className={`${styles.option}`} key={index} onClick={() => {setSelected(option); handleExtension();}}>
                                     {option}
                                 </div>
                             );

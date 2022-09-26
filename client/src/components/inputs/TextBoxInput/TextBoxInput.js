@@ -3,8 +3,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useState } from "react";
 
-const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false }) => {
-    const [text, setText] = useState(null)
+const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false, value, setValue }) => {
 
     const handleChange = (event) => {
         if (type === 'number') {
@@ -12,23 +11,23 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
                 return;
             }
         }
-        setText(event.target.value)
+        setValue(event.target.value)
     }
 
     const checkIfNull = () => {
-        if (text === null) {
-            setText(0);
+        if (value === null) {
+            setValue(0);
         }
     }
 
     const increment = () => {
         checkIfNull();
-        setText(current => current + 1);
+        setValue(current => current + 1);
     }
 
     const decrement = () => {
         checkIfNull();
-        setText(current => current - 1);
+        setValue(current => current - 1);
     }
 
   return (
@@ -36,7 +35,9 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
       className={`${styles.container} Horizontal-Flex-Container Rounded-Container`}
     >
       {icon !== null && <>{icon}</>}
-      <span className={styles.inputWrapper}><input disabled={isDisabled} type={type === 'password' ? 'password' : 'text'} className={styles.input} placeholder={placeholder} value={text !== null ? text : ""} onChange={handleChange} /></span>
+      <span className={styles.inputWrapper}>
+          <input disabled={isDisabled} type={type === 'password' ? 'password' : 'text'} className={styles.input} placeholder={placeholder} value={value} onChange={handleChange} />
+      </span>
       {type === "number" && (
         <div className={styles.buttonsContainer}>
           <button disabled={isDisabled} className={`${styles.button}`} onClick={increment}><ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>

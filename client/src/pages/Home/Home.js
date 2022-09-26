@@ -23,8 +23,6 @@ const Home = () => {
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);
 
-    console.log(groupedTasks);
-
     const screenSizeContext = useContext(ScreenSizeContext);
 
     return (

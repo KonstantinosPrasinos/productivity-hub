@@ -4,10 +4,11 @@ import styles from './VisualStreak.module.scss';
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import { useState } from 'react';
 
-const VisualStreak = ({ streak, step, current, goal }) => {
+const VisualStreak = ({ task }) => {
+
   const [hoveredDate, setHoveredDate] = useState();
 
-  const chars = streak.split("");
+  const chars = task.shortHistory.split("");
   let date = new Date();
   date.setDate(date.getDate() - 7);
 
@@ -39,7 +40,7 @@ const VisualStreak = ({ streak, step, current, goal }) => {
           {renderDate(index)}
         </div>
       )}
-      <CurrentProgress current={current} goal={goal} setCurrent={() => {}} step={step}></CurrentProgress>
+      <CurrentProgress task={task}></CurrentProgress>
     </div>
   );
 };

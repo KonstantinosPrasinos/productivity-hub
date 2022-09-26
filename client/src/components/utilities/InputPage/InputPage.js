@@ -5,7 +5,7 @@ import IconButton from "../../buttons/IconButton/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import FilledButton from "../../buttons/FilledButton/FilledButton";
 
-const InputPage = ({leftSide, rightSide, toggleState}) => {
+const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
     const screenSizeContext = useContext(ScreenSizeContext);
     return (
         <div
@@ -32,7 +32,7 @@ const InputPage = ({leftSide, rightSide, toggleState}) => {
                 }
 
                 <div className={`${styles.saveButton} ${screenSizeContext.state === 'small' && styles.small}`}>
-                    <FilledButton>Save</FilledButton>
+                    <FilledButton onClick={handleSave}>Save</FilledButton>
                 </div>
             </div>
         </div>
