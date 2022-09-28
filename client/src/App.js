@@ -14,6 +14,8 @@ import NotFound from "./pages/NotFound/NotFound";
 import {ScreenSizeContext} from "./context/ScreenSizeContext";
 import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
+import MiniPageHandler from "./components/utilities/MiniPageHandler/MiniPageHandler";
+import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 
 function App() {
 
@@ -77,6 +79,8 @@ function App() {
             <div className={`App ${themeContext.state.theme ? themeContext.state.theme : ''}`}>
                 <NavBar/>
                 <TopAppBar/>
+                <AlertHandler />
+                {/*<MiniPageHandler />*/}
                 <div className="content-container">
                     <Routes>
                         <Route

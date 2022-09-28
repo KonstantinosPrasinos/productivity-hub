@@ -1,0 +1,58 @@
+@import 'src/styles/variables.scss';
+
+@media (max-width: $tablet-breakpoint) {
+  .container {
+    border-top: 2px solid var(--primary-color);
+    width: calc(100% - 40px);
+    height: calc(100% - 4em - 32px);
+    bottom: calc(4em + 12px);
+    min-height: 25%;
+    max-height: calc(100% - 4em - 32px);
+  }
+}
+
+@media (min-width: $tablet-breakpoint) {
+  .container {
+    width: 320px;
+    height: 100%;
+    right: 0;
+    top: 0;
+    box-sizing: content-box;
+  }
+}
+
+.container {
+  position: fixed;
+  background-color: var(--surface-color);
+  z-index: 2;
+  padding: 10px 20px;
+  flex-wrap: nowrap;
+}
+
+.topLineContainer {
+  height: min-content;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0 0;
+}
+
+.topLine {
+  height: 0.3em;
+  width: 25%;
+  background-color: var(--primary-color);
+  border-radius: 0.5em;
+}
+
+.actionButtonsContainer {
+  display: flex;
+  justify-content: space-between;
+  font-size: $font-xl;
+  padding: 0 10px 10px 10px;
+  background-color: var(--surface-color);
+}
+
+.childrenContainer {
+  overflow-y: auto;
+  padding-right: 10px;
+}

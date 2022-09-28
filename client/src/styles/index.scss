@@ -36,6 +36,10 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.content-container {
+    position: relative;
+}
+
 .Button {
     display: inline-flex;
     justify-content: center;
@@ -60,7 +64,7 @@ body {
 .Stack-Container {
     display: flex;
     gap: $base-gap;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     flex-direction: column;
 }
 

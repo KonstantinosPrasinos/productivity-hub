@@ -4,6 +4,7 @@
     border-radius: $button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
+    font-size: $font-l;
 
     &.square {
         border-radius: $base-border-radius;

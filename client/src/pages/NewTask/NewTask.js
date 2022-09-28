@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid';
 import {addTask} from "../../state/tasksSlice";
 import {AnimatePresence, motion} from 'framer-motion';
+import MiniPageHandler from "../../components/utilities/MiniPageHandler/MiniPageHandler";
 
 const NewTask = () => {
     const categories = useSelector((state) => state.categories.categories);
@@ -23,13 +24,13 @@ const NewTask = () => {
     const dispatch = useDispatch();
 
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
-    const taskType = ['Number', 'Checkbox'];
+    const taskType = ['Checkbox', 'Number'];
     const goalTypes = ['At most', 'Exactly', 'At least'];
     const timePeriods = ['Day', 'Week', 'Month', 'Year'];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     const [name, setName] = useState('');
-    const [type, setType] = useState('Number');
+    const [type, setType] = useState('Checkbox');
     const [step, setStep] = useState('');
     const [goalType, setGoalType] = useState('At least');
     const [goalNumber, setGoalNumber] = useState('');
@@ -69,7 +70,6 @@ const NewTask = () => {
             if (id && name && type) {
                 return true
             }
-
             return false;
         }
 
@@ -106,111 +106,102 @@ const NewTask = () => {
     }
 
     return (
-        <InputPage
-            leftSide={
-                <div className={'Stack-Container'}>
-                    <input type="text" className="Title Title-Input" placeholder="Add task name" value={name}
-                           onChange={(e) => setName(e.target.value)}/>
-                    <InputWrapper label="Type">
-                        <div className={`Horizontal-Flex-Container`}>
-                            {taskType.map((task, index) => (
-                                <Chip
-                                    selected={type}
-                                    setSelected={setType}
-                                    value={task}
-                                    key={index}
-                                >
-                                    {task}
-                                </Chip>
-                            ))
-                            }
-                        </div>
-                    </InputWrapper>
-                    <AnimatePresence>
-                        {type === 'Number' && <motion.div className={'Collapsible-Container'} initial={{height: 0}} animate={{height: 'auto'}} exit={{height: 0}}>
-                            <InputWrapper label="Step">
-                                <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
-                            </InputWrapper>
-                            <InputWrapper label={"Goal"}>
-                                <DropDownInput
-                                    placeholder={'Type'}
-                                    options={goalTypes}
-                                    selected={goalType}
-                                    setSelected={setGoalType}
-                                />
-                                <TextBoxInput type="number" placeholder="Number" value={goalNumber}
-                                              setValue={setGoalNumber}/>
-                            </InputWrapper>
-                        </motion.div>}
-                    </AnimatePresence>
-
-                    <InputWrapper label={"Category"}>
-                        <DropDownInput
-                            placeholder={'Category'}
-                            options={categoryNames}
-                            selected={category}
-                            setSelected={setCategory}
-                        />
-                    </InputWrapper>
-                    <InputWrapper label="Priority">
-                        <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
-                        <PriorityIndicator/>
-                    </InputWrapper>
-                    <InputWrapper label="Repeats">
-                        <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
-                    </InputWrapper>
+        <MiniPageHandler
+            toggleState={repeats}
+            handleSave={handleSave}
+        >
+            <input type="text" className="Title Title-Input" placeholder="Add task name" value={name}
+                   onChange={(e) => setName(e.target.value)}/>
+            <InputWrapper label="Type">
+                <div className={`Horizontal-Flex-Container`}>
+                    {taskType.map((task, index) => (
+                        <Chip
+                            selected={type}
+                            setSelected={setType}
+                            value={task}
+                            key={index}
+                        >
+                            {task}
+                        </Chip>
+                    ))
+                    }
                 </div>
-            }
-            rightSide={
-                <div className={'Stack-Container'}>
-                    <InputWrapper label={"Long term goal"}>
+            </InputWrapper>
+            <AnimatePresence>
+                {type === 'Number' && <motion.div className={'Collapsible-Container'} initial={{height: 0}} animate={{height: 'auto'}} exit={{height: 0}}>
+                    <InputWrapper label="Step">
+                        <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+                    </InputWrapper>
+                    <InputWrapper label={"Goal"}>
                         <DropDownInput
                             placeholder={'Type'}
                             options={goalTypes}
-                            selected={longGoalType}
-                            setSelected={setLongGoalType}
+                            selected={goalType}
+                            setSelected={setGoalType}
                         />
-                        <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
-                                      setValue={setLongGoalNumber}/>
+                        <TextBoxInput type="number" placeholder="Number" value={goalNumber}
+                                      setValue={setGoalNumber}/>
                     </InputWrapper>
-                    <InputWrapper label={"Expires at"}>
-                        <DropDownInput
-                            placeholder={'Never'}
-                            options={causesOfExpiration}
-                            selected={expiresAt}
-                            setSelected={setExpiresAt}
-                        />
-                    </InputWrapper>
-                    <InputWrapper label={"Repeat every"}>
-                        <DropDownInput
-                            placeholder={'Time period'}
-                            options={timePeriods}
-                            selected={repeatEvery}
-                            setSelected={setRepeatEvery}
-                        />
-                        <DropDownInput
-                            placeholder={'Subdivision'}
-                            options={days}
-                            selected={repeatEverySub}
-                            setSelected={setRepeatEverySub}
-                        />
-                    </InputWrapper>
-                    <div className='Label'>Or</div>
-                    <InputWrapper label={"Select a category time group"}>
-                        <DropDownInput
-                            placeholder={'Time group'}
-                            options={groupNames}
-                            selected={timeGroup}
-                            setSelected={setTimeGroup}
-                        />
-                    </InputWrapper>
+                </motion.div>}
+            </AnimatePresence>
 
-
-                </div>
-            }
-            toggleState={repeats}
-            handleSave={handleSave}
-        ></InputPage>
+            <InputWrapper label={"Category"}>
+                <DropDownInput
+                    placeholder={'Category'}
+                    options={categoryNames}
+                    selected={category}
+                    setSelected={setCategory}
+                />
+            </InputWrapper>
+            <InputWrapper label="Priority">
+                <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
+                <PriorityIndicator/>
+            </InputWrapper>
+            <InputWrapper label="Repeats">
+                <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
+            </InputWrapper>
+            <InputWrapper label={"Long term goal"}>
+                <DropDownInput
+                    placeholder={'Type'}
+                    options={goalTypes}
+                    selected={longGoalType}
+                    setSelected={setLongGoalType}
+                />
+                <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
+                              setValue={setLongGoalNumber}/>
+            </InputWrapper>
+            <InputWrapper label={"Expires at"}>
+                <DropDownInput
+                    placeholder={'Never'}
+                    options={causesOfExpiration}
+                    selected={expiresAt}
+                    setSelected={setExpiresAt}
+                />
+            </InputWrapper>
+            <InputWrapper label={"Repeat every"}>
+                <DropDownInput
+                    placeholder={'Time period'}
+                    options={timePeriods}
+                    selected={repeatEvery}
+                    setSelected={setRepeatEvery}
+                />
+                <DropDownInput
+                    placeholder={'Subdivision'}
+                    options={days}
+                    selected={repeatEverySub}
+                    setSelected={setRepeatEverySub}
+                />
+            </InputWrapper>
+            <div className='Label'>Or</div>
+            <InputWrapper label={"Select a category time group"}>
+                <DropDownInput
+                    placeholder={'Time group'}
+                    options={groupNames}
+                    selected={timeGroup}
+                    setSelected={setTimeGroup}
+                />
+            </InputWrapper>
+        </MiniPageHandler>
     );
 };
 
