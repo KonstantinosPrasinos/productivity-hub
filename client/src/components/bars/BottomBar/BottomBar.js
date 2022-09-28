@@ -6,12 +6,15 @@ import AddIcon from '@mui/icons-material/Add';
 import styles from './BottomBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
 import FilledButton from "../../buttons/FilledButton/FilledButton";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
+import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
 const BottomBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const miniPagesContext = useContext(MiniPagesContext);
 
     const [selected, setSelected] = useState(null);
 
@@ -65,9 +68,7 @@ const BottomBar = () => {
                 <SettingsIcon sx={{fontSize: '1.5em'}} />
             </IconButton>
             <FilledButton
-                onClick={() => {
-                    navigate('/new-task', {replace: true})
-                }}
+                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-task'})}
                 type='square'
             >
                 <AddIcon sx={{fontSize: '2em'}} />

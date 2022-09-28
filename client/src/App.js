@@ -14,8 +14,8 @@ import NotFound from "./pages/NotFound/NotFound";
 import {ScreenSizeContext} from "./context/ScreenSizeContext";
 import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
-import MiniPageHandler from "./components/utilities/MiniPageHandler/MiniPageHandler";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
+import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 
 function App() {
 
@@ -80,7 +80,7 @@ function App() {
                 <NavBar/>
                 <TopAppBar/>
                 <AlertHandler />
-                {/*<MiniPageHandler />*/}
+                <MiniPagesHandler />
                 <div className="content-container">
                     <Routes>
                         <Route

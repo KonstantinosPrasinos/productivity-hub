@@ -1,16 +1,18 @@
-import styles from './MIniPageHandler.module.scss';
+import styles from './MiniPageContainer.module.scss';
 import {useContext, useEffect, useRef} from "react";
 import {motion, useAnimation} from 'framer-motion';
 import FilledButton from "../../buttons/FilledButton/FilledButton";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
+import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
-const MiniPageHandler = ({children}) => {
+const MiniPageContainer = ({children}) => {
     const containerRef = useRef();
     const animation = useAnimation();
 
     const screenSizeContext = useContext(ScreenSizeContext);
+    const miniPagesContext = useContext(MiniPagesContext);
 
     let startY;
 
@@ -24,7 +26,6 @@ const MiniPageHandler = ({children}) => {
         } else {
             e.stopPropagation();
         }
-
     }
 
     const makeFullHeight = () => {
@@ -58,13 +59,24 @@ const MiniPageHandler = ({children}) => {
         if (screenSizeContext.state === 'big') {
             containerRef.current.style.height = '100%'
         } else {
-            console.log('this.2')
             containerRef.current.style.height = 'calc(100% - 4em - 32px)'
         }
     }, [screenSizeContext])
 
+    useEffect(() => {
+        animation.start({
+            y: 0
+        });
+    }, [])
+
     return (
-        <motion.div className={`${styles.container} Stack-Container Symmetrical`} ref={containerRef} animate={animation} transition={{type: "tween"}} >
+        <motion.div
+            className={`${styles.container} Stack-Container Symmetrical`}
+            ref={containerRef} initial={{y: '100%'}}
+            animate={animation}
+            transition={{type: "tween"}}
+            exit={{y: "100%"}}
+        >
             <div className={styles.staticElements} onTouchMove={handleMove} onTouchEnd={handleEnd}>
                 {screenSizeContext.state === 'small' &&
                     <div className={styles.topLineContainer}>
@@ -73,7 +85,7 @@ const MiniPageHandler = ({children}) => {
                 }
 
                 <div className={styles.actionButtonsContainer}>
-                    <IconButton><CloseIcon /></IconButton>
+                    <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><CloseIcon /></IconButton>
                     <FilledButton >Save</FilledButton>
                 </div>
             </div>
@@ -84,4 +96,4 @@ const MiniPageHandler = ({children}) => {
     );
 };
 
-export default MiniPageHandler;
+export default MiniPageContainer;

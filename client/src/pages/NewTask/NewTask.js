@@ -1,4 +1,3 @@
-import InputPage from "../../components/utilities/InputPage/InputPage";
 import {useEffect, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
@@ -10,7 +9,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid';
 import {addTask} from "../../state/tasksSlice";
 import {AnimatePresence, motion} from 'framer-motion';
-import MiniPageHandler from "../../components/utilities/MiniPageHandler/MiniPageHandler";
+import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 
 const NewTask = () => {
     const categories = useSelector((state) => state.categories.categories);
@@ -67,10 +66,8 @@ const NewTask = () => {
         } while (idIsValid === false);
 
         const checkAllInputs = () => {
-            if (id && name && type) {
-                return true
-            }
-            return false;
+            return !!(id && name && type);
+
         }
 
         if (checkAllInputs()) {
@@ -106,7 +103,7 @@ const NewTask = () => {
     }
 
     return (
-        <MiniPageHandler
+        <MiniPageContainer
             toggleState={repeats}
             handleSave={handleSave}
         >
@@ -201,7 +198,7 @@ const NewTask = () => {
                     setSelected={setTimeGroup}
                 />
             </InputWrapper>
-        </MiniPageHandler>
+        </MiniPageContainer>
     );
 };
 

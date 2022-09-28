@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import ThemeContextProvider from './context/ThemeContext';
 import ScreenSizeContextProvider from './context/ScreenSizeContext';
 import AlertsContextProvider from './context/AlertsContext';
+import MiniPagesContextProvider from "./context/MiniPagesContext";
 
 ReactDOM.render(
   
@@ -14,7 +15,9 @@ ReactDOM.render(
         <AlertsContextProvider>
           <ScreenSizeContextProvider>
             <ThemeContextProvider>
-              <App />
+              <MiniPagesContextProvider>
+                  <App />
+              </MiniPagesContextProvider>
             </ThemeContextProvider>
           </ScreenSizeContextProvider>
         </AlertsContextProvider>
