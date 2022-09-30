@@ -9,17 +9,14 @@ const MiniPagesHandler = () => {
     const renderPage = (page, index) => {
         switch (page) {
             case 'new-task':
-                return (<NewTask key={index} />)
+                return (<NewTask key={index} index={index} length={miniPagesContext.state.length} />)
             default: return ''
         }
     }
 
     return (
         <AnimatePresence>
-            {miniPagesContext.state.length > 0 &&
-                miniPagesContext.state.map((page, index) => miniPagesContext.state.length-1 === index &&
-                    renderPage(page, index)
-                )}
+            {miniPagesContext.state.length > 0 && miniPagesContext.state.map((page, index) => renderPage(page, index))}
         </AnimatePresence>
     );
 };

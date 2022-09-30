@@ -7,7 +7,7 @@ import IconButton from "../../buttons/IconButton/IconButton";
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
-const MiniPageContainer = ({children, onClickSave}) => {
+const MiniPageContainer = ({children, onClickSave, length, index}) => {
     const containerRef = useRef();
     const animation = useAnimation();
 
@@ -68,6 +68,14 @@ const MiniPageContainer = ({children, onClickSave}) => {
             y: 0
         });
     }, [])
+
+    useEffect(() => {
+        if (index !== length - 1) {
+            animation.start({y: "100%"});
+        } else {
+            animation.start({y: 0});
+        }
+    }, [length, index])
 
     return (
         <motion.div

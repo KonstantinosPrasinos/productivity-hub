@@ -13,7 +13,7 @@ import MiniPageContainer from "../../components/utilities/MiniPagesContainer/Min
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 
-const NewTask = () => {
+const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state.categories.categories);
     const categoryNames = categories.map(category => category.name);
 
@@ -114,6 +114,8 @@ const NewTask = () => {
     return (
         <MiniPageContainer
             onClickSave={handleSave}
+            index={index}
+            length={length}
         >
             <input type="text" className="Title Title-Input" placeholder="Add task name" value={name}
                    onChange={(e) => setName(e.target.value)}/>
