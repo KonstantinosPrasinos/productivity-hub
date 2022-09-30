@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -10,6 +10,8 @@ import {v4 as uuidv4} from 'uuid';
 import {addTask} from "../../state/tasksSlice";
 import {AnimatePresence, motion} from 'framer-motion';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import {AlertsContext} from "../../context/AlertsContext";
+import {MiniPagesContext} from "../../context/MiniPagesContext";
 
 const NewTask = () => {
     const categories = useSelector((state) => state.categories.categories);
@@ -20,24 +22,27 @@ const NewTask = () => {
 
     const tasks = useSelector((state) => state.tasks.tasks);
     const {defaults} = useSelector((state) => state.user.settings);
+    const miniPagesContext = useContext(MiniPagesContext);
     const dispatch = useDispatch();
+
+    const alertsContext = useContext(AlertsContext);
 
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
-    const goalTypes = ['At most', 'Exactly', 'At least'];
+    const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
     const timePeriods = ['Day', 'Week', 'Month', 'Year'];
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     const [name, setName] = useState('');
     const [type, setType] = useState('Checkbox');
-    const [step, setStep] = useState('');
+    const [step, setStep] = useState(defaults.defaultStep);
     const [goalType, setGoalType] = useState('At least');
-    const [goalNumber, setGoalNumber] = useState('');
+    const [goalNumber, setGoalNumber] = useState(defaults.defaultGoal);
     const [category, setCategory] = useState('');
-    const [priority, setPriority] = useState('');
+    const [priority, setPriority] = useState(defaults.defaultPriority);
     const [repeats, setRepeats] = useState(false);
-    const [longGoalType, setLongGoalType] = useState('At least');
-    const [longGoalNumber, setLongGoalNumber] = useState('');
+    const [longGoalType, setLongGoalType] = useState('None');
+    const [longGoalNumber, setLongGoalNumber] = useState(defaults.defaultGoal);
     const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
@@ -60,14 +65,19 @@ const NewTask = () => {
         let idIsValid = true;
         let id;
 
+        console.log(defaults);
+
         do {
             id = uuidv4();
             idIsValid = !tasks.find(task => task.id === id);
         } while (idIsValid === false);
 
         const checkAllInputs = () => {
-            return !!(id && name && type);
-
+            if (name) {
+                return true
+            }
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Not all required fields are filled"}})
+            return false;
         }
 
         if (checkAllInputs()) {
@@ -99,13 +109,13 @@ const NewTask = () => {
             }
 
             dispatch(addTask(task));
+            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
     }
 
     return (
         <MiniPageContainer
-            toggleState={repeats}
-            handleSave={handleSave}
+            onClickSave={handleSave}
         >
             <input type="text" className="Title Title-Input" placeholder="Add task name" value={name}
                    onChange={(e) => setName(e.target.value)}/>

@@ -13,11 +13,11 @@
 
 @media (min-width: $tablet-breakpoint) {
   .container {
-    width: 320px;
+    width: 360px;
     height: 100%;
     right: 0;
     top: 0;
-    box-sizing: content-box;
+    box-sizing: border-box;
   }
 }
 
@@ -53,6 +53,6 @@
 }
 
 .childrenContainer {
-  overflow-y: auto;
   padding-right: 10px;
+  overflow-y: visible;
 }

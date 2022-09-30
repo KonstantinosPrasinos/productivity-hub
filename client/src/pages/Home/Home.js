@@ -4,6 +4,7 @@ import {ScreenSizeContext} from "../../context/ScreenSizeContext";
 import styles from './Home.module.scss'
 import Task from "../../components/indicators/Task/Task";
 import {useSelector} from "react-redux";
+import {AnimatePresence} from "framer-motion";
 
 const Home = () => {
     const tasks = useSelector((state) => state.tasks.tasks);
@@ -28,10 +29,12 @@ const Home = () => {
     return (
         <div className={`${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}>
             <div className={`Stack-Container ${styles.leftSide}`}>
-                {groupedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
-                    (<Task key={task.id} tasks={[task]}></Task>) :
-                    (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
-                )}
+                <AnimatePresence>
+                    {groupedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
+                        (<Task key={task.id} tasks={[task]}></Task>) :
+                        (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
+                    )}
+                </AnimatePresence>
             </div>
             {screenSizeContext.state !== 'small' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>

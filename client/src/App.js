@@ -4,7 +4,6 @@ import Settings from "./pages/Settings/Settings";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect} from "react";
-import TopAppBar from "./components/bars/TopAppBar/TopAppBar";
 
 import "./styles/index.scss";
 import {ThemeContext} from "./context/ThemeContext";
@@ -78,7 +77,6 @@ function App() {
         <BrowserRouter>
             <div className={`App ${themeContext.state.theme ? themeContext.state.theme : ''}`}>
                 <NavBar/>
-                <TopAppBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
                 <div className="content-container">

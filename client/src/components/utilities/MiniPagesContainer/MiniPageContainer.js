@@ -7,7 +7,7 @@ import IconButton from "../../buttons/IconButton/IconButton";
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
-const MiniPageContainer = ({children}) => {
+const MiniPageContainer = ({children, onClickSave}) => {
     const containerRef = useRef();
     const animation = useAnimation();
 
@@ -86,7 +86,7 @@ const MiniPageContainer = ({children}) => {
 
                 <div className={styles.actionButtonsContainer}>
                     <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><CloseIcon /></IconButton>
-                    <FilledButton >Save</FilledButton>
+                    <FilledButton onClick={onClickSave}>Save</FilledButton>
                 </div>
             </div>
             <div className={`Stack-Container ${styles.childrenContainer}`}>

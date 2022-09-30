@@ -5,6 +5,7 @@ import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
 import {useContext} from "react";
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import {useSelector} from "react-redux";
+import {motion} from "framer-motion";
 
 const Task = ({tasks}) => {
     const categories = useSelector((state) => state.categories.categories);
@@ -16,7 +17,11 @@ const Task = ({tasks}) => {
     const screenSizeContext = useContext(ScreenSizeContext);
 
     return (
-        <div className={`Rounded-Container Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}>
+        <motion.div
+            className={`Rounded-Container Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
+            initial={{ opacity: 0, y: 50, scale: 0.3 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+        >
             {category !== null && group !== null && <div className={styles.categoryContainer}>
                 <CategoryIndicator
                     category={category.name}
@@ -32,7 +37,8 @@ const Task = ({tasks}) => {
                     <VisualStreak task={task}></VisualStreak>
                 </div>
             ))}
-        </div>
+        </motion.div>
+
     );
 };
 

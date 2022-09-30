@@ -1,13 +1,16 @@
 import styles from "./TextBoxInput.module.scss";
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { useState } from "react";
 
 const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false, value, setValue }) => {
 
     const handleChange = (event) => {
         if (type === 'number') {
             if (isNaN(event.target.value)) {
+                return;
+            }
+            if (event.target.value === '') {
+                setValue(0);
                 return;
             }
         }
