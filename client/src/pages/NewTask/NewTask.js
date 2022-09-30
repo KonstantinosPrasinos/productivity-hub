@@ -23,10 +23,10 @@ const NewTask = ({index, length}) => {
 
     const tasks = useSelector((state) => state.tasks.tasks);
     const {defaults} = useSelector((state) => state.user.settings);
-    const miniPagesContext = useContext(MiniPagesContext);
     const dispatch = useDispatch();
 
     const alertsContext = useContext(AlertsContext);
+    const miniPagesContext = useContext(MiniPagesContext);
 
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
@@ -75,7 +75,7 @@ const NewTask = ({index, length}) => {
             if (name) {
                 return true
             }
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Not all required fields are filled"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a name for the task"}})
             return false;
         }
 
@@ -118,8 +118,12 @@ const NewTask = ({index, length}) => {
             index={index}
             length={length}
         >
-            <input type="text" className="Title Title-Input" placeholder="Add task name" value={name}
-                   onChange={(e) => setName(e.target.value)}/>
+            <input
+                type="text"
+                className="Title Title-Input"
+                placeholder="Add task name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}/>
             <InputWrapper label="Type">
                 <div className={`Horizontal-Flex-Container`}>
                     {taskType.map((task, index) => (

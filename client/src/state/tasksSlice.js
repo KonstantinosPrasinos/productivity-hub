@@ -1,4 +1,4 @@
-import {createSlice, current} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
     tasks: [
@@ -62,10 +62,12 @@ export const tasksSlice = createSlice({
     reducers: {
         addTask: (state, action) => {
             state.tasks.push(action.payload);
-            console.log(current(state));
         },
         removeTask: (state) => {
             state.tasks.pop();
+        },
+        setTasks: (state, action) => {
+            state.tasks = action.payload;
         },
         setTaskPreviousEntry: (state, action) => {
             state.tasks.find(task => task.id === action.payload.id).previousEntry = action.payload.value;
@@ -73,6 +75,6 @@ export const tasksSlice = createSlice({
     },
 })
 
-export const {addTask, removeTask, setTaskPreviousEntry} = tasksSlice.actions;
+export const {addTask, removeTask, setTaskPreviousEntry, setTasks} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

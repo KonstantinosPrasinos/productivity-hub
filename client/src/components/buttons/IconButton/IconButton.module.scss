@@ -8,6 +8,8 @@
   justify-content: center;
   font-size: $font-l;
   color: var(--primary-color);
+  height: 1.5em;
+  width: 1.5em;
 
   &:hover {
     transform: scale(1.01);
@@ -23,4 +25,9 @@
   &.notSelected {
     opacity: $opacity-low;
   }
+}
+
+.border {
+  border: 1px solid var(--primary-color);
+  border-radius: 100%;
 }

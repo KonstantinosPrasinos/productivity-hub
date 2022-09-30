@@ -10,6 +10,12 @@ export const categoriesSlice = createSlice({
             timeGroups: ['0']
         }]},
     reducers: {
+        addCategory: (state, action) => {
+            state.categories.push(action.payload);
+        },
+        removeCategory: (state, action) => {
+            state.categories.filter((category) => category.name !== action.payload);
+        },
         setCategories: (state, action) => {
             state.categories.length = 0;
             state.categories.push(...action.payload);
@@ -20,6 +26,6 @@ export const categoriesSlice = createSlice({
     }
 })
 
-export const {setCategories, emptyCategories} = categoriesSlice.actions;
+export const {setCategories, emptyCategories, addCategory, removeCategory} = categoriesSlice.actions;
 
 export default categoriesSlice.reducer;
