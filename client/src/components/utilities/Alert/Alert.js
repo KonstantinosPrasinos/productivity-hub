@@ -12,12 +12,10 @@ const Alert = ({ type, message, id }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log("removing", id);
       alertsContext.dispatch({ type: "DELETE_ALERT", payload: id });
     }, 3000);
     return () => {
       clearTimeout(timer);
-      console.log("unmount", id);
     };
   }, [id, alertsContext]);
 

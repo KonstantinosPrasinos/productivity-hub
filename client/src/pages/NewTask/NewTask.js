@@ -65,8 +65,6 @@ const NewTask = () => {
         let idIsValid = true;
         let id;
 
-        console.log(defaults);
-
         do {
             id = uuidv4();
             idIsValid = !tasks.find(task => task.id === id);
@@ -88,14 +86,14 @@ const NewTask = () => {
                 step: type === 'Number' ? (step ? step : defaults.defaultStep) : null,
                 goal: type === 'Number' ? {
                     goalType,
-                    number: goalNumber ? goalNumber : defaults.defaultGoal
+                    number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.defaultGoal)
                 } : null,
                 category,
                 priority: priority ? priority : defaults.defaultPriority,
                 repeats,
                 longGoal: repeats ? {
                     goalType: longGoalType,
-                    number: longGoalNumber ? longGoalNumber : defaults.defaultGoal
+                    number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.defaultGoal)
                 } : null,
                 expiresAt: repeats ? expiresAt : null,
                 timeGroup: repeats ? (timeGroup ? groups.find(group => group.name === timeGroup).id : null) : null,
