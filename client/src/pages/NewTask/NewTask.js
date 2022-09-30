@@ -12,6 +12,7 @@ import {AnimatePresence, motion} from 'framer-motion';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
+import AddIcon from "@mui/icons-material/Add";
 
 const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state.categories.categories);
@@ -155,7 +156,11 @@ const NewTask = ({index, length}) => {
             <InputWrapper label={"Category"}>
                 <DropDownInput
                     placeholder={'Category'}
-                    options={categoryNames}
+                    options={[...categoryNames,
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                            Add new
+                            <AddIcon />
+                        </div>]}
                     selected={category}
                     setSelected={setCategory}
                 />

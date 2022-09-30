@@ -5,13 +5,13 @@ import styles from './ColorInput.module.scss';
 const ColorInput = ({selected, setSelected}) => {
     return (
         <div className={styles.container}>
-            <div className={`${styles.colorContainer} ${styles.red} ${selected === 'red' ? styles.selected : ''}`} onClick={() => setSelected('red')}></div>
-            <div className={`${styles.colorContainer} ${styles.orange} ${selected === 'orange' ? styles.selected : ''}`} onClick={() => setSelected('orange')}></div>
-            <div className={`${styles.colorContainer} ${styles.yellow} ${selected === 'yellow' ? styles.selected : ''}`} onClick={() => setSelected('yellow')}></div>
-            <div className={`${styles.colorContainer} ${styles.green} ${selected === 'green' ? styles.selected : ''}`} onClick={() => setSelected('green')}></div>
-            <div className={`${styles.colorContainer} ${styles.lightBlue} ${selected === 'lightBlue' ? styles.selected : ''}`} onClick={() => setSelected('lightBlue')}></div>
-            <div className={`${styles.colorContainer} ${styles.blue} ${selected === 'blue' ? styles.selected : ''}`} onClick={() => setSelected('blue')}></div>
-            <div className={`${styles.colorContainer} ${styles.purple} ${selected === 'purple' ? styles.selected : ''}`} onClick={() => setSelected('purple')}></div>
+            <div className={`${styles.colorContainer} Red ${selected === 'Red' ? styles.selected : ''}`} onClick={() => setSelected('Red')}></div>
+            <div className={`${styles.colorContainer} Orange ${selected === 'Orange' ? styles.selected : ''}`} onClick={() => setSelected('Orange')}></div>
+            <div className={`${styles.colorContainer} Yellow ${selected === 'Yellow' ? styles.selected : ''}`} onClick={() => setSelected('Yellow')}></div>
+            <div className={`${styles.colorContainer} Green ${selected === 'Green' ? styles.selected : ''}`} onClick={() => setSelected('Green')}></div>
+            <div className={`${styles.colorContainer} LightBlue ${selected === 'LightBlue' ? styles.selected : ''}`} onClick={() => setSelected('LightBlue')}></div>
+            <div className={`${styles.colorContainer} Blue ${selected === 'Blue' ? styles.selected : ''}`} onClick={() => setSelected('Blue')}></div>
+            <div className={`${styles.colorContainer} Purple ${selected === 'Purple' ? styles.selected : ''}`} onClick={() => setSelected('Purple')}></div>
         </div>
     );
 };

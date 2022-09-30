@@ -2,6 +2,7 @@ import React, {useContext} from 'react';
 import NewTask from "../../../pages/NewTask/NewTask";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {AnimatePresence} from 'framer-motion'
+import NewCategory from "../../../pages/NewCategory/NewCategory";
 
 const MiniPagesHandler = () => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -10,6 +11,8 @@ const MiniPagesHandler = () => {
         switch (page) {
             case 'new-task':
                 return (<NewTask key={index} index={index} length={miniPagesContext.state.length} />)
+            case 'new-category':
+                return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} />)
             default: return ''
         }
     }

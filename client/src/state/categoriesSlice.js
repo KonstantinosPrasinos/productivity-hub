@@ -6,7 +6,7 @@ export const categoriesSlice = createSlice({
         categories: [{
             id: '0',
             name: 'Workout',
-            color: 'red',
+            color: 'Red',
             timeGroups: ['0']
         }]},
     reducers: {
@@ -14,7 +14,7 @@ export const categoriesSlice = createSlice({
             state.categories.length = 0;
             state.categories.push(...action.payload);
         },
-        emptyCategories: (state, action) => {
+        emptyCategories: (state) => {
             state.categories.length = 0;
         }
     }

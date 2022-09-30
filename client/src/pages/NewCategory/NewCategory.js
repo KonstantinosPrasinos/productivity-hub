@@ -4,32 +4,45 @@ import TextBoxInput from '../../components/inputs/TextBoxInput/TextBoxInput';
 import {useState} from 'react';
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
-import InputPage from "../../components/utilities/InputPage/InputPage";
+import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 
-const NewCategory = () => {
+const NewCategory = ({index, length}) => {
     const [isRepeatableContainer, setIsRepeatableContainer] = useState(true);
     const [selectedColor, setSelectedColor] = useState('red');
 
-    return (<InputPage
-        leftSide={
-        <div className={'Stack-Container'}>
-            <input type="text" className="Title Title-Input" placeholder="Add category name" />
-            <InputWrapper label="Color"><ColorInput selected={selectedColor} setSelected={setSelectedColor} /></InputWrapper>
-            <InputWrapper label="Act as repeatable container">
-                <ToggleButton isToggled={isRepeatableContainer} setIsToggled={setIsRepeatableContainer}></ToggleButton>
+    const handleSave = () => {
+
+    }
+
+    return (
+        <MiniPageContainer
+            onClickSave={handleSave}
+            index={index}
+            length={length}
+        >
+            <input type="text" className="Title Title-Input" placeholder="Add category name"/>
+            <InputWrapper label="Color">
+                <ColorInput selected={selectedColor} setSelected={setSelectedColor}/>
             </InputWrapper>
-        </div>
-        }
-        rightSide={
-        <div className={'Stack-Container'}>
-            <InputWrapper label="Priority"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput><PriorityIndicator /></InputWrapper>
-            <InputWrapper label="Ends at"><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
-            <InputWrapper label="Entry goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
-            <InputWrapper label="Long term goal"><TextBoxInput isDisabled={!isRepeatableContainer}></TextBoxInput><TextBoxInput isDisabled={!isRepeatableContainer} type="number"></TextBoxInput></InputWrapper>
-        </div>
-        }
-        toggleState={isRepeatableContainer}
-    ></InputPage>);
+            <InputWrapper label="Act as repeatable container">
+                <ToggleButton isToggled={isRepeatableContainer} setIsToggled={setIsRepeatableContainer} />
+            </InputWrapper>
+            <InputWrapper label="Priority">
+                <TextBoxInput isDisabled={!isRepeatableContainer} type="number" />
+                <PriorityIndicator/>
+            </InputWrapper>
+            <InputWrapper label="Ends at">
+                <TextBoxInput isDisabled={!isRepeatableContainer} type="number" />
+            </InputWrapper>
+            <InputWrapper label="Entry goal">
+                <TextBoxInput isDisabled={!isRepeatableContainer} />
+                <TextBoxInput isDisabled={!isRepeatableContainer} type="number" />
+            </InputWrapper>
+            <InputWrapper label="Long term goal">
+                <TextBoxInput isDisabled={!isRepeatableContainer} />
+                <TextBoxInput isDisabled={!isRepeatableContainer} type="number" />
+            </InputWrapper>
+        </MiniPageContainer>);
 }
- 
+
 export default NewCategory;

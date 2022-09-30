@@ -1,13 +1,15 @@
-import {useRef, useState} from "react";
+import {useContext, useRef, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
 const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected }) => {
   const [extended, setExtended] = useState(false);
   const containerRef = useRef();
+  const miniPagesContext = useContext(MiniPagesContext);
 
   const handleExtension = () => {
       const collapse = (event) => {
@@ -53,7 +55,11 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                     >
                         {options.map((option, index) => {
                             return (
-                                <div className={`${styles.option}`} key={index} onClick={() => {setSelected(option); handleExtension();}}>
+                                <div className={`${styles.option}`} key={index} onClick={() => {
+                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-category'})
+                                    setSelected(typeof option === 'string' ? option : '');
+                                    handleExtension();
+                                }}>
                                     {option}
                                 </div>
                             );
