@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 import styles from './SideBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
-import FilledButton from "../../buttons/FilledButton/FilledButton";
+import Button from "../../buttons/Button/Button";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
 const SideBar = () => {
@@ -44,7 +44,7 @@ const SideBar = () => {
                 <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'} setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}} /></IconButton>
                 <IconButton onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'} setSelected={() => setSelected('settings')}><SettingsIcon sx={{fontSize: '1.5em'}} /></IconButton>
             </div>
-            <FilledButton type='square' onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-task'})}><AddIcon sx={{fontSize: '1.5em'}} /></FilledButton>
+            <Button type='square' onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-task'})}><AddIcon sx={{fontSize: '1.5em'}} /></Button>
         </div>
     );
 }

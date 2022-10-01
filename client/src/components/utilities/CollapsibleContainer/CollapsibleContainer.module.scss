@@ -1,0 +1,7 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  border-top: $base-border;
+  border-bottom: $base-border;
+  padding: 10px 0 10px 0;
+}

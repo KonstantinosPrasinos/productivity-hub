@@ -1,25 +1,29 @@
 import React from 'react';
-import Chip from "../../../buttons/Chip/Chip";
+import styles from './WeekDayInput.module.scss'
 
 const WeekDayInput = ({selected, setSelected}) => {
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     const toggleSelected = (day) => {
-        if (selected.find(selectedDay => day === selectedDay)) {
-            setSelected(selected.filter(selectedDay => selectedDay !== day));
+        if (Array.isArray(selected)) {
+            if (selected?.find(selectedDay => day === selectedDay)) {
+                setSelected(selected.filter(selectedDay => selectedDay !== day));
+            } else {
+                setSelected([...selected, day]);
+            }
         } else {
-            setSelected([...selected, day]);
+            setSelected([day]);
         }
+
     }
 
     return (
         <div className={`Horizontal-Flex-Container`}>
-            <Chip selected={selected.find(value => value === 'Monday') ? 'Monday' : ''} setSelected={toggleSelected} value={'Monday'}>M</Chip>
-            <Chip selected={selected.find(value => value === 'Tuesday') ? 'Tuesday' : ''} setSelected={toggleSelected} value={'Tuesday'}>T</Chip>
-            <Chip selected={selected.find(value => value === 'Wednesday') ? 'Wednesday' : ''} setSelected={toggleSelected} value={'Wednesday'}>W</Chip>
-            <Chip selected={selected.find(value => value === 'Thursday') ? 'Thursday' : ''} setSelected={toggleSelected} value={'Thursday'}>T</Chip>
-            <Chip selected={selected.find(value => value === 'Friday') ? 'Friday' : ''} setSelected={toggleSelected} value={'Friday'}>F</Chip>
-            <Chip selected={selected.find(value => value === 'Saturday') ? 'Saturday' : ''} setSelected={toggleSelected} value={'Saturday'}>S</Chip>
-            <Chip selected={selected.find(value => value === 'Sunday') ? 'Sunday' : ''} setSelected={toggleSelected} value={'Sunday'}>S</Chip>
+            {days.map(day => (<button
+                key={day}
+                className={`${styles.button} ${selected?.includes(day) ? styles.selected : ''}`}
+                onClick={() => toggleSelected(day)}
+            >{day.slice(0, 1)}</button>))}
         </div>
     );
 };

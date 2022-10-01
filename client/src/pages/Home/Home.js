@@ -13,16 +13,29 @@ const Home = () => {
     // Create array of tasks to be rendered
     const groupedTasks = [];
 
-    // Add tasks to array grouped by timeGroup sorted by task priority
+    // Add tasks to array grouped by timeGroup sorted by task priority. Only if they have children tasks
     groups.forEach(group => {
-        groupedTasks.push({priority: group.priority, tasks: tasks.filter(task => task.timeGroup === group.id).sort((a, b) => b.priority - a.priority)});
-    });
+        const groupTasks = tasks.filter(task => task.timeGroup === group.id)
+
+        if (!groupTasks.length) {
+            return;
+        }
+
+        console.log(groupTasks);
+
+        groupedTasks.push({
+            priority: group.priority,
+            tasks: groupTasks.sort((a, b) => b.priority - a.priority)
+        })
+    })
 
     // Add the tasks that aren't in a timeGroup
     groupedTasks.push(...tasks.filter(task => task.timeGroup === null));
 
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);
+
+    console.log(groupedTasks);
 
     const screenSizeContext = useContext(ScreenSizeContext);
 

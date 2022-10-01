@@ -63,8 +63,8 @@ export const tasksSlice = createSlice({
         addTask: (state, action) => {
             state.tasks.push(action.payload);
         },
-        removeTask: (state) => {
-            state.tasks.pop();
+        removeTask: (state, action) => {
+            state.tasks.filter(task => task.id !== action.payload)
         },
         setTasks: (state, action) => {
             state.tasks = action.payload;

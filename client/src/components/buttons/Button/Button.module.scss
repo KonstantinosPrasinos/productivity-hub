@@ -10,4 +10,10 @@
         border-radius: $base-border-radius;
         padding: 10px
     }
+
+    &.outlined {
+        border: 1px solid var(--primary-color);
+        background-color: var(--surface-color);
+        color: var(--on-surface-color);
+    }
 }

@@ -1,0 +1,14 @@
+@import 'src/styles/variables.scss';
+
+.button {
+  width: 2em;
+  height: 2em;
+  border-radius: $chip-border-radius;
+  border: 1px solid var(--primary-color);
+
+  &.selected {
+    color: var(--on-primary-color);
+    background-color: var(--primary-color);
+  }
+  //background-color: red;
+}

@@ -3,7 +3,7 @@ import styles from './InputPage.module.scss';
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import IconButton from "../../buttons/IconButton/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import FilledButton from "../../buttons/FilledButton/FilledButton";
+import Button from "../../buttons/Button/Button";
 
 const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -32,7 +32,7 @@ const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
                 }
 
                 <div className={`${styles.saveButton} ${screenSizeContext.state === 'small' && styles.small}`}>
-                    <FilledButton onClick={handleSave}>Save</FilledButton>
+                    <Button onClick={handleSave}>Save</Button>
                 </div>
             </div>
         </div>

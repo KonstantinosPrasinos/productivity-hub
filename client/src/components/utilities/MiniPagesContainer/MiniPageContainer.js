@@ -1,7 +1,7 @@
 import styles from './MiniPageContainer.module.scss';
 import {useContext, useEffect, useRef} from "react";
 import {motion, useAnimation} from 'framer-motion';
-import FilledButton from "../../buttons/FilledButton/FilledButton";
+import Button from "../../buttons/Button/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
@@ -94,7 +94,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
                 <div className={styles.actionButtonsContainer}>
                     <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><CloseIcon /></IconButton>
-                    <FilledButton onClick={onClickSave}>Save</FilledButton>
+                    <Button onClick={onClickSave}>Save</Button>
                 </div>
             </div>
             <div className={`Stack-Container ${styles.childrenContainer}`}>

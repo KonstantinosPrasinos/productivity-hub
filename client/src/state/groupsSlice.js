@@ -28,16 +28,22 @@ export const groupsSlice = createSlice({
         }]
     },
     reducers: {
+        addGroup: (state, action) => {
+            state.groups.push(action.payload);
+        },
+        removeGroup: (state, action) => {
+            state.groups.filter(group => group.id !== action.payload)
+        },
         setGroups: (state, action) => {
             state.groups.length = 0;
             state.groups.push(...action.payload);
         },
-        emptyGroups: (state, action) => {
+        emptyGroups: (state) => {
             state.groups.length = 0;
         }
     }
 })
 
-export const {setGroups, emptyGroups} = groupsSlice.actions;
+export const {addGroup, removeGroup, setGroups, emptyGroups} = groupsSlice.actions;
 
 export default groupsSlice.reducer;

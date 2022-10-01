@@ -3,14 +3,13 @@ import { useContext, useState } from "react";
 import styles from "./Playground.module.scss";
 
 import Chip from "../../components/buttons/Chip/Chip";
-import FilledButton from "../../components/buttons/FilledButton/FilledButton";
+import Button from "../../components/buttons/Button/Button";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 
 import Skeleton from "../../components/utilities/Skeleton/Skeleton";
 import AlertHandler from "../../components/utilities/AlertHandler/AlertHandler";
 import { AlertsContext } from "../../context/AlertsContext";
-import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 import VisualStreak from "../../components/indicators/VisualStreak/VisualStreak";
 
 import EmailIcon from '@mui/icons-material/Email';
@@ -39,9 +38,9 @@ const Playground = () => {
           </Chip>
         ))}
       </div>
-      <FilledButton onClick={() => console.log("Clicked!")}>
+      <Button onClick={() => console.log("Clicked!")}>
         Click me
-      </FilledButton>
+      </Button>
       <div className="Title">Task Name</div>
       <span className="Label">This is a headline:</span>
       <DropDownInput options={["Option 1", "Option 2", "Option 3"]}>
