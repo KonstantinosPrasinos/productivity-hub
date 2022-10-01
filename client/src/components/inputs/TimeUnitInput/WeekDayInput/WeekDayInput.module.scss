@@ -3,7 +3,7 @@
 .button {
   width: 2em;
   height: 2em;
-  border-radius: $chip-border-radius;
+  border-radius: $button-border-radius;
   border: 1px solid var(--primary-color);
 
   &.selected {

@@ -15,4 +15,13 @@
     &:hover {
         filter: brightness(95%);
     }
+
+    &.round {
+        border-radius: $button-border-radius;
+    }
+
+    &.filled {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+    }
 }

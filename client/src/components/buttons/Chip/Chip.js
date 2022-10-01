@@ -1,12 +1,19 @@
 import styles from "./Chip.module.scss";
 
-const Chip = ({ children, value, selected, setSelected }) => {
+const Chip = ({ children, value, selected, setSelected, type='select', onClick, style = 'squared' }) => {
   return (
     <div
-      className={`Button ${styles.container} ${
-        value === selected ? styles.selected : ""
-      }`}
-      onClick={() => setSelected(value)}
+      className={`Button ${styles[style]} ${styles.container} ${type === 'select' && value === selected ? styles.filled : ""} ${type === 'icon'}`}
+      onClick={(e) => {
+          switch (type) {
+              case 'select':
+                  setSelected(value);
+                  return;
+              case 'icon':
+                  onClick(e);
+                  return;
+          }
+      }}
     >
       {children}
     </div>

@@ -42,3 +42,11 @@
   flex-direction: row;
   justify-content: space-between;
 }
+
+.groupsContainer {
+  display: inline-flex;
+  flex-direction: row;
+  gap: $base-gap;
+  align-items: center;
+  overflow-x: auto;
+}

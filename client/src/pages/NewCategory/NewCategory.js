@@ -1,6 +1,6 @@
 import InputWrapper from '../../components/utilities/InputWrapper/InputWrapper';
 import TextBoxInput from '../../components/inputs/TextBoxInput/TextBoxInput';
-import {useContext, useState} from 'react';
+import {useContext, useRef, useState} from 'react';
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
@@ -18,7 +18,9 @@ import customStyles from './NewCategory.module.scss';
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import {v4 as uuidv4} from "uuid";
-import {addGroup} from "../../state/groupsSlice";
+import {addGroup, removeGroup} from "../../state/groupsSlice";
+import Chip from "../../components/buttons/Chip/Chip";
+import CloseIcon from "@mui/icons-material/Close";
 
 const NewCategory = ({index, length}) => {
     const groups = useSelector((state) => state.groups.groups);
@@ -28,6 +30,7 @@ const NewCategory = ({index, length}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years']
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
+    const currentEditedGroup = useRef();
 
     const [name, setName] = useState('');
     const [color, setColor] = useState('Red');
@@ -64,8 +67,6 @@ const NewCategory = ({index, length}) => {
         setTimePeriod('Weeks');
         setTimePeriod2(null);
         setPriority(defaults.defaultPriority);
-
-        setCreatingTimeGroup(false);
     }
 
     const handleTimeGroupSave = () => {
@@ -74,7 +75,7 @@ const NewCategory = ({index, length}) => {
             return;
         }
 
-        if (timeGroups.find(group => group.title === timeGroupTitle))  {
+        if (timeGroupTitle !== currentEditedGroup.current?.title && timeGroups.find(group => group.title === timeGroupTitle))  {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Time group title must be unique"}})
             return;
         }
@@ -84,13 +85,18 @@ const NewCategory = ({index, length}) => {
             return;
         }
 
-        let idIsValid = true;
         let id;
 
-        do {
-            id = uuidv4();
-            idIsValid = !groups.find(group => group.id === id);
-        } while (idIsValid === false);
+        if (!currentEditedGroup.current) {
+            let idIsValid = true;
+
+            do {
+                id = uuidv4();
+                idIsValid = !groups.find(group => group.id === id);
+            } while (idIsValid === false);
+        } else {
+            id = currentEditedGroup.current?.id;
+        }
 
         const timeGroup = {
             id,
@@ -101,9 +107,22 @@ const NewCategory = ({index, length}) => {
             smallTimePeriod: timePeriod2
         }
 
-        setTimeGroups([...timeGroups, {id, title: timeGroupTitle}]);
-        dispatch(addGroup(timeGroup));
+        if (currentEditedGroup.current) {
+            setTimeGroups(timeGroups.map(group => {
+                if (group.id === timeGroup.id) {
+                    return timeGroup;
+                } else {
+                    return group;
+                }
+            }))
+        } else {
+            setTimeGroups([...timeGroups, timeGroup]);
+            dispatch(addGroup(timeGroup));
+        }
+
         resetTimeGroupInputs();
+        currentEditedGroup.current = null;
+        setCreatingTimeGroup(false);
     }
 
     const formatCaption = (month) => {
@@ -147,6 +166,46 @@ const NewCategory = ({index, length}) => {
         }
     }
 
+    const handleGroupClick = (e, group) => {
+        // If target is icon then stop the event
+        if (e.target !== e.currentTarget) {
+            e.stopPropagation();
+            return;
+        }
+
+        // Show time group inputs
+        setCreatingTimeGroup(true);
+
+        // Reset time group inputs
+        resetTimeGroupInputs();
+
+        // Populate time group inputs
+        setTimeGroupTitle(group.title);
+        setPriority(group.priority);
+        setTimeGroupNumber(group.number);
+        setTimePeriod(group.bigTimePeriod);
+        setTimePeriod2(group.smallTimePeriod);
+
+        currentEditedGroup.current = group;
+    }
+
+    const handleDelete = (group) => {
+        if (group.id === currentEditedGroup.current?.id) {
+            resetTimeGroupInputs();
+            currentEditedGroup.current = null;
+            setCreatingTimeGroup(false);
+        }
+
+        setTimeGroups(timeGroups.filter(filterGroup => filterGroup.id !== group.id));
+        dispatch(removeGroup(group.id));
+    }
+
+    const handleCancel = () => {
+        resetTimeGroupInputs();
+        currentEditedGroup.current = null;
+        setCreatingTimeGroup(false);
+    }
+
     return (
         <MiniPageContainer
             onClickSave={handleSave}
@@ -158,11 +217,17 @@ const NewCategory = ({index, length}) => {
                 <ColorInput selected={color} setSelected={setColor}/>
             </InputWrapper>
             <InputWrapper label="Time Groups">
-                {timeGroups.map(group => (<div key={group}>{group.title}</div>))}
-                <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
-                    <AddIcon/>
-                </IconButton>
+                <div className={customStyles.groupsContainer}>
+                    <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
+                        <AddIcon/>
+                    </IconButton>
+                    {timeGroups.map(group => (<Chip key={group.id} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
+                        {group.title}
+                        <IconButton onClick={() => handleDelete(group)}><CloseIcon /></IconButton>
+                    </Chip>))}
+                </div>
             </InputWrapper>
+
             <CollapsibleContainer isVisible={creatingTimeGroup}>
                 <InputWrapper label={'Title'}>
                     <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle}/>
@@ -180,7 +245,7 @@ const NewCategory = ({index, length}) => {
                     {renderTimePeriodInput()}
                 </InputWrapper>}
                 <div className={customStyles.bottomButtonsContainer}>
-                    <Button filled={false} onClick={resetTimeGroupInputs}>Cancel</Button>
+                    <Button filled={false} onClick={handleCancel}>Cancel</Button>
                     <Button onClick={handleTimeGroupSave}>Save</Button>
                 </div>
             </CollapsibleContainer>

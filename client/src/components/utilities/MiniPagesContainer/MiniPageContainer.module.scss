@@ -54,5 +54,6 @@
 
 .childrenContainer {
   padding-right: 10px;
-  overflow-y: visible;
+  overflow-y: auto;
+  flex: 1;
 }

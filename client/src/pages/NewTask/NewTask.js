@@ -8,11 +8,11 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import {useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid';
 import {addTask} from "../../state/tasksSlice";
-import {AnimatePresence, motion} from 'framer-motion';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
+import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 
 const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state.categories.categories);
@@ -139,23 +139,21 @@ const NewTask = ({index, length}) => {
                     }
                 </div>
             </InputWrapper>
-            <AnimatePresence>
-                {type === 'Number' && <motion.div className={'Collapsible-Container'} initial={{height: 0}} animate={{height: 'auto'}} exit={{height: 0}}>
-                    <InputWrapper label="Step">
-                        <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
-                    </InputWrapper>
-                    <InputWrapper label={"Goal"}>
-                        <DropDownInput
-                            placeholder={'Type'}
-                            options={goalTypes}
-                            selected={goalType}
-                            setSelected={setGoalType}
-                        />
-                        <TextBoxInput type="number" placeholder="Number" value={goalNumber}
-                                      setValue={setGoalNumber}/>
-                    </InputWrapper>
-                </motion.div>}
-            </AnimatePresence>
+            <CollapsibleContainer isVisible={type === 'Number'}>
+                <InputWrapper label="Step">
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+                </InputWrapper>
+                <InputWrapper label={"Goal"}>
+                    <DropDownInput
+                        placeholder={'Type'}
+                        options={goalTypes}
+                        selected={goalType}
+                        setSelected={setGoalType}
+                    />
+                    <TextBoxInput type="number" placeholder="Number" value={goalNumber}
+                                  setValue={setGoalNumber}/>
+                </InputWrapper>
+            </CollapsibleContainer>
 
             <InputWrapper label={"Category"}>
                 <DropDownInput
