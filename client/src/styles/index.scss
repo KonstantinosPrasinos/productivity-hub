@@ -177,11 +177,6 @@ button {
     .App {
         flex-direction: column;
     }
-    .Rounded-Container {
-        width: 100%;
-        border-radius: 0;
-        height: 100%;
-    }
 }
 
 @media (min-width: $tablet-breakpoint) {
@@ -190,9 +185,6 @@ button {
         width: calc(100% - 300px - 8em);
         height: 100%;
         padding: 2em;
-    }
-    .Rounded-Container {
-        height: min-content;
     }
 }
 

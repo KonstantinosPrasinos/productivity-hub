@@ -13,7 +13,7 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
 
   const handleExtension = () => {
       const collapse = (event) => {
-          if (event.target !== containerRef.current && !containerRef.current.contains(event.target)) {
+          if (event.target !== containerRef.current && !containerRef.current?.contains(event.target)) {
               setExtended(false);
           }
       }
