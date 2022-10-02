@@ -7,24 +7,10 @@ export const groupsSlice = createSlice({
             id: '0',
             name: 'Monday',
             priority: 1,
-            repeatEvery: {
-                subMeasurement: 'Monday',
-                measurement: 'week',
-                time: {
-                    from: '17:00',
-                    to: '21:00'
-                }
-            },
-            longGoal: {
-                goalType: 'streak',
-                number: '12'
-            },
-            goal: {
-                goalType: 'any task',
-                number: null
-            },
-            expiresAt: '20-1-2023',
-            parentCategory: '0'
+            number: 1,
+            bigTimePeriod: 'Weeks',
+            smallTimePeriod: 'Monday',
+            parent: 'Workout'
         }]
     },
     reducers: {

@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const groupSchema = new Schema({
-    id: {
+    user_id: {
         type: String,
         required: true
     },
-    user_id: {
+    id: {
         type: String,
         required: true
     },
@@ -14,31 +14,16 @@ const groupSchema = new Schema({
         type: String,
         required: true
     },
-    priority: {
+    repeatNumber: {
         type: Number,
         required: true
     },
-    repeatEvery: {
-        subMeasurement: String,
-        measurement: String,
-        time: {
-            from: String,
-            to: String
-        }
-    },
-    longGoal: {
-        goalType: String,
-        number: Number
-    },
-    goal: {
+    timePeriod: {
         type: String,
         required: true
     },
-    expiresAt: {
-        type: String
-    },
-    parentCategory: {
-        type: String
+    onTimePeriod: {
+        type: [String]
     }
 })
 

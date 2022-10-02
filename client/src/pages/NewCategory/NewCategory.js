@@ -57,6 +57,12 @@ const NewCategory = ({index, length}) => {
             }
 
             dispatch(addCategory(category));
+
+            timeGroups.forEach(group => {
+                group.parent = category.name;
+                dispatch(addGroup(group));
+            })
+
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
     }
@@ -117,7 +123,6 @@ const NewCategory = ({index, length}) => {
             }))
         } else {
             setTimeGroups([...timeGroups, timeGroup]);
-            dispatch(addGroup(timeGroup));
         }
 
         resetTimeGroupInputs();
