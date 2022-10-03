@@ -40,7 +40,7 @@ const NewCategory = ({index, length}) => {
     const [priority, setPriority] = useState(0);
     const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.defaultPriority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
-    const [timePeriod2, setTimePeriod2] = useState();
+    const [timePeriod2, setTimePeriod2] = useState([]);
 
     const handleSave = () => {
         const checkAllInputs = () => {
@@ -71,6 +71,8 @@ const NewCategory = ({index, length}) => {
 
                 dispatch(addGroup(tempGroup));
             })
+
+            console.log(timeGroups);
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
@@ -114,29 +116,28 @@ const NewCategory = ({index, length}) => {
         }
 
         let startingDates = [];
-
-        [...timePeriod2].forEach(timePeriod => {
+        
+        timePeriod2.forEach(smallTimePeriod => {
             let startingDate = new Date();
 
             switch (timePeriod) {
                 case 'Days':
-                    startingDate = new Date();
                     break;
                 case 'Weeks':
                     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-                    const weekDaysDifference = startingDate.getDay() - days.findIndex(day => day === timePeriod2) + 1;
+                    const weekDaysDifference = days.findIndex(day => day === smallTimePeriod) + 1 - startingDate.getDay();
                     startingDate.setDate(startingDate.getDate() + weekDaysDifference);
                     break;
                 case 'Months':
-                    startingDate.setDate(timePeriod2?.getDate());
+                    startingDate.setDate(smallTimePeriod?.getDate());
                     break;
                 case 'Years':
-                    startingDate.setTime(timePeriod2?.getTime());
+                    startingDate.setTime(smallTimePeriod?.getTime());
                     break;
             }
-
-            startingDates.push(startingDate);
+            startingDate.setHours(0, 0, 0, 0);
+            startingDates.push(startingDate.getTime());
         })
 
         const timeGroup = {

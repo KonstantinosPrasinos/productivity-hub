@@ -29,6 +29,10 @@ const groupSchema = new Schema({
     smallTimePeriod: {
         type: String
     },
+    startingDate: {
+        type: Date,
+        required: true
+    },
     parent: {
         type: String,
         required: true

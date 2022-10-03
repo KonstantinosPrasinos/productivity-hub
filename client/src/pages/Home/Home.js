@@ -12,6 +12,7 @@ const Home = () => {
 
     // Create array of tasks to be rendered
     const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
     const groupedTasks = [];
 
     // Add tasks to array grouped by timeGroup sorted by task priority. Only if they have children tasks
@@ -20,33 +21,37 @@ const Home = () => {
 
         // Check if the task should be rendered at the current time
         for (const startingTime of group.startingDate) {
+            const formattedDate = new Date();
+            formattedDate.setTime(startingTime);
+
             const differenceInDays = (startingDate) => {
-                return ((currentDate.getTime() - startingDate.getTime()) / (1000 * 3600 * 24));
+                const days = ((startingDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24))
+                return days < 0 ? Math.ceil(days) : Math.floor(days);
             }
 
             switch (group.bigTimePeriod) {
                 case 'Days':
-                    if (differenceInDays(startingTime) % group.number !== 0) {
+                    if (differenceInDays(formattedDate) % group.number === 0) {
                         isCorrectTime = true;
                     }
                     break;
                 case 'Weeks':
-                    if (differenceInDays(startingTime) % (group.number * 7) !== 0) {
+                    if (differenceInDays(formattedDate) % (group.number * 7) === 0) {
                         isCorrectTime = true;
                     }
                     break;
                 case 'Months':
-                    const yearsDifference = currentDate.getFullYear() - startingTime.getFullYear();
-                    const monthsDifference = currentDate.getMonth() * yearsDifference - startingTime.getMonth();
-                    if (monthsDifference % group.number !== 0) {
+                    const yearsDifference = currentDate.getFullYear() - formattedDate.getFullYear();
+                    const monthsDifference = currentDate.getMonth() * yearsDifference - formattedDate.getMonth();
+                    if (monthsDifference % group.number === 0) {
                         isCorrectTime = true;
                     }
                     break;
                 case 'Years':
-                    if (currentDate.getFullYear() !== startingTime.getFullYear() &&
-                        (currentDate.getFullYear() - startingTime.getFullYear()) % group.number !== 0 &&
-                        currentDate.getMonth() !== startingTime.getMonth() &&
-                        currentDate.getDate() !== startingTime.getDate()
+                    if (currentDate.getFullYear() === formattedDate.getFullYear() &&
+                        (currentDate.getFullYear() - formattedDate.getFullYear()) % group.number === 0 &&
+                        currentDate.getMonth() === formattedDate.getMonth() &&
+                        currentDate.getDate() === formattedDate.getDate()
                     ){
                         isCorrectTime = true;
                     }
