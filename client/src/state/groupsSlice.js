@@ -3,15 +3,7 @@ import {createSlice} from "@reduxjs/toolkit";
 export const groupsSlice = createSlice({
     name: 'groups',
     initialState: {
-        groups: [{
-            id: '0',
-            name: 'Monday',
-            priority: 1,
-            number: 1,
-            bigTimePeriod: 'Weeks',
-            smallTimePeriod: 'Monday',
-            parent: 'Workout'
-        }]
+        groups: []
     },
     reducers: {
         addGroup: (state, action) => {

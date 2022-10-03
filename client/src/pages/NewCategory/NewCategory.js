@@ -32,7 +32,7 @@ const NewCategory = ({index, length}) => {
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
     const currentEditedGroup = useRef();
 
-    const [name, setName] = useState('');
+    const [title, setTitle] = useState('');
     const [color, setColor] = useState('Red');
     const [timeGroups, setTimeGroups] = useState([]);
 
@@ -44,7 +44,7 @@ const NewCategory = ({index, length}) => {
 
     const handleSave = () => {
         const checkAllInputs = () => {
-            if (name) return true
+            if (title) return true
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
             return false;
         }
@@ -56,7 +56,7 @@ const NewCategory = ({index, length}) => {
 
         if (checkAllInputs()) {
             const category = {
-                name,
+                title,
                 color,
                 timeGroups,
             }
@@ -66,9 +66,9 @@ const NewCategory = ({index, length}) => {
             timeGroups.forEach(group => {
                 const tempGroup = {
                     ...group,
-                    parent: name
+                    parent: title
                 }
-                console.log(tempGroup);
+
                 dispatch(addGroup(tempGroup));
             })
 
@@ -227,7 +227,7 @@ const NewCategory = ({index, length}) => {
             index={index}
             length={length}
         >
-            <input type="text" className="Title Title-Input" placeholder="Add category name" value={name} onChange={(e) => setName(e.target.value)}/>
+            <input type="text" className="Title Title-Input" placeholder="Add category title" value={title} onChange={(e) => setTitle(e.target.value)}/>
             <InputWrapper label="Color">
                 <ColorInput selected={color} setSelected={setColor}/>
             </InputWrapper>

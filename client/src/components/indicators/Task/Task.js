@@ -14,6 +14,8 @@ const Task = ({tasks}) => {
     const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
 
+    console.log(tasks, category, group);
+
     const screenSizeContext = useContext(ScreenSizeContext);
 
     return (

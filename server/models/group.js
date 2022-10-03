@@ -10,20 +10,28 @@ const groupSchema = new Schema({
         type: String,
         required: true
     },
-    name: {
+    title: {
         type: String,
         required: true
     },
-    repeatNumber: {
+    priority: {
         type: Number,
         required: true
     },
-    timePeriod: {
+    number: {
+        type: Number,
+        required: true
+    },
+    bigTimePeriod: {
         type: String,
         required: true
     },
-    onTimePeriod: {
-        type: [String]
+    smallTimePeriod: {
+        type: String
+    },
+    parent: {
+        type: String,
+        required: true
     }
 })
 

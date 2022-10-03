@@ -16,10 +16,10 @@ import CollapsibleContainer from "../../components/utilities/CollapsibleContaine
 
 const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state.categories.categories);
-    const categoryNames = categories.map(category => category.name);
+    const categoryNames = categories.map(category => category.title);
     const {defaults} = useSelector((state) => state.user.settings);
 
-    const [name, setName] = useState('');
+    const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
     const [step, setStep] = useState(defaults.defaultStep);
     const [goalType, setGoalType] = useState('At least');
@@ -35,7 +35,7 @@ const NewTask = ({index, length}) => {
     const [repeatEvery, setRepeatEvery] = useState('');
 
     const groups = useSelector((state) => state.groups.groups);
-    const groupNames = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
+    const groupTitles = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
 
     const tasks = useSelector((state) => state.tasks.tasks);
 
@@ -73,17 +73,17 @@ const NewTask = ({index, length}) => {
         } while (idIsValid === false);
 
         const checkAllInputs = () => {
-            if (name) {
+            if (title) {
                 return true
             }
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a name for the task"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the task"}})
             return false;
         }
 
         if (checkAllInputs()) {
             const task = {
                 id,
-                name,
+                title,
                 type,
                 step: type === 'Number' ? (step ? step : defaults.defaultStep) : null,
                 goal: type === 'Number' ? {
@@ -98,7 +98,7 @@ const NewTask = ({index, length}) => {
                     number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.defaultGoal)
                 } : null,
                 expiresAt: repeats ? expiresAt : null,
-                timeGroup: repeats ? (timeGroup ? groups.find(group => group.name === timeGroup).id : null) : null,
+                timeGroup: repeats ? (timeGroup ? groups.find(group => group.title === timeGroup).id : null) : null,
                 repeatEvery: repeats ? {
                     repeatEvery,
                     repeatEverySub
@@ -122,9 +122,9 @@ const NewTask = ({index, length}) => {
             <input
                 type="text"
                 className="Title Title-Input"
-                placeholder="Add task name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}/>
+                placeholder="Add task title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}/>
             <InputWrapper label="Type">
                 <div className={`Horizontal-Flex-Container`}>
                     {taskType.map((task, index) => (
