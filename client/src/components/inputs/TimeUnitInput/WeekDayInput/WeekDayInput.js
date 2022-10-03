@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './WeekDayInput.module.scss'
 
 const WeekDayInput = ({selected, setSelected}) => {
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
     const toggleSelected = (day) => {
         if (Array.isArray(selected)) {

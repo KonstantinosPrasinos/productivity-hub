@@ -7,14 +7,61 @@ import {useSelector} from "react-redux";
 import {AnimatePresence} from "framer-motion";
 
 const Home = () => {
-    const tasks = useSelector((state) => state.tasks.tasks);
-    const groups = useSelector((state) => state.groups.groups);
+    const tasks = useSelector((state) => state?.tasks.tasks);
+    const groups = useSelector((state) => state?.groups.groups);
 
     // Create array of tasks to be rendered
+    const currentDate = new Date();
     const groupedTasks = [];
 
     // Add tasks to array grouped by timeGroup sorted by task priority. Only if they have children tasks
     groups.forEach(group => {
+        let isCorrectTime = false;
+
+        // Check if the task should be rendered at the current time
+        for (const startingTime of group.startingDate) {
+            const differenceInDays = (startingDate) => {
+                return ((currentDate.getTime() - startingDate.getTime()) / (1000 * 3600 * 24));
+            }
+
+            switch (group.bigTimePeriod) {
+                case 'Days':
+                    if (differenceInDays(startingTime) % group.number !== 0) {
+                        isCorrectTime = true;
+                    }
+                    break;
+                case 'Weeks':
+                    if (differenceInDays(startingTime) % (group.number * 7) !== 0) {
+                        isCorrectTime = true;
+                    }
+                    break;
+                case 'Months':
+                    const yearsDifference = currentDate.getFullYear() - startingTime.getFullYear();
+                    const monthsDifference = currentDate.getMonth() * yearsDifference - startingTime.getMonth();
+                    if (monthsDifference % group.number !== 0) {
+                        isCorrectTime = true;
+                    }
+                    break;
+                case 'Years':
+                    if (currentDate.getFullYear() !== startingTime.getFullYear() &&
+                        (currentDate.getFullYear() - startingTime.getFullYear()) % group.number !== 0 &&
+                        currentDate.getMonth() !== startingTime.getMonth() &&
+                        currentDate.getDate() !== startingTime.getDate()
+                    ){
+                        isCorrectTime = true;
+                    }
+                    break;
+            }
+
+            if (isCorrectTime) {
+                break;
+            }
+        }
+
+        if (!isCorrectTime) {
+            return;
+        }
+
         const groupTasks = tasks.filter(task => task.timeGroup === group.id)
 
         if (!groupTasks.length) {
@@ -29,6 +76,7 @@ const Home = () => {
 
     // Add the tasks that aren't in a timeGroup
     groupedTasks.push(...tasks.filter(task => task.timeGroup === null));
+
 
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);

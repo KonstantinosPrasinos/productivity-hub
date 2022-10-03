@@ -113,6 +113,32 @@ const NewCategory = ({index, length}) => {
             id = currentEditedGroup.current?.id;
         }
 
+        let startingDates = [];
+
+        [...timePeriod2].forEach(timePeriod => {
+            let startingDate = new Date();
+
+            switch (timePeriod) {
+                case 'Days':
+                    startingDate = new Date();
+                    break;
+                case 'Weeks':
+                    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+                    const weekDaysDifference = startingDate.getDay() - days.findIndex(day => day === timePeriod2) + 1;
+                    startingDate.setDate(startingDate.getDate() + weekDaysDifference);
+                    break;
+                case 'Months':
+                    startingDate.setDate(timePeriod2?.getDate());
+                    break;
+                case 'Years':
+                    startingDate.setTime(timePeriod2?.getTime());
+                    break;
+            }
+
+            startingDates.push(startingDate);
+        })
+
         const timeGroup = {
             id,
             title: timeGroupTitle,
@@ -120,6 +146,7 @@ const NewCategory = ({index, length}) => {
             number: timeGroupNumber,
             bigTimePeriod: timePeriod,
             smallTimePeriod: timePeriod2,
+            startingDate: startingDates,
             parent: null
         }
 

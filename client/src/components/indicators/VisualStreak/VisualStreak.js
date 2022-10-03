@@ -17,7 +17,7 @@ const VisualStreak = ({ task }) => {
     const options = { day: "numeric", month: "numeric" };
     return (
       <div className={`${styles.date} ${index === hoveredDate ? styles.hovered : ''}`}>
-        {date.toLocaleDateString(undefined, options)}
+        {date.toLocaleDateString('en-uk', options)}
       </div>
     );
   };
