@@ -53,14 +53,18 @@ const NewCategory = ({index, length}) => {
             const category = {
                 name,
                 color,
-                timeGroups
+                timeGroups,
             }
 
             dispatch(addCategory(category));
 
             timeGroups.forEach(group => {
-                group.parent = category.name;
-                dispatch(addGroup(group));
+                const tempGroup = {
+                    ...group,
+                    parent: name
+                }
+                console.log(tempGroup);
+                dispatch(addGroup(tempGroup));
             })
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
@@ -110,7 +114,8 @@ const NewCategory = ({index, length}) => {
             priority,
             number: timeGroupNumber,
             bigTimePeriod: timePeriod,
-            smallTimePeriod: timePeriod2
+            smallTimePeriod: timePeriod2,
+            parent: null
         }
 
         if (currentEditedGroup.current) {

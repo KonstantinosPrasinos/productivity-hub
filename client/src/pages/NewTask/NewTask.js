@@ -17,22 +17,7 @@ import CollapsibleContainer from "../../components/utilities/CollapsibleContaine
 const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state.categories.categories);
     const categoryNames = categories.map(category => category.name);
-
-    const groups = useSelector((state) => state.groups.groups);
-    const groupNames = groups.filter(group => group.parentCategory).map(group => group.name);
-
-    const tasks = useSelector((state) => state.tasks.tasks);
     const {defaults} = useSelector((state) => state.user.settings);
-    const dispatch = useDispatch();
-
-    const alertsContext = useContext(AlertsContext);
-    const miniPagesContext = useContext(MiniPagesContext);
-
-    const causesOfExpiration = ['End of goal', 'Date', 'Never'];
-    const taskType = ['Checkbox', 'Number'];
-    const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
-    const timePeriods = ['Day', 'Week', 'Month', 'Year'];
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     const [name, setName] = useState('');
     const [type, setType] = useState('Checkbox');
@@ -48,6 +33,22 @@ const NewTask = ({index, length}) => {
     const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
+
+    const groups = useSelector((state) => state.groups.groups);
+    const groupNames = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
+
+    const tasks = useSelector((state) => state.tasks.tasks);
+
+    const dispatch = useDispatch();
+
+    const alertsContext = useContext(AlertsContext);
+    const miniPagesContext = useContext(MiniPagesContext);
+
+    const causesOfExpiration = ['End of goal', 'Date', 'Never'];
+    const taskType = ['Checkbox', 'Number'];
+    const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
+    const timePeriods = ['Day', 'Week', 'Month', 'Year'];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     useEffect(() => {
         if (timeGroup) {
@@ -150,11 +151,9 @@ const NewTask = ({index, length}) => {
                         selected={goalType}
                         setSelected={setGoalType}
                     />
-                    <TextBoxInput type="number" placeholder="Number" value={goalNumber}
-                                  setValue={setGoalNumber}/>
+                    <TextBoxInput type="number" placeholder="Number" value={goalNumber} setValue={setGoalNumber}/>
                 </InputWrapper>
             </CollapsibleContainer>
-
             <InputWrapper label={"Category"}>
                 <DropDownInput
                     placeholder={'Category'}
