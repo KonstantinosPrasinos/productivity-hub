@@ -49,6 +49,11 @@ const NewCategory = ({index, length}) => {
             return false;
         }
 
+        if (creatingTimeGroup) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You have unsaved time group changes"}})
+            return false;
+        }
+
         if (checkAllInputs()) {
             const category = {
                 name,
