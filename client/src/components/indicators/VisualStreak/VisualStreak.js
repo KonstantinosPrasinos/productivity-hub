@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const VisualStreak = ({ task }) => {
 
-  const [hoveredDate, setHoveredDate] = useState();
+  const [hoveredDate, setHoveredDate] = useState(null);
 
   const chars = task.shortHistory.split("");
   let date = new Date();

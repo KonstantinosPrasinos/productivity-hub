@@ -104,7 +104,7 @@ const NewTask = ({index, length}) => {
                     repeatEverySub
                 } : null,
                 lastEntryDate: null,
-                previousEntry: null,
+                previousEntry: type === 'Number' ? 0 : null,
                 shortHistory: '000000'
             }
 
@@ -209,7 +209,7 @@ const NewTask = ({index, length}) => {
             <InputWrapper label={"Select a category time group"}>
                 <DropDownInput
                     placeholder={'Time group'}
-                    options={groupNames}
+                    options={groupTitles}
                     selected={timeGroup}
                     setSelected={setTimeGroup}
                 />

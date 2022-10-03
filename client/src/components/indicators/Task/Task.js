@@ -11,10 +11,8 @@ const Task = ({tasks}) => {
     const categories = useSelector((state) => state.categories.categories);
     const groups = useSelector((state) => state.groups.groups);
 
-    const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
+    const category = tasks[0].category !== null ? categories.find(category => category.title === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
-
-    console.log(tasks, category, group);
 
     const screenSizeContext = useContext(ScreenSizeContext);
 
@@ -24,17 +22,17 @@ const Task = ({tasks}) => {
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
         >
-            {category !== null && group !== null && <div className={styles.categoryContainer}>
+            {tasks[0].category !== null && group !== null && <div className={styles.categoryContainer}>
                 <CategoryIndicator
-                    category={category.name}
-                    group={group.name}
+                    category={tasks[0].category}
+                    group={group.title}
                     color={category.color}
                 />
             </div>}
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`}>
                     <div className={styles.titleContainer}>
-                        <div className={`Title`}>{task.name}</div>
+                        <div className={`Title`}>{task.title}</div>
                     </div>
                     <VisualStreak task={task}></VisualStreak>
                 </div>
