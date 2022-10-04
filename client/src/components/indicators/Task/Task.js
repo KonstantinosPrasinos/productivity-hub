@@ -16,16 +16,17 @@ const Task = ({tasks}) => {
 
     const screenSizeContext = useContext(ScreenSizeContext);
 
+    console.log(tasks);
     return (
         <motion.div
             className={`Rounded-Container Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
         >
-            {tasks[0].category !== null && group !== null && <div className={styles.categoryContainer}>
+            {tasks[0].category !== null && <div className={styles.categoryContainer}>
                 <CategoryIndicator
                     category={tasks[0].category}
-                    group={group.title}
+                    group={group?.title}
                     color={category.color}
                 />
             </div>}

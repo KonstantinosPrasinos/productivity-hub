@@ -72,8 +72,6 @@ const NewCategory = ({index, length}) => {
                 dispatch(addGroup(tempGroup));
             })
 
-            console.log(timeGroups);
-
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
     }

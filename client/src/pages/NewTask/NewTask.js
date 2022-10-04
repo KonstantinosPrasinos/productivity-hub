@@ -90,7 +90,7 @@ const NewTask = ({index, length}) => {
                     goalType,
                     number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.defaultGoal)
                 } : null,
-                category,
+                category: category ? category : null,
                 priority: priority ? priority : defaults.defaultPriority,
                 repeats,
                 longGoal: repeats ? {
