@@ -4,7 +4,7 @@ import styles from './CollapsibleContainer.module.scss';
 
 const CollapsibleContainer = ({children, isVisible}) => {
     return (
-        <>
+        <div>
             <AnimatePresence>
                 {isVisible && <motion.div
                     className={`Stack-Container ${styles.container}`}
@@ -32,7 +32,7 @@ const CollapsibleContainer = ({children, isVisible}) => {
                     {children}
                 </motion.div>}
             </AnimatePresence>
-        </>
+        </div>
     );
 };
 
