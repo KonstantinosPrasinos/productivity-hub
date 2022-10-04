@@ -173,47 +173,49 @@ const NewTask = ({index, length}) => {
             <InputWrapper label="Repeats">
                 <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
             </InputWrapper>
-            <InputWrapper label={"Long term goal"}>
-                <DropDownInput
-                    placeholder={'Type'}
-                    options={goalTypes}
-                    selected={longGoalType}
-                    setSelected={setLongGoalType}
-                />
-                <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
-                              setValue={setLongGoalNumber}/>
-            </InputWrapper>
-            <InputWrapper label={"Expires at"}>
-                <DropDownInput
-                    placeholder={'Never'}
-                    options={causesOfExpiration}
-                    selected={expiresAt}
-                    setSelected={setExpiresAt}
-                />
-            </InputWrapper>
-            <InputWrapper label={"Repeat every"}>
-                <DropDownInput
-                    placeholder={'Time period'}
-                    options={timePeriods}
-                    selected={repeatEvery}
-                    setSelected={setRepeatEvery}
-                />
-                <DropDownInput
-                    placeholder={'Subdivision'}
-                    options={days}
-                    selected={repeatEverySub}
-                    setSelected={setRepeatEverySub}
-                />
-            </InputWrapper>
-            <div className='Label'>Or</div>
-            <InputWrapper label={"Select a category time group"}>
-                <DropDownInput
-                    placeholder={'Time group'}
-                    options={groupTitles}
-                    selected={timeGroup}
-                    setSelected={setTimeGroup}
-                />
-            </InputWrapper>
+            <CollapsibleContainer isVisible={repeats}>
+                <InputWrapper label={"Long term goal"}>
+                    <DropDownInput
+                        placeholder={'Type'}
+                        options={goalTypes}
+                        selected={longGoalType}
+                        setSelected={setLongGoalType}
+                    />
+                    <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
+                                  setValue={setLongGoalNumber}/>
+                </InputWrapper>
+                <InputWrapper label={"Expires at"}>
+                    <DropDownInput
+                        placeholder={'Never'}
+                        options={causesOfExpiration}
+                        selected={expiresAt}
+                        setSelected={setExpiresAt}
+                    />
+                </InputWrapper>
+                <InputWrapper label={"Repeat every"}>
+                    <DropDownInput
+                        placeholder={'Time period'}
+                        options={timePeriods}
+                        selected={repeatEvery}
+                        setSelected={setRepeatEvery}
+                    />
+                    <DropDownInput
+                        placeholder={'Subdivision'}
+                        options={days}
+                        selected={repeatEverySub}
+                        setSelected={setRepeatEverySub}
+                    />
+                </InputWrapper>
+                <div className='Label'>Or</div>
+                <InputWrapper label={"Select a category time group"}>
+                    <DropDownInput
+                        placeholder={'Time group'}
+                        options={groupTitles}
+                        selected={timeGroup}
+                        setSelected={setTimeGroup}
+                    />
+                </InputWrapper>
+            </CollapsibleContainer>
         </MiniPageContainer>
     );
 };

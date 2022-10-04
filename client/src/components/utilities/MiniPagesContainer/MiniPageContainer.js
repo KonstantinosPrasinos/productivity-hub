@@ -97,9 +97,9 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
                     <Button onClick={onClickSave}>Save</Button>
                 </div>
             </div>
-            <div className={`Stack-Container ${styles.childrenContainer}`}>
+            <motion.div className={`Stack-Container ${styles.childrenContainer}`} layout>
                 {children}
-            </div>
+            </motion.div>
         </motion.div>
     );
 };
