@@ -1,0 +1,6 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  display: inline-flex;
+  color: var(--primary-color);
+}

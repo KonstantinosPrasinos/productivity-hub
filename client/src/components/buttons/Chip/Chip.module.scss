@@ -1,0 +1,27 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    background-color: var(--surface-color);
+    color: var(--on-surface-color);
+    border-radius: $chip-border-radius;
+    transition: 0.2s background-color, 0.2s color, 0.2s filter;
+    border: $base-border;
+
+    &.selected {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+    }
+
+    &:hover {
+        filter: brightness(95%);
+    }
+
+    &.round {
+        border-radius: $button-border-radius;
+    }
+
+    &.filled {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+    }
+}

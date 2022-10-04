@@ -1,0 +1,66 @@
+@import 'src/styles/variables.scss';
+
+$barWidth: 0.45em;
+$barHeight: 0.3em;
+
+.container {
+    justify-content: flex-start;
+    gap: 0;
+}
+
+.streakIndicator {
+    height: 1.2em;
+    width: 1.2em;
+    background-color: var(--surface-color);
+    border-radius: 1em;
+    border: 0.25em solid var(--primary-color);
+    position: relative;
+    box-sizing: border-box;
+    margin-left: $barWidth;
+    margin-right: $barWidth;
+
+    &.hasBefore {
+        &::before {
+            content: "";
+            width: $barWidth;
+            height: $barHeight;
+            position: absolute;
+            background-color: var(--primary-color);
+            top: calc(50% - #{$barHeight} + 0.125em);
+            left: -$barWidth - 0.25em;
+        }
+    }
+    
+    &.hasAfter {
+        &::after {
+            content: "";
+            width: $barWidth;
+            height: $barHeight;
+            position: absolute;
+            background-color: var(--primary-color);
+            top: calc(50% - #{$barHeight} + 0.125em);
+            right: -$barWidth - 0.25em;
+        }
+    }
+
+    &.isFirst {
+        margin-left: 0;
+    }
+
+    &.unfilled {
+        opacity: 0.5;
+    }
+}
+
+.date {
+    font-size: $font-s;
+    position: absolute;
+    bottom: -1.5em;
+    left: -50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    &.hovered {
+        opacity: 1;
+    }
+}

@@ -1,160 +1,167 @@
-import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
-import NavBar from "./components/navbar/NavBar";
-import Home from "./components/home/Home";
-import Settings from "./components/settings/Settings";
-import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import GroupDetails from "./components/groups/GroupDetails";
-import NewGroup from "./components/popups/NewGroup";
-import { useSelector } from "react-redux";
-import GroupList from "./components/groups/GroupList";
-import PopupHandler from "./components/popups/PopupHandler";
+import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
+import NavBar from './components/bars/NavBar/NavBar';
+import Settings from "./pages/Settings/Settings";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
-import { useEffect } from "react";
-import { setIsDarkMode, setUiTheme } from "./app/uiSlice";
-import styled from 'styled-components';
-import NewCategory from "./components/popups/NewCategory";
-import NewTask from "./components/popups/NewTask"
-import { StylesProvider } from "@mui/styles";
+import {useContext, useEffect} from "react";
 
-let lightTheme = createTheme({
-  palette: {
-    type: "light",
-    primary: {
-      main: "#2E3440",
-    },
-    secondary: {
-      main: "#2E3440",
-    },
-    background: {
-      default: "#ECEFF4",
-      paper: "#ffffff",
-    },
-    text: {
-      primary: "#3B4252",
-    },
-    success: {
-      main: "#26DE81"
-    }
-  },
-  typography: {
-    fontFamily: "'Roboto', sans-serif",
-  }
-});
-
-const darkTheme = createTheme({
-  palette: {
-    type: "dark",
-    primary: {
-      main: "#ffffff",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    warning: {
-      main: "#ff9800",
-    },
-    background: {
-      default: "#3B4252",
-      paper: "#2E3440",
-    },
-    text: {
-      primary: "#ffffff",
-    },
-    success: {
-      main: "#26DE81"
-    }
-  },
-});
-
-const midnightTheme = createTheme({
-  palette: {
-    type: "midnight",
-
-  }
-})
-
-lightTheme = responsiveFontSizes(lightTheme);
+import "./styles/index.scss";
+import {ThemeContext} from "./context/ThemeContext";
+import Playground from "./pages/Playground/Playground";
+import NewCategory from './pages/NewCategory/NewCategory';
+import NotFound from "./pages/NotFound/NotFound";
+import {ScreenSizeContext} from "./context/ScreenSizeContext";
+import NewTask from "./pages/NewTask/NewTask";
+import HomePageContainer from "./pages/Home/Home";
+import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
+import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 
 function App() {
-  const theme = useSelector((state) => state.ui.uiTheme);
-  const screenIsMobile = useSelector((state) => state.ui.screenIsMobile);
 
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('ui-theme');
-    switch (storedTheme) {
-      case "default":
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
-          setUiTheme('dark');
-          setIsDarkMode(true);
-        } else {
-          setUiTheme('light');
-          setIsDarkMode(false);
+    const themeContext = useContext(ThemeContext);
+    const screenSizeContext = useContext(ScreenSizeContext);
+
+    // useEffect(() => {
+    //   //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
+    //   const loggedInUser = localStorage.getItem("user");
+    //   if (loggedInUser) {
+    //     const foundUser = JSON.parse(loggedInUser);
+    //     dispatch(setUser(foundUser));
+    //   } else {
+    //     //   Are commented because login in and saving info to localstorage doesn't work
+    //     //   dispatch(setUser(false));
+    //     //   navigate('/log-in')
+    //   }
+    // }, [dispatch, navigate]);
+
+    useEffect(() => {
+        themeContext.dispatch({type: "SET_THEME", payload: "dark"});
+        const storedTheme = localStorage.getItem("ui-theme");
+        switch (storedTheme) {
+            case "default":
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    themeContext.dispatch({type: "SET_THEME", payload: "dark"});
+                } else {
+                    themeContext.dispatch({type: "SET_THEME", payload: "light"});
+                }
+                break;
+            case "dark":
+                themeContext.dispatch({type: "SET_THEME", payload: "dark"});
+                break;
+            case "light":
+                themeContext.dispatch({type: "SET_THEME", payload: "light"});
+                break;
+            default:
+                themeContext.dispatch({type: "SET_THEME", payload: "light"});
+                localStorage.setItem("ui-theme", "light");
+                break;
         }
-        break;
-      case "dark":
-        setUiTheme('dark');
-        setIsDarkMode(true);
-        break;
-      case "midnight":
-        setUiTheme('midnight');
-        setIsDarkMode(true);
-        break;
-      case "light":
-        setUiTheme('light');
-        setIsDarkMode(false);
-        break;
-      default:
-        setUiTheme('light');
-        setIsDarkMode(false);
-        localStorage.setItem('ui-theme', 'light');
-        break;
-    }
-  }, [])
+    }, []);
 
-  const ContentContainer = styled.div`
-    @media (max-width: 768px) {
-      height: calc(100% - 5em);
-      width: 100%;
-      padding: 1em 1em 2.5em 1em;
+    useEffect(() => {
+        screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
+        window.addEventListener('resize', () => {
+            screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})
+        });
+    }, [screenSizeContext]);
+
+    function checkScreenWidth() {
+        if (window.innerWidth > 768) return 'big';
+        return 'small';
     }
 
-    @media (min-width: 768px) {
-      width: calc(100% - 300px - 8em);
-      height: 100%;
-      padding: 2em;
-    }
-    
-    flex-grow: 1;
-  `;
-
-  return (
-    <StylesProvider injectFirst>
-      <ThemeProvider theme={theme === 'dark' ? darkTheme : (theme === 'midnight' ? midnightTheme : lightTheme)}>
-      <CssBaseline enableColorScheme />
-      <BrowserRouter>
-        <div className="App">
-          {/* <PopupHandler /> */}
-          <NavBar />
-          <ContentContainer>
-            <Routes>
-              <Route exact path="/" element={<RequireAuth><Home /></RequireAuth>} />
-              <Route exact path="/home" element={<RequireAuth><Navigate to="/" /></RequireAuth>} />
-              <Route path="/tasks" element={<RequireAuth><GroupList /></RequireAuth>} />
-              <Route path="/tasks/:id" element={<RequireAuth><GroupDetails /></RequireAuth>} />
-              <Route path="/tasks/new-category" element={<RequireAuth><NewCategory /></RequireAuth>} />
-              <Route path="/tasks/new-task" element={<RequireAuth><NewTask /></RequireAuth>} />
-              <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-              <Route path="/log-in" element={<LogInPage />} />
-              <Route path="*" element={<div>Not found</div>} />
-            </Routes>
-          </ContentContainer>
-        </div>
-      </BrowserRouter>
-    </ThemeProvider>
-    </StylesProvider>
-  );
+    return (
+        <BrowserRouter>
+            <div className={`App ${themeContext.state.theme ? themeContext.state.theme : ''}`}>
+                <NavBar/>
+                <AlertHandler />
+                <MiniPagesHandler />
+                <div className="content-container">
+                    <Routes>
+                        <Route
+                            exact
+                            path="/"
+                            element={
+                                <RequireAuth>
+                                  <HomePageContainer />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/home"
+                            element={
+                                <RequireAuth>
+                                    <Navigate to="/"/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/tasks"
+                            element={
+                                <RequireAuth>
+                                    <div>at</div>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/tasks/:id"
+                            element={
+                                <RequireAuth>
+                                    <div>ads</div>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/new-category"
+                            element={
+                                <RequireAuth>
+                                    <NewCategory></NewCategory>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/new-task"
+                            element={
+                                <RequireAuth>
+                                    <NewTask></NewTask>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/new-task"
+                            element={
+                                <RequireAuth>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/settings"
+                            element={
+                                <RequireAuth>
+                                    <Settings/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/settings/:tab"
+                            element={
+                                <RequireAuth>
+                                    <Settings/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route path="/playground" element={<Playground/>}/>
+                        <Route path="/log-in" element={<LogInPage/>}/>
+                        <Route path="*" element={<NotFound/>}/>
+                    </Routes>
+                </div>
+            </div>
+        </BrowserRouter>
+    );
 }
 
 export default App;

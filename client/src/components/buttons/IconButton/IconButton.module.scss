@@ -1,0 +1,33 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  transition: transform 0.2s, opacity 0.1s;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-l;
+  color: var(--primary-color);
+  height: 1.5em;
+  width: 1.5em;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &.selected {
+    opacity: 1;
+  }
+
+  &.notSelected {
+    opacity: $opacity-low;
+  }
+}
+
+.border {
+  border: 1px solid var(--primary-color);
+  border-radius: 100%;
+}

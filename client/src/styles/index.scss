@@ -1,0 +1,223 @@
+@import "./variables.scss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+:root {
+    --red-color: #FC5C65;
+    --orange-color: #FD9644;
+    --yellow-color: #FED330;
+    --green-color: #26DE81;
+    --light-blue-color: #45AAF2;
+    --blue-color: #4B7BEC;
+    --purple-color: #A55EEA;
+}
+
+.App {
+    background-color: var(--background-color);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    &.light {
+        @include getTheme('light');
+    }
+    &.dark {
+        @include getTheme('dark');
+    }
+}
+
+body {
+    overflow-y: hidden;
+    position: fixed;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+.content-container {
+    position: relative;
+}
+
+.Button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: $base-gap;
+    cursor: pointer;
+    padding: $base-padding;
+    width: max-content;
+    
+    &.disabled {
+        cursor: not-allowed;
+    }
+}
+
+.Horizontal-Flex-Container {
+    display: flex;
+    align-items: center;
+    gap: $base-gap;
+    //justify-content: space-between;
+}
+
+.Stack-Container {
+    display: flex;
+    gap: $base-gap;
+    flex-wrap: nowrap;
+    flex-direction: column;
+}
+
+.Label {
+    font-size: $font-s;
+    opacity: $opacity-low;
+}
+
+.Title {
+    font-size: $font-xxl;
+    opacity: $opacity-low;
+    max-width: fit-content;
+}
+
+.Headline {
+    font-size: $font-xl;
+}
+
+.Rounded-Container {
+    padding: $base-padding;
+    border-radius: $base-border-radius;
+    background-color: var(--surface-color);
+    border: $base-border;
+    box-shadow: $elevation-1;
+    display: inline-flex;
+
+    &.Symmetrical {
+        padding: $symmetrical-padding;
+    }
+}
+
+.Collapsible-Container {
+    overflow-y: hidden;
+}
+
+.Red {
+    background-color: var(--red-color);
+}
+
+.Orange {
+    background-color: var(--orange-color);
+}
+
+.Yellow {
+    background-color: var(--yellow-color);
+}
+
+.Green {
+    background-color: var(--green-color);
+}
+
+.LightBlue {
+    background-color: var(--light-blue-color);
+}
+
+.Blue {
+    background-color: var(--blue-color);
+}
+
+.Purple {
+    background-color: var(--purple-color);
+}
+
+input {
+    border: none;
+    background: none;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.Title {
+        opacity: 1;
+        box-shadow: 0 2px 0 0 var(--surface-color);
+        transition: box-shadow 0.2s;
+        background-color: var(--surface-color);
+
+        &:focus {
+            box-shadow: 0 2px 0 0 var(--on-surface-color);
+        }
+    } 
+}
+
+::placeholder {
+    opacity: 0.5;
+}
+
+button {
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+// App.js
+@media (max-width: $tablet-breakpoint) {
+    .content-container {
+        width: 100vw;
+        flex-grow: 1;
+        overflow: auto;
+    }
+    .Page {
+        box-sizing: border-box;
+        border: none !important;
+        width: 100%;
+        border-radius: 0;
+        height: 100%;
+        overflow-y: auto;
+    }
+    .App {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: $tablet-breakpoint) {
+    .content-container {
+        box-sizing: border-box;
+        width: calc(100% - 300px - 8em);
+        height: 100%;
+        padding: 2em;
+    }
+}
+
+.content-container {
+    box-sizing: border-box;
+    flex-grow: 1;
+    justify-content: center;
+    display: flex;
+}
+
+.icon {
+    position: absolute;
+    top: -0.5em;
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px grey;
+    border-radius: 10px
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+}

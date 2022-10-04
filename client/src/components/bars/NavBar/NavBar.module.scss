@@ -1,0 +1,17 @@
+@import 'src/styles/variables.scss';
+
+@media (max-width: $tablet-breakpoint) {
+  .container {
+    order: 3;
+  }
+}
+@media (min-width: $tablet-breakpoint) {
+  .container {
+    height: 100%;
+    width: 4em;
+  }
+}
+
+.container {
+  z-index: 3;
+}

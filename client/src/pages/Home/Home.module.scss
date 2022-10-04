@@ -1,0 +1,29 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  gap: 3em;
+  justify-content: center;
+  width: 100%;
+
+  &.small {
+    background-color: var(--surface-color);
+  }
+}
+
+.leftSide {
+  width: min-content;
+  align-items: center;
+}
+
+.rightSide {
+  flex: 2;
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .leftSide {
+    width: 100%;
+  }
+}

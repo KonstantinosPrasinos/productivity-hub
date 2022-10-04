@@ -1,0 +1,45 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    width: 40%;
+    height: 100%;
+}
+
+.redirectContainer {
+    width: min-content;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    border-right: $base-border;
+    border-width: 2px;
+    padding: 1em;
+}
+
+.contentContainer {
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    flex-wrap: nowrap !important;
+}
+
+.email {
+    font-size: $font-s;
+}
+
+.accountContainer {
+    justify-content: flex-start !important;
+}
+
+.segment {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    width: 100%;
+}
+
+@media (max-width: $tablet-breakpoint) {
+    .container {
+        width: 100%;
+        height: auto;
+    }
+}

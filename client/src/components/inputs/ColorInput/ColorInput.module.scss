@@ -1,0 +1,22 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  display: inline-flex;
+  gap: 1.2em;
+  
+}
+
+.colorContainer {
+  height: 1.5em;
+  width: 1.5em;
+  border-radius: 1.5em;
+  border: 0.1em solid var(--primary-color);
+  position: relative;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border 0.1s;
+
+  &.selected {
+    border: 0.25em solid var(--primary-color);
+  }
+}

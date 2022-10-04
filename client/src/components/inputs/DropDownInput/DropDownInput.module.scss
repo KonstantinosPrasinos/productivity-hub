@@ -1,0 +1,67 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    width: 10em;
+    position: relative;
+}
+
+.inputContainer {
+    width: 100%;
+    transition: transform 0.2s;
+    box-sizing: border-box;
+    height: 2.5em;
+    box-shadow: none;
+
+    &:hover {
+        transform: scale(1.01);
+    }
+
+    cursor: pointer;
+
+    &.disabled {
+        cursor: not-allowed;
+    }
+}
+
+.arrowIndicator {
+    position: relative;
+    transition: transform 2s linear;
+    &.extended {
+        transform: rotate(180deg); 
+    }
+}
+
+.optionsContainer {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    gap: 5px;
+    transform-origin: top;
+    left: 0;
+    top: 2.5em;
+    
+    z-index: 1;
+    margin-top: 5px;
+}
+
+.option {
+    position: relative;
+    padding: $base-padding;
+    font-size: $font-m;
+    line-height: $font-m;
+    cursor: pointer;
+    
+    &:hover {
+        &::after {
+            content: '';
+            background-color: var(--on-surface-color);
+            position: absolute;
+            width: 100%;
+            height: 1.75em;
+            bottom: calc(50% - 0.875em);
+            left: 0;
+            opacity: 0.05;
+            border-radius: $base-border-radius;
+        }
+    }
+}

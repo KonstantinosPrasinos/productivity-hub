@@ -1,0 +1,16 @@
+@import 'src/styles/variables.scss';
+
+.container {
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 10px;
+    cursor: pointer;
+    font-size: $font-l;
+    justify-content: space-around;
+}
+
+.forwardIcon {
+    margin-left: auto;
+}

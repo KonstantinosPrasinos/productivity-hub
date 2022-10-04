@@ -1,15 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
-import { store } from './app/store';
+import { store } from './state/store';
 import { Provider } from 'react-redux';
+import ThemeContextProvider from './context/ThemeContext';
+import ScreenSizeContextProvider from './context/ScreenSizeContext';
+import AlertsContextProvider from './context/AlertsContext';
+import MiniPagesContextProvider from "./context/MiniPagesContext";
 
 ReactDOM.render(
-  <Provider store={store}>
+  
     <React.StrictMode>
-      <App />
+      <Provider store={store}>
+        <AlertsContextProvider>
+          <ScreenSizeContextProvider>
+            <ThemeContextProvider>
+              <MiniPagesContextProvider>
+                  <App />
+              </MiniPagesContextProvider>
+            </ThemeContextProvider>
+          </ScreenSizeContextProvider>
+        </AlertsContextProvider>
+      </Provider>
     </React.StrictMode>,
-  </Provider>,
   document.getElementById('root')
 );

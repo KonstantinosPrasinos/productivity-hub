@@ -1,0 +1,47 @@
+@import '../../../styles/variables';
+
+.container {
+    width: 100%;
+    max-width: 360px;
+    height: 3em;
+    color: var(--on-error-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $base-padding;
+    transform-origin: top;
+    border-radius: $base-border-radius;
+}
+
+.textContainer {
+    display: inline-flex;
+    align-items: center;
+    gap: $base-gap;
+}
+
+.iconContainer {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.error {
+    background-color: var(--error-color);
+}
+
+.warning {
+    background-color: var(--warning-color);
+}
+
+.success {
+    background-color: var(--success-color);
+}
+
+.info {
+    background-color: var(--info-color);
+}
