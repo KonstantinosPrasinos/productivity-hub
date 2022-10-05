@@ -2,7 +2,6 @@ import styles from './CategoryIndicator.module.scss';
 
 const CategoryIndicator = ({category, group, color}) => {
 
-    console.log(group);
     return (
         <div className={`${styles.container} Horizontal-Flex-Container ${color}`}>
             <div>{category}</div>

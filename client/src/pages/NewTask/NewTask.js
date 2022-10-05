@@ -104,7 +104,7 @@ const NewTask = ({index, length}) => {
                     repeatEverySub
                 } : null,
                 lastEntryDate: null,
-                previousEntry: type === 'Number' ? 0 : null,
+                previousEntry: 0,
                 shortHistory: '000000'
             }
 

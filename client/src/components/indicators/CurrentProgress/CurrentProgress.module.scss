@@ -9,7 +9,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--primary-color);
+    background-color: var(--border-color);
+
+    &.typeCheckbox {
+        width: 2.6em;
+    }
 }
 
 .outlineContainer {
@@ -31,6 +35,10 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+
+    &.typeCheckbox {
+        width: 2.2em;
+    }
 }
 
 .circularBarContainer {
