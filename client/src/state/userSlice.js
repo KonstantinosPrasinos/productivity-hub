@@ -1,4 +1,4 @@
-import {createSlice, current} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
     userName: null,
@@ -9,6 +9,10 @@ const initialState = {
             defaultGoal: 10,
             defaultPriority: 1
         }
+    },
+    priorityBounds: {
+        low: 1,
+        high: 1
     }
 }
 
@@ -28,9 +32,15 @@ export const userSlice = createSlice({
         setDefaultPriority: (state, action) => {
             state.settings.defaults.defaultPriority = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.defaultPriority;
         },
+        setLowestPriority: (state, action) => {
+            state.priorityBounds.low = action.payload;
+        },
+        setHighestPriority: (state, action) => {
+            state.priorityBounds.high = action.payload;
+        }
     },
 })
 
-export const {setTheme, setDefaultGoal, setDefaultPriority, setDefaultStep} = userSlice.actions;
+export const {setTheme, setDefaultGoal, setDefaultPriority, setDefaultStep, setLowestPriority, setHighestPriority} = userSlice.actions;
 
 export default userSlice.reducer;

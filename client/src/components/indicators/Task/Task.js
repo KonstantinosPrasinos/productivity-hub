@@ -16,7 +16,6 @@ const Task = ({tasks}) => {
 
     const screenSizeContext = useContext(ScreenSizeContext);
 
-    console.log(tasks);
     return (
         <motion.div
             className={`Rounded-Container Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}

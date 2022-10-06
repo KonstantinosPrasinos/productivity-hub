@@ -13,11 +13,12 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
+import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
 
 const NewTask = ({index, length}) => {
-    const categories = useSelector((state) => state.categories.categories);
+    const categories = useSelector((state) => state?.categories.categories);
     const categoryNames = categories.map(category => category.title);
-    const {defaults} = useSelector((state) => state.user.settings);
+    const {defaults} = useSelector((state) => state?.user.settings);
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
@@ -34,10 +35,11 @@ const NewTask = ({index, length}) => {
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
-    const groups = useSelector((state) => state.groups.groups);
+    const groups = useSelector((state) => state?.groups.groups);
     const groupTitles = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
 
-    const tasks = useSelector((state) => state.tasks.tasks);
+    const tasks = useSelector((state) => state?.tasks.tasks);
+    const {low, high} = useSelector((state) => state?.user.priorityBounds);
 
     const dispatch = useDispatch();
 
@@ -81,6 +83,13 @@ const NewTask = ({index, length}) => {
         }
 
         if (checkAllInputs()) {
+            if (priority < low) {
+                dispatch(setLowestPriority(priority));
+            }
+            if (priority > high) {
+                dispatch(setHighestPriority(priority));
+            }
+
             const task = {
                 id,
                 title,

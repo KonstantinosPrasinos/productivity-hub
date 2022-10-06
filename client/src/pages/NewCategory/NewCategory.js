@@ -21,10 +21,12 @@ import {v4 as uuidv4} from "uuid";
 import {addGroup, removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
+import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
 
 const NewCategory = ({index, length}) => {
-    const groups = useSelector((state) => state.groups.groups);
-    const {defaults} = useSelector((state) => state.user.settings);
+    const groups = useSelector((state) => state?.groups.groups);
+    const {defaults} = useSelector((state) => state?.user.settings);
+    const {low, high} = useSelector((state) => state?.user.priorityBounds);
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
@@ -64,6 +66,13 @@ const NewCategory = ({index, length}) => {
             dispatch(addCategory(category));
 
             timeGroups.forEach(group => {
+                if (group.priority < low) {
+                    dispatch(setLowestPriority(group.priority));
+                }
+                if (group.priority > high) {
+                    dispatch(setHighestPriority(group.priority));
+                }
+
                 const tempGroup = {
                     ...group,
                     parent: title
