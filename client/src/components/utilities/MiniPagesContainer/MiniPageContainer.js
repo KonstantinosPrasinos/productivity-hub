@@ -79,7 +79,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
     return (
         <motion.div
-            className={`${styles.container} Stack-Container Symmetrical`}
+            className={`${styles.container} Stack-Container Symmetrical BigGap`}
             ref={containerRef} initial={{y: '100%'}}
             animate={animation}
             transition={{type: "tween"}}

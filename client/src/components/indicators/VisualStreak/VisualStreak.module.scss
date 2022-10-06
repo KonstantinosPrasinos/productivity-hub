@@ -4,8 +4,9 @@ $barWidth: 0.45em;
 $barHeight: 0.3em;
 
 .container {
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 0;
+    //width: 22.15em;
 }
 
 .streakIndicator {

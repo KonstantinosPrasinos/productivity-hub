@@ -24,7 +24,7 @@ const VisualStreak = ({ task }) => {
 
   return (
     <div className={`${styles.container} Horizontal-Flex-Container`}>
-      {chars.map((char, index) => 
+      {task.repeats && chars.map((char, index) =>
         <div 
           key={index}
           className={`

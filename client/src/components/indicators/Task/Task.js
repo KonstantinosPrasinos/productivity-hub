@@ -8,8 +8,8 @@ import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 
 const Task = ({tasks}) => {
-    const categories = useSelector((state) => state.categories.categories);
-    const groups = useSelector((state) => state.groups.groups);
+    const categories = useSelector((state) => state?.categories.categories);
+    const groups = useSelector((state) => state?.groups.groups);
 
     const category = tasks[0].category !== null ? categories.find(category => category.title === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
@@ -22,21 +22,23 @@ const Task = ({tasks}) => {
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
         >
-            {tasks[0].category !== null && <div className={styles.categoryContainer}>
-                <CategoryIndicator
-                    category={tasks[0].category}
-                    group={group?.title}
-                    color={category.color}
-                />
-            </div>}
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`}>
-                    <div className={styles.titleContainer}>
-                        <div className={`Title`}>{task.title}</div>
+                    <div className={styles.topLine}>
+                        <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>
+                            <div className={`${styles.titleContainer}`}>{task.title}</div>
+                            {index === 0 && task.category !== null &&
+                                <CategoryIndicator
+                                    category={task.category}
+                                    group={group?.title}
+                                    color={category.color}
+                                />
+                            }
+                        </div>
+                        {!task.repeats && <VisualStreak task={task}></VisualStreak>}
                     </div>
-                    <VisualStreak task={task}></VisualStreak>
-                </div>
-            ))}
+                    {task.repeats && <VisualStreak task={task}></VisualStreak>}
+                </div>))}
         </motion.div>
 
     );

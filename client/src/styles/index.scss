@@ -66,6 +66,10 @@ body {
     gap: $base-gap;
     flex-wrap: nowrap;
     flex-direction: column;
+
+    &.BigGap {
+        gap: $big-gap;
+    }
 }
 
 .Label {
@@ -76,7 +80,7 @@ body {
 .Title {
     font-size: $font-xxl;
     opacity: $opacity-low;
-    max-width: fit-content;
+    //max-width: fit-content;
 }
 
 .Headline {

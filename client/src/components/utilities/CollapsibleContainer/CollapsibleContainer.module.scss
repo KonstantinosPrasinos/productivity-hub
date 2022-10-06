@@ -3,4 +3,8 @@
 .container {
   border-top: $base-border;
   border-bottom: $base-border;
+
+  & > * {
+    margin-bottom: 20px;
+  }
 }
