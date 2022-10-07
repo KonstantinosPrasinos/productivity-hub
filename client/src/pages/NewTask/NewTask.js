@@ -14,6 +14,8 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
+import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 
 const NewTask = ({index, length}) => {
     const categories = useSelector((state) => state?.categories.categories);
@@ -35,6 +37,12 @@ const NewTask = ({index, length}) => {
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
+    const [repeatNumber, setRepeatNumber] = useState(defaults.defaultPriority);
+    const [timePeriod, setTimePeriod] = useState('Weeks');
+    const [timePeriod2, setTimePeriod2] = useState([]);
+
+    const [repeatType, setRepeatType] = useState('Custom Rules')
+
     const groups = useSelector((state) => state?.groups.groups);
     const groupTitles = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
 
@@ -49,8 +57,8 @@ const NewTask = ({index, length}) => {
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
     const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
-    const timePeriods = ['Day', 'Week', 'Month', 'Year'];
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
+    const repeatTypes = ['Custom Rules', 'Time Group'];
 
     useEffect(() => {
         if (timeGroup) {
@@ -64,6 +72,10 @@ const NewTask = ({index, length}) => {
             setTimeGroup('');
         }
     }, [repeatEvery, repeatEverySub])
+
+    useEffect(() => {
+        setTimePeriod2([]);
+    }, [timePeriod])
 
     const handleSave = () => {
         let idIsValid = true;
@@ -201,29 +213,42 @@ const NewTask = ({index, length}) => {
                         setSelected={setExpiresAt}
                     />
                 </InputWrapper>
-                <InputWrapper label={"Repeat every"}>
-                    <DropDownInput
-                        placeholder={'Time period'}
-                        options={timePeriods}
-                        selected={repeatEvery}
-                        setSelected={setRepeatEvery}
-                    />
-                    <DropDownInput
-                        placeholder={'Subdivision'}
-                        options={days}
-                        selected={repeatEverySub}
-                        setSelected={setRepeatEverySub}
-                    />
+                <InputWrapper label="Repeat with">
+                    <div className={`Horizontal-Flex-Container`}>
+                        {repeatTypes.map((type, index) => (
+                            <Chip
+                                selected={repeatType}
+                                setSelected={setRepeatType}
+                                value={type}
+                                key={index}
+                            >
+                                {type}
+                            </Chip>
+                        ))
+                        }
+                    </div>
                 </InputWrapper>
-                <div className='Label'>Or</div>
-                <InputWrapper label={"Select a category time group"}>
-                    <DropDownInput
-                        placeholder={'Time group'}
-                        options={groupTitles}
-                        selected={timeGroup}
-                        setSelected={setTimeGroup}
-                    />
-                </InputWrapper>
+                <SwitchContainer selectedTab={repeatType === 'Custom Rules' ? 0 : 1}>
+                    <>
+                        <InputWrapper label={'Repeat every'}>
+                            <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
+                        </InputWrapper>
+                        <InputWrapper label={'Time period'}>
+                            <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
+                        </InputWrapper>
+                        {timePeriod !== 'Days' && <InputWrapper label={'On'}>
+                            <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
+                        </InputWrapper>}
+                    </>
+                    <InputWrapper label={"Select a category time group"}>
+                        <DropDownInput
+                            placeholder={'Time group'}
+                            options={groupTitles}
+                            selected={timeGroup}
+                            setSelected={setTimeGroup}
+                        />
+                    </InputWrapper>
+                </SwitchContainer>
             </CollapsibleContainer>
         </MiniPageContainer>
     );

@@ -1,42 +1,5 @@
 @import 'src/styles/variables.scss';
 
-
-.calendarRoot {
-  --rdp-cell-size: 40px;
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
-}
-
-.calendarDay {
-  display: flex;
-  overflow: hidden;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 2em;
-  max-width: 2em;
-  height: 2em;
-  margin: 0;
-  border: 2px solid transparent;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: var(--primary-color) !important;
-    color: var(--on-primary-color);
-    opacity: 0.75;
-  }
-}
-
-.calendarSelected {
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
-
-  &:hover {
-    background-color: var(--primary-color) !important;
-    opacity: 0.75;
-  }
-}
-
 .bottomButtonsContainer {
   display: flex;
   flex-direction: row;

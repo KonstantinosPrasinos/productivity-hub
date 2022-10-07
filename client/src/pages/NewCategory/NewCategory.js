@@ -10,11 +10,6 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
-import {DayPicker} from "react-day-picker";
-import styles from 'react-day-picker/dist/style.module.css';
-import WeekDayInput from "../../components/inputs/TimeUnitInput/WeekDayInput/WeekDayInput";
-
-import customStyles from './NewCategory.module.scss';
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import {v4 as uuidv4} from "uuid";
@@ -22,6 +17,7 @@ import {addGroup, removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
 import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
+import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 
 const NewCategory = ({index, length}) => {
     const groups = useSelector((state) => state?.groups.groups);
@@ -175,47 +171,6 @@ const NewCategory = ({index, length}) => {
         setCreatingTimeGroup(false);
     }
 
-    const formatCaption = (month) => {
-        return (<div>{month.toLocaleDateString('default', {month: 'long'})}</div>)
-    }
-
-    const classNames = {
-        ...styles,
-        root: customStyles.calendarRoot,
-        day_selected: customStyles.calendarSelected,
-        day: customStyles.calendarDay
-    }
-
-    const renderTimePeriodInput = () => {
-        switch (timePeriod) {
-            case 'Days':
-                return;
-            case 'Weeks':
-                return (<WeekDayInput selected={timePeriod2} setSelected={setTimePeriod2}></WeekDayInput>)
-            case 'Months':
-                return (<DayPicker
-                    mode="multiple"
-                    styles={{caption: {display: 'none'}}}
-                    selected={timePeriod2}
-                    onSelect={setTimePeriod2}
-                    defaultMonth={new Date(2022, 4)}
-                    classNames={classNames}
-                />)
-            case 'Years':
-                return (<DayPicker
-                    mode="multiple"
-                    styles={{caption_label: {zIndex: 'auto'}}}
-                    selected={timePeriod2}
-                    onSelect={setTimePeriod2}
-                    fromDate={new Date(2022, 0)}
-                    toDate={new Date(2022, 11, 31)}
-                    formatters={{ formatCaption }}
-                    defaultMonth={new Date(2022, 0)}
-                    classNames={classNames}
-                />)
-        }
-    }
-
     const handleGroupClick = (e, group) => {
         // If target is icon then stop the event
         if (e.target !== e.currentTarget) {
@@ -292,7 +247,7 @@ const NewCategory = ({index, length}) => {
                     <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
                 </InputWrapper>
                 {timePeriod !== 'Days' && <InputWrapper label={'On'}>
-                    {renderTimePeriodInput()}
+                    <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
                 </InputWrapper>}
                 <div className={customStyles.bottomButtonsContainer}>
                     <Button filled={false} onClick={handleCancel}>Cancel</Button>
