@@ -7,7 +7,7 @@ import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import {useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid';
-import {addTask} from "../../state/tasksSlice";
+import {addTask, setTask} from "../../state/tasksSlice";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -114,13 +114,20 @@ const NewTask = ({index, length, id}) => {
     }, [timePeriod])
 
     const handleSave = () => {
-        let idIsValid = true;
-        let id;
 
-        do {
-            id = uuidv4();
-            idIsValid = !tasks.find(task => task.id === id);
-        } while (idIsValid === false);
+        let localId;
+
+        if (id) {
+            localId = id;
+        } else {
+            let idIsValid = true;
+
+            do {
+                localId = uuidv4();
+                idIsValid = !tasks.find(task => task.id === localId);
+            } while (idIsValid === false);
+        }
+
 
         const checkAllInputs = () => {
             if (title) {
@@ -139,7 +146,7 @@ const NewTask = ({index, length, id}) => {
             }
 
             const task = {
-                id,
+                id: localId,
                 title,
                 type,
                 step: type === 'Number' ? (step ? step : defaults.defaultStep) : null,
@@ -166,7 +173,13 @@ const NewTask = ({index, length, id}) => {
                 shortHistory: '000000'
             }
 
-            dispatch(addTask(task));
+            if (id) {
+                dispatch(setTask(task));
+
+            } else {
+                dispatch(addTask(task));
+            }
+
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
     }
