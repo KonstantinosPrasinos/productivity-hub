@@ -58,7 +58,10 @@ body {
     display: flex;
     align-items: center;
     gap: $base-gap;
-    //justify-content: space-between;
+
+    &.Space-Between {
+        justify-content: space-between;
+    }
 }
 
 .Stack-Container {
@@ -72,6 +75,15 @@ body {
     }
 }
 
+.Grid-Container {
+    display: grid;
+    &.Two-By-Two {
+        grid-template-columns: calc(50% - 5px) calc(50% - 5px);
+        grid-template-rows: calc(50% - 5px) calc(50% - 5px);
+        gap: $base-gap;
+    }
+}
+
 .Label {
     font-size: $font-s;
     opacity: $opacity-low;
@@ -79,7 +91,7 @@ body {
 
 .Title {
     font-size: $font-xxl;
-    opacity: $opacity-low;
+    //opacity: $opacity-low;
     //max-width: fit-content;
 }
 
@@ -92,8 +104,11 @@ body {
     border-radius: $base-border-radius;
     background-color: var(--surface-color);
     border: $base-border;
-    box-shadow: $elevation-1;
     display: inline-flex;
+
+    &.Has-Shadow {
+        box-shadow: $elevation-1;
+    }
 
     &.Symmetrical {
         padding: $symmetrical-padding;

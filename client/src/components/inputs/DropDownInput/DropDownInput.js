@@ -56,7 +56,7 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                         {options.map((option, index) => {
                             return (
                                 <div className={`${styles.option}`} key={index} onClick={() => {
-                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-category'})
+                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}})
                                     setSelected(typeof option === 'string' ? option : '');
                                     handleExtension();
                                 }}>

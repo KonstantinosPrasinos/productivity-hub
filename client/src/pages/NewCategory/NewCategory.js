@@ -13,6 +13,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import {v4 as uuidv4} from "uuid";
+import customStyles from './NewCategory.module.scss';
 import {addGroup, removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
