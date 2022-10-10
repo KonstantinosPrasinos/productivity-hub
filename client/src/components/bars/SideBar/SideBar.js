@@ -1,5 +1,5 @@
 import {useContext, useEffect, useState} from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 import HomeIcon from '@mui/icons-material/Home';
 import TimerIcon from '@mui/icons-material/Timer';
@@ -10,7 +10,6 @@ import styles from './SideBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
 import Button from "../../buttons/Button/Button";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
-import {useSelector} from "react-redux";
 
 const SideBar = () => {
     const navigate = useNavigate();
@@ -20,7 +19,6 @@ const SideBar = () => {
     const [selected, setSelected] = useState(null);
 
     const miniPagesContext = useContext(MiniPagesContext);
-    const tasks = useSelector((state) => state?.tasks.tasks);
 
     useEffect(() => {
         switch (location.pathname) {
@@ -42,13 +40,19 @@ const SideBar = () => {
     return (
         <div className={`Stack-Container ${styles.container} `}>
             <div className={`Stack-Container ${styles.buttonsContainer}`}>
-                <IconButton onClick={() => navigate('/', {replace: true})} selected={selected === 'home'} setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}} /></IconButton>
-                <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'} setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}} /></IconButton>
-                <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0].id}})} selected={selected === 'settings'} setSelected={() => setSelected('settings')}><SettingsIcon sx={{fontSize: '1.5em'}} /></IconButton>
+                <IconButton onClick={() => navigate('/', {replace: true})} selected={selected === 'home'}
+                            setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}}/></IconButton>
+                <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}
+                            setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>
+                <IconButton onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'}
+                            setSelected={() => setSelected('settings')}><SettingsIcon
+                    sx={{fontSize: '1.5em'}}/></IconButton>
             </div>
-            <Button type='square' onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}><AddIcon sx={{fontSize: '1.5em'}} /></Button>
+            <Button type='square'
+                    onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}><AddIcon
+                sx={{fontSize: '1.5em'}}/></Button>
         </div>
     );
 }
- 
+
 export default SideBar;

@@ -68,7 +68,7 @@ const BottomBar = () => {
                 <SettingsIcon sx={{fontSize: '1.5em'}} />
             </IconButton>
             <Button
-                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-task'})}
+                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}
                 type='square'
             >
                 <AddIcon sx={{fontSize: '2em'}} />
