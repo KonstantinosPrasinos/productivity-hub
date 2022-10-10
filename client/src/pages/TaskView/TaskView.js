@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import {useSelector} from "react-redux";
@@ -9,9 +9,11 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
+import {MiniPagesContext} from "../../context/MiniPagesContext";
 
 const TaskView = ({index, length, task}) => {
     const categories = useSelector((state) => state?.categories.categories);
+    const miniPagesContext = useContext(MiniPagesContext);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
@@ -32,7 +34,7 @@ const TaskView = ({index, length, task}) => {
         >
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Title'}>{task.title}</div>
-                <IconButton><EditIcon /></IconButton>
+                <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task.id}})}><EditIcon /></IconButton>
             </section>
             <section className={'Horizontal-Flex-Container'}>
                 <div className={'Label'}>Category:</div>

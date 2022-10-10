@@ -16,8 +16,9 @@ import CollapsibleContainer from "../../components/utilities/CollapsibleContaine
 import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import Divider from "../../components/utilities/Divider/Divider";
 
-const NewTask = ({index, length}) => {
+const NewTask = ({index, length, id}) => {
     const categories = useSelector((state) => state?.categories.categories);
     const categoryNames = categories.map(category => category.title);
     const {defaults} = useSelector((state) => state?.user.settings);
@@ -59,6 +60,41 @@ const NewTask = ({index, length}) => {
     const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
+
+    useEffect(() => {
+        if (id) {
+            const task = tasks.find(task => task.id === id);
+            console.log(task);
+
+            setTitle(task.title);
+            setType(task.type);
+
+            if (task.type === 'Number') {
+                setStep(task.step);
+                setGoalType(task.goal.type);
+                setGoalNumber(task.goal.number);
+            }
+
+            setCategory(task.category);
+            setPriority(task.priority);
+            setRepeats(task.repeats);
+
+            if (task.repeats) {
+                setLongGoalType(task.longGoal.type);
+                setLongGoalNumber(task.longGoal.number);
+                setExpiresAt(task.expiresAt);
+
+                if (task.timeGroup) {
+                    setRepeatType('Time Group');
+                    setTimeGroup(groups.find(group => group.id === timeGroup).title)
+                } else {
+                    setRepeatType(task.repeatRate.number);
+                    setTimePeriod(task.repeatRate.bigTimePeriod);
+                    setTimePeriod2(task.repeatRate.smallTimePeriod);
+                }
+            }
+        }
+    }, [])
 
     useEffect(() => {
         if (timeGroup) {
@@ -108,7 +144,7 @@ const NewTask = ({index, length}) => {
                 type,
                 step: type === 'Number' ? (step ? step : defaults.defaultStep) : null,
                 goal: type === 'Number' ? {
-                    goalType,
+                    type: goalType,
                     number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.defaultGoal)
                 } : null,
                 category: category ? category : null,
@@ -119,10 +155,11 @@ const NewTask = ({index, length}) => {
                     number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.defaultGoal)
                 } : null,
                 expiresAt: repeats ? expiresAt : null,
-                timeGroup: repeats ? (timeGroup ? groups.find(group => group.title === timeGroup).id : null) : null,
-                repeatEvery: repeats ? {
-                    repeatEvery,
-                    repeatEverySub
+                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : null,
+                repeatRate: repeats && !timeGroup ? {
+                    number: repeatNumber,
+                    bigTimePeriod: timePeriod,
+                    smallTimePeriod: timePeriod2
                 } : null,
                 lastEntryDate: null,
                 previousEntry: 0,
@@ -213,6 +250,7 @@ const NewTask = ({index, length}) => {
                         setSelected={setExpiresAt}
                     />
                 </InputWrapper>
+                <Divider />
                 <InputWrapper label="Repeat with">
                     <div className={`Horizontal-Flex-Container`}>
                         {repeatTypes.map((type, index) => (

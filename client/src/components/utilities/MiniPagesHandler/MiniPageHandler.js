@@ -13,7 +13,7 @@ const MiniPagesHandler = () => {
     const renderPage = (page, index) => {
         switch (page.type) {
             case 'new-task':
-                return (<NewTask key={index} index={index} length={miniPagesContext.state.length} />)
+                return (<NewTask key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)
             case 'new-category':
                 return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} />)
             case 'task-view':

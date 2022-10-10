@@ -47,7 +47,7 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                     <motion.div
                         className={`${
                             styles.optionsContainer
-                        } Stack-Container Rounded-Container`}
+                        } Stack-Container Rounded-Container Has-Shadow`}
                         initial={{height: 0}}
                         animate={{height: 'auto'}}
                         exit={{height: 0}}
