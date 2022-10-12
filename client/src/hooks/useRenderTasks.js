@@ -85,7 +85,7 @@ export function useRenderTasks(usesTime) {
     tasks.forEach(task => {
 
         // Check if the group should be rendered at the current time
-        if (usesTime) {
+        if (usesTime && task.repeats && !task.timeGroup) {
             if (!checkTime(task)) {
                 return;
             }
@@ -95,7 +95,6 @@ export function useRenderTasks(usesTime) {
             groupedTasks.push(task);
         }
     })
-
 
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);
