@@ -15,6 +15,7 @@ import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
+import TaskList from "./pages/TaskList/TaskList";
 
 function App() {
 
@@ -103,15 +104,7 @@ function App() {
                             path="/tasks"
                             element={
                                 <RequireAuth>
-                                    <div>at</div>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/tasks/:id"
-                            element={
-                                <RequireAuth>
-                                    <div>ads</div>
+                                    <TaskList />
                                 </RequireAuth>
                             }
                         />

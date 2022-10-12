@@ -10,6 +10,7 @@ import styles from './SideBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
 import Button from "../../buttons/Button/Button";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 const SideBar = () => {
     const navigate = useNavigate();
@@ -29,6 +30,9 @@ const SideBar = () => {
             case '/timer':
                 setSelected('timer')
                 break;
+            case '/tasks':
+                setSelected('tasks')
+                break;
             case '/settings':
                 setSelected('settings')
                 break;
@@ -44,6 +48,15 @@ const SideBar = () => {
                             setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}}/></IconButton>
                 <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}
                             setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>
+                <IconButton
+                    onClick={() => {
+                        setSelected('tasks');
+                        navigate('/tasks', {replace: true});
+                    }}
+                    selected={selected === 'tasks'}
+                >
+                    <FormatListBulletedIcon sx={{fontSize: '1.5em'}}/>
+                </IconButton>
                 <IconButton onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'}
                             setSelected={() => setSelected('settings')}><SettingsIcon
                     sx={{fontSize: '1.5em'}}/></IconButton>

@@ -142,16 +142,18 @@ const NewCategory = ({index, length}) => {
             }
             startingDate.setHours(0, 0, 0, 0);
             startingDates.push(startingDate.getTime());
-        })
+        });
 
         const timeGroup = {
             id,
             title: timeGroupTitle,
             priority,
-            number: timeGroupNumber,
-            bigTimePeriod: timePeriod,
-            smallTimePeriod: timePeriod2,
-            startingDate: startingDates,
+            repeatRate: {
+                number: timeGroupNumber,
+                bigTimePeriod: timePeriod,
+                smallTimePeriod: timePeriod2,
+                startingDate: startingDates
+            },
             parent: null
         }
 

@@ -62,6 +62,10 @@ body {
     &.Space-Between {
         justify-content: space-between;
     }
+
+    &.Align-Right {
+        justify-content: flex-end;
+    }
 }
 
 .Stack-Container {

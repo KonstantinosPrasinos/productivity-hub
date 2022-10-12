@@ -145,6 +145,30 @@ const NewTask = ({index, length, id}) => {
                 dispatch(setHighestPriority(priority));
             }
 
+            let startingDates = [];
+            timePeriod2.forEach(smallTimePeriod => {
+                let startingDate = new Date();
+
+                switch (timePeriod) {
+                    case 'Days':
+                        break;
+                    case 'Weeks':
+                        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+                        const weekDaysDifference = days.findIndex(day => day === smallTimePeriod) + 1 - startingDate.getDay();
+                        startingDate.setDate(startingDate.getDate() + weekDaysDifference);
+                        break;
+                    case 'Months':
+                        startingDate.setDate(smallTimePeriod?.getDate());
+                        break;
+                    case 'Years':
+                        startingDate.setTime(smallTimePeriod?.getTime());
+                        break;
+                }
+                startingDate.setHours(0, 0, 0, 0);
+                startingDates.push(startingDate.getTime());
+            });
+
             const task = {
                 id: localId,
                 title,
@@ -166,7 +190,8 @@ const NewTask = ({index, length, id}) => {
                 repeatRate: repeats && !timeGroup ? {
                     number: repeatNumber,
                     bigTimePeriod: timePeriod,
-                    smallTimePeriod: timePeriod2
+                    smallTimePeriod: timePeriod2,
+                    startingDate: startingDates
                 } : null,
                 lastEntryDate: null,
                 previousEntry: 0,

@@ -20,7 +20,7 @@ const Task = ({tasks}) => {
 
     return (
         <motion.div
-            className={`Rounded-Container Stack-Container Has-Shadow ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
+            className={`Rounded-Container Symmetrical Stack-Container Has-Shadow ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
 
@@ -28,9 +28,9 @@ const Task = ({tasks}) => {
         >
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`}>
-                    <div className={styles.topLine}>
+                    {(task.repeats || task.category) && <div className={styles.topLine}>
                         <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>
-                            <div className={`${styles.titleContainer}`}>{task.title}</div>
+                            {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}
                             {index === 0 && task.category !== null &&
                                 <div onClick={(e) => e.stopPropagation()}>
                                     <CategoryIndicator
@@ -41,9 +41,14 @@ const Task = ({tasks}) => {
                                 </div>
                             }
                         </div>
-                        {!task.repeats && <div onClick={(e) => e.stopPropagation()}><VisualStreak task={task}></VisualStreak></div>}
+                    </div>}
+                    <div className={`Horizontal-Flex-Container ${!task.repeats ? 'Space-Between' : 'Align-Right'}`}>
+                        {!task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}
+                        <div onClick={(e) => e.stopPropagation()} className={styles.streakContainer}>
+                            <VisualStreak task={task}></VisualStreak>
+                        </div>
                     </div>
-                    {task.repeats && <div onClick={(e) => e.stopPropagation()}><VisualStreak task={task}></VisualStreak></div>}
+
                 </div>))}
         </motion.div>
 
