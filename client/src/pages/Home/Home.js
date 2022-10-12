@@ -8,7 +8,7 @@ import {useRenderTasks} from "../../hooks/useRenderTasks";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 
 const Home = () => {
-    const groupedTasks = useRenderTasks(true);
+    const {completedTasks, incompleteTasks} = useRenderTasks(true);
 
     const screenSizeContext = useContext(ScreenSizeContext);
 
@@ -16,12 +16,19 @@ const Home = () => {
         <div className={`${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}>
             <div className={`Stack-Container ${styles.leftSide}`}>
                 <AnimatePresence>
-                    {groupedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
+                    {incompleteTasks.map((task) => task.hasOwnProperty('timeGroup') ?
                         (<Task key={task.id} tasks={[task]}></Task>) :
                         (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
                     )}
                 </AnimatePresence>
-                <CollapsibleContainer label={'Completed'}></CollapsibleContainer>
+                <CollapsibleContainer label={'Completed'}>
+                    <AnimatePresence>
+                        {completedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
+                            (<Task key={task.id} tasks={[task]}></Task>) :
+                            (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
+                        )}
+                    </AnimatePresence>
+                </CollapsibleContainer>
             </div>
             {screenSizeContext.state !== 'small' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>

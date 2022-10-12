@@ -91,13 +91,44 @@ export function useRenderTasks(usesTime) {
             }
         }
 
-        if (!task.timeGroup) {
-            groupedTasks.push(task);
-        }
+        groupedTasks.push(task);
     })
 
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);
 
-    return groupedTasks;
+
+    // Create arrays for completed and
+    const completedTasks = [];
+    const incompleteTasks = [];
+
+    groupedTasks.filter(task => {
+        const checkTaskCompletion = (task) => {
+            if (task.type === 'Checkbox') {
+                if (task.previousEntry === 1) {
+                    completedTasks.push(task);
+                } else {
+                    incompleteTasks.push(task);
+                }
+            } else {
+                if (task.goal.type === 'At least' && task.goal.number < task.previousEntry) {
+                    completedTasks.push(task);
+                } else {
+                    incompleteTasks.push(task);
+                }
+            }
+        }
+
+        if (Array.isArray(task)) {
+
+            task.forEach(subTask => {
+                checkTaskCompletion(subTask)
+            })
+
+        } else {
+            checkTaskCompletion(task);
+        }
+    })
+
+    return {completedTasks, incompleteTasks};
 }

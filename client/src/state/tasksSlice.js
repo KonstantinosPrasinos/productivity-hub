@@ -15,7 +15,6 @@ export const tasksSlice = createSlice({
             state.tasks = action.payload;
         },
         setTask: (state, action) => {
-            console.log(action.payload);
             const index = state.tasks.findIndex(task => task.id === action.payload.id);
             state.tasks[index] = action.payload
         },
