@@ -5,6 +5,7 @@ import styles from './Home.module.scss'
 import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
+import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 
 const Home = () => {
     const groupedTasks = useRenderTasks(true);
@@ -20,6 +21,7 @@ const Home = () => {
                         (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
                     )}
                 </AnimatePresence>
+                <CollapsibleContainer label={'Completed'}></CollapsibleContainer>
             </div>
             {screenSizeContext.state !== 'small' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>

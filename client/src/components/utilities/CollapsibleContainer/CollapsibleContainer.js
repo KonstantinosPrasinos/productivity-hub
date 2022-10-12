@@ -1,12 +1,35 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {AnimatePresence, motion} from "framer-motion";
 import styles from './CollapsibleContainer.module.scss';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const CollapsibleContainer = ({children, isVisible}) => {
+const CollapsibleContainer = ({children, isVisible, label}) => {
+    const [extended, setExtended] = useState(false);
+
     return (
         <div>
+            {label &&
+                <div className={`${label ? `Rounded-Container ${styles.bigContainer}` : ''} Horizontal-Flex-Container Space-Between Clickable`}
+                     onClick={() => {setExtended(state => !state)}}
+                >
+                    <span>{label}</span>
+                    <motion.div
+                        animate={extended ? 'extended' : 'collapsed'}
+                        variants={{
+                        extended: {
+                            rotate: 180
+                        },
+                        collapsed: {
+                            rotate: 0
+                        }}}
+                        transition={{type: 'tween'}}
+                    >
+                        <ExpandMoreIcon />
+                    </motion.div>
+                </div>
+            }
             <AnimatePresence>
-                {isVisible && <motion.div
+                {(isVisible || (label && extended)) && <motion.div
                     className={`Stack-Container ${styles.container}`}
                     initial={"collapsed"}
                     animate={"extended"}

@@ -123,6 +123,10 @@ body {
     overflow-y: hidden;
 }
 
+.Clickable {
+    cursor: pointer;
+}
+
 .Red {
     background-color: var(--red-color);
 }
