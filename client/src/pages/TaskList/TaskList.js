@@ -8,7 +8,7 @@ const TaskList = () => {
     const groupedTasks = useRenderTasks(false);
 
     return (
-        <div className={styles.container}>
+        <div className={`Stack-Container ${styles.container}`}>
             <AnimatePresence>
                 {groupedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
                     (<Task key={task.id} tasks={[task]}></Task>) :
