@@ -1,5 +1,4 @@
 import {useContext} from "react";
-
 import {ScreenSizeContext} from "../../context/ScreenSizeContext";
 import styles from './Home.module.scss'
 import Task from "../../components/indicators/Task/Task";
@@ -21,14 +20,14 @@ const Home = () => {
                         (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
                     )}
                 </AnimatePresence>
-                <CollapsibleContainer label={'Completed'}>
+                {completedTasks.length > 0 && <CollapsibleContainer label={'Completed'}>
                     <AnimatePresence>
                         {completedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
                             (<Task key={task.id} tasks={[task]}></Task>) :
                             (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
                         )}
                     </AnimatePresence>
-                </CollapsibleContainer>
+                </CollapsibleContainer>}
             </div>
             {screenSizeContext.state !== 'small' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>
