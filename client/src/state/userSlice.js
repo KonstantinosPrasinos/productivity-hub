@@ -22,7 +22,7 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         setTheme: (state, action) => {
-            state.settings.theme = ['Light', 'Dark', 'Black', 'Device Default'].includes(action.payload) ? action.payload : state.settings.theme;
+            state.settings.theme = ['Light', 'Dark', 'Black', 'Device'].includes(action.payload) ? action.payload : state.settings.theme;
         },
         setDefaultStep: (state, action) => {
             state.settings.defaults.defaultStep = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.defaultStep;

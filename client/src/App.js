@@ -3,7 +3,7 @@ import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -22,6 +22,7 @@ function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
 
     const userTheme = useSelector((state) => state?.user.settings.theme);
+    const matchMediaHasEventListener = useRef(false);
 
     // useEffect(() => {
     //   //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
@@ -50,6 +51,19 @@ function App() {
 
     useEffect(() => {
         setTheme(getTheme());
+
+        const handleDefaultTheme = () => {
+            setTheme(getTheme());
+        }
+
+        if (userTheme === 'Device' && !matchMediaHasEventListener.current) {
+            matchMediaHasEventListener.current = true;
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDefaultTheme);
+        } else if (matchMediaHasEventListener.current) {
+            matchMediaHasEventListener.current = false;
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDefaultTheme);
+        }
+
     }, [userTheme])
 
     const getDeviceTheme = () => {
@@ -60,9 +74,13 @@ function App() {
         }
     }
 
+    useEffect(() => {
+
+    }, [userTheme]);
+
     const getTheme = () => {
         switch (userTheme) {
-            case 'Device Default':
+            case 'Device':
                 return getDeviceTheme();
             case 'Light':
             case 'Dark':

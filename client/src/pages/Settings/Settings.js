@@ -3,7 +3,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PaletteIcon from "@mui/icons-material/Palette";
 import AutoFixNormalIcon from '@mui/icons-material/AutoFixNormal';
 import InfoIcon from "@mui/icons-material/Info";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -11,16 +11,24 @@ import Chip from "../../components/buttons/Chip/Chip";
 import EmailIcon from '@mui/icons-material/Email';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
+import {setTheme} from "../../state/userSlice";
 
 const Settings = () => {
   const {theme} = useSelector((state) => state?.user.settings);
 
   const [selectedTheme, setSelectedTheme] = useState(theme);
+  const dispatch = useDispatch();
 
-  const themeChips = ['Device Default', 'Light', 'Dark', 'Black'];
+  const themeChips = ['Device', 'Light', 'Dark', 'Black'];
+
+  useEffect(() => {
+      if (theme !== selectedTheme) {
+          dispatch(setTheme(selectedTheme));
+      }
+  }, [selectedTheme])
 
   const handleProjectClick = () => {
     window.open('https://github.com/KonstantinosPrasinos/productivity-hub');
