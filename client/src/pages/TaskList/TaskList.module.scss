@@ -1,3 +1,12 @@
+@import 'src/styles/variables.scss';
+
 .container {
   width: 100%;
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .leftSide {
+    width: 100%;
+    padding-top: 1em;
+  }
 }

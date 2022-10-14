@@ -7,10 +7,11 @@
   gap: 3em;
   justify-content: center;
   width: 100%;
+}
 
-  &.small {
-    background-color: var(--surface-color);
-  }
+.noTasks {
+  width: 22.15em;
+  justify-content: center;
 }
 
 .leftSide {
@@ -25,5 +26,6 @@
 @media (max-width: $tablet-breakpoint) {
   .leftSide {
     width: 100%;
+    padding-top: 1em;
   }
 }

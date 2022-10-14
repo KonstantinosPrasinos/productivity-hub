@@ -49,7 +49,7 @@ const Settings = () => {
   }
 
   return (
-    <div className={`Rounded-Container ${styles.container} Stack-Container`}>
+    <div className={`Rounded-Container ${styles.container} Stack-Container To-Edge`}>
       <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon />Account</div>
       <section className={'Stack-Container'}>
         <InputWrapper label={'Email'}>

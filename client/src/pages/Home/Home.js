@@ -12,8 +12,11 @@ const Home = () => {
     const screenSizeContext = useContext(ScreenSizeContext);
 
     return (
-        <div className={`${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}>
+        <div className={`${styles.container}`}>
             <div className={`Stack-Container ${styles.leftSide}`}>
+                {completedTasks.length === 0 && incompleteTasks.length === 0 &&
+                    <div className={`Rounded-Container ${styles.noTasks}`}>No tasks for now</div>
+                }
                 <AnimatePresence>
                     {incompleteTasks.map((task) => task.hasOwnProperty('timeGroup') ?
                         (<Task key={task.id} tasks={[task]}></Task>) :

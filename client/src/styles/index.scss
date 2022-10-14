@@ -34,6 +34,9 @@ body {
     position: fixed;
     height: 100%;
     font-family: 'Roboto', sans-serif;
+    > * {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
 
 .Content-Container {
@@ -208,6 +211,11 @@ button {
     }
     .App {
         flex-direction: column;
+    }
+    .Rounded-Container {
+        &.To-Edge {
+            border-radius: 0;
+        }
     }
 }
 
