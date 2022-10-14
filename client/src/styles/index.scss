@@ -21,10 +21,10 @@
     display: flex;
     flex-direction: row;
     gap: 0;
-    &.light {
+    &.Light {
         @include getTheme('light');
     }
-    &.dark {
+    &.Dark {
         @include getTheme('dark');
     }
 }
