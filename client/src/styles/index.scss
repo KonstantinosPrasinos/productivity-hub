@@ -36,7 +36,7 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-.content-container {
+.Content-Container {
     position: relative;
 }
 
@@ -188,7 +188,8 @@ button {
 
 // App.js
 @media (max-width: $tablet-breakpoint) {
-    .content-container {
+    .Content-Container {
+        justify-content: center;
         width: 100vw;
         flex-grow: 1;
         overflow: auto;
@@ -207,7 +208,7 @@ button {
 }
 
 @media (min-width: $tablet-breakpoint) {
-    .content-container {
+    .Content-Container {
         box-sizing: border-box;
         width: calc(100% - 300px - 8em);
         height: 100%;
@@ -215,10 +216,9 @@ button {
     }
 }
 
-.content-container {
+.Content-Container {
     box-sizing: border-box;
     flex-grow: 1;
-    justify-content: center;
     display: flex;
 }
 

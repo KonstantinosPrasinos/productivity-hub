@@ -2,12 +2,13 @@
 
 @media (max-width: $tablet-breakpoint) {
   .container {
-    border-top: 2px solid var(--primary-color);
+    border-top: $base-border;
     width: calc(100% - 40px);
     height: calc(100% - 4em - 32px);
     bottom: calc(4em + 12px);
     min-height: 25%;
     max-height: calc(100% - 4em - 32px);
+    border-radius: 10px 10px 0 0;
   }
 }
 
@@ -18,6 +19,7 @@
     right: 0;
     top: 0;
     box-sizing: border-box;
+    border-left: $base-border;
   }
 }
 

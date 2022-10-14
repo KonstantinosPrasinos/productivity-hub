@@ -80,7 +80,7 @@ function App() {
                 <NavBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
-                <div className="content-container">
+                <div className="Content-Container">
                     <Routes>
                         <Route
                             exact
