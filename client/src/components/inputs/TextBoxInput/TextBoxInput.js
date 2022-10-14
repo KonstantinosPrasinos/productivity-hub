@@ -14,7 +14,6 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
     }
 
     const handleBlur = () => {
-        console.log(type);
         if (type === 'number') {
             checkIfNull()
         }
@@ -28,12 +27,12 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
 
     const increment = () => {
         checkIfNull();
-        setValue(current => parseInt(current) + 1);
+        setValue(parseInt(value) + 1);
     }
 
     const decrement = () => {
         checkIfNull();
-        setValue(current => parseInt(current) - 1);
+        setValue(parseInt(value) - 1);
     }
 
   return (

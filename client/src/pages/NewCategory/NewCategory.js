@@ -37,7 +37,7 @@ const NewCategory = ({index, length}) => {
 
     const [timeGroupTitle, setTimeGroupTitle] = useState('');
     const [priority, setPriority] = useState(0);
-    const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.defaultPriority);
+    const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
@@ -87,7 +87,7 @@ const NewCategory = ({index, length}) => {
         setTimeGroupNumber(1);
         setTimePeriod('Weeks');
         setTimePeriod2(null);
-        setPriority(defaults.defaultPriority);
+        setPriority(defaults.priority);
     }
 
     const handleTimeGroupSave = () => {

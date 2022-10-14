@@ -5,9 +5,9 @@ const initialState = {
     settings: {
         theme: 'Light',
         defaults: {
-            defaultStep: 5,
-            defaultGoal: 10,
-            defaultPriority: 1
+            step: 5,
+            goal: 10,
+            priority: 1
         }
     },
     priorityBounds: {
@@ -25,13 +25,13 @@ export const userSlice = createSlice({
             state.settings.theme = ['Light', 'Dark', 'Black', 'Device'].includes(action.payload) ? action.payload : state.settings.theme;
         },
         setDefaultStep: (state, action) => {
-            state.settings.defaults.defaultStep = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.defaultStep;
+            state.settings.defaults.step = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.step;
         },
         setDefaultGoal: (state, action) => {
-            state.settings.defaults.defaultGoal = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.defaultGoal;
+            state.settings.defaults.goal = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.goal;
         },
         setDefaultPriority: (state, action) => {
-            state.settings.defaults.defaultPriority = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.defaultPriority;
+            state.settings.defaults.priority = !isNaN(parseFloat(action.payload)) ? parseFloat(action.payload) : state.settings.defaults.priority;
         },
         setLowestPriority: (state, action) => {
             state.priorityBounds.low = action.payload;

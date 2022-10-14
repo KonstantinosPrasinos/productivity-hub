@@ -14,12 +14,13 @@ import Button from "../../components/buttons/Button/Button";
 import {useDispatch, useSelector} from "react-redux";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
-import {setTheme} from "../../state/userSlice";
+import {setDefaultGoal, setDefaultPriority, setDefaultStep, setTheme} from "../../state/userSlice";
 
 const Settings = () => {
-  const {theme} = useSelector((state) => state?.user.settings);
+  const {theme, defaults} = useSelector((state) => state?.user.settings);
 
   const [selectedTheme, setSelectedTheme] = useState(theme);
+
   const dispatch = useDispatch();
 
   const themeChips = ['Device', 'Light', 'Dark', 'Black'];
@@ -72,13 +73,13 @@ const Settings = () => {
       <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AutoFixNormalIcon />Defaults</div>
       <section className={'Stack-Container'}>
         <InputWrapper label={'Priority'}>
-          <TextBoxInput type={'number'}></TextBoxInput>
+          <TextBoxInput type={'number'} value={defaults.priority} setValue={(e) => dispatch(setDefaultPriority(e))}></TextBoxInput>
         </InputWrapper>
         <InputWrapper label={'Number Task Step'}>
-          <TextBoxInput type={'number'}></TextBoxInput>
+          <TextBoxInput type={'number'} value={defaults.step} setValue={(e) => dispatch(setDefaultStep(e))}></TextBoxInput>
         </InputWrapper>
         <InputWrapper label={'Goal Number'}>
-          <TextBoxInput type={'number'}></TextBoxInput>
+          <TextBoxInput type={'number'} value={defaults.goal} setValue={(e) => dispatch(setDefaultGoal(e))}></TextBoxInput>
         </InputWrapper>
       </section>
       <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><InfoIcon />About</div>

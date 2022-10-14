@@ -25,20 +25,20 @@ const NewTask = ({index, length, id}) => {
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
-    const [step, setStep] = useState(defaults.defaultStep);
+    const [step, setStep] = useState(defaults.step);
     const [goalType, setGoalType] = useState('At least');
-    const [goalNumber, setGoalNumber] = useState(defaults.defaultGoal);
+    const [goalNumber, setGoalNumber] = useState(defaults.goal);
     const [category, setCategory] = useState('');
-    const [priority, setPriority] = useState(defaults.defaultPriority);
+    const [priority, setPriority] = useState(defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
-    const [longGoalNumber, setLongGoalNumber] = useState(defaults.defaultGoal);
+    const [longGoalNumber, setLongGoalNumber] = useState(defaults.goal);
     const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
-    const [repeatNumber, setRepeatNumber] = useState(defaults.defaultPriority);
+    const [repeatNumber, setRepeatNumber] = useState(defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
@@ -173,17 +173,17 @@ const NewTask = ({index, length, id}) => {
                 id: localId,
                 title,
                 type,
-                step: type === 'Number' ? (step ? step : defaults.defaultStep) : null,
+                step: type === 'Number' ? (step ? step : defaults.step) : null,
                 goal: type === 'Number' ? {
                     type: goalType,
-                    number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.defaultGoal)
+                    number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.goal)
                 } : null,
                 category: category ? category : null,
-                priority: priority ? priority : defaults.defaultPriority,
+                priority: priority ? priority : defaults.priority,
                 repeats,
                 longGoal: repeats ? {
                     goalType: longGoalType,
-                    number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.defaultGoal)
+                    number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.goal)
                 } : null,
                 expiresAt: repeats ? expiresAt : null,
                 timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : null,

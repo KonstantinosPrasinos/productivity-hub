@@ -18,7 +18,6 @@ import TaskList from "./pages/TaskList/TaskList";
 import {useSelector} from "react-redux";
 
 function App() {
-
     const screenSizeContext = useContext(ScreenSizeContext);
 
     const userTheme = useSelector((state) => state?.user.settings.theme);
