@@ -5,6 +5,7 @@ export const tasksSlice = createSlice({
     initialState: {tasks: []},
     reducers: {
         addTask: (state, action) => {
+            console.log('test')
             state.tasks.push(action.payload);
         },
         removeTask: (state, action) => {
@@ -13,12 +14,16 @@ export const tasksSlice = createSlice({
         setTasks: (state, action) => {
             state.tasks = action.payload;
         },
+        setTask: (state, action) => {
+            const index = state.tasks.findIndex(task => task.id === action.payload.id);
+            state.tasks[index] = action.payload
+        },
         setTaskPreviousEntry: (state, action) => {
             state.tasks.find(task => task.id === action.payload.id).previousEntry = action.payload.value;
         }
     },
 })
 
-export const {addTask, removeTask, setTaskPreviousEntry, setTasks} = tasksSlice.actions;
+export const {addTask, removeTask, setTaskPreviousEntry, setTasks, setTask} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

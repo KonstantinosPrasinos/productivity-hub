@@ -1,112 +1,101 @@
 import styles from "./Settings.module.scss";
-import RedirectButton from "../../components/buttons/RedirectButton/RedirectButton";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import PaletteIcon from "@mui/icons-material/Palette";
-import KeyIcon from "@mui/icons-material/Key";
-import LanguageIcon from "@mui/icons-material/Language";
+import AutoFixNormalIcon from '@mui/icons-material/AutoFixNormal';
 import InfoIcon from "@mui/icons-material/Info";
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { ScreenSizeContext } from "../../context/ScreenSizeContext";
+import {useEffect, useState} from "react";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
-import TextButton from "../../components/buttons/TextButton/TextButton";
-import Divider from "../../components/utilities/Divider/Divider";
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import Chip from "../../components/buttons/Chip/Chip";
-import {ThemeContext} from "../../context/ThemeContext";
+import EmailIcon from '@mui/icons-material/Email';
+import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
+import Button from "../../components/buttons/Button/Button";
+import {useDispatch, useSelector} from "react-redux";
+import IconButton from "../../components/buttons/IconButton/IconButton";
+import TwitterIcon from '@mui/icons-material/Twitter';
+import {setDefaultGoal, setDefaultPriority, setDefaultStep, setTheme} from "../../state/userSlice";
 
 const Settings = () => {
-  const location = useLocation();
-  const [currentLocation, setCurrentLocation] = useState('account');
-  const screenSizeContext = useContext(ScreenSizeContext);
-  const themeContext = useContext(ThemeContext);
+  const {theme, defaults} = useSelector((state) => state?.user.settings);
 
-  const [selectedTheme, setSelectedTheme] = useState('light');
+  const [selectedTheme, setSelectedTheme] = useState(theme);
 
-  const themeChips = ['Light', 'Dark', 'Black'];
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.log(selectedTheme)
-    themeContext.dispatch({type: "SET_THEME", payload: selectedTheme});
-  }, [selectedTheme]);
+  const themeChips = ['Device', 'Light', 'Dark', 'Black'];
 
   useEffect(() => {
-    setCurrentLocation(
-      location.pathname.slice(
-        location.pathname.indexOf("/", 1) + 1,
-        location.pathname.length
-      )
-    );
-  }, [location]);
+      if (theme !== selectedTheme) {
+          dispatch(setTheme(selectedTheme));
+      }
+  }, [selectedTheme])
+
+  const handleProjectClick = () => {
+    window.open('https://github.com/KonstantinosPrasinos/productivity-hub');
+  }
+
+  const handleGithubClick = () => {
+    window.open('https://github.com/KonstantinosPrasinos/');
+  }
+
+  const handleLinkedInClick = () => {
+    window.open('https://www.linkedin.com/in/konstantinos-prasinos-ab2a201bb/')
+  }
+
+  const handleTwitterClick = () => {
+    window.open('https://twitter.com/ConstantDeenos');
+  }
 
   return (
-    <div className={`Rounded-Container ${styles.container}`}>
-      {/*{(screenSizeContext.state !== 'small' || currentLocation === "/settings") && (*/}
-      {/*  <div className={styles.redirectContainer}>*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"Account"}*/}
-      {/*      location={"/settings/account"}*/}
-      {/*    />*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"Notifications"}*/}
-      {/*      location={"/settings/notifications"}*/}
-      {/*    />*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"Appearance"}*/}
-      {/*      location={"/settings/appearance"}*/}
-      {/*    />*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"Integrations"}*/}
-      {/*      location={"/settings/integrations"}*/}
-      {/*    />*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"Language"}*/}
-      {/*      location={"/settings/language"}*/}
-      {/*    />*/}
-      {/*    <RedirectButton*/}
-      {/*      label={"About"}*/}
-      {/*      location={"/settings/about"}*/}
-      {/*    />*/}
-      {/*  </div>*/}
-      {/*)}*/}
-      <div className={`Stack-Container ${styles.contentContainer}`}>
-        <div className={styles.segment}>
-          <div className={'Title'}>Account</div>
-          <div className={`Horizontal-Flex-Container ${styles.accountContainer}`}>
-            <AccountCircleIcon sx={{fontSize: '4em'}} />
-            <div className={styles.email}>konstantinos.prasinos@gmail.com</div>
-          </div>
-          <InputWrapper type={'vertical'} label={'Manage Account'}>
-            <TextButton to={'/change-email'}>Change Email</TextButton>
-            <TextButton to={'/reset-password'}>Reset Password</TextButton>
-            <TextButton type={'important'} to={'/delete-account'}>Delete Account</TextButton>
-          </InputWrapper>
-          <InputWrapper type={'vertical'} label={'Task Data'}>
-            <TextButton to={'/download-data'}>Download your task data</TextButton>
-          </InputWrapper>
+    <div className={`Rounded-Container ${styles.container} Stack-Container`}>
+      <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon />Account</div>
+      <section className={'Stack-Container'}>
+        <InputWrapper label={'Email'}>
+          <TextBoxInput size={'max'} icon={<EmailIcon />}></TextBoxInput>
+        </InputWrapper>
+        <InputWrapper label={'Password'}>
+          <Button filled={false} size={'small'}>Change your Password</Button>
+        </InputWrapper>
+        <InputWrapper label={'Your Data'}>
+          <Button filled={false} size={'small'}>Download Data</Button>
+        </InputWrapper>
+        <InputWrapper label={'Account Removal'}>
+          <Button filled={false} size={'small'}>Delete Account</Button>
+        </InputWrapper>
+      </section>
+      <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><PaletteIcon />Appearance</div>
+      <section className={'Stack-Container'}>
+        <InputWrapper label={'Theme'}>
+          {themeChips.map(theme => <Chip key={theme} value={theme} selected={selectedTheme} setSelected={setSelectedTheme}>{theme}</Chip>)}
+        </InputWrapper>
+      </section>
+      <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AutoFixNormalIcon />Defaults</div>
+      <section className={'Stack-Container'}>
+        <InputWrapper label={'Priority'}>
+          <TextBoxInput type={'number'} value={defaults.priority} setValue={(e) => dispatch(setDefaultPriority(e))}></TextBoxInput>
+        </InputWrapper>
+        <InputWrapper label={'Number Task Step'}>
+          <TextBoxInput type={'number'} value={defaults.step} setValue={(e) => dispatch(setDefaultStep(e))}></TextBoxInput>
+        </InputWrapper>
+        <InputWrapper label={'Goal Number'}>
+          <TextBoxInput type={'number'} value={defaults.goal} setValue={(e) => dispatch(setDefaultGoal(e))}></TextBoxInput>
+        </InputWrapper>
+      </section>
+      <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><InfoIcon />About</div>
+      <InputWrapper label={'App'} type={'vertical'}>
+        Available as a Web App, on Android and on Windows.
+        You can view the source code for this app on the github page below.
+        <Button onClick={handleProjectClick}>Project Source Code<GitHubIcon /></Button>
+      </InputWrapper>
+      <InputWrapper label={'Creator'} type={'vertical'}>
+        This app was created by Konstantinos Prasinos.
+        <div className={'Horizontal-Flex-Container'}>
+          <IconButton onClick={handleGithubClick}><GitHubIcon /></IconButton>
+          <IconButton onClick={handleLinkedInClick}><LinkedInIcon /></IconButton>
+          <IconButton onClick={handleTwitterClick}><TwitterIcon /></IconButton>
         </div>
-        <Divider />
-        {/*<div className={styles.segment}>*/}
-        {/*  <div className={'Title'}>Notifications</div>*/}
-        {/*</div>*/}
-        <div className={styles.segment}>
-          <div className={'Title'}>Appearance</div>
-          <div className={'Horizontal-Flex-Container'}>
-            <InputWrapper label={'Theme'}>
-              {themeChips.map((chip, index) => (
-                  <Chip
-                      selected={selectedTheme}
-                      setSelected={setSelectedTheme}
-                      value={chip.toLowerCase()}
-                      key={index}
-                  >
-                    {chip}
-                  </Chip>
-              ))}
-            </InputWrapper>
-          </div>
-        </div>
-      </div>
+      </InputWrapper>
     </div>
   );
 };

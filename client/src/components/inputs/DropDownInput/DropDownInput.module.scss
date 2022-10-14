@@ -11,6 +11,7 @@
     box-sizing: border-box;
     height: 2.5em;
     box-shadow: none;
+    justify-content: space-between;
 
     &:hover {
         transform: scale(1.01);
@@ -42,6 +43,7 @@
     
     z-index: 1;
     margin-top: 5px;
+    overflow-y: hidden;
 }
 
 .option {

@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './WeekDayInput.module.scss'
 
 const WeekDayInput = ({selected, setSelected}) => {

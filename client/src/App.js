@@ -3,10 +3,9 @@ import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogInPage from "./components/etc/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 
 import "./styles/index.scss";
-import {ThemeContext} from "./context/ThemeContext";
 import Playground from "./pages/Playground/Playground";
 import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
@@ -15,11 +14,14 @@ import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
+import TaskList from "./pages/TaskList/TaskList";
+import {useSelector} from "react-redux";
 
 function App() {
-
-    const themeContext = useContext(ThemeContext);
     const screenSizeContext = useContext(ScreenSizeContext);
+
+    const userTheme = useSelector((state) => state?.user.settings.theme);
+    const matchMediaHasEventListener = useRef(false);
 
     // useEffect(() => {
     //   //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
@@ -34,32 +36,10 @@ function App() {
     //   }
     // }, [dispatch, navigate]);
 
-    useEffect(() => {
-        themeContext.dispatch({type: "SET_THEME", payload: "dark"});
-        const storedTheme = localStorage.getItem("ui-theme");
-        switch (storedTheme) {
-            case "default":
-                if (
-                    window.matchMedia &&
-                    window.matchMedia("(prefers-color-scheme: dark)").matches
-                ) {
-                    themeContext.dispatch({type: "SET_THEME", payload: "dark"});
-                } else {
-                    themeContext.dispatch({type: "SET_THEME", payload: "light"});
-                }
-                break;
-            case "dark":
-                themeContext.dispatch({type: "SET_THEME", payload: "dark"});
-                break;
-            case "light":
-                themeContext.dispatch({type: "SET_THEME", payload: "light"});
-                break;
-            default:
-                themeContext.dispatch({type: "SET_THEME", payload: "light"});
-                localStorage.setItem("ui-theme", "light");
-                break;
-        }
-    }, []);
+    function checkScreenWidth() {
+        if (window.innerWidth > 768) return 'big';
+        return 'small';
+    }
 
     useEffect(() => {
         screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
@@ -68,18 +48,57 @@ function App() {
         });
     }, [screenSizeContext]);
 
-    function checkScreenWidth() {
-        if (window.innerWidth > 768) return 'big';
-        return 'small';
+    useEffect(() => {
+        setTheme(getTheme());
+
+        const handleDefaultTheme = () => {
+            setTheme(getTheme());
+        }
+
+        if (userTheme === 'Device' && !matchMediaHasEventListener.current) {
+            matchMediaHasEventListener.current = true;
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDefaultTheme);
+        } else if (matchMediaHasEventListener.current) {
+            matchMediaHasEventListener.current = false;
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDefaultTheme);
+        }
+
+    }, [userTheme])
+
+    const getDeviceTheme = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'Dark';
+        } else {
+            return 'Light';
+        }
     }
+
+    useEffect(() => {
+
+    }, [userTheme]);
+
+    const getTheme = () => {
+        switch (userTheme) {
+            case 'Device':
+                return getDeviceTheme();
+            case 'Light':
+            case 'Dark':
+            case 'Midnight':
+                return userTheme;
+            default:
+                return 'Light'
+        }
+    }
+
+    const [theme, setTheme] = useState(getTheme());
 
     return (
         <BrowserRouter>
-            <div className={`App ${themeContext.state.theme ? themeContext.state.theme : ''}`}>
+            <div className={`App ${theme}`}>
                 <NavBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
-                <div className="content-container">
+                <div className="Content-Container">
                     <Routes>
                         <Route
                             exact
@@ -103,15 +122,7 @@ function App() {
                             path="/tasks"
                             element={
                                 <RequireAuth>
-                                    <div>at</div>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/tasks/:id"
-                            element={
-                                <RequireAuth>
-                                    <div>ads</div>
+                                    <TaskList />
                                 </RequireAuth>
                             }
                         />

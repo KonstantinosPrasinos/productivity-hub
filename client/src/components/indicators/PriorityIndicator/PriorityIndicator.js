@@ -1,10 +1,10 @@
 import styles from './PriorityIndicator.module.scss';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import {useSelector} from "react-redux";
 
 const PriorityIndicator = () => {
     // Placeholders for until I make the needed context
-    const low = 1;
-    const high = 10;
+    const {low, high} = useSelector((state) => state.user.priorityBounds);
 
     return (
         <div className={`Horizontal-Flex-Container ${styles.container}`}>

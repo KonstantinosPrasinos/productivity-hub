@@ -2,8 +2,10 @@ import { useAnimation, motion  } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
 import styles from "./CurrentProgress.module.scss";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {setTaskPreviousEntry} from "../../../state/tasksSlice";
+import CheckIcon from '@mui/icons-material/Check';
+import IconButton from "../../buttons/IconButton/IconButton";
 
 const CurrentProgress = ({ task }) => {
   const topLeftControls = useAnimation();
@@ -19,8 +21,15 @@ const CurrentProgress = ({ task }) => {
   const [prevPercentage, setPrevPercentage] = useState(0);
 
   useEffect(() => {
-    const maxDuration = 0.5;
-    const percentage = Math.round( task.previousEntry / task.goal.number * 100);
+    const maxDuration = 0.4;
+    let percentage;
+
+    if (task.type === 'Number') {
+      percentage = Math.round( task.previousEntry / task.goal.number * 100);
+    } else {
+      percentage = task.previousEntry;
+    }
+
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
 
     const setupAnimations = (start, finish) => {
@@ -90,16 +99,39 @@ const CurrentProgress = ({ task }) => {
       }
     }
 
-    if (prevPercentage !== percentage) {
-      // The following ternary statement is used to check for percentages of under 0 or over 100 and round to 0 and 100 respectively
-      setupAnimations(findRemaining(prevPercentage), findRemaining(percentage > 100 ? 100 : (percentage < 0 ? 0 : percentage)));
-      setPrevPercentage(percentage);
+    const triggerAnimationsCheckbox = () => {
+      let rotation = 90;
+      const animationControlsCopy = animationControls.filter((_, index) => {return index !== 1 && index !== 4});
+
+      if (prevPercentage === 1 ) {
+        rotation = 0;
+        animationControlsCopy.reverse();
+      }
+
+      for (const index in animationControlsCopy) {
+        animationControlsCopy[index].start({rotate: 270 + rotation, transition: {duration: maxDuration / 4, delay: index * maxDuration / 4, style: "tween", ease: "linear"}});
+      }
+    }
+
+    if (task.type === 'Number') {
+      if (prevPercentage !== percentage) {
+        // The following ternary statement is used to check for percentages of under 0 or over 100 and round to 0 and 100 respectively
+        setupAnimations(findRemaining(prevPercentage), findRemaining(percentage > 100 ? 100 : (percentage < 0 ? 0 : percentage)));
+        setPrevPercentage(percentage);
+      }
+    } else {
+      if (prevPercentage !== percentage) {
+        // console.log(percentage, prevPercentage);
+        triggerAnimationsCheckbox();
+        // console.log(percentage);
+        setPrevPercentage(percentage);
+      }
     }
 
   }, [prevPercentage, animationControls, task])
 
   return (
-    <div className={`${styles.container}`}>
+    <div className={`${styles.container} ${task.type === 'Checkbox' ? styles.typeCheckbox : ''}`}>
       <div className={`${styles.outlineContainer}`}>
 
         {/* Corners */}
@@ -117,15 +149,26 @@ const CurrentProgress = ({ task }) => {
         </div>
 
         {/* Edges */}
-        <motion.div className={`${styles.straightBarContainer} ${styles.top}`} initial={{scaleX: 0}} animate={animationControls[1]}></motion.div>
-        <motion.div className={`${styles.straightBarContainer} ${styles.bottom}`} initial={{scaleX: 0}} animate={animationControls[4]}></motion.div>
+        {task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.top}`} initial={{scaleX: 0}} animate={animationControls[1]} />}
+        {task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.bottom}`} initial={{scaleX: 0}} animate={animationControls[4]} />}
 
       </div>
-      <div className={`${styles.textContainer}`}>
+      {task.type === 'Number' && <div className={`${styles.textContainer}`}>
         <div>{task.previousEntry} / {task.goal.number} </div>
         <div>|</div>
-        <div onClick={() => dispatch(setTaskPreviousEntry({id: task.id, value: parseInt(task.previousEntry) + task.step}))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}`: task.step}</div>
-      </div>
+        <div onClick={() => dispatch(setTaskPreviousEntry({
+          id: task.id,
+          value: parseInt(task.previousEntry) + task.step
+        }))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}` : task.step}</div>
+      </div>}
+      {task.type === 'Checkbox' && <div className={`${styles.textContainer} ${styles.typeCheckbox}`}>
+        <IconButton color={task.previousEntry === 0 ? 'normal' : 'green'} selected={true} onClick={() => dispatch(setTaskPreviousEntry({
+          id: task.id,
+          value: parseInt(task.previousEntry) === 0 ? 1 : 0
+        }))}>
+          <CheckIcon />
+        </IconButton>
+      </div>}
     </div>
   );
 };

@@ -1,6 +1,18 @@
 @import 'src/styles/variables.scss';
 
 .container {
+  margin: 0;
+}
+
+.childrenContainer {
   border-top: $base-border;
   border-bottom: $base-border;
+  gap: 0;
+  & > * {
+    margin-bottom: 20px;
+  }
+}
+
+.subContainer {
+  width: 22.15em;
 }

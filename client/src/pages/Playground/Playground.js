@@ -17,6 +17,7 @@ import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import Task from "../../components/indicators/Task/Task";
+import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -78,12 +79,12 @@ const Playground = () => {
         <button onClick={() => {setPercentage(percentage + 5)}}>Increase percentage by 5</button>
         <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
         <AlertHandler></AlertHandler>
-        {/*<CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>*/}
-        <VisualStreak streak={"010111"}></VisualStreak>
+        <CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>
+        {/*<VisualStreak streak={"010111"}></VisualStreak>*/}
         <InputWrapper label="Ends at:"><TextBoxInput placeholder={"Number"}></TextBoxInput></InputWrapper>
         <PriorityIndicator></PriorityIndicator>
         <ColorInput selected={'red'} setSelected={() => {}}></ColorInput>
-        <Task tasks={[{title: 'Workout', streak: '100110'}, {title: 'Workout', streak: '100110'}]}></Task>
+        {/*<Task tasks={[{title: 'Workout', streak: '100110'}, {title: 'Workout', streak: '100110'}]}></Task>*/}
     </div>
   );
 };

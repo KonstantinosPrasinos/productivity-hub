@@ -47,16 +47,16 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                     <motion.div
                         className={`${
                             styles.optionsContainer
-                        } Stack-Container Rounded-Container`}
-                        initial={{scaleY: 0}}
-                        animate={{scaleY: 1}}
-                        exit={{scaleY: 0}}
+                        } Stack-Container Rounded-Container Has-Shadow`}
+                        initial={{height: 0}}
+                        animate={{height: 'auto'}}
+                        exit={{height: 0}}
                         transition={{duration: 0.15}}
                     >
                         {options.map((option, index) => {
                             return (
                                 <div className={`${styles.option}`} key={index} onClick={() => {
-                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-category'})
+                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}})
                                     setSelected(typeof option === 'string' ? option : '');
                                     handleExtension();
                                 }}>

@@ -10,21 +10,20 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
-import {DayPicker} from "react-day-picker";
-import styles from 'react-day-picker/dist/style.module.css';
-import WeekDayInput from "../../components/inputs/TimeUnitInput/WeekDayInput/WeekDayInput";
-
-import customStyles from './NewCategory.module.scss';
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import {v4 as uuidv4} from "uuid";
+import customStyles from './NewCategory.module.scss';
 import {addGroup, removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
+import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
+import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 
 const NewCategory = ({index, length}) => {
-    const groups = useSelector((state) => state.groups.groups);
-    const {defaults} = useSelector((state) => state.user.settings);
+    const groups = useSelector((state) => state?.groups.groups);
+    const {defaults} = useSelector((state) => state?.user.settings);
+    const {low, high} = useSelector((state) => state?.user.priorityBounds);
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
@@ -38,7 +37,7 @@ const NewCategory = ({index, length}) => {
 
     const [timeGroupTitle, setTimeGroupTitle] = useState('');
     const [priority, setPriority] = useState(0);
-    const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.defaultPriority);
+    const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
@@ -64,6 +63,13 @@ const NewCategory = ({index, length}) => {
             dispatch(addCategory(category));
 
             timeGroups.forEach(group => {
+                if (group.priority < low) {
+                    dispatch(setLowestPriority(group.priority));
+                }
+                if (group.priority > high) {
+                    dispatch(setHighestPriority(group.priority));
+                }
+
                 const tempGroup = {
                     ...group,
                     parent: title
@@ -71,8 +77,6 @@ const NewCategory = ({index, length}) => {
 
                 dispatch(addGroup(tempGroup));
             })
-
-            console.log(timeGroups);
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
@@ -83,7 +87,7 @@ const NewCategory = ({index, length}) => {
         setTimeGroupNumber(1);
         setTimePeriod('Weeks');
         setTimePeriod2(null);
-        setPriority(defaults.defaultPriority);
+        setPriority(defaults.priority);
     }
 
     const handleTimeGroupSave = () => {
@@ -138,16 +142,18 @@ const NewCategory = ({index, length}) => {
             }
             startingDate.setHours(0, 0, 0, 0);
             startingDates.push(startingDate.getTime());
-        })
+        });
 
         const timeGroup = {
             id,
             title: timeGroupTitle,
             priority,
-            number: timeGroupNumber,
-            bigTimePeriod: timePeriod,
-            smallTimePeriod: timePeriod2,
-            startingDate: startingDates,
+            repeatRate: {
+                number: timeGroupNumber,
+                bigTimePeriod: timePeriod,
+                smallTimePeriod: timePeriod2,
+                startingDate: startingDates
+            },
             parent: null
         }
 
@@ -166,47 +172,6 @@ const NewCategory = ({index, length}) => {
         resetTimeGroupInputs();
         currentEditedGroup.current = null;
         setCreatingTimeGroup(false);
-    }
-
-    const formatCaption = (month) => {
-        return (<div>{month.toLocaleDateString('default', {month: 'long'})}</div>)
-    }
-
-    const classNames = {
-        ...styles,
-        root: customStyles.calendarRoot,
-        day_selected: customStyles.calendarSelected,
-        day: customStyles.calendarDay
-    }
-
-    const renderTimePeriodInput = () => {
-        switch (timePeriod) {
-            case 'Days':
-                return;
-            case 'Weeks':
-                return (<WeekDayInput selected={timePeriod2} setSelected={setTimePeriod2}></WeekDayInput>)
-            case 'Months':
-                return (<DayPicker
-                    mode="multiple"
-                    styles={{caption: {display: 'none'}}}
-                    selected={timePeriod2}
-                    onSelect={setTimePeriod2}
-                    defaultMonth={new Date(2022, 4)}
-                    classNames={classNames}
-                />)
-            case 'Years':
-                return (<DayPicker
-                    mode="multiple"
-                    styles={{caption_label: {zIndex: 'auto'}}}
-                    selected={timePeriod2}
-                    onSelect={setTimePeriod2}
-                    fromDate={new Date(2022, 0)}
-                    toDate={new Date(2022, 11, 31)}
-                    formatters={{ formatCaption }}
-                    defaultMonth={new Date(2022, 0)}
-                    classNames={classNames}
-                />)
-        }
     }
 
     const handleGroupClick = (e, group) => {
@@ -285,7 +250,7 @@ const NewCategory = ({index, length}) => {
                     <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
                 </InputWrapper>
                 {timePeriod !== 'Days' && <InputWrapper label={'On'}>
-                    {renderTimePeriodInput()}
+                    <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
                 </InputWrapper>}
                 <div className={customStyles.bottomButtonsContainer}>
                     <Button filled={false} onClick={handleCancel}>Cancel</Button>

@@ -2,6 +2,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import TimerIcon from '@mui/icons-material/Timer';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import styles from './BottomBar.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
@@ -26,6 +27,9 @@ const BottomBar = () => {
                 break;
             case '/timer':
                 setSelected('timer')
+                break;
+            case '/tasks':
+                setSelected('tasks')
                 break;
             case '/settings':
                 setSelected('settings')
@@ -59,6 +63,16 @@ const BottomBar = () => {
             </IconButton>
             <IconButton
                 onClick={() => {
+                    setSelected('tasks');
+                    navigate('/tasks', {replace: true});
+                }}
+                label={'Tasks'}
+                selected={selected === 'tasks'}
+            >
+                <FormatListBulletedIcon sx={{fontSize: '1.5em'}} />
+            </IconButton>
+            <IconButton
+                onClick={() => {
                     setSelected('settings');
                     navigate('/settings', {replace: true});
                 }}
@@ -68,7 +82,7 @@ const BottomBar = () => {
                 <SettingsIcon sx={{fontSize: '1.5em'}} />
             </IconButton>
             <Button
-                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: 'new-task'})}
+                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}
                 type='square'
             >
                 <AddIcon sx={{fontSize: '2em'}} />

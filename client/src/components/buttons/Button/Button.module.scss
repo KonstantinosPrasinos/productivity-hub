@@ -16,4 +16,8 @@
         background-color: var(--surface-color);
         color: var(--on-surface-color);
     }
+
+    &.small {
+        font-size: $font-s;
+    }
 }

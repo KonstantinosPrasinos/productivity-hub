@@ -2,8 +2,8 @@
 
 .container {
   display: inline-flex;
-  width: min-content;
   position: relative;
+  width: 22.15em;
 
   &.small {
     box-shadow: none;
@@ -13,14 +13,30 @@
   }
 }
 
-.titleContainer {
+.topLine {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  align-items: center;
 }
 
-.categoryContainer {
-  position: absolute;
-  top: 6px;
-  right: 12px;
+.titleContainer {
+  font-size: $font-l;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: $base-gap;
+
+  &.repeats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+  }
+}
+
+.streakContainer {
+  display: inline-block;
 }

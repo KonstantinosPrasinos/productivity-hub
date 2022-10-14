@@ -1,7 +1,7 @@
 import styles from './InputWrapper.module.scss'
 
 const InputWrapper = ({children, label, type}) => {
-    return <div className='Stack-Container'>
+    return <div className={`Stack-Container ${styles.container}`}>
         <div className='Label'>{label}</div>
         <div className={`${type === 'vertical' ? 'Stack-Container' : 'Horizontal-Flex-Container'} ${styles.inputContainer}`}>{children}</div>
     </div>;
