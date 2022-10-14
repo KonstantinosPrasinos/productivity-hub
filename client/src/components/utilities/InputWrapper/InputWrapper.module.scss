@@ -1,5 +1,9 @@
 @import 'src/styles/variables.scss';
 
+.container {
+  padding: $symmetrical-padding;
+}
+
 .inputContainer {
   justify-content: flex-start;
 }

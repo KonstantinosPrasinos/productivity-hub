@@ -3,7 +3,7 @@ import {createSlice} from '@reduxjs/toolkit'
 const initialState = {
     userName: null,
     settings: {
-        theme: 'light',
+        theme: 'Light',
         defaults: {
             defaultStep: 5,
             defaultGoal: 10,

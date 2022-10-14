@@ -231,17 +231,18 @@ button {
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+    padding-right: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 2px grey;
+    //box-shadow: inset 0 0 2px grey;
     border-radius: 10px
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
+    background: var(--border-color);
     border-radius: 10px;
 }
 

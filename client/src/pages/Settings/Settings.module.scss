@@ -1,8 +1,26 @@
 @import 'src/styles/variables.scss';
 
 .container {
-    width: 40%;
+    width: 600px;
+    height: calc(100% - 4em);
+    overflow-y: auto;
+    padding: $big-gap !important;
+    position: relative;
+}
+
+.middleContainer {
+    width: 100%;
     height: 100%;
+    overflow-y: auto;
+}
+
+.header {
+    width: 100%;
+    padding-bottom: $symmetrical-padding;
+    border-bottom: $base-border;
+    font-weight: 500;
+    background-color: var(--surface-color);
+    z-index: 1;
 }
 
 .redirectContainer {
