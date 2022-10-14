@@ -13,6 +13,7 @@
 
 .App {
     background-color: var(--background-color);
+    color: var(--primary-color);
     position: fixed;
     top: 0;
     bottom: 0;
@@ -165,6 +166,7 @@ body {
 input {
     border: none;
     background: none;
+    color: var(--primary-color);
 
     &:focus {
         outline: none;
