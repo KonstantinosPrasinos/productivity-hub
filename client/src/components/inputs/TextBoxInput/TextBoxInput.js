@@ -9,28 +9,31 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
             if (isNaN(event.target.value)) {
                 return;
             }
-            if (event.target.value === '') {
-                setValue(0);
-                return;
-            }
         }
         setValue(event.target.value)
     }
 
+    const handleBlur = () => {
+        console.log(type);
+        if (type === 'number') {
+            checkIfNull()
+        }
+    }
+
     const checkIfNull = () => {
-        if (value === null) {
+        if (value === null || value === '') {
             setValue(0);
         }
     }
 
     const increment = () => {
         checkIfNull();
-        setValue(current => current + 1);
+        setValue(current => parseInt(current) + 1);
     }
 
     const decrement = () => {
         checkIfNull();
-        setValue(current => current - 1);
+        setValue(current => parseInt(current) - 1);
     }
 
   return (
@@ -39,12 +42,31 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
     >
       {icon !== null && <>{icon}</>}
       <span className={styles.inputWrapper}>
-          <input disabled={isDisabled} type={type === 'password' ? 'password' : 'text'} className={styles.input} placeholder={placeholder} value={value} onChange={handleChange} />
+          <input
+              disabled={isDisabled}
+              type={type === 'password' ? 'password' : 'text'}
+              className={styles.input} placeholder={placeholder}
+              value={value}
+              onChange={handleChange}
+              onBlur={handleBlur}
+          />
       </span>
       {type === "number" && (
         <div className={styles.buttonsContainer}>
-          <button disabled={isDisabled} className={`${styles.button}`} onClick={increment}><ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
-          <button disabled={isDisabled} className={`${styles.button}`} onClick={decrement}><ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} /></button>
+          <button
+              disabled={isDisabled}
+              className={`${styles.button}`}
+              onClick={increment}
+          >
+              <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} />
+          </button>
+          <button
+              disabled={isDisabled}
+              className={`${styles.button}`}
+              onClick={decrement}
+          >
+              <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} />
+          </button>
         </div>
       )}
     </div>
