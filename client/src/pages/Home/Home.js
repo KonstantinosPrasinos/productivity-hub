@@ -5,6 +5,7 @@ import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
+import {motion} from "framer-motion";
 
 const Home = () => {
     const {completedTasks, incompleteTasks} = useRenderTasks(true);
@@ -15,7 +16,7 @@ const Home = () => {
         <div className={`${styles.container}`}>
             <div className={`Stack-Container ${styles.leftSide}`}>
                 {completedTasks.length === 0 && incompleteTasks.length === 0 &&
-                    <div className={`Rounded-Container ${styles.noTasks}`}>No tasks for now</div>
+                    <motion.div positionTransition className={`Rounded-Container ${styles.noTasks}`}>No tasks for now</motion.div>
                 }
                 <AnimatePresence>
                     {incompleteTasks.map((task) => task.hasOwnProperty('timeGroup') ?

@@ -8,8 +8,13 @@
   border-top: $base-border;
   border-bottom: $base-border;
   gap: 0;
+  overflow-x: hidden;
   & > * {
     margin-bottom: 20px;
+  }
+
+  &.noBorder {
+    border: none;
   }
 }
 
