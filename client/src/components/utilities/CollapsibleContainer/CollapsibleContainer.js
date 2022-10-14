@@ -7,9 +7,9 @@ const CollapsibleContainer = ({children, isVisible, label}) => {
     const [extended, setExtended] = useState(false);
 
     return (
-        <div>
+        <div className={styles.container}>
             {label &&
-                <div className={`${label ? `Rounded-Container ${styles.bigContainer}` : ''} Horizontal-Flex-Container Space-Between Clickable`}
+                <div className={`${label ? `Rounded-Container ${styles.subContainer}` : ''} Horizontal-Flex-Container Space-Between Clickable`}
                      onClick={() => {setExtended(state => !state)}}
                 >
                     <span>{label}</span>
@@ -30,7 +30,7 @@ const CollapsibleContainer = ({children, isVisible, label}) => {
             }
             <AnimatePresence>
                 {(isVisible || (label && extended)) && <motion.div
-                    className={`Stack-Container ${styles.container}`}
+                    className={`Stack-Container ${styles.childrenContainer}`}
                     initial={"collapsed"}
                     animate={"extended"}
                     exit={"collapsed"}

@@ -43,7 +43,7 @@ const Settings = () => {
       <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon />Account</div>
       <section className={'Stack-Container'}>
         <InputWrapper label={'Email'}>
-          <TextBoxInput icon={<EmailIcon />}></TextBoxInput>
+          <TextBoxInput size={'max'} icon={<EmailIcon />}></TextBoxInput>
         </InputWrapper>
         <InputWrapper label={'Password'}>
           <Button filled={false} size={'small'}>Change your Password</Button>

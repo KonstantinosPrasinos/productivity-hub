@@ -2,7 +2,7 @@ import styles from "./TextBoxInput.module.scss";
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false, value, setValue }) => {
+const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false, value, setValue, size }) => {
 
     const handleChange = (event) => {
         if (type === 'number') {
@@ -38,7 +38,7 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
 
   return (
     <div
-      className={`${styles.container} Horizontal-Flex-Container Rounded-Container`}
+      className={`${styles.container} Horizontal-Flex-Container Rounded-Container ${styles[size]}`}
     >
       {icon !== null && <>{icon}</>}
       <span className={styles.inputWrapper}>

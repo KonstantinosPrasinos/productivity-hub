@@ -1,6 +1,10 @@
 @import 'src/styles/variables.scss';
 
 .container {
+  margin: 0;
+}
+
+.childrenContainer {
   border-top: $base-border;
   border-bottom: $base-border;
   gap: 0;
@@ -9,6 +13,6 @@
   }
 }
 
-.bigContainer {
+.subContainer {
   width: 22.15em;
 }
