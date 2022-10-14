@@ -18,6 +18,7 @@ import {setDefaultGoal, setDefaultPriority, setDefaultStep, setTheme} from "../.
 
 const Settings = () => {
   const {theme, defaults} = useSelector((state) => state?.user.settings);
+  const email = useSelector((state) => state?.user.email);
 
   const [selectedTheme, setSelectedTheme] = useState(theme);
 
@@ -52,7 +53,7 @@ const Settings = () => {
       <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon />Account</div>
       <section className={'Stack-Container'}>
         <InputWrapper label={'Email'}>
-          <TextBoxInput size={'max'} icon={<EmailIcon />}></TextBoxInput>
+          <TextBoxInput size={'max'} value={email} icon={<EmailIcon />}></TextBoxInput>
         </InputWrapper>
         <InputWrapper label={'Password'}>
           <Button filled={false} size={'small'}>Change your Password</Button>
