@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -10,9 +10,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
+import DeleteIcon from '@mui/icons-material/Delete';
+import {removeTask} from "../../state/tasksSlice";
 
 const TaskView = ({index, length, task}) => {
     const categories = useSelector((state) => state?.categories.categories);
+    const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
@@ -27,6 +30,11 @@ const TaskView = ({index, length, task}) => {
         setDate(newDate);
     }
 
+    const handleDelete = () => {
+        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+        dispatch(removeTask(task.id))
+    }
+
     return (
         <MiniPageContainer
             index={index}
@@ -34,7 +42,10 @@ const TaskView = ({index, length, task}) => {
         >
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Title'}>{task.title}</div>
-                <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task.id}})}><EditIcon /></IconButton>
+                <div>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task.id}})}><EditIcon /></IconButton>
+                    <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
+                </div>
             </section>
             <section className={'Horizontal-Flex-Container'}>
                 <div className={'Label'}>Category:</div>
