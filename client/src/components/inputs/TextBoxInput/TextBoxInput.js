@@ -1,8 +1,24 @@
 import styles from "./TextBoxInput.module.scss";
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {useState} from "react";
+import IconButton from "../../buttons/IconButton/IconButton";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisabled = false, value, setValue, size }) => {
+const TextBoxInput = ({
+                          placeholder = "placeholder",
+                          type = "text",
+                          icon,
+                          isDisabled = false,
+                          value,
+                          setValue,
+                          size = 'medium',
+                          width = 'medium',
+                          onKeydown = () => {}
+                      }) => {
+
+    const [passwordVisible, setPasswordVisible] = useState(false)
 
     const handleChange = (event) => {
         if (type === 'number') {
@@ -35,41 +51,45 @@ const TextBoxInput = ({ placeholder = "placeholder", type = "text", icon, isDisa
         setValue(parseInt(value) - 1);
     }
 
-  return (
-    <div
-      className={`${styles.container} Horizontal-Flex-Container Rounded-Container ${styles[size]}`}
+    const handleShowPassword = () => {
+        setPasswordVisible(current => !current);
+    }
+
+    return (<div
+        className={`${styles.container} Horizontal-Flex-Container Rounded-Container ${styles[size]} ${styles[width]}`}
     >
-      {icon !== null && <>{icon}</>}
-      <span className={styles.inputWrapper}>
+        {icon !== null && <>{icon}</>}
+        <span className={styles.inputWrapper}>
           <input
               disabled={isDisabled}
-              type={type === 'password' ? 'password' : 'text'}
+              type={type === 'password' && !passwordVisible ? 'password' : 'text'}
               className={styles.input} placeholder={placeholder}
               value={value}
               onChange={handleChange}
               onBlur={handleBlur}
+              onKeyDown={onKeydown}
           />
       </span>
-      {type === "number" && (
-        <div className={styles.buttonsContainer}>
-          <button
-              disabled={isDisabled}
-              className={`${styles.button}`}
-              onClick={increment}
-          >
-              <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} />
-          </button>
-          <button
-              disabled={isDisabled}
-              className={`${styles.button}`}
-              onClick={decrement}
-          >
-              <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}} />
-          </button>
-        </div>
-      )}
-    </div>
-  );
+        {type === "number" && (<div className={styles.buttonsContainer}>
+            <button
+                disabled={isDisabled}
+                className={`${styles.button}`}
+                onClick={increment}
+            >
+                <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+            </button>
+            <button
+                disabled={isDisabled}
+                className={`${styles.button}`}
+                onClick={decrement}
+            >
+                <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+            </button>
+        </div>)}
+        {type === 'password' && <IconButton onClick={handleShowPassword}>
+            {passwordVisible ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+        </IconButton>}
+    </div>);
 };
 
 export default TextBoxInput;

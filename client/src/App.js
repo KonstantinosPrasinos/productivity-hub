@@ -16,9 +16,13 @@ import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 import TaskList from "./pages/TaskList/TaskList";
 import {useSelector} from "react-redux";
+import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
+import {ModalContext} from "./context/ModalContext";
+import {AnimatePresence} from "framer-motion";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
+    const modalContext = useContext(ModalContext);
 
     const userTheme = useSelector((state) => state?.user.settings.theme);
     const matchMediaHasEventListener = useRef(false);
@@ -98,6 +102,7 @@ function App() {
                 <NavBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
+                <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
                 <div className="Content-Container">
                     <Routes>
                         <Route
@@ -115,6 +120,15 @@ function App() {
                             element={
                                 <RequireAuth>
                                     <Navigate to="/"/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/change-email"
+                            element={
+                                <RequireAuth>
+                                    <ChangeEmail />
                                 </RequireAuth>
                             }
                         />

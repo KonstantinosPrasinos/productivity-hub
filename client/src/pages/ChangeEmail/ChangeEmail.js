@@ -1,0 +1,128 @@
+import styles from './ChangeEmail.module.scss'
+import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
+import Button from "../../components/buttons/Button/Button";
+import {useContext, useState} from "react";
+import {useSelector} from "react-redux";
+import Pagination from "../../components/utilities/Pagination/Pagination";
+import {motion} from 'framer-motion';
+import {ModalContext} from "../../context/ModalContext";
+
+const ChangeEmail = () => {
+    const currentEmail = useSelector(state => state?.user.email);
+    const modalContext = useContext(ModalContext);
+
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('')
+    const [verificationCode, setVerificationCode] = useState('');
+
+    const validateEmail = () => {
+        return email.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.code === 'Enter') {
+            handleNextPage();
+        }
+    }
+
+    const checkIfFilled = () => {
+        if (currentPage === 1) {
+            return validateEmail();
+        }
+
+        return true
+    }
+
+    const handleVerificationCode = (e) => {
+        if (e.length <= 6) {
+            setVerificationCode(e);
+        }
+    }
+
+    const handleNextPage = () => {
+        switch (currentPage) {
+            case 0:
+                // Verify password
+                setCurrentPage(1);
+                break;
+            case 1:
+                if (validateEmail()) {
+                    setCurrentPage(2)
+                }
+                break;
+            case 2:
+                // Verify Code
+                setCurrentPage(3);
+                break;
+            case 3:
+                modalContext.dispatch({type: 'TOGGLE_MODAL'});
+        }
+    }
+
+    const handleCancel = () => {
+        modalContext.dispatch({type: 'TOGGLE_MODAL'});
+    }
+
+    return (
+        <motion.div
+            className={styles.container}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.2}}
+        >
+            <div className={styles.surface}>
+                <Pagination currentPage={currentPage}>
+                    <div className={styles.topHalf}>
+                        <div className={styles.infoContainer}>
+                            <div className={'Display'}>Verify your password</div>
+                            <div className={'Label'}>Please enter your password to verify your identity.</div>
+                        </div>
+                        <TextBoxInput type={'password'} width={'max'} size={'big'} placeholder={'Password'} value={password} setValue={setPassword} onKeydown={handleKeyDown}/>
+                    </div>
+                    <div className={styles.topHalf}>
+                        <div className={styles.infoContainer}>
+                            <div className={'Display'}>Change your email</div>
+                            <div className={'Label'}>
+                                Your current email is {currentEmail}. <br/>
+                                Your email is not visible to anyone.
+                            </div>
+                        </div>
+                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'New email address'} value={email} setValue={setEmail} onKeydown={handleKeyDown}/>
+                    </div>
+                    <div className={styles.topHalf}>
+                        <div className={styles.infoContainer}>
+                            <div className={'Display'}>We sent you a code</div>
+                            <div className={'Label'}>
+                                If the email you entered exists, is should receive a verification code.
+                                Enter the code below to verify your email.
+                            </div>
+                        </div>
+                        <TextBoxInput width={'max'} size={'big'} placeholder={'Verification code'} value={verificationCode} setValue={handleVerificationCode} onKeydown={handleKeyDown}/>
+                    </div>
+                    <div className={styles.topHalf}>
+                        <div className={styles.infoContainer}>
+                            <div className={'Display'}>Email changed successfully</div>
+                        </div>
+                    </div>
+                </Pagination>
+                <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`} >
+                    {currentPage !== 3 ? <Button
+                        size={'big'}
+                        filled={false}
+                        onClick={handleCancel}
+                    >
+                        Cancel
+                    </Button> : null}
+                    <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true}>{currentPage !== 3 ? 'Continue' : 'Finish'}</Button>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+export default ChangeEmail;

@@ -7,6 +7,8 @@
     font-size: $font-m;
     box-sizing: border-box;
     box-shadow: none;
+    display: flex;
+    align-items: center;
 
     &:hover:enabled {
         transform: scale(1.01);
@@ -19,6 +21,14 @@
     &.max {
         width: 100%;
     }
+
+    &.big {
+        font-size: $font-xl;
+
+        & > * {
+            font-size: $font-xl;
+        }
+    }
 }
 
 .inputWrapper {
@@ -28,7 +38,7 @@
 }
 
 .input {
-    font-size: $font-m;
+    font-size: inherit;
     width: 100%;
 }
 

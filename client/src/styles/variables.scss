@@ -45,8 +45,10 @@ $theme: 'light';
 $base-padding: 6px 12px;
 $symmetrical-padding: 10px;
 $base-margin: 0.75rem;
-$big-gap: 20px;
+
 $base-gap: 10px;
+$big-gap: 20px;
+$huge-gap: 30px;
 
 $padding-symmetrical-m: 10px;
 
@@ -65,6 +67,7 @@ $font-s: 14px;
 $font-l: 18px;
 $font-xl: 20px;
 $font-xxl: 24px;
+$font-xxxl: 32px;
 
 // box shadow
 $elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.15);

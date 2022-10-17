@@ -38,13 +38,15 @@ const CollapsibleContainer = ({children, isVisible, label}) => {
                         collapsed: {
                             height: 0,
                             padding: 0,
+                            marginTop: 0,
                             marginBottom: 0,
                             overflowY: 'hidden'
                         },
                         extended: {
                             height: 'auto',
                             padding: '10px 0',
-                            marginBottom: '20px',
+                            marginTop: '10px',
+                            marginBottom: '10px',
                             transitionEnd: {
                                 overflowY: 'visible'
                             }
