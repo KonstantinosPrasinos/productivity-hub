@@ -3,7 +3,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import styles from './CollapsibleContainer.module.scss';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const CollapsibleContainer = ({children, isVisible, label}) => {
+const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) => {
     const [extended, setExtended] = useState(false);
 
     return (
@@ -30,7 +30,7 @@ const CollapsibleContainer = ({children, isVisible, label}) => {
             }
             <AnimatePresence>
                 {(isVisible || (label && extended)) && <motion.div
-                    className={`Stack-Container ${styles.childrenContainer}`}
+                    className={`Stack-Container No-Gap ${styles.childrenContainer} ${label || !hasBorder ? styles.noBorder : ''}`}
                     initial={"collapsed"}
                     animate={"extended"}
                     exit={"collapsed"}
@@ -38,13 +38,15 @@ const CollapsibleContainer = ({children, isVisible, label}) => {
                         collapsed: {
                             height: 0,
                             padding: 0,
+                            marginTop: 0,
                             marginBottom: 0,
                             overflowY: 'hidden'
                         },
                         extended: {
                             height: 'auto',
-                            padding: '10px 0',
-                            marginBottom: '20px',
+                            padding: label || !hasBorder ? 0 : '10px 0',
+                            marginTop: label || !hasBorder ? 0 : '10px',
+                            marginBottom: label || !hasBorder ? 0 : '10px',
                             transitionEnd: {
                                 overflowY: 'visible'
                             }

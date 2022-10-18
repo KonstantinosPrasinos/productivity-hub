@@ -1,11 +1,13 @@
 import React from 'react';
 import {AnimatePresence, motion} from "framer-motion";
+import styles from './SwitchContainer.module.scss';
 
 const SwitchContainer = ({children, selectedTab}) => {
     return (
         <div>
             <AnimatePresence exitBeforeEnter>
                 {selectedTab >= 0 && selectedTab < children.length && <motion.div
+                    className={styles.container}
                     key={selectedTab}
                     variants={{
                         enter: {

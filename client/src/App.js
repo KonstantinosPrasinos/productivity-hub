@@ -1,7 +1,7 @@
 import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
-import LogInPage from "./components/etc/LogInPage";
+import LogInPage from "./pages/LogInPage/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect, useRef, useState} from "react";
 
@@ -16,11 +16,17 @@ import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 import TaskList from "./pages/TaskList/TaskList";
 import {useSelector} from "react-redux";
+import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
+import {ModalContext} from "./context/ModalContext";
+import {AnimatePresence} from "framer-motion";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
+    const modalContext = useContext(ModalContext);
 
     const userTheme = useSelector((state) => state?.user.settings.theme);
+    const {userId} = useSelector(state => state?.user);
     const matchMediaHasEventListener = useRef(false);
 
     // useEffect(() => {
@@ -98,6 +104,7 @@ function App() {
                 <NavBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
+                <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
                 <div className="Content-Container">
                     <Routes>
                         <Route
@@ -130,7 +137,7 @@ function App() {
                             path="/new-category"
                             element={
                                 <RequireAuth>
-                                    <NewCategory></NewCategory>
+                                    <NewCategory />
                                 </RequireAuth>
                             }
                         />
@@ -138,14 +145,7 @@ function App() {
                             path="/new-task"
                             element={
                                 <RequireAuth>
-                                    <NewTask></NewTask>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/new-task"
-                            element={
-                                <RequireAuth>
+                                    <NewTask />
                                 </RequireAuth>
                             }
                         />
@@ -166,7 +166,29 @@ function App() {
                             }
                         />
                         <Route path="/playground" element={<Playground/>}/>
-                        <Route path="/log-in" element={<LogInPage/>}/>
+                        <Route
+                            exact
+                            path="/change-email"
+                            element={
+                                <RequireAuth>
+                                    <ChangeEmail />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/log-in"
+                            element={
+                                userId === null ? <LogInPage/> : <Navigate to="/" />
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/password-reset"
+                            element={
+                                userId === null ? <ResetPassword/> : <Navigate to="/" />
+                            }
+                        />
                         <Route path="*" element={<NotFound/>}/>
                     </Routes>
                 </div>

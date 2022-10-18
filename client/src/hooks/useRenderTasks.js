@@ -83,7 +83,6 @@ export function useRenderTasks(usesTime) {
 
     // Add the tasks that aren't in a timeGroup
     tasks.forEach(task => {
-
         // Check if the group should be rendered at the current time
         if (usesTime && task.repeats && !task.timeGroup) {
             if (!checkTime(task)) {

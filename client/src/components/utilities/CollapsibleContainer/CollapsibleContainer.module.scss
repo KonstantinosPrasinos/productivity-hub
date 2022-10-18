@@ -1,15 +1,22 @@
 @import 'src/styles/variables.scss';
 
 .container {
-  margin: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .childrenContainer {
   border-top: $base-border;
   border-bottom: $base-border;
   gap: 0;
+  overflow-x: hidden;
   & > * {
-    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  &.noBorder {
+    border: none;
   }
 }
 

@@ -23,6 +23,7 @@ const Task = ({tasks}) => {
             className={`Rounded-Container Symmetrical Stack-Container Has-Shadow ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
 
             onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0].id}})}
         >

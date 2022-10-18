@@ -20,4 +20,17 @@
     &.small {
         font-size: $font-s;
     }
+
+    &.big {
+        font-size: $font-xxl;
+    }
+
+    &.max {
+        width: 100%;
+    }
+
+    &:disabled {
+        opacity: $opacity-low;
+        cursor: not-allowed;
+    }
 }
