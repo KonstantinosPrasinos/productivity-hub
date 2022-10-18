@@ -34,6 +34,7 @@ const LogInPage = () => {
                     <Button filled={false} onClick={handleLogInAction}>{currentPage === 0 ? 'Register' : 'Log in'}</Button>
                     <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                 </div>
+                <Button filled={true} width={'max'} size={'big'}>{currentPage === 0 ? 'Log in' : 'Register'}</Button>
             </div>
         </div>
     );

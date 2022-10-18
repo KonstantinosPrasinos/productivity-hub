@@ -264,6 +264,12 @@ button {
             border-radius: 0;
         }
     }
+
+    .Surface {
+        height: 100%;
+        width: 100%;
+        padding: 40px;
+    }
 }
 
 @media (min-width: $tablet-breakpoint) {

@@ -24,4 +24,8 @@
     &.big {
         font-size: $font-xxl;
     }
+
+    &.max {
+        width: 100%;
+    }
 }
