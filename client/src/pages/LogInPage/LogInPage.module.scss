@@ -1,0 +1,10 @@
+@import 'src/styles/variables.scss';
+
+@media (min-width: $tablet-breakpoint) {
+  .surface {
+    width: 600px;
+    height: 650px;
+    border-radius: $base-border-radius;
+    border: $base-border;
+  }
+}

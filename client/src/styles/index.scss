@@ -9,6 +9,7 @@
     --light-blue-color: #45AAF2;
     --blue-color: #4B7BEC;
     --purple-color: #A55EEA;
+    --overlay-color: rgba(0, 0, 0, 0.4);
 }
 
 .App {
@@ -129,6 +130,37 @@ body {
 
     &.Has-Shadow {
         box-shadow: $elevation-1;
+    }
+}
+
+.Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--overlay-color);
+    z-index: 3;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.Opaque {
+        background-color: var(--background-color);
+    }
+}
+
+.Surface {
+    background-color: var(--surface-color);
+    padding: 40px 80px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+
+    & > * {
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 }
 

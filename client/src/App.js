@@ -1,7 +1,7 @@
 import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
-import LogInPage from "./components/etc/LogInPage";
+import LogInPage from "./pages/LogInPage/LogInPage";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect, useRef, useState} from "react";
 
@@ -19,6 +19,7 @@ import {useSelector} from "react-redux";
 import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import {ModalContext} from "./context/ModalContext";
 import {AnimatePresence} from "framer-motion";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -124,15 +125,6 @@ function App() {
                             }
                         />
                         <Route
-                            exact
-                            path="/change-email"
-                            element={
-                                <RequireAuth>
-                                    <ChangeEmail />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
                             path="/tasks"
                             element={
                                 <RequireAuth>
@@ -157,13 +149,6 @@ function App() {
                             }
                         />
                         <Route
-                            path="/new-task"
-                            element={
-                                <RequireAuth>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
                             path="/settings"
                             element={
                                 <RequireAuth>
@@ -180,7 +165,25 @@ function App() {
                             }
                         />
                         <Route path="/playground" element={<Playground/>}/>
-                        <Route path="/log-in" element={<LogInPage/>}/>
+                        <Route
+                            exact
+                            path="/change-email"
+                            element={
+                                <RequireAuth>
+                                    <ChangeEmail />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/log-in"
+                            element={<LogInPage/>}
+                        />
+                        <Route
+                            exact
+                            path="/password-reset"
+                            element={<ResetPassword/>}
+                        />
                         <Route path="*" element={<NotFound/>}/>
                     </Routes>
                 </div>

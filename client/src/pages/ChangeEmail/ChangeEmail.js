@@ -69,13 +69,13 @@ const ChangeEmail = () => {
 
     return (
         <motion.div
-            className={styles.container}
+            className={'Overlay'}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}
             transition={{duration: 0.2}}
         >
-            <div className={styles.surface}>
+            <div className={`Surface ${styles.surface}`}>
                 <Pagination currentPage={currentPage}>
                     <div className={styles.topHalf}>
                         <div className={styles.infoContainer}>

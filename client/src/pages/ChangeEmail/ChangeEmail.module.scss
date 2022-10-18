@@ -1,9 +1,6 @@
 @import 'src/styles/variables.scss';
 
 @media (min-width: $tablet-breakpoint) {
-  .container {
-
-  }
 
   .surface {
     width: 600px;
@@ -17,7 +14,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: var(--overlay-color);
   z-index: 3;
   position: fixed;
   display: flex;
@@ -26,11 +23,6 @@
 }
 
 .surface {
-  background-color: var(--surface-color);
-  padding: 40px 80px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
 }
 
