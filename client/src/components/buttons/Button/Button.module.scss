@@ -28,4 +28,9 @@
     &.max {
         width: 100%;
     }
+
+    &:disabled {
+        opacity: $opacity-low;
+        cursor: not-allowed;
+    }
 }

@@ -15,7 +15,9 @@ const TextBoxInput = ({
                           setValue,
                           size = 'medium',
                           width = 'medium',
-                          onKeydown = () => {}
+                          onKeydown = () => {
+                          },
+                          invalid = null
                       }) => {
 
     const [passwordVisible, setPasswordVisible] = useState(false)
@@ -56,7 +58,13 @@ const TextBoxInput = ({
     }
 
     return (<div
-        className={`${styles.container} Horizontal-Flex-Container Rounded-Container ${styles[size]} ${styles[width]}`}
+        className={`
+            ${styles.container}
+            Horizontal-Flex-Container
+            Rounded-Container
+            ${styles[size]} ${styles[width]}
+            ${invalid !== null ? (invalid ? styles.invalid : styles.valid) : ''} // If invalid is null then the border is normal, else it's red for invalid and green for valid
+        `}
     >
         {icon !== null && <>{icon}</>}
         <span className={styles.inputWrapper}>

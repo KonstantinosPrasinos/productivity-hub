@@ -1,7 +1,7 @@
 import styles from "./Button.module.scss";
 import {motion} from 'framer-motion';
 
-const Button = ({onClick, children, type = 'round', filled = 'true', size, initial, exit, transition, animate, layout, width='medium'}) => {
+const Button = ({onClick, children, type = 'round', filled = 'true', size, initial, exit, transition, animate, layout, width='medium', disabled = false}) => {
     return <motion.button
         onClick={onClick}
         className={`Button Horizontal-Flex-Container
@@ -11,6 +11,7 @@ const Button = ({onClick, children, type = 'round', filled = 'true', size, initi
           ${filled ? '' : styles.outlined}
           ${styles[width]}
           `}
+        disabled={disabled}
         initial={initial}
         animate={animate}
         exit={exit}

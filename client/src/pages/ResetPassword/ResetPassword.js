@@ -18,6 +18,12 @@ const ResetPassword = () => {
         );
     };
 
+    const handleInvalidEmail = () => {
+        if (email.length === 0) {
+            return null;
+        } else return !validateEmail();
+    }
+
     const checkPasswordStrength = () => {
         // Temp
         return true;
@@ -68,6 +74,17 @@ const ResetPassword = () => {
         }
     }
 
+    const handleDisabledButton = () => {
+        switch (currentPage) {
+            case 0:
+                return !validateEmail();
+            case 1:
+                return !(verificationCode.length === 6);
+            default:
+                return false
+        }
+    }
+
     return (
         <div className={`Overlay Opaque`}>
             <div className={`Surface ${styles.surface}`}>
@@ -75,7 +92,7 @@ const ResetPassword = () => {
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Enter your email</div>
                         <div className={'Label'}>We will send you a password to verify it's you.</div>
-                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail}/>
+                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail} invalid={handleInvalidEmail()}/>
                     </div>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>We sent you a code</div>
@@ -102,7 +119,7 @@ const ResetPassword = () => {
                     >
                         Cancel
                     </Button> : null}
-                    <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true}>{currentPage !== 4 ? 'Continue' : 'Finish'}</Button>
+                    <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true} disabled={handleDisabledButton()}>{currentPage !== 4 ? 'Continue' : 'Finish'}</Button>
                 </div>
             </div>
         </div>
