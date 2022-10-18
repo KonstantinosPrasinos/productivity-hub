@@ -26,6 +26,7 @@ function App() {
     const modalContext = useContext(ModalContext);
 
     const userTheme = useSelector((state) => state?.user.settings.theme);
+    const {userId} = useSelector(state => state?.user);
     const matchMediaHasEventListener = useRef(false);
 
     // useEffect(() => {
@@ -136,7 +137,7 @@ function App() {
                             path="/new-category"
                             element={
                                 <RequireAuth>
-                                    <NewCategory></NewCategory>
+                                    <NewCategory />
                                 </RequireAuth>
                             }
                         />
@@ -144,7 +145,7 @@ function App() {
                             path="/new-task"
                             element={
                                 <RequireAuth>
-                                    <NewTask></NewTask>
+                                    <NewTask />
                                 </RequireAuth>
                             }
                         />
@@ -177,12 +178,16 @@ function App() {
                         <Route
                             exact
                             path="/log-in"
-                            element={<LogInPage/>}
+                            element={
+                                !userId ? <LogInPage/> : <Navigate to="/" />
+                            }
                         />
                         <Route
                             exact
                             path="/password-reset"
-                            element={<ResetPassword/>}
+                            element={
+                                !userId ? <ResetPassword/> : <Navigate to="/" />
+                            }
                         />
                         <Route path="*" element={<NotFound/>}/>
                     </Routes>
