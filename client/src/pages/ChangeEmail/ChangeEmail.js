@@ -6,10 +6,14 @@ import {useSelector} from "react-redux";
 import Pagination from "../../components/utilities/Pagination/Pagination";
 import {motion} from 'framer-motion';
 import {ModalContext} from "../../context/ModalContext";
+import {useVerify} from "../../hooks/useVerify";
+import {AlertsContext} from "../../context/AlertsContext";
 
 const ChangeEmail = () => {
+    const {verifyPassword, verifyVerificationCode} = useVerify();
     const currentEmail = useSelector(state => state?.user.email);
     const modalContext = useContext(ModalContext);
+    const alertsContext = useContext(AlertsContext);
 
     const [currentPage, setCurrentPage] = useState(0);
 
@@ -47,7 +51,11 @@ const ChangeEmail = () => {
         switch (currentPage) {
             case 0:
                 // Verify password
-                setCurrentPage(1);
+                if (verifyPassword(password)) {
+                    setCurrentPage(1);
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password is invalid"}});
+                }
                 break;
             case 1:
                 if (validateEmail()) {
@@ -56,7 +64,12 @@ const ChangeEmail = () => {
                 break;
             case 2:
                 // Verify Code
-                setCurrentPage(3);
+                if (verifyVerificationCode(verificationCode)) {
+                    setCurrentPage(3);
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Verification code is invalid"}});
+                }
+
                 break;
             case 3:
                 modalContext.dispatch({type: 'TOGGLE_MODAL'});
@@ -92,7 +105,16 @@ const ChangeEmail = () => {
                                 Your email is not visible to anyone.
                             </div>
                         </div>
-                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'New email address'} value={email} setValue={setEmail} onKeydown={handleKeyDown}/>
+                        <TextBoxInput
+                            type={'email'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'New email address'}
+                            value={email}
+                            setValue={setEmail}
+                            onKeydown={handleKeyDown}
+                            invalid={email.length ? !validateEmail() : null}
+                        />
                     </div>
                     <div className={styles.topHalf}>
                         <div className={styles.infoContainer}>
@@ -102,7 +124,15 @@ const ChangeEmail = () => {
                                 Enter the code below to verify your email.
                             </div>
                         </div>
-                        <TextBoxInput width={'max'} size={'big'} placeholder={'Verification code'} value={verificationCode} setValue={handleVerificationCode} onKeydown={handleKeyDown}/>
+                        <TextBoxInput
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Verification code'}
+                            value={verificationCode}
+                            setValue={handleVerificationCode}
+                            onKeydown={handleKeyDown}
+                            invalid={verificationCode.length ? !verificationCode.length === 6 : null}
+                        />
                     </div>
                     <div className={styles.topHalf}>
                         <div className={styles.infoContainer}>

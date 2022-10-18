@@ -1,22 +1,36 @@
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import styles from './ResetPassword.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
 import Pagination from "../../components/utilities/Pagination/Pagination";
+import PasswordStrengthBar from "react-password-strength-bar";
+import {AlertsContext} from "../../context/AlertsContext";
+import {useVerify} from "../../hooks/useVerify";
 
 const ResetPassword = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [email, setEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [reEnterPassword, setReEnterPassword] = useState('');
+    const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
+    const {verifyVerificationCode} = useVerify();
     const navigate = useNavigate();
+    const alertsContext = useContext(AlertsContext);
 
     const validateEmail = () => {
         return email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
     };
+
+    const handleKeyDown = (e) => {
+        if (e.code === 'Enter') {
+            handleNextPage();
+        }
+    }
 
     const handleInvalidEmail = () => {
         if (email.length === 0) {
@@ -62,16 +76,32 @@ const ResetPassword = () => {
                 break;
             case 1:
                 // Verify code
-                setCurrentPage(2);
+                if (verifyVerificationCode(verificationCode)) {
+                    setCurrentPage(2);
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Verification code is invalid"}});
+                }
                 break;
             case 2:
                 // Check if password is strong enough
-                setCurrentPage(3)
+                if (passwordScore !== 0) {
+                    if (reEnterPassword === newPassword){
+                        setCurrentPage(3)
+                    } else {
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
+                    }
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+                }
                 break;
             case 3:
                 navigate(-1);
                 break;
         }
+    }
+
+    const handlePasswordScore = (score) => {
+        setPasswordScore(score);
     }
 
     const handleDisabledButton = () => {
@@ -80,6 +110,8 @@ const ResetPassword = () => {
                 return !validateEmail();
             case 1:
                 return !(verificationCode.length === 6);
+            case 2:
+                return !passwordScore || !newPassword.length || !reEnterPassword.length;
             default:
                 return false
         }
@@ -92,7 +124,16 @@ const ResetPassword = () => {
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Enter your email</div>
                         <div className={'Label'}>We will send you a password to verify it's you.</div>
-                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail} invalid={handleInvalidEmail()}/>
+                        <TextBoxInput
+                            type={'email'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Email address'}
+                            value={email}
+                            setValue={setEmail}
+                            invalid={handleInvalidEmail()}
+                            onKeydown={handleKeyDown}
+                        />
                     </div>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>We sent you a code</div>
@@ -100,12 +141,37 @@ const ResetPassword = () => {
                             If the email you entered exists, is should receive a verification code.
                             Enter the code below to verify your email.
                         </div>
-                        <TextBoxInput width={'max'} size={'big'} placeholder={'Verification code'} value={verificationCode} setValue={handleVerificationCode}/>
+                        <TextBoxInput
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Verification code'}
+                            value={verificationCode}
+                            setValue={handleVerificationCode}
+                            onKeydown={handleKeyDown}
+                        />
                     </div>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Enter new password</div>
-                        <TextBoxInput type={'password'} width={'max'} size={'big'} placeholder={'New password'}/>
-                        <TextBoxInput type={'password'} width={'max'} size={'big'} placeholder={'Re-enter password'}/>
+                        <TextBoxInput
+                            type={'password'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'New password'}
+                            onKeydown={handleKeyDown}
+                            value={newPassword}
+                            setValue={setNewPassword}
+                            invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
+                        />
+                        <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore}/>
+                        <TextBoxInput
+                            type={'password'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Re-enter password'}
+                            onKeydown={handleKeyDown}
+                            value={reEnterPassword}
+                            setValue={setReEnterPassword}
+                        />
                     </div>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Password set successfully</div>
@@ -119,7 +185,15 @@ const ResetPassword = () => {
                     >
                         Cancel
                     </Button> : null}
-                    <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true} disabled={handleDisabledButton()}>{currentPage !== 4 ? 'Continue' : 'Finish'}</Button>
+                    <Button
+                        size={'big'}
+                        filled={checkIfFilled()}
+                        onClick={handleNextPage}
+                        layout={true}
+                        disabled={handleDisabledButton()}
+                    >
+                        {currentPage !== 4 ? 'Continue' : 'Finish'}
+                    </Button>
                 </div>
             </div>
         </div>

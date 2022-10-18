@@ -179,14 +179,14 @@ function App() {
                             exact
                             path="/log-in"
                             element={
-                                !userId ? <LogInPage/> : <Navigate to="/" />
+                                userId === null ? <LogInPage/> : <Navigate to="/" />
                             }
                         />
                         <Route
                             exact
                             path="/password-reset"
                             element={
-                                !userId ? <ResetPassword/> : <Navigate to="/" />
+                                userId === null ? <ResetPassword/> : <Navigate to="/" />
                             }
                         />
                         <Route path="*" element={<NotFound/>}/>

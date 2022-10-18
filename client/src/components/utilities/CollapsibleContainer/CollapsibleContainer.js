@@ -30,7 +30,7 @@ const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) =>
             }
             <AnimatePresence>
                 {(isVisible || (label && extended)) && <motion.div
-                    className={`Stack-Container ${styles.childrenContainer} ${label || !hasBorder ? styles.noBorder : ''}`}
+                    className={`Stack-Container No-Gap ${styles.childrenContainer} ${label || !hasBorder ? styles.noBorder : ''}`}
                     initial={"collapsed"}
                     animate={"extended"}
                     exit={"collapsed"}

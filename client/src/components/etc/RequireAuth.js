@@ -5,7 +5,7 @@ const RequireAuth = ({children}) => {
     const {userId} = useSelector(state => state?.user);
     const location = useLocation();
 
-    return (userId ? children : <Navigate to="/log-in" replace state={{path: location.pathname}}></Navigate>);
+    return (userId !== null ? children : <Navigate to="/log-in" replace state={{path: location.pathname}}></Navigate>);
 }
  
 export default RequireAuth;
