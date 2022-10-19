@@ -53,7 +53,7 @@ const TaskView = ({index, length, task}) => {
                     <CategoryIndicator
                         category={task.category}
                         group={task.timeGroup}
-                        color={categories.find(category => category.title === task.category).color}
+                        color={categories.find(category => category.id === task.category).color}
                     /> :
                     <div>None</div>
                 }

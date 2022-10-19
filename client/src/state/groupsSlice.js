@@ -10,11 +10,16 @@ export const groupsSlice = createSlice({
             state.groups.push(action.payload);
         },
         removeGroup: (state, action) => {
-            state.groups.filter(group => group.id !== action.payload)
+            const temp = state.groups.filter(group => group.id !== action.payload);
+            return {groups: temp}
         },
         setGroups: (state, action) => {
             state.groups.length = 0;
             state.groups.push(...action.payload);
+        },
+        setGroup: (state, action) => {
+            const index = state.groups.findIndex(group => group.id === action.payload.id);
+            state.groups[index] = action.payload;
         },
         emptyGroups: (state) => {
             state.groups.length = 0;
@@ -22,6 +27,6 @@ export const groupsSlice = createSlice({
     }
 })
 
-export const {addGroup, removeGroup, setGroups, emptyGroups} = groupsSlice.actions;
+export const {addGroup, removeGroup, setGroup, setGroups, emptyGroups} = groupsSlice.actions;
 
 export default groupsSlice.reducer;

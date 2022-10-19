@@ -121,9 +121,7 @@ const CurrentProgress = ({ task }) => {
       }
     } else {
       if (prevPercentage !== percentage) {
-        // console.log(percentage, prevPercentage);
         triggerAnimationsCheckbox();
-        // console.log(percentage);
         setPrevPercentage(percentage);
       }
     }

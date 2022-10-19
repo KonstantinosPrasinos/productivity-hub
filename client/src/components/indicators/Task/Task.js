@@ -12,7 +12,7 @@ const Task = ({tasks}) => {
     const categories = useSelector((state) => state?.categories.categories);
     const groups = useSelector((state) => state?.groups.groups);
 
-    const category = tasks[0].category !== null ? categories.find(category => category.title === tasks[0].category) : null;
+    const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
 
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -35,7 +35,8 @@ const Task = ({tasks}) => {
                             {index === 0 && task.category !== null &&
                                 <div onClick={(e) => e.stopPropagation()}>
                                     <CategoryIndicator
-                                        category={task.category}
+                                        category={category.title}
+                                        categoryId={category.id}
                                         group={group?.title}
                                         color={category.color}
                                     />

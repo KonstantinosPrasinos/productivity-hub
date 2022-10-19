@@ -13,17 +13,15 @@ const MiniPagesHandler = () => {
     const categories = useSelector(state => state?.categories.categories);
 
     const renderPage = (page, index) => {
-        console.log(page, categories.find(category => category.title === page.id));
         switch (page.type) {
             case 'new-task':
                 return (<NewTask key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)
             case 'new-category':
-                return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} />)
+                return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)
             case 'task-view':
                 return (<TaskView key={index} index={index} length={miniPagesContext.state.length} task={tasks.find(task => task.id === page.id)} />)
             case 'category-view':
-                console.log('hello')
-                return (<CategoryView key={index} index={index} length={miniPagesContext.state.length} category={categories.find(category => category.title === page.id)} />)
+                return (<CategoryView key={index} index={index} length={miniPagesContext.state.length} category={categories.find(category => category.id === page.id)} />)
             default: return ''
         }
     }

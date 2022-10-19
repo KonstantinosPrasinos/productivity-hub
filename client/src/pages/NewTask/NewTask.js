@@ -20,7 +20,7 @@ import Divider from "../../components/utilities/Divider/Divider";
 
 const NewTask = ({index, length, id}) => {
     const categories = useSelector((state) => state?.categories.categories);
-    const categoryNames = categories.map(category => category.title);
+    const categoryNames = categories?.map(category => category.title);
     const {defaults} = useSelector((state) => state?.user.settings);
 
     const [title, setTitle] = useState('');
@@ -64,7 +64,6 @@ const NewTask = ({index, length, id}) => {
     useEffect(() => {
         if (id) {
             const task = tasks.find(task => task.id === id);
-            console.log(task);
 
             setTitle(task.title);
             setType(task.type);
@@ -114,21 +113,6 @@ const NewTask = ({index, length, id}) => {
     }, [timePeriod])
 
     const handleSave = () => {
-
-        let localId;
-
-        if (id) {
-            localId = id;
-        } else {
-            let idIsValid = true;
-
-            do {
-                localId = uuidv4();
-                idIsValid = !tasks.find(task => task.id === localId);
-            } while (idIsValid === false);
-        }
-
-
         const checkAllInputs = () => {
             if (title) {
                 return true
@@ -138,6 +122,19 @@ const NewTask = ({index, length, id}) => {
         }
 
         if (checkAllInputs()) {
+            let localId;
+
+            if (id) {
+                localId = id;
+            } else {
+                let idIsValid = true;
+
+                do {
+                    localId = uuidv4();
+                    idIsValid = !tasks.find(task => task.id === localId);
+                } while (idIsValid === false);
+            }
+
             if (priority < low) {
                 dispatch(setLowestPriority(priority));
             }
@@ -178,7 +175,7 @@ const NewTask = ({index, length, id}) => {
                     type: goalType,
                     number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.goal)
                 } : null,
-                category: category ? category : null,
+                category: category ? categories.find(localCategory => localCategory.title === category).id : null,
                 priority: priority ? priority : defaults.priority,
                 repeats,
                 longGoal: repeats ? {
@@ -200,7 +197,6 @@ const NewTask = ({index, length, id}) => {
 
             if (id) {
                 dispatch(setTask(task));
-
             } else {
                 dispatch(addTask(task));
             }

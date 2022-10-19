@@ -1,10 +1,10 @@
 import InputWrapper from '../../components/utilities/InputWrapper/InputWrapper';
 import TextBoxInput from '../../components/inputs/TextBoxInput/TextBoxInput';
-import {useContext, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
-import {addCategory} from "../../state/categoriesSlice";
+import {addCategory, setCategory} from "../../state/categoriesSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -14,13 +14,14 @@ import CollapsibleContainer from "../../components/utilities/CollapsibleContaine
 import Button from "../../components/buttons/Button/Button";
 import {v4 as uuidv4} from "uuid";
 import customStyles from './NewCategory.module.scss';
-import {addGroup, removeGroup} from "../../state/groupsSlice";
+import {addGroup, removeGroup, setGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
 import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 
-const NewCategory = ({index, length}) => {
+const NewCategory = ({index, length, id}) => {
+    const categories = useSelector(state => state?.categories.categories);
     const groups = useSelector((state) => state?.groups.groups);
     const {defaults} = useSelector((state) => state?.user.settings);
     const {low, high} = useSelector((state) => state?.user.priorityBounds);
@@ -54,13 +55,31 @@ const NewCategory = ({index, length}) => {
         }
 
         if (checkAllInputs()) {
+            let localId;
+
+            if (id) {
+                localId = id;
+            } else {
+                let idIsValid = true;
+
+                do {
+                    localId = uuidv4();
+                    idIsValid = !categories.find(category => category.id === localId);
+                } while (idIsValid === false);
+            }
+
             const category = {
+                id: localId,
                 title,
                 color,
                 timeGroups,
             }
 
-            dispatch(addCategory(category));
+            if (id) {
+                dispatch(setCategory(category));
+            } else {
+                dispatch(addCategory(category));
+            }
 
             timeGroups.forEach(group => {
                 if (group.priority < low) {
@@ -72,10 +91,16 @@ const NewCategory = ({index, length}) => {
 
                 const tempGroup = {
                     ...group,
-                    parent: title
+                    parent: localId
                 }
 
-                dispatch(addGroup(tempGroup));
+                delete tempGroup.initial;
+
+                if (id && group.initial) {
+                    dispatch(setGroup(tempGroup));
+                } else {
+                    dispatch(addGroup(tempGroup));
+                }
             })
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
@@ -154,7 +179,8 @@ const NewCategory = ({index, length}) => {
                 smallTimePeriod: timePeriod2,
                 startingDate: startingDates
             },
-            parent: null
+            parent: null,
+            initial: currentEditedGroup.current?.initial
         }
 
         if (currentEditedGroup.current) {
@@ -190,9 +216,9 @@ const NewCategory = ({index, length}) => {
         // Populate time group inputs
         setTimeGroupTitle(group.title);
         setPriority(group.priority);
-        setTimeGroupNumber(group.number);
-        setTimePeriod(group.bigTimePeriod);
-        setTimePeriod2(group.smallTimePeriod);
+        setTimeGroupNumber(group.repeatRate.number);
+        setTimePeriod(group.repeatRate.bigTimePeriod);
+        setTimePeriod2(group.repeatRate.smallTimePeriod);
 
         currentEditedGroup.current = group;
     }
@@ -205,7 +231,9 @@ const NewCategory = ({index, length}) => {
         }
 
         setTimeGroups(timeGroups.filter(filterGroup => filterGroup.id !== group.id));
-        dispatch(removeGroup(group.id));
+        if (group.initial) {
+            dispatch(removeGroup(group.id));
+        }
     }
 
     const handleCancel = () => {
@@ -213,6 +241,16 @@ const NewCategory = ({index, length}) => {
         currentEditedGroup.current = null;
         setCreatingTimeGroup(false);
     }
+
+    useEffect(() => {
+        if (id) {
+            const category = categories.find(category => category.id === id);
+
+            setTitle(category.title);
+            setColor(category.color);
+            setTimeGroups(groups.filter(group => group.parent === category.id).map(group => {return {...group, initial: true}}));
+        }
+    }, [])
 
     return (
         <MiniPageContainer

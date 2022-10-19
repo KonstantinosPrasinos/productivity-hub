@@ -9,12 +9,16 @@ export const categoriesSlice = createSlice({
             state.categories.push(action.payload);
         },
         removeCategory: (state, action) => {
-            const temp = state.categories.filter(category => category.name !== action.payload);
-            return {tasks: temp}
+            const temp = state.categories.filter(category => category.id !== action.payload);
+            return {categories: temp}
         },
         setCategories: (state, action) => {
             state.categories.length = 0;
             state.categories.push(...action.payload);
+        },
+        setCategory: (state, action) => {
+            const index = state.categories.findIndex(category => category.id === action.payload.id);
+            state.categories[index] = action.payload;
         },
         emptyCategories: (state) => {
             state.categories.length = 0;
@@ -22,6 +26,6 @@ export const categoriesSlice = createSlice({
     }
 })
 
-export const {setCategories, emptyCategories, addCategory, removeCategory} = categoriesSlice.actions;
+export const {setCategories, emptyCategories, setCategory, addCategory, removeCategory} = categoriesSlice.actions;
 
 export default categoriesSlice.reducer;

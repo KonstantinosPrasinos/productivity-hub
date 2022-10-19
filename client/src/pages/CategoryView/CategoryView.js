@@ -1,21 +1,23 @@
 import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {removeCategory} from "../../state/categoriesSlice";
 import styles from './CategoryView.module.scss';
+import {useSafeDeleteCategory} from "../../hooks/useSafeDeleteCategory";
 
 const CategoryView = ({index, length, category}) => {
-    const dispatch = useDispatch();
+    const {safeDeleteCategory} = useSafeDeleteCategory(category);
     const miniPagesContext = useContext(MiniPagesContext);
+
+    const groups = useSelector(state => state?.groups.groups).filter(group => group.parent === category.id);
+
+    const [selectedGroup, setSelectedGroup] = useState();
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
     // const graphOptions = ['Average', 'Total'];
@@ -31,7 +33,7 @@ const CategoryView = ({index, length, category}) => {
 
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        dispatch(removeCategory(category));
+        safeDeleteCategory();
     }
 
     return (
@@ -45,7 +47,7 @@ const CategoryView = ({index, length, category}) => {
                     <div className={'Title'}>{category.title}</div>
                 </div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.title}})}><EditIcon /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><EditIcon /></IconButton>
                     <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
                 </div>
             </section>
@@ -73,6 +75,11 @@ const CategoryView = ({index, length, category}) => {
                 </div>
             </section>
             <Divider />
+            <section className={'Horizontal-Flex-Container'}>
+                {groups.map(group => <Chip key={group.id} value={group.title} selected={selectedGroup} setSelected={setSelectedGroup}>
+                    {group.title}
+                </Chip>)}
+            </section>
             {/*<section className={'Stack-Container'}>*/}
             {/*    <div className={'Horizontal-Flex-Container'}>*/}
             {/*        {graphOptions.map((option, index) => (*/}
