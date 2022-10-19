@@ -5,12 +5,15 @@ import {AnimatePresence} from 'framer-motion'
 import NewCategory from "../../../pages/NewCategory/NewCategory";
 import TaskView from "../../../pages/TaskView/TaskView";
 import {useSelector} from "react-redux";
+import CategoryView from "../../../pages/CategoryView/CategoryView";
 
 const MiniPagesHandler = () => {
     const miniPagesContext = useContext(MiniPagesContext);
     const tasks = useSelector((state) => state?.tasks.tasks);
+    const categories = useSelector(state => state?.categories.categories);
 
     const renderPage = (page, index) => {
+        console.log(page, categories.find(category => category.title === page.id));
         switch (page.type) {
             case 'new-task':
                 return (<NewTask key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)
@@ -18,6 +21,9 @@ const MiniPagesHandler = () => {
                 return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} />)
             case 'task-view':
                 return (<TaskView key={index} index={index} length={miniPagesContext.state.length} task={tasks.find(task => task.id === page.id)} />)
+            case 'category-view':
+                console.log('hello')
+                return (<CategoryView key={index} index={index} length={miniPagesContext.state.length} category={categories.find(category => category.title === page.id)} />)
             default: return ''
         }
     }

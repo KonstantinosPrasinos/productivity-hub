@@ -9,7 +9,8 @@ export const categoriesSlice = createSlice({
             state.categories.push(action.payload);
         },
         removeCategory: (state, action) => {
-            state.categories.filter((category) => category.name !== action.payload);
+            const temp = state.categories.filter(category => category.name !== action.payload);
+            return {tasks: temp}
         },
         setCategories: (state, action) => {
             state.categories.length = 0;
