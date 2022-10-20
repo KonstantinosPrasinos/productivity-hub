@@ -200,6 +200,12 @@ const NewCategory = ({index, length, id}) => {
         setCreatingTimeGroup(false);
     }
 
+    const handleKeyDown = (e) => {
+        if (e.code === 'Enter') {
+            handleSave();
+        }
+    }
+
     const handleGroupClick = (e, group) => {
         // If target is icon then stop the event
         if (e.target !== e.currentTarget) {
@@ -258,7 +264,13 @@ const NewCategory = ({index, length, id}) => {
             index={index}
             length={length}
         >
-            <input type="text" className="Title Title-Input" placeholder="Add category title" value={title} onChange={(e) => setTitle(e.target.value)}/>
+            <input
+                type="text"
+                className="Title Title-Input"
+                placeholder="Add category title" value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+            />
             <InputWrapper label="Color">
                 <ColorInput selected={color} setSelected={setColor}/>
             </InputWrapper>

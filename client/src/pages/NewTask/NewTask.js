@@ -61,6 +61,12 @@ const NewTask = ({index, length, id}) => {
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
 
+    const handleKeyDown = (e) => {
+        if (e.code === 'Enter') {
+            handleSave();
+        }
+    }
+
     useEffect(() => {
         if (id) {
             const task = tasks.find(task => task.id === id);
@@ -216,7 +222,9 @@ const NewTask = ({index, length, id}) => {
                 className="Title Title-Input"
                 placeholder="Add task title"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}/>
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+            />
             <InputWrapper label="Type">
                 <div className={`Horizontal-Flex-Container`}>
                     {taskType.map((task, index) => (
