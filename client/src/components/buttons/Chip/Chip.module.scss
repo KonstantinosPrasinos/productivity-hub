@@ -25,4 +25,12 @@
         color: var(--on-primary-color);
         border: none;
     }
+
+    &.small {
+        font-size: $font-s;
+    }
+
+    &.big {
+        font-size: $font-xxl;
+    }
 }

@@ -3,6 +3,8 @@
 .container {
   width: 100%;
   height: 100%;
+  gap: 4em;
+  position: relative;
 }
 
 .leftSide {
@@ -14,17 +16,55 @@
 }
 
 @media (min-width: $tablet-breakpoint) {
-  .leftSide {
-    width: 50%;
-  }
-  .rightSide {
-    width: 50%;
-  }
+  //.leftSide {
+  //  width: 22.15em;
+  //}
+  //.rightSide {
+  //  width: 22.15em;
+  //}
 }
 
 @media (max-width: $tablet-breakpoint) {
-  .leftSide {
+  .leftSide, .rightSide {
     width: 100%;
-    padding-top: 1em;
+    overflow: hidden;
   }
+  .container {
+    overflow-y: hidden;
+    padding-top: 5em;
+    box-sizing: border-box;
+  }
+}
+
+.categoryContainer {
+  width: calc(22.15em - 20px);
+  padding: 20px;
+}
+
+.categoryCircle {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.5em;
+}
+
+.selectionBar {
+  background-color: var(--surface-color);
+  padding: 1em;
+  border-bottom: $base-border;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.noTasks {
+  width: 22.15em;
+  justify-content: center;
+}
+
+.mobileView {
+  height: 100%;
+  overflow-y: auto;
 }

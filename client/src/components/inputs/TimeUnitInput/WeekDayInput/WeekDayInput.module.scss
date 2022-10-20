@@ -5,6 +5,7 @@
   height: 2em;
   border-radius: $button-border-radius;
   border: 1px solid var(--primary-color);
+  color: var(--primary-color);
 
   &.selected {
     color: var(--on-primary-color);
