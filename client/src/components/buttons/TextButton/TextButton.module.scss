@@ -6,9 +6,6 @@
   color: var(--primary-color);
   text-decoration: none;
 
-  &.important {
-    color: var(--error-color);
-  }
   &:hover {
     text-decoration: underline;
   }
