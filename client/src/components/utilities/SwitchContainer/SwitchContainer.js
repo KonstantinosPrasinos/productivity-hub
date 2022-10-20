@@ -17,7 +17,7 @@ const SwitchContainer = ({children, selectedTab}) => {
                     key={selectedTab}
 
                     initial={{
-                        x: previousTab.current < selectedTab ? -500 : 500,
+                        x: previousTab.current < selectedTab ? 500 : -500,
                         opacity: 0
                     }}
                     animate={{
@@ -25,7 +25,7 @@ const SwitchContainer = ({children, selectedTab}) => {
                         opacity: 1
                     }}
                     exit={{
-                        x: previousTab.current < selectedTab ? -500 : 500,
+                        x: previousTab.current < selectedTab ? 500 : -500,
                         opacity: 0
                     }}
 
