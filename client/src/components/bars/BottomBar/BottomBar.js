@@ -51,16 +51,16 @@ const BottomBar = () => {
             >
                 <HomeIcon sx={{fontSize: '1.5em'}} />
             </IconButton>
-            <IconButton
-                onClick={() => {
-                    setSelected('timer');
-                    navigate('/timer', {replace: true});
-                }}
-                label={'Timer'}
-                selected={selected === 'timer'}
-            >
-                <TimerIcon sx={{fontSize: '1.5em'}} />
-            </IconButton>
+            {/*<IconButton*/}
+            {/*    onClick={() => {*/}
+            {/*        setSelected('timer');*/}
+            {/*        navigate('/timer', {replace: true});*/}
+            {/*    }}*/}
+            {/*    label={'Timer'}*/}
+            {/*    selected={selected === 'timer'}*/}
+            {/*>*/}
+            {/*    <TimerIcon sx={{fontSize: '1.5em'}} />*/}
+            {/*</IconButton>*/}
             <IconButton
                 onClick={() => {
                     setSelected('tasks');

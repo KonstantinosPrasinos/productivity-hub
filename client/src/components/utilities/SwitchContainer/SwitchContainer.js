@@ -26,7 +26,8 @@ const SwitchContainer = ({children, selectedTab}) => {
                     }}
                     exit={{
                         x: previousTab.current < selectedTab ? 500 : -500,
-                        opacity: 0
+                        opacity: 0,
+                        height: 0
                     }}
 
                     transition={{

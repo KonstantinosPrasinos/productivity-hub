@@ -46,8 +46,8 @@ const SideBar = () => {
             <div className={`Stack-Container ${styles.buttonsContainer}`}>
                 <IconButton onClick={() => navigate('/', {replace: true})} selected={selected === 'home'}
                             setSelected={() => setSelected('home')}><HomeIcon sx={{fontSize: '1.5em'}}/></IconButton>
-                <IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}
-                            setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>
+                {/*<IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}*/}
+                {/*            setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>*/}
                 <IconButton
                     onClick={() => {
                         setSelected('tasks');
