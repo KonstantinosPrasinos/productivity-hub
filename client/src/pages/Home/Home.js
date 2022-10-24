@@ -21,7 +21,7 @@ const Home = () => {
                             initial={{ opacity: 0, y: 50, scale: 0.3 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                            className={`Rounded-Container ${styles.noTasks}`}
+                            className={`Empty-Indicator-Container`}
                         >
                             No tasks for now
                         </motion.div>
@@ -32,7 +32,7 @@ const Home = () => {
                     )}
                 </AnimatePresence>
                 {completedTasks.length > 0 && <CollapsibleContainer label={'Completed'}>
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                         {completedTasks.map((task) => task.hasOwnProperty('timeGroup') ?
                             (<Task key={task.id} tasks={[task]}></Task>) :
                             (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)

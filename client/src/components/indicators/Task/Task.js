@@ -3,7 +3,6 @@ import VisualStreak from "../VisualStreak/VisualStreak";
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
 import {useContext} from "react";
-import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
@@ -15,12 +14,11 @@ const Task = ({tasks}) => {
     const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
 
-    const screenSizeContext = useContext(ScreenSizeContext);
     const miniPagesContext = useContext(MiniPagesContext);
 
     return (
         <motion.div
-            className={`Rounded-Container Symmetrical Stack-Container ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
+            className={`Rounded-Container Stack-Container ${styles.container}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}

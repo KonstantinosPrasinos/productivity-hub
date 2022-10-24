@@ -177,16 +177,13 @@ body {
     }
 }
 
-.Symmetrical {
-    padding: $symmetrical-padding;
-
-    &.Big-Padding {
-        padding: 20px 20px;
-    }
-}
-
-.Collapsible-Container {
-    overflow-y: hidden;
+.Empty-Indicator-Container {
+    @extend .Stack-Container, .Rounded-Container;
+    height: 2.5em;
+    width: 22.15em;
+    padding: 6px 12px;
+    justify-content: center;
+    align-items: center;
 }
 
 .Clickable {
