@@ -14,7 +14,7 @@ const Home = () => {
     return (
         <div className={`${styles.container}`}>
             <div className={`Stack-Container ${styles.leftSide}`}>
-                <AnimatePresence mode={'wait'} initial={false}>
+                <AnimatePresence exitBeforeEnter initial={false}>
                     {tasks.length === 0 &&
                         <motion.div
                             initial={{ opacity: 0, y: 50, scale: 0.3 }}
