@@ -68,6 +68,7 @@
     }
 
     .circularBar {
+        transform: rotate(270deg) translateZ(0px);
         background-color: #26DE81;
         width: 100%;
         height: 100%;
@@ -91,6 +92,7 @@
 }
 
 .straightBarContainer {
+    transform: scaleX(0) translateZ(0px);
     height: 1.3em;
     width: 7.4em;
     position: absolute;

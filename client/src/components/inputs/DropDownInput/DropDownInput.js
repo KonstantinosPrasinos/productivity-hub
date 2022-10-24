@@ -33,7 +33,7 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
         onClick={handleExtension}
 
       >
-        <div>{selected ? selected : placeholder}</div>
+        <div className={styles.selected}>{selected ? selected : placeholder}</div>
         <ArrowDropDownIcon
           className={`${styles.arrowIndicator} ${
             extended ? styles.extended : ""

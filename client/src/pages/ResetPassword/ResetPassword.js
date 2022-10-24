@@ -3,10 +3,11 @@ import styles from './ResetPassword.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
-import Pagination from "../../components/utilities/Pagination/Pagination";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../context/AlertsContext";
 import {useVerify} from "../../hooks/useVerify";
+import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import TextButton from "../../components/buttons/TextButton/TextButton";
 
 const ResetPassword = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -120,7 +121,7 @@ const ResetPassword = () => {
     return (
         <div className={`Overlay Opaque`}>
             <div className={`Surface ${styles.surface}`}>
-                <Pagination currentPage={currentPage}>
+                <SwitchContainer selectedTab={currentPage}>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Enter your email</div>
                         <div className={'Label'}>We will send you a password to verify it's you.</div>
@@ -141,14 +142,17 @@ const ResetPassword = () => {
                             If the email you entered exists, is should receive a verification code.
                             Enter the code below to verify your email.
                         </div>
-                        <TextBoxInput
-                            width={'max'}
-                            size={'big'}
-                            placeholder={'Verification code'}
-                            value={verificationCode}
-                            setValue={handleVerificationCode}
-                            onKeydown={handleKeyDown}
-                        />
+                        <div>
+                            <TextBoxInput
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'Verification code'}
+                                value={verificationCode}
+                                setValue={handleVerificationCode}
+                                onKeydown={handleKeyDown}
+                            />
+                            <TextButton>Didn't receive code?</TextButton>
+                        </div>
                     </div>
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Enter new password</div>
@@ -176,7 +180,7 @@ const ResetPassword = () => {
                     <div className={'Stack-Container'}>
                         <div className={'Display'}>Password set successfully</div>
                     </div>
-                </Pagination>
+                </SwitchContainer>
                 <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`}>
                     {currentPage !== 3 ? <Button
                         size={'big'}

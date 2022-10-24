@@ -31,6 +31,11 @@
     }
 }
 
+ul {
+    margin: 0;
+    font-size: $font-l;
+}
+
 body {
     overflow-y: hidden;
     position: fixed;
@@ -68,6 +73,10 @@ body {
         justify-content: space-between;
     }
 
+    &.Space-Around {
+        justify-content: space-around;
+    }
+
     &.Align-Right {
         justify-content: flex-end;
     }
@@ -89,6 +98,10 @@ body {
 
     &.No-Gap {
         gap: 0;
+    }
+
+    &.Centered {
+        align-items: center;
     }
 }
 
@@ -140,7 +153,7 @@ body {
     height: 100%;
     width: 100%;
     background-color: var(--overlay-color);
-    z-index: 3;
+    z-index: 4;
 
     display: flex;
     justify-content: center;
@@ -164,16 +177,13 @@ body {
     }
 }
 
-.Symmetrical {
-    padding: $symmetrical-padding;
-
-    &.Big-Padding {
-        padding: 20px 20px;
-    }
-}
-
-.Collapsible-Container {
-    overflow-y: hidden;
+.Empty-Indicator-Container {
+    @extend .Stack-Container, .Rounded-Container;
+    height: 2.5em;
+    width: 22.15em;
+    padding: 6px 12px;
+    justify-content: center;
+    align-items: center;
 }
 
 .Clickable {

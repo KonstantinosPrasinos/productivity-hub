@@ -52,6 +52,9 @@
     font-size: $font-m;
     line-height: $font-m;
     cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
     
     &:hover {
         &::after {
@@ -66,4 +69,10 @@
             border-radius: $base-border-radius;
         }
     }
+}
+
+.selected {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }

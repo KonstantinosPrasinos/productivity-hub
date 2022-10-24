@@ -1,11 +1,10 @@
 import styles from './TextButton.module.scss';
-import {Link} from "react-router-dom";
 
-const TextButton = ({children, type, to}) => {
+const TextButton = ({children, onClick}) => {
     return (
-        <Link to={to} className={`${styles.container} ${type ? styles[type] : ''}`}>
+        <button className={`Button ${styles.container}`} onClick={onClick}>
             {children}
-        </Link>
+        </button>
     );
 };
 

@@ -2,25 +2,24 @@
 import styles from './VisualStreak.module.scss';
 
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
-import { useState } from 'react';
 
 const VisualStreak = ({ task }) => {
 
-  const [hoveredDate, setHoveredDate] = useState(null);
+  // const [hoveredDate, setHoveredDate] = useState(null);
 
   const chars = task.shortHistory.split("");
   let date = new Date();
   date.setDate(date.getDate() - 7);
 
-  const renderDate = (index) => {
-    date.setDate(date.getDate() + 1);
-    const options = { day: "numeric", month: "numeric" };
-    return (
-      <div className={`${styles.date} ${index === hoveredDate ? styles.hovered : ''}`}>
-        {date.toLocaleDateString('en-uk', options)}
-      </div>
-    );
-  };
+  // const renderDate = (index) => {
+  //   date.setDate(date.getDate() + 1);
+  //   const options = { day: "numeric", month: "numeric" };
+  //   return (
+  //     <div className={`${styles.date} ${index === hoveredDate ? styles.hovered : ''}`}>
+  //       {date.toLocaleDateString('en-uk', options)}
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className={`${styles.container} Horizontal-Flex-Container`}>
@@ -34,10 +33,10 @@ const VisualStreak = ({ task }) => {
             ${char === '1' && ((index < chars.length && chars[index + 1] === '1') || index === chars.length - 1) ? styles.hasAfter : ''}
             ${char === '0' ? styles.unfilled : ''}
           `}
-          onMouseEnter={() => setHoveredDate(index)}
-          onMouseLeave={() => setHoveredDate(null)}
+          // onMouseEnter={() => setHoveredDate(index)}
+          // onMouseLeave={() => setHoveredDate(null)}
         >
-          {renderDate(index)}
+          {/*{renderDate(index)}*/}
         </div>
       )}
       <CurrentProgress task={task}></CurrentProgress>

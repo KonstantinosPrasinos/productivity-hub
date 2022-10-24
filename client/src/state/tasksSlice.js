@@ -16,14 +16,17 @@ export const tasksSlice = createSlice({
         },
         setTask: (state, action) => {
             const index = state.tasks.findIndex(task => task.id === action.payload.id);
-            state.tasks[index] = action.payload
+            state.tasks[index] = action.payload;
         },
         setTaskPreviousEntry: (state, action) => {
             state.tasks.find(task => task.id === action.payload.id).previousEntry = action.payload.value;
+        },
+        setTaskCategory: (state, action) => {
+            state.tasks.find(task => task.id === action.payload.id).category = action.payload.value;
         }
     },
 })
 
-export const {addTask, removeTask, setTaskPreviousEntry, setTasks, setTask} = tasksSlice.actions;
+export const {addTask, removeTask, setTaskPreviousEntry, setTasks, setTask, setTaskCategory} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

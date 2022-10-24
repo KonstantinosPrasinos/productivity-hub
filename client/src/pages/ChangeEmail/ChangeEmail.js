@@ -3,11 +3,12 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import {useContext, useState} from "react";
 import {useSelector} from "react-redux";
-import Pagination from "../../components/utilities/Pagination/Pagination";
 import {motion} from 'framer-motion';
 import {ModalContext} from "../../context/ModalContext";
 import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
+import TextButton from "../../components/buttons/TextButton/TextButton";
+import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 
 const ChangeEmail = () => {
     const {verifyPassword, verifyVerificationCode} = useVerify();
@@ -89,7 +90,7 @@ const ChangeEmail = () => {
             transition={{duration: 0.2}}
         >
             <div className={`Surface ${styles.surface}`}>
-                <Pagination currentPage={currentPage}>
+                <SwitchContainer selectedTab={currentPage}>
                     <div className={styles.topHalf}>
                         <div className={styles.infoContainer}>
                             <div className={'Display'}>Verify your password</div>
@@ -124,22 +125,25 @@ const ChangeEmail = () => {
                                 Enter the code below to verify your email.
                             </div>
                         </div>
-                        <TextBoxInput
-                            width={'max'}
-                            size={'big'}
-                            placeholder={'Verification code'}
-                            value={verificationCode}
-                            setValue={handleVerificationCode}
-                            onKeydown={handleKeyDown}
-                            invalid={verificationCode.length ? !verificationCode.length === 6 : null}
-                        />
+                        <div>
+                            <TextBoxInput
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'Verification code'}
+                                value={verificationCode}
+                                setValue={handleVerificationCode}
+                                onKeydown={handleKeyDown}
+                                invalid={verificationCode.length ? !(verificationCode.length === 6) : null}
+                            />
+                            <TextButton>Didn't receive code?</TextButton>
+                        </div>
                     </div>
                     <div className={styles.topHalf}>
                         <div className={styles.infoContainer}>
                             <div className={'Display'}>Email changed successfully</div>
                         </div>
                     </div>
-                </Pagination>
+                </SwitchContainer>
                 <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`} >
                     {currentPage !== 3 ? <Button
                         size={'big'}

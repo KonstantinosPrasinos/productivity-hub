@@ -1,5 +1,17 @@
 .container {
+  overflow-y: hidden;
   > * {
     margin: 10px 0;
+  }
+}
+
+.bigContainer {
+  display: grid;
+  grid-template: 1fr / 1 fr;
+  overflow-x: hidden;
+
+  > * {
+    grid-column: 1 / 1;
+    grid-row: 1 / 1;
   }
 }

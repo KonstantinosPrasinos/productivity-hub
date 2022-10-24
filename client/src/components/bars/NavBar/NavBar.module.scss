@@ -4,14 +4,42 @@
   .container {
     order: 3;
   }
+
+  .navBar {
+    height: 4em;
+    background-color: var(--surface-color);
+    display: flex;
+    align-items: center;
+    padding: $base-padding;
+    justify-content: space-around;
+    border-top: $base-border;
+    z-index: 3;
+    flex-direction: row;
+  }
 }
 @media (min-width: $tablet-breakpoint) {
   .container {
     height: 100%;
     width: 4em;
   }
+
+  .navBar {
+    position: fixed;
+    width: 4em;
+    height: 100%;
+    background: var(--surface-color);
+    padding: 40px 0 40px 0;
+    gap: 2em !important;
+    border-right: $base-border;
+    flex-direction: column;
+  }
+}
+
+.navBar {
+  display: flex;
+  align-items: center;
 }
 
 .container {
-  z-index: 3;
+  z-index: 4;
 }

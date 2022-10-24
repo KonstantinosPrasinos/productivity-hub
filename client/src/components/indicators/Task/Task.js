@@ -2,8 +2,7 @@ import VisualStreak from "../VisualStreak/VisualStreak";
 
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
-import {useContext} from "react";
-import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
+import {useContext, useMemo} from "react";
 import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
@@ -12,18 +11,38 @@ const Task = ({tasks}) => {
     const categories = useSelector((state) => state?.categories.categories);
     const groups = useSelector((state) => state?.groups.groups);
 
-    const category = tasks[0].category !== null ? categories.find(category => category.title === tasks[0].category) : null;
+    const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
     const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
 
-    const screenSizeContext = useContext(ScreenSizeContext);
     const miniPagesContext = useContext(MiniPagesContext);
+
+    const checkIfCompleted = () => {
+        let isCompleted = false;
+
+        tasks.map(task => {
+            if (task.type === 'Checkbox') {
+                if (task.previousEntry !== 1) {
+                    isCompleted = true;
+                }
+            } else {
+                if (task.goal.type === 'At least' && task.goal.number >= task.previousEntry) {
+                    isCompleted = true;
+                }
+            }
+        });
+
+        return isCompleted;
+    }
+
+    const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
 
     return (
         <motion.div
-            className={`Rounded-Container Symmetrical Stack-Container Has-Shadow ${styles.container} ${screenSizeContext.state === 'small' ? styles.small : ''}`}
+            className={`Rounded-Container Stack-Container ${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            layout
 
             onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0].id}})}
         >
@@ -35,7 +54,8 @@ const Task = ({tasks}) => {
                             {index === 0 && task.category !== null &&
                                 <div onClick={(e) => e.stopPropagation()}>
                                     <CategoryIndicator
-                                        category={task.category}
+                                        category={category.title}
+                                        categoryId={category.id}
                                         group={group?.title}
                                         color={category.color}
                                     />

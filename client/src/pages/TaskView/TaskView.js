@@ -17,6 +17,7 @@ const TaskView = ({index, length, task}) => {
     const categories = useSelector((state) => state?.categories.categories);
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
+    const category = categories.find(category => category.id === task.category);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
@@ -51,9 +52,10 @@ const TaskView = ({index, length, task}) => {
                 <div className={'Label'}>Category:</div>
                 {task.category ?
                     <CategoryIndicator
-                        category={task.category}
+                        category={category.title}
+                        categoryId={category.id}
                         group={task.timeGroup}
-                        color={categories.find(category => category.title === task.category).color}
+                        color={category.color}
                     /> :
                     <div>None</div>
                 }

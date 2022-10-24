@@ -14,7 +14,7 @@ import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
-import TaskList from "./pages/TaskList/TaskList";
+import ListView from "./pages/ListView/ListView";
 import {useSelector} from "react-redux";
 import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import {ModalContext} from "./context/ModalContext";
@@ -126,10 +126,10 @@ function App() {
                             }
                         />
                         <Route
-                            path="/tasks"
+                            path="/list"
                             element={
                                 <RequireAuth>
-                                    <TaskList />
+                                    <ListView />
                                 </RequireAuth>
                             }
                         />
