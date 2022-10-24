@@ -25,11 +25,11 @@ const NavBar = () => {
             case '/home':
                 setSelected('home')
                 break;
-            case '/timer':
-                setSelected('timer')
-                break;
-            case '/tasks':
-                setSelected('tasks')
+            // case '/timer':
+            //     setSelected('timer')
+            //     break;
+            case '/list':
+                setSelected('list')
                 break;
             case '/settings':
                 setSelected('settings')
@@ -54,7 +54,7 @@ const NavBar = () => {
                 <IconButton
                     onClick={() => {
                         setSelected('tasks');
-                        navigate('/tasks', {replace: true});
+                        navigate('/list', {replace: true});
                     }}
                     selected={selected === 'tasks'}
                 >

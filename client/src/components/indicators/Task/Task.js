@@ -2,7 +2,7 @@ import VisualStreak from "../VisualStreak/VisualStreak";
 
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
-import {useContext} from "react";
+import {useContext, useMemo} from "react";
 import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
@@ -16,9 +16,29 @@ const Task = ({tasks}) => {
 
     const miniPagesContext = useContext(MiniPagesContext);
 
+    const checkIfCompleted = () => {
+        let isCompleted = false;
+
+        tasks.map(task => {
+            if (task.type === 'Checkbox') {
+                if (task.previousEntry !== 1) {
+                    isCompleted = true;
+                }
+            } else {
+                if (task.goal.type === 'At least' && task.goal.number >= task.previousEntry) {
+                    isCompleted = true;
+                }
+            }
+        });
+
+        return isCompleted;
+    }
+
+    const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
+
     return (
         <motion.div
-            className={`Rounded-Container Stack-Container ${styles.container}`}
+            className={`Rounded-Container Stack-Container ${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}

@@ -126,7 +126,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/tasks"
+                            path="/list"
                             element={
                                 <RequireAuth>
                                     <ListView />
