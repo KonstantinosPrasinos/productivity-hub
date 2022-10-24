@@ -45,7 +45,7 @@ const NewTask = ({index, length, id}) => {
     const [repeatType, setRepeatType] = useState('Custom Rules')
 
     const groups = useSelector((state) => state?.groups.groups);
-    const groupTitles = ['None', ...groups.filter(group => group.parent === category).map(group => group.title)];
+
 
     const tasks = useSelector((state) => state?.tasks.tasks);
     const {low, high} = useSelector((state) => state?.user.priorityBounds);
@@ -66,6 +66,16 @@ const NewTask = ({index, length, id}) => {
             handleSave();
         }
     }
+
+
+
+    const findMatchingGroups = () => {
+        const categoryId = categories.find(localCategory => localCategory.title === category)?.id
+
+        return groups.filter(group => group.parent === categoryId).map(group => group.title)
+    }
+
+    const groupTitles = ['None', ...findMatchingGroups()];
 
     useEffect(() => {
         if (id) {
@@ -181,7 +191,7 @@ const NewTask = ({index, length, id}) => {
                     type: goalType,
                     number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.goal)
                 } : null,
-                category: category ? categories.find(localCategory => localCategory.title === category).id : null,
+                category: category ? categories.find(localCategory => localCategory.title === category)?.id : null,
                 priority: priority ? priority : defaults.priority,
                 repeats,
                 longGoal: repeats ? {
@@ -321,12 +331,16 @@ const NewTask = ({index, length, id}) => {
                         </InputWrapper>}
                     </>
                     <InputWrapper label={"Select a category time group"}>
-                        <DropDownInput
-                            placeholder={'Time group'}
-                            options={groupTitles}
-                            selected={timeGroup}
-                            setSelected={setTimeGroup}
-                        />
+                        {groupTitles.map((group, index) => (
+                            <Chip
+                                key={index}
+                                value={group}
+                                selected={timeGroup}
+                                setSelected={setTimeGroup}
+                            >
+                                {group}
+                            </Chip>
+                        ))}
                     </InputWrapper>
                 </SwitchContainer>
             </CollapsibleContainer>
