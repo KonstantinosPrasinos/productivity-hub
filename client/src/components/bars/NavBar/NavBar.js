@@ -56,7 +56,7 @@ const NavBar = () => {
                         setSelected('tasks');
                         navigate('/list', {replace: true});
                     }}
-                    selected={selected === 'tasks'}
+                    selected={selected === 'list'}
                 >
                     <FormatListBulletedIcon sx={{fontSize: '1.5em'}}/>
                 </IconButton>
