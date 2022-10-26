@@ -50,6 +50,10 @@ body {
     position: relative;
 }
 
+* {
+    transition: background-color 0.2s;
+}
+
 .Button {
     display: inline-flex;
     justify-content: center;

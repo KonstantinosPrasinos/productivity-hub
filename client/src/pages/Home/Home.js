@@ -25,7 +25,7 @@ const Home = () => {
                             No tasks for now
                         </motion.div>
                     }
-                    {tasks.length > 0 && <AnimatePresence>
+                    {tasks.length > 0 && <AnimatePresence initial={false}>
                         {tasks.map((task) => task.hasOwnProperty('timeGroup') ?
                             (<Task key={task.id} tasks={[task]}></Task>) :
                             (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)

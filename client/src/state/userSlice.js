@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-    userId: 1,
+    userId: 12,
     settings: {
         theme: 'Light',
         defaults: {
