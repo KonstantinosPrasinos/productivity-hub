@@ -7,22 +7,22 @@ const signupUser = (req, res) => {
     const {email, password} = req.body;
 
     if (!email || !password) {return res.json({error: 'All fields must be filled.'})}
-    User.findOne({email}, async (err, userExists) => {
+    User.findOne({'local.email': email}, async (err, userExists) => {
         if (userExists) {return res.json({error: 'User already exists'})}
 
         const hashedPassword = bcrypt.hashSync(password, 10);
 
-        const user = await User.create({email, password: hashedPassword});
+        const user = await User.create({local: {email, password: hashedPassword}});
 
-        return res.json({...user._doc, password: undefined});
+        return res.json({user: {...user._doc, local: {email, password: undefined}, google: undefined}});
     });
 }
 
 const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
-    User.findOne({email: email}, (err, user) =>{
+    User.findOne({'local.email': email}, (err, user) =>{
         if (err) {return done(err)}
         if (!user) {return done(null, false)}
-        if (!bcrypt.compareSync(password, user.password)) {return done(null, false, { message: 'Incorrect username or password.' })}
+        if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect username or password.' })}
 
         return done(null, user);
     })
