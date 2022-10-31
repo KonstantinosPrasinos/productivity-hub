@@ -9,9 +9,11 @@ import PasswordStrengthBar from "react-password-strength-bar";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import {useVerify} from "../../hooks/useVerify";
 import TextButton from "../../components/buttons/TextButton/TextButton";
+import {useLogin} from "../../hooks/useLogin";
 
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
+    const {login, getData} = useLogin();
     const {verifyVerificationCode} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -46,9 +48,13 @@ const LogInPage = () => {
     }
 
     const handleContinue = () => {
+        console.log(email, password);
         if (selectedTab === 0) {
             if (currentPage === 0) {
                 // Attempt login
+                console.log(email, password);
+                const temp = login(email, password);
+                console.log(temp);
             } else {
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
@@ -150,6 +156,7 @@ const LogInPage = () => {
                         </Button>
                     </div>
                 </SwitchContainer>
+                <Button onClick={() => getData()}>Click me to get data</Button>
             </div>
         </div>
     );

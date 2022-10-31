@@ -4,9 +4,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
+const cors = require('cors')
 
 const userRoutes = require('./routes/userRoutes');
 const {loginUser} = require('./controllers/userController')
+const User = require('./models/userSchema')
+const settingsRoutes = require('./routes/settingsRoutes');
 
 // Express app
 const app = express();
@@ -18,22 +21,35 @@ app.use(
         secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            maxAge: 30 * 24 * 60 * 60 * 1000 // One month
+        }
     })
 );
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-    done(null, user);
+    done(null, user.id);
 });
 
 passport.deserializeUser(function(user, done) {
-    done(null, user);
+    console.log('Deserialize ' + user);
+    User.findById(user, (err, user) => {
+        done(null, user);
+    })
 });
 
 // Routes
 app.use('/api/user', userRoutes);
+app.use('/api/settings', settingsRoutes)
 
 passport.use(loginUser);
 

@@ -13,17 +13,6 @@ const User = new mongoose.Schema({
     },
     google: {
         googleId: {type: String, required: false}
-    },
-    settings: {
-        theme: {
-            type: String,
-            default: 'Light'
-        },
-        defaults: {
-            step: {type: Number, default: 1},
-            goal: {type: Number, default: 1},
-            priority: {type: Number, default: 1}
-        }
     }
 });
 

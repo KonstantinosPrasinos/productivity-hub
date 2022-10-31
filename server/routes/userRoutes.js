@@ -7,16 +7,17 @@ const router = express.Router();
 router.post('/login',
     passport.authenticate('local'),
     (req, res) => {
-        const user = JSON.parse(JSON.stringify(req.user)) // hack
+        const user = JSON.parse(JSON.stringify(req.user))
 
         if (user) {
             delete user.password
         }
-        res.json({ user: user })
+
+        return res.json({ user: user })
     }
 )
 
 router.post('/signup', signupUser);
-router.post('/logout', logoutUser)
+router.post('/logout', logoutUser);
 
 module.exports = router;
