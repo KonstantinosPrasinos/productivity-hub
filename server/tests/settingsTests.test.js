@@ -2,6 +2,8 @@ const request = require("supertest");
 const server = require("../server");
 const mongoose = require('mongoose')
 
+jest.setTimeout(10 * 1000)
+
 describe('Settings Tests', () => {
     afterAll(() => {
         mongoose.connection.close();
@@ -13,7 +15,7 @@ describe('Settings Tests', () => {
         // log in
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'konstantinos.prasinos@gmail.com', password: 'asdfafasd'});
+            .send({email: 'temp@email.com', password: 'asdfafasd'});
 
         const userId = response.body.user._id;
         cookie = response.headers['set-cookie'];

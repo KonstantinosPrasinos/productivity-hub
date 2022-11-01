@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const {signupUser, logoutUser} = require('../controllers/userController');
+const {signupUser, logoutUser, deleteUser} = require('../controllers/userController');
 
 const router = express.Router();
 
@@ -19,5 +19,6 @@ router.post('/login',
 
 router.post('/signup', signupUser);
 router.post('/logout', logoutUser);
+router.post('/delete', deleteUser);
 
 module.exports = router;

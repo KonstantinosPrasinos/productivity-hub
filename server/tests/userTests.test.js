@@ -1,6 +1,7 @@
 const server = require('../server');
 const request = require('supertest');
 const User = require("../models/userSchema");
+const Settings = require('../models/settingsSchema');
 const mongoose = require('mongoose')
 
 describe('Test User', () => {
@@ -11,13 +12,13 @@ describe('Test User', () => {
     test('Login Success', async () => {
         await request(server)
             .post('/api/user/login')
-            .send({email: 'konstantinos.prasinos@gmail.com', password: 'asdfafasd'})
+            .send({email: 'temp@email.com', password: 'asdfafasd'})
             .expect(200)
             .then(response => {
                 expect(response.body).toEqual(expect.objectContaining({user: {
                                 __v: expect.any(Number),
                                 _id: expect.any(String),
-                                local: expect.objectContaining({email: 'konstantinos.prasinos@gmail.com'})
+                                local: expect.objectContaining({email: 'temp@email.com'})
                             }}));
             })
     })
@@ -25,33 +26,36 @@ describe('Test User', () => {
     test('Login Failure', async () => {
         await request(server)
             .post('/api/user/login')
-            .send({email: 'konstantinos.prasinos@gmail.com', password: ''})
+            .send({email: 'temp@email.com', password: ''})
             .expect(400)
     })
 
     test('Register Success', async () => {
-        await User.findOneAndRemove({'local.email': 'konstantinos.prasinos@gmail.com'});
+        const a = await User.findOneAndDelete({'local.email': 'temp@email.com'});
+        if (a) {
+            await Settings.findOneAndDelete({'userId': a._id});
+        }
 
         await request(server)
             .post('/api/user/signup')
-            .send({email: 'konstantinos.prasinos@gmail.com', password: 'asdfafasd'})
+            .send({email: 'temp@email.com', password: 'asdfafasd'})
             .expect(200)
             .then(response => {
                 expect(response.body).toEqual(expect.objectContaining({user: {
-                                __v: expect.any(Number),
-                                _id: expect.any(String),
-                                local: expect.objectContaining({email: 'konstantinos.prasinos@gmail.com'}),
-                            }}));
+                        __v: expect.any(Number),
+                        _id: expect.any(String),
+                        local: expect.objectContaining({email: 'temp@email.com'}),
+                    }}));
             })
     })
 
     test('Register Failure (User already exists)' , async () => {
         await request(server)
             .post('/api/user/signup')
-            .send({email: 'konstantinos.prasinos@gmail.com', password: 'asdfafasd'})
+            .send({email: 'temp@email.com', password: 'asdfafasd'})
             .expect(409)
             .then(response => {
-                expect(response.body).toEqual({error: 'User already exists'});
+                expect(response.body).toEqual({error: 'User already exists.'});
             })
     })
 
@@ -62,5 +66,40 @@ describe('Test User', () => {
             .then(response => {
                 expect(response.body).toEqual({error: 'All fields must be filled.'});
             })
+    })
+
+    test('Delete User Success', async () => {
+        let cookie;
+
+        // Register user
+        await request(server)
+            .post('/api/user/signup')
+            .send({email: 'temp2@email.com', password: 'asdfafasd'})
+
+        // Log in as user
+        const response = await request(server)
+            .post('/api/user/login')
+            .send({email: 'temp2@email.com', password: 'asdfafasd'});
+
+
+        // Get session cookie for next request
+        cookie = response.headers['set-cookie'];
+
+        // Delete user
+        await request(server)
+            .post('/api/user/delete')
+            .set('Cookie', cookie)
+            .send({email: 'temp2@email.com', password: 'asdfafasd'})
+            .expect(200)
+            .then(async () => {
+                // Attempt to log in again but fail to
+                await request(server)
+                    .post('/api/user/login')
+                    .send({email: 'temp2@email.com', password: 'asdfafasd'})
+                    .then(promise => {
+                        console.log(promise.statusCode, promise.body)
+                    })
+            })
+
     })
 })
