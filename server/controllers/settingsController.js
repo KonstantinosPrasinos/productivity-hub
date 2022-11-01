@@ -12,7 +12,7 @@ const getSettings = async (req, res) => {
             return res.json(newSettings);
         });
     } else {
-        res.status(401).send("Not authorized");
+        res.status(401).send({message: "Not authorized"});
     }
 }
 

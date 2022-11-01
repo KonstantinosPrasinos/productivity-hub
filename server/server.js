@@ -41,7 +41,6 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-    console.log('Deserialize ' + user);
     User.findById(user, (err, user) => {
         done(null, user);
     })
@@ -56,9 +55,11 @@ passport.use(loginUser);
 // Connect to database
 mongoose.connect(process.env.MONG_URI)
     .then(() => {
-        app.listen(process.env.PORT, () => {
-            console.log('connected to database and listening to port: ', process.env.PORT);
-        });
+        if (process.env.NODE_ENV !== 'test') {
+            app.listen(process.env.PORT, () => {
+                console.log('connected to database and listening to port: ', process.env.PORT);
+            });
+        }
     })
     .catch(error => {
         console.log(error);
