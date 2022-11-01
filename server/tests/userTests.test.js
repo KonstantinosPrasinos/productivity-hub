@@ -12,13 +12,13 @@ describe('Test User', () => {
     test('Login Success', async () => {
         await request(server)
             .post('/api/user/login')
-            .send({email: 'temp@email.com', password: 'asdfafasd'})
+            .send({email: 'user1@email.com', password: 'password'})
             .expect(200)
             .then(response => {
                 expect(response.body).toEqual(expect.objectContaining({user: {
                                 __v: expect.any(Number),
                                 _id: expect.any(String),
-                                local: expect.objectContaining({email: 'temp@email.com'})
+                                local: expect.objectContaining({email: 'user1@email.com'})
                             }}));
             })
     })
@@ -26,25 +26,25 @@ describe('Test User', () => {
     test('Login Failure', async () => {
         await request(server)
             .post('/api/user/login')
-            .send({email: 'temp@email.com', password: ''})
+            .send({email: 'user1@email.com', password: ''})
             .expect(400)
     })
 
     test('Register Success', async () => {
-        const a = await User.findOneAndDelete({'local.email': 'temp@email.com'});
+        const a = await User.findOneAndDelete({'local.email': 'userRegister@email.com'});
         if (a) {
             await Settings.findOneAndDelete({'userId': a._id});
         }
 
         await request(server)
             .post('/api/user/signup')
-            .send({email: 'temp@email.com', password: 'asdfafasd'})
+            .send({email: 'userRegister@email.com', password: 'password'})
             .expect(200)
             .then(response => {
                 expect(response.body).toEqual(expect.objectContaining({user: {
                         __v: expect.any(Number),
                         _id: expect.any(String),
-                        local: expect.objectContaining({email: 'temp@email.com'}),
+                        local: expect.objectContaining({email: 'userRegister@email.com'}),
                     }}));
             })
     })
@@ -52,7 +52,7 @@ describe('Test User', () => {
     test('Register Failure (User already exists)' , async () => {
         await request(server)
             .post('/api/user/signup')
-            .send({email: 'temp@email.com', password: 'asdfafasd'})
+            .send({email: 'userRegister@email.com', password: 'password'})
             .expect(409)
             .then(response => {
                 expect(response.body).toEqual({error: 'User already exists.'});
@@ -74,12 +74,12 @@ describe('Test User', () => {
         // Register user
         await request(server)
             .post('/api/user/signup')
-            .send({email: 'temp2@email.com', password: 'asdfafasd'})
+            .send({email: 'userDelete@email.com', password: 'password'})
 
         // Log in as user
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'temp2@email.com', password: 'asdfafasd'});
+            .send({email: 'userDelete@email.com', password: 'password'});
 
 
         // Get session cookie for next request
@@ -89,16 +89,14 @@ describe('Test User', () => {
         await request(server)
             .post('/api/user/delete')
             .set('Cookie', cookie)
-            .send({email: 'temp2@email.com', password: 'asdfafasd'})
+            .send({email: 'userDelete@email.com', password: 'password'})
             .expect(200)
             .then(async () => {
                 // Attempt to log in again but fail to
                 await request(server)
                     .post('/api/user/login')
-                    .send({email: 'temp2@email.com', password: 'asdfafasd'})
-                    .then(promise => {
-                        console.log(promise.statusCode, promise.body)
-                    })
+                    .send({email: 'userDelete@email.com', password: 'password'})
+                    .expect(401)
             })
 
     })

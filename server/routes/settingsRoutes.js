@@ -1,8 +1,9 @@
 const express = require('express');
-const {getSettings} = require('../controllers/settingsController');
+const {getSettings, updateSettings} = require('../controllers/settingsController');
 
 const router = express.Router();
 
 router.get('/', getSettings);
+router.post('/update', updateSettings);
 
 module.exports = router;

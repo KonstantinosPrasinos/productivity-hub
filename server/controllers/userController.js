@@ -19,6 +19,7 @@ const signupUser = (req, res) => {
 
         const hashedPassword = bcrypt.hashSync(password, 10);
         const user = await User.create({local: {email: email, password: hashedPassword}});
+        await Settings.create({userId: user._id});
 
         return res.json({user: {...user._doc, local: {email, password: undefined}, google: undefined}});
     });

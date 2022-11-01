@@ -10,15 +10,13 @@ describe('Settings Tests', () => {
     })
 
     test('Get Settings Success', async () => {
-        let cookie;
-
         // log in
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'temp@email.com', password: 'asdfafasd'});
+            .send({email: 'settings@email.com', password: 'password'});
 
         const userId = response.body.user._id;
-        cookie = response.headers['set-cookie'];
+        const cookie = response.headers['set-cookie'];
 
         await request(server)
             .get('/api/settings')
@@ -41,6 +39,31 @@ describe('Settings Tests', () => {
             .expect(401)
             .then(response => {
                 expect(response.body).toEqual({message: 'Not authorized'});
+            })
+    })
+
+    test('Set Settings success', async () => {
+        // log in
+        const response = await request(server)
+            .post('/api/user/login')
+            .send({email: 'settings@email.com', password: 'password'});
+
+        const userId = response.body.user._id;
+        const cookie = response.headers['set-cookie'];
+
+        await request(server)
+            .post('/api/settings/update')
+            .set('Cookie', cookie)
+            .send({theme: 'Dark', defaults: {step: 10}})
+            .expect(200)
+            .then(finalResponse => {
+                expect(finalResponse.body.settings).toEqual(expect.objectContaining({
+                    __v: expect.any(Number),
+                    _id: expect.any(String),
+                    defaults: expect.objectContaining({goal: 1, priority: 1, step: 10}),
+                    theme: expect.stringMatching('Dark'),
+                    userId: expect.stringMatching(userId)
+                }));
             })
     })
 })
