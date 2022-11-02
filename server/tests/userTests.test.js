@@ -3,6 +3,7 @@ const request = require('supertest');
 const User = require("../models/userSchema");
 const Settings = require('../models/settingsSchema');
 const mongoose = require('mongoose')
+const bcrypt = require("bcrypt");
 
 describe('Test User', () => {
     afterAll(() => {
@@ -99,5 +100,34 @@ describe('Test User', () => {
                     .expect(401)
             })
 
+    })
+
+    test('Change User Password', async () => {
+        // Log in as user
+        const response = await request(server)
+            .post('/api/user/login')
+            .send({email: 'user2@email.com', password: 'password'});
+
+        // Get session cookie for next request
+        const id = response.body.user._id;
+        const cookie = response.headers['set-cookie'];
+
+        // Change password to password 2
+        await request(server)
+            .post('/api/user/change-password')
+            .set('Cookie', cookie)
+            .send({password: 'password', newPassword: 'password2'})
+            .expect(200)
+            .then(response => {
+                expect(response.body).toEqual({message: 'Password changed successfully.'});
+            })
+
+        // Re hash password
+        const hashedPassword = bcrypt.hashSync('password', 10)
+
+        // Reset password to password hashed above
+        const user = await User.findByIdAndUpdate(id, {$set: {'local.password': hashedPassword}});
+
+        expect(bcrypt.compareSync('password2', user.local.password)).toBe(true);
     })
 })

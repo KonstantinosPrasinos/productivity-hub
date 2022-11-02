@@ -72,4 +72,31 @@ const deleteUser = (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser};
+const changePassword = async (req, res) => {
+    if (req.user) {
+        const {password, newPassword}  = req.body;
+
+        if (!password) {
+            return res.status(400).json({message: 'Password required.'});
+        }
+
+        if (!bcrypt.compareSync(password, req.user.local.password)) {
+            res.status(400).json({message: 'Incorrect password.'});
+        }
+
+        if (password === newPassword) {
+            res.status(400).json({message: 'New password is the same as the old password.'})
+        }
+
+
+        const id = req.user._id.valueOf();
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        await User.findByIdAndUpdate(id, {$set: {'local.password': hashedPassword}});
+
+        return res.status(200).json({message: 'Password changed successfully.'});
+    }
+}
+
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword};
