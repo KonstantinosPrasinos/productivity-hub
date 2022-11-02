@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const {signupUser, logoutUser, deleteUser, changePassword} = require('../controllers/userController');
+const {signupUser, logoutUser, deleteUser, changePassword, changeEmail} = require('../controllers/userController');
 
 const router = express.Router();
 
@@ -20,6 +20,7 @@ router.post('/login',
 router.post('/signup', signupUser);
 router.post('/logout', logoutUser);
 router.post('/delete', deleteUser);
-router.post('/change-password', changePassword)
+router.post('/change-password', changePassword);
+router.post('/change-email', changeEmail);
 
 module.exports = router;

@@ -28,8 +28,8 @@ const signupUser = (req, res) => {
 const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
     User.findOne({'local.email': email}, (err, user) =>{
         if (err) {return done(err)}
-        if (!user) {return done(null, false, {message: 'Incorrect username or password.'})}
-        if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect username or password.' })}
+        if (!user) {return done(null, false, {message: 'Incorrect email or password.'})}
+        if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect email or password.' })}
 
         return done(null, user);
     })
@@ -48,12 +48,13 @@ const logoutUser = (req, res) => {
 const deleteUser = (req, res) => {
     if (req.user) {
         const {email, password} = req.body;
+
         if (!email || !password) {
             return res.status(400).json({message: 'All fields must be filled.'});
         }
 
         if (!bcrypt.compareSync(password, req.user.local.password)) {
-            res.status(400).json({message: 'Incorrect username or password.'});
+            res.status(400).json({message: 'Incorrect email or password.'});
         }
 
         Settings.findOneAndDelete({'userId': req.user.id})
@@ -69,6 +70,8 @@ const deleteUser = (req, res) => {
         res.clearCookie('connect.sid');
 
         return res.status(200).json({message: 'User deleted successfully.'});
+    } else {
+        res.status(401).send({message: "Not authorized"});
     }
 }
 
@@ -76,8 +79,8 @@ const changePassword = async (req, res) => {
     if (req.user) {
         const {password, newPassword}  = req.body;
 
-        if (!password) {
-            return res.status(400).json({message: 'Password required.'});
+        if (!password || !newPassword) {
+            return res.status(400).json({message: 'Password and new password required.'});
         }
 
         if (!bcrypt.compareSync(password, req.user.local.password)) {
@@ -87,7 +90,6 @@ const changePassword = async (req, res) => {
         if (password === newPassword) {
             res.status(400).json({message: 'New password is the same as the old password.'})
         }
-
 
         const id = req.user._id.valueOf();
 
@@ -99,4 +101,30 @@ const changePassword = async (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword};
+const changeEmail = async (req, res) => {
+    if (req.user) {
+        const {email, password, newEmail} = req.body;
+
+        if (!email || !password || !newEmail) {
+            return res.status(400).json({message: 'All fields must be filled.'});
+        }
+
+        if (!bcrypt.compareSync(password, req.user.local.password)) {
+            res.status(400).json({message: 'Incorrect email or password.'});
+        }
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({message: 'Email is invalid.'})
+        }
+
+        const id = req.user._id.valueOf();
+
+        await User.findByIdAndUpdate(id, {$set: {'local.email': newEmail}})
+
+        return res.status(200).json({message: 'Email changed successfully.'});
+    } else {
+        res.status(401).send({message: "Not authorized"});
+    }
+}
+
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail};

@@ -130,4 +130,31 @@ describe('Test User', () => {
 
         expect(bcrypt.compareSync('password2', user.local.password)).toBe(true);
     })
+
+    test('Change User Email', async () => {
+        // Log in as user
+        const response = await request(server)
+            .post('/api/user/login')
+            .send({email: 'user2@email.com', password: 'password'});
+
+        // Get session cookie for next request
+        const id = response.body.user._id;
+        const cookie = response.headers['set-cookie'];
+
+        // Change email to user2Changed
+        await request(server)
+            .post('/api/user/change-email')
+            .set('Cookie', cookie)
+            .send({email: 'user2@email.com', password: 'password', newEmail: 'user2Changed@email.com'})
+            .expect(200)
+            .then(response => {
+                expect(response.body).toEqual({message: 'Email changed successfully.'});
+            })
+
+        // Reset email to user2
+        const user = await User.findByIdAndUpdate(id, {$set: {'local.email': 'user2@email.com'}});
+
+        // Take the response from the query (which is the user before the change) and make sure the email was changed properly
+        expect(user.local.email).toBe('user2Changed@email.com');
+    })
 })
