@@ -5,7 +5,7 @@ const getSettings = async (req, res) => {
         const userId = req.user._id;
 
         Settings.findOne({'userId': userId}, async (err, settings) => {
-            if (settings) {return res.status(200).json(settings)}
+            if (settings) {return res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined})}
 
             return res.status(404).json({message: 'Settings not found.'});
         });
@@ -24,31 +24,25 @@ const updateSettings = async (req, res) => {
         let update = {};
 
         if (theme) {
-            update.theme = theme;
+            update['theme'] = theme;
         }
 
-        const defaults = {};
-
         if (defaultStep) {
-            defaults.step = defaultStep;
+            update['defaults.step'] = defaultStep;
         }
 
         if (defaultPriority) {
-            defaults.priority = defaultPriority;
+            update['defaults.priority'] = defaultPriority;
         }
 
         if (defaultGoal) {
-            defaults.goal = defaultGoal;
+            update['defaults.goal'] = defaultGoal;
         }
 
-        if (Object.keys(defaults).length !== 0) {
-            update.defaults = defaults;
-        }
-
-        const settings = await Settings.findOneAndUpdate({'userId': req.user._id}, update, {new: true});
+        const settings = await Settings.findOneAndUpdate({'userId': req.user._id}, {$set: update}, {new: true});
 
         if (settings) {
-            res.status(200).json({settings: settings})
+            res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined});
         } else {
             res.status(404).json({message: 'Settings not found.'})
         }

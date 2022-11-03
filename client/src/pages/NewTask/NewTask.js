@@ -13,7 +13,7 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
-import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
+import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";

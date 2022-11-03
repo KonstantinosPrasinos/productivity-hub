@@ -17,7 +17,7 @@ import customStyles from './NewCategory.module.scss';
 import {addGroup, removeGroup, setGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
-import {setHighestPriority, setLowestPriority} from "../../state/userSlice";
+import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 
 const NewCategory = ({index, length, id}) => {

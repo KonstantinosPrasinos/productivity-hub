@@ -13,16 +13,17 @@ import Button from "../../components/buttons/Button/Button";
 import {useDispatch, useSelector} from "react-redux";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
-import {setDefaultGoal, setDefaultPriority, setDefaultStep, setTheme} from "../../state/userSlice";
+import {setDefaultGoal, setDefaultPriority, setDefaultStep, setTheme} from "../../state/settingsSlice";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import {ModalContext} from "../../context/ModalContext";
 import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
 import PasswordStrengthBar from "react-password-strength-bar";
+import {UserContext} from "../../context/UserContext";
 
 const Settings = () => {
-    const {theme, defaults} = useSelector((state) => state?.user.settings);
-    const email = useSelector((state) => state?.user.email);
+    const {theme, defaults} = useSelector((state) => state?.settings);
+    const email = useContext(UserContext).state.email;
 
     const {verifyPassword} = useVerify();
     const alertsContext = useContext(AlertsContext);

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import styles from './LogInPage.module.scss';
 import Button from "../../components/buttons/Button/Button";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
@@ -9,11 +9,12 @@ import PasswordStrengthBar from "react-password-strength-bar";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import {useVerify} from "../../hooks/useVerify";
 import TextButton from "../../components/buttons/TextButton/TextButton";
-import {useLogin} from "../../hooks/useLogin";
+import {useAuth} from "../../hooks/useAuth";
+import {UserContext} from "../../context/UserContext";
 
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
-    const {login, getData} = useLogin();
+    const {login} = useAuth();
     const {verifyVerificationCode} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -24,6 +25,7 @@ const LogInPage = () => {
 
     const [passwordScore, setPasswordScore] = useState();
     const alertsContext = useContext(AlertsContext);
+    const user = useContext(UserContext).state;
     const navigate = useNavigate();
 
     const handleVerificationCode = (e) => {
@@ -48,13 +50,10 @@ const LogInPage = () => {
     }
 
     const handleContinue = () => {
-        console.log(email, password);
         if (selectedTab === 0) {
             if (currentPage === 0) {
                 // Attempt login
-                console.log(email, password);
                 const temp = login(email, password);
-                console.log(temp);
             } else {
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
@@ -94,6 +93,12 @@ const LogInPage = () => {
     const handleForgotPassword = () => {
         navigate('/password-reset')
     }
+
+    useEffect(() => {
+        if (user.id) {
+            navigate('/');
+        }
+    }, [user])
 
     return (
         <div className={'Overlay Opaque'}>
@@ -156,7 +161,6 @@ const LogInPage = () => {
                         </Button>
                     </div>
                 </SwitchContainer>
-                <Button onClick={() => getData()}>Click me to get data</Button>
             </div>
         </div>
     );

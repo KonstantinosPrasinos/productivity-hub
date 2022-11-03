@@ -10,7 +10,7 @@ router.post('/login',
         const user = JSON.parse(JSON.stringify(req.user))
 
         if (user) {
-            delete user.password
+            delete user.local.password;
         }
 
         return res.json({ user: user })

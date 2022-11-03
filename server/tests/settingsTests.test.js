@@ -1,6 +1,7 @@
 const request = require("supertest");
 const server = require("../server");
 const mongoose = require('mongoose')
+const Settings = require('../models/settingsSchema');
 
 jest.setTimeout(10 * 1000)
 
@@ -15,7 +16,6 @@ describe('Settings Tests', () => {
             .post('/api/user/login')
             .send({email: 'settings@email.com', password: 'password'});
 
-        const userId = response.body.user._id;
         const cookie = response.headers['set-cookie'];
 
         await request(server)
@@ -24,11 +24,8 @@ describe('Settings Tests', () => {
             .expect(200)
             .then(finalResponse => {
                 expect(finalResponse.body).toEqual(expect.objectContaining({
-                    __v: expect.any(Number),
-                    _id: expect.any(String),
                     defaults: expect.objectContaining({step: 1, goal: 1, priority: 1}),
-                    theme: expect.stringMatching('Light'),
-                    userId: expect.stringMatching(userId)
+                    theme: expect.stringMatching('Light')
                 }));
             })
     })
@@ -57,13 +54,12 @@ describe('Settings Tests', () => {
             .send({theme: 'Dark', defaults: {step: 10}})
             .expect(200)
             .then(finalResponse => {
-                expect(finalResponse.body.settings).toEqual(expect.objectContaining({
-                    __v: expect.any(Number),
-                    _id: expect.any(String),
+                expect(finalResponse.body).toEqual(expect.objectContaining({
                     defaults: expect.objectContaining({goal: 1, priority: 1, step: 10}),
-                    theme: expect.stringMatching('Dark'),
-                    userId: expect.stringMatching(userId)
+                    theme: expect.stringMatching('Dark')
                 }));
             })
+
+        await Settings.findOneAndUpdate({userId: userId}, {$set: {'theme': 'Light', 'defaults': {goal: 1, priority: 1, step: 1}}});
     })
 })
