@@ -5,6 +5,8 @@ const Settings = require('../models/settingsSchema');
 const mongoose = require('mongoose')
 const bcrypt = require("bcrypt");
 
+jest.setTimeout(20000);
+
 describe('Test User', () => {
     afterAll(() => {
         mongoose.connection.close();
@@ -135,7 +137,8 @@ describe('Test User', () => {
         // Log in as user
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'user2@email.com', password: 'password'});
+            .send({email: 'user2@email.com', password: 'password'})
+            .expect(200);
 
         // Get session cookie for next request
         const id = response.body.user._id;
@@ -148,7 +151,11 @@ describe('Test User', () => {
             .send({email: 'user2@email.com', password: 'password', newEmail: 'user2Changed@email.com'})
             .expect(200)
             .then(response => {
-                expect(response.body).toEqual({message: 'Email changed successfully.'});
+                expect(response.body).toEqual(expect.objectContaining({user: {
+                        __v: expect.any(Number),
+                        _id: expect.any(String),
+                        local: expect.objectContaining({email: 'user2Changed@email.com'}),
+                    }}));
             })
 
         // Reset email to user2

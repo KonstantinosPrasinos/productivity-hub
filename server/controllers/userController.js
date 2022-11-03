@@ -119,9 +119,9 @@ const changeEmail = async (req, res) => {
 
         const id = req.user._id.valueOf();
 
-        await User.findByIdAndUpdate(id, {$set: {'local.email': newEmail}})
+        const editedUser = await User.findByIdAndUpdate(id, {$set: {'local.email': newEmail}}, {returnNewDocument: true})
 
-        return res.status(200).json({message: 'Email changed successfully.'});
+        return res.status(200).json({user: {...editedUser._doc, local: {email: newEmail, password: undefined}, google: undefined}});
     } else {
         res.status(401).send({message: "Not authorized"});
     }

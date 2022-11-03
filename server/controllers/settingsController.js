@@ -5,12 +5,12 @@ const getSettings = async (req, res) => {
         const userId = req.user._id;
 
         Settings.findOne({'userId': userId}, async (err, settings) => {
-            if (settings) {return res.json(settings)}
+            if (settings) {return res.status(200).json(settings)}
 
-            return res.status(404).json({message: 'Settings not found'});
+            return res.status(404).json({message: 'Settings not found.'});
         });
     } else {
-        res.status(401).send({message: "Not authorized"});
+        res.status(401).send({message: "Not authorized."});
     }
 }
 
@@ -53,7 +53,7 @@ const updateSettings = async (req, res) => {
             res.status(404).json({message: 'Settings not found.'})
         }
     } else {
-        res.status(401).send({message: "Not authorized"});
+        res.status(401).send({message: "Not authorized."});
     }
 }
 

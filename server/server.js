@@ -6,10 +6,14 @@ const passport = require('passport');
 const session = require('express-session');
 const cors = require('cors')
 
+const {loginUser} = require('./controllers/userController');
+const User = require('./models/userSchema');
+
 const userRoutes = require('./routes/userRoutes');
-const {loginUser} = require('./controllers/userController')
-const User = require('./models/userSchema')
+const taskRoutes = require('./routes/taskRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const groupRoutes = require('./routes/groupRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 // Express app
 const app = express();
@@ -49,6 +53,9 @@ passport.deserializeUser(function(user, done) {
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/settings', settingsRoutes)
+app.use('/api/tasks', taskRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/categories', categoryRoutes);
 
 passport.use(loginUser);
 
