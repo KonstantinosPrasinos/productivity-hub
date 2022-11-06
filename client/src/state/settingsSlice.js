@@ -7,6 +7,9 @@ export const settingsSlice = createSlice({
         setSettings: (state, action) => {
             return action.payload;
         },
+        removeSettings: () => {
+            return null;
+        },
         setTheme: (state, action) => {
             state.theme = ['Light', 'Dark', 'Black', 'Device'].includes(action.payload) ? action.payload : state.settings.theme;
         },
@@ -28,6 +31,6 @@ export const settingsSlice = createSlice({
     }
 })
 
-export const {setTheme, setDefaultGoal, setDefaultPriority, setDefaultStep, setLowestPriority, setHighestPriority, setSettings} = settingsSlice.actions;
+export const {setTheme, setDefaultGoal, setDefaultPriority, setDefaultStep, setLowestPriority, setHighestPriority, setSettings, removeSettings} = settingsSlice.actions;
 
 export default settingsSlice.reducer;

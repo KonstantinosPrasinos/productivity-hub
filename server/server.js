@@ -14,6 +14,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const verificationRoutes = require('./routes/verificationRoutes');
 
 // Express app
 const app = express();
@@ -56,6 +57,7 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/tasks', taskRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/verify', verificationRoutes);
 
 passport.use(loginUser);
 

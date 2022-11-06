@@ -14,7 +14,7 @@ import {UserContext} from "../../context/UserContext";
 
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
-    const {login} = useAuth();
+    const {login, register} = useAuth();
     const {verifyVerificationCode} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -49,14 +49,15 @@ const LogInPage = () => {
         }
     }
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (selectedTab === 0) {
             if (currentPage === 0) {
                 // Attempt login
-                const temp = login(email, password);
+                login(email, password);
             } else {
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
+                        const status = await register(email, password);
                         setSelectedTab(1);
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
@@ -95,10 +96,10 @@ const LogInPage = () => {
     }
 
     useEffect(() => {
-        if (user.id) {
+        if (user?.id) {
             navigate('/');
         }
-    }, [user])
+    }, [user, navigate])
 
     return (
         <div className={'Overlay Opaque'}>

@@ -15,30 +15,43 @@ import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 import ListView from "./pages/ListView/ListView";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import {ModalContext} from "./context/ModalContext";
 import {AnimatePresence} from "framer-motion";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
+import {useSettings} from "./hooks/useSettings";
+import {setSettings} from "./state/settingsSlice";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
     const modalContext = useContext(ModalContext);
 
-    const userTheme = useSelector((state) => state?.settings.theme);
+    const settings = useSelector((state) => state?.settings);
+    
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
 
-    const navigate = useNavigate();
+    const {getSettings} = useSettings();
 
-    useEffect(() => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    useEffect(async () => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
       const loggedInUser = localStorage.getItem("user");
+      const settings = localStorage.getItem("settings");
 
       if (loggedInUser) {
           const userObject = JSON.parse(loggedInUser);
           user.dispatch({type: "SET_USER", payload: userObject});
+
+          if (!settings) {
+              await getSettings();
+          } else {
+              dispatch(setSettings(JSON.parse(settings)));
+          }
       } else {
           navigate('/log-in')
       }
@@ -63,7 +76,7 @@ function App() {
             setTheme(getTheme());
         }
 
-        if (userTheme === 'Device' && !matchMediaHasEventListener.current) {
+        if (settings?.theme === 'Device' && !matchMediaHasEventListener.current) {
             matchMediaHasEventListener.current = true;
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDefaultTheme);
         } else if (matchMediaHasEventListener.current) {
@@ -71,7 +84,7 @@ function App() {
             window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDefaultTheme);
         }
 
-    }, [userTheme])
+    }, [settings?.theme])
 
     const getDeviceTheme = () => {
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -81,18 +94,14 @@ function App() {
         }
     }
 
-    useEffect(() => {
-
-    }, [userTheme]);
-
     const getTheme = () => {
-        switch (userTheme) {
+        switch (settings?.theme) {
             case 'Device':
                 return getDeviceTheme();
             case 'Light':
             case 'Dark':
             case 'Midnight':
-                return userTheme;
+                return settings?.theme;
             default:
                 return 'Light'
         }
@@ -180,14 +189,14 @@ function App() {
                         exact
                         path="/log-in"
                         element={
-                            !user.state.id ? <LogInPage/> : <Navigate to="/" />
+                            !user.state?.id ? <LogInPage/> : <Navigate to="/" />
                         }
                     />
                     <Route
                         exact
                         path="/password-reset"
                         element={
-                            !user.state.id ? <ResetPassword/> : <Navigate to="/" />
+                            !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
                         }
                     />
                     <Route path="*" element={<NotFound/>}/>

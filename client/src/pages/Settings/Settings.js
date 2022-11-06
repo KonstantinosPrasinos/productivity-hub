@@ -20,6 +20,7 @@ import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {UserContext} from "../../context/UserContext";
+import {useAuth} from "../../hooks/useAuth";
 
 const Settings = () => {
     const {theme, defaults} = useSelector((state) => state?.settings);
@@ -33,6 +34,7 @@ const Settings = () => {
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordScore, setNewPasswordScore] = useState();
     const [selectedTheme, setSelectedTheme] = useState(theme);
+    const {logout} = useAuth();
 
     const dispatch = useDispatch();
 
@@ -48,6 +50,10 @@ const Settings = () => {
             dispatch(setTheme(selectedTheme));
         }
     }, [selectedTheme]);
+
+    const handleLogOut = async () => {
+        await logout();
+    }
 
     const handleSavePassword = () => {
         if (verifyPassword(currentPassword)) {
@@ -99,7 +105,10 @@ const Settings = () => {
                 <InputWrapper label={'Email'}>
                     {email}
                 </InputWrapper>
-                <InputWrapper label={'ChangeEmail'}>
+                <InputWrapper label={'Log Out'}>
+                    <Button filled={false} size={'small'} onClick={handleLogOut}>Log out</Button>
+                </InputWrapper>
+                <InputWrapper label={'Change Email'}>
                     <Button filled={false} size={'small'} onClick={handleChangeEmail}>Change your Email</Button>
                 </InputWrapper>
                 <InputWrapper label={'Password'}>
