@@ -15,7 +15,7 @@ import {UserContext} from "../../context/UserContext";
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register} = useAuth();
-    const {verifyVerificationCode} = useVerify();
+    const {verifyEmail} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
     const [email, setEmail] = useState('');
@@ -52,12 +52,11 @@ const LogInPage = () => {
     const handleContinue = async () => {
         if (selectedTab === 0) {
             if (currentPage === 0) {
-                // Attempt login
-                login(email, password);
+                await login(email, password);
             } else {
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
-                        const status = await register(email, password);
+                        await register(email, password);
                         setSelectedTab(1);
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
@@ -67,7 +66,7 @@ const LogInPage = () => {
                 }
             }
         } else {
-            if (verifyVerificationCode(verificationCode)) {
+            if (await verifyEmail(email, verificationCode)) {
                 alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Account created successfully"}});
                 setSelectedTab(0);
                 setCurrentPage(0);
