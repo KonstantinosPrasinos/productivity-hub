@@ -38,6 +38,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -51,6 +52,8 @@ passport.deserializeUser(function(user, done) {
     })
 });
 
+passport.use(loginUser);
+
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/settings', settingsRoutes)
@@ -58,8 +61,6 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/verify', verificationRoutes);
-
-passport.use(loginUser);
 
 // Connect to database
 mongoose.connect(process.env.MONG_URI)

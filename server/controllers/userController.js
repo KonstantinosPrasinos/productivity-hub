@@ -2,8 +2,12 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 
+const {sendEmail} = require('../email/sendEmail');
+
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
+const VerificationCode = require('../models/verificationCodeSchema');
+const crypto = require('crypto');
 
 const signupUser = (req, res) => {
     const {email, password} = req.body;
@@ -20,6 +24,12 @@ const signupUser = (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, 10);
         const user = await User.create({local: {email: email, password: hashedPassword}});
         await Settings.create({userId: user._id});
+
+        let randomCode = crypto.randomInt(100000, 999999);
+
+        await VerificationCode.create({userEmail: email, code: bcrypt.hashSync(randomCode.toString(), 10)});
+
+        await sendEmail(randomCode, email);
 
         return res.json({user: {...user._doc, local: {email, password: undefined}, google: undefined}});
     });
