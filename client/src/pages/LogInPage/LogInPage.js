@@ -16,7 +16,7 @@ import SurfaceContainer from "../../components/utilities/SurfaceContainer/Surfac
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
-    const {verifyEmail} = useVerify();
+    const {verifyEmail, isLoading: isLoadingVerify} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
     const [email, setEmail] = useState('');
@@ -71,7 +71,6 @@ const LogInPage = () => {
             }
         } else {
             if (await verifyEmail(email, verificationCode)) {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Account created successfully"}});
                 setSelectedTab(0);
                 setCurrentPage(0);
             } else {
@@ -105,7 +104,7 @@ const LogInPage = () => {
     }, [user, navigate])
 
     return (
-        <SurfaceContainer isLoading={isLoading} isOpaque={true}>
+        <SurfaceContainer isLoading={isLoading || isLoadingVerify} isOpaque={true}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>

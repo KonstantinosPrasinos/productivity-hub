@@ -4,6 +4,15 @@
   .surface {
     border-radius: $base-border-radius;
     border: $base-border;
+    width: 600px;
+  }
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .Surface {
+    height: 100%;
+    width: 100%;
+    padding: 40px;
   }
 }
 

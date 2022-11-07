@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const verifyEmail = (req, res) => {
     const {email, code} = req.body;
 
-    if (!email || !code) {return res.status(400).json({error: 'All fields must be filled.'})}
+    if (!email || !code) {return res.status(400).json({message: 'All fields must be filled.'})}
 
     if (!validator.isEmail(email)) {
         return res.status(400).json({message: 'Email is invalid.'});
@@ -21,7 +21,7 @@ const verifyEmail = (req, res) => {
         await User.findOneAndUpdate({'local.email': email}, {$set: {'active': true}});
         await VerificationCode.findOneAndDelete({userEmail: email});
 
-        return res.status(200).json();
+        return res.status(200).json({message: 'Email verification successful.'});
     })
 }
 
