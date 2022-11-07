@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
 const cors = require('cors')
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const {loginUser} = require('./controllers/userController');
 const User = require('./models/userSchema');
@@ -19,10 +20,17 @@ const verificationRoutes = require('./routes/verificationRoutes');
 // Express app
 const app = express();
 
+// Session store
+const sessionStore = new MongoDBStore({
+    uri: process.env.MONG_URI,
+    collection: 'sessions'
+})
+
 // Middleware
 app.use(express.json());
 app.use(
     session({
+        store: sessionStore,
         secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
@@ -31,6 +39,7 @@ app.use(
         }
     })
 );
+
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
