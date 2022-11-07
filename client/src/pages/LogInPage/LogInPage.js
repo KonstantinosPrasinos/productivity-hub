@@ -15,7 +15,7 @@ import SurfaceContainer from "../../components/utilities/SurfaceContainer/Surfac
 
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
-    const {login, register} = useAuth();
+    const {login, register, isLoading} = useAuth();
     const {verifyEmail} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -57,8 +57,11 @@ const LogInPage = () => {
             } else {
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
-                        await register(email, password);
-                        setSelectedTab(1);
+                        const response = await register(email, password);
+
+                        if (response) {
+                            setSelectedTab(1);
+                        }
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
                     }
@@ -102,7 +105,7 @@ const LogInPage = () => {
     }, [user, navigate])
 
     return (
-        <SurfaceContainer isLoading={true} isOpaque={true}>
+        <SurfaceContainer isLoading={isLoading} isOpaque={true}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>

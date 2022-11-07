@@ -7,9 +7,15 @@ const SurfaceContainer = ({children, isLoading, isOpaque = false}) => {
         <div className={`${styles.container} ${isOpaque ? styles.opaque : ''} `}>
             <div className={styles.surface}>
                 <AnimatePresence>
-                    <motion.div className={isLoading ? styles.loadingContainer : ''} initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}}>
+                    {isLoading && <motion.div
+                        className={styles.loadingContainer}
+                        initial={{opacity: 0}}
+                        animate={{opacity: 1}}
+                        exit={{opacity: 0}}
+                        transition={{duration: 0.2}}
+                    >
                         <div className={styles.loadingIndicator}></div>
-                    </motion.div>
+                    </motion.div>}
                 </AnimatePresence>
                 {children}
             </div>

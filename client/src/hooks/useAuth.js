@@ -1,15 +1,21 @@
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {UserContext} from "../context/UserContext";
 import {useSettings} from "./useSettings";
 import {useDispatch} from "react-redux";
 import {removeSettings} from "../state/settingsSlice";
+import {AlertsContext} from "../context/AlertsContext";
 
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
+    const alertsContext = useContext(AlertsContext);
     const {getSettings} = useSettings();
     const reduxDispatch = useDispatch();
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const login = async (email, password) => {
+        setIsLoading(true);
+
         const response = await fetch('http://localhost:5000/api/user/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -18,7 +24,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Incorrect email or password."}});
         } else {
             const data = await response.json();
 
@@ -27,9 +33,12 @@ export function useAuth() {
 
             await getSettings();
         }
+        setIsLoading(false);
     }
 
     const register = async (email, password) => {
+        setIsLoading(true);
+
         const response = await fetch('http://localhost:5000/api/user/signup', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -38,10 +47,13 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-
-        } else {
-            return true;
+            const data = await response.json();
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            setIsLoading(false);
+            return false;
         }
+        setIsLoading(false);
+        return true;
     }
 
     const logout = async () => {
@@ -52,7 +64,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to log out user."}});
         } else {
             localStorage.removeItem('user');
             localStorage.removeItem('settings');
@@ -61,5 +73,5 @@ export function useAuth() {
         }
     }
 
-    return {login, logout, register}
+    return {login, logout, register, isLoading}
 }

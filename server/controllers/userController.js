@@ -19,7 +19,7 @@ const signupUser = (req, res) => {
     }
 
     User.findOne({'local.email': email}, async (err, userExists) => {
-        if (userExists) {return res.status(409).json({error: 'User already exists.'})}
+        if (userExists) {return res.status(409).json({message: 'User already exists.'})}
 
         const hashedPassword = bcrypt.hashSync(password, 10);
         const user = await User.create({local: {email: email, password: hashedPassword}});
