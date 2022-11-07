@@ -7,6 +7,8 @@ import ScreenSizeContextProvider from './context/ScreenSizeContext';
 import AlertsContextProvider from './context/AlertsContext';
 import MiniPagesContextProvider from "./context/MiniPagesContext";
 import ModalContextProvider from "./context/ModalContext";
+import UserContextProvider from "./context/UserContext";
+import {BrowserRouter} from "react-router-dom";
 
 ReactDOM.render(
     <React.StrictMode>
@@ -15,7 +17,11 @@ ReactDOM.render(
                 <ScreenSizeContextProvider>
                     <MiniPagesContextProvider>
                         <ModalContextProvider>
-                            <App/>
+                            <UserContextProvider>
+                                <BrowserRouter>
+                                    <App/>
+                                </BrowserRouter>
+                            </UserContextProvider>
                         </ModalContextProvider>
                     </MiniPagesContextProvider>
                 </ScreenSizeContextProvider>

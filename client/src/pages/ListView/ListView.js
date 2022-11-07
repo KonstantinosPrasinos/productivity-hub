@@ -46,8 +46,8 @@ const ListView = () => {
                     exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                     layout
 
-                    className={`Rounded-Container Stack-Container
-                                ${styles.categoryContainer}`} key={category.id}
+                    className={`Rounded-Container Stack-Container ${styles.categoryContainer}`}
+                    key={category.id}
                     onClick={() => {
                         miniPagesContext.dispatch({
                             type: 'ADD_PAGE', payload: {type: 'category-view', id: category.id}
@@ -59,7 +59,7 @@ const ListView = () => {
                         <div className={'Title'}>{category.title}</div>
                     </div>
                     {categoryGroups.length > 0 && <ul>
-                        {categoryGroups.map(group => <li>{group.title}</li>)}
+                        {categoryGroups.map((group, index) => <li key={index}>{group.title}</li>)}
                     </ul>}
                 </motion.div>)
             })) : <motion.div

@@ -3,12 +3,12 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import {useContext, useState} from "react";
 import {useSelector} from "react-redux";
-import {motion} from 'framer-motion';
 import {ModalContext} from "../../context/ModalContext";
 import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
 
 const ChangeEmail = () => {
     const {verifyPassword, verifyVerificationCode} = useVerify();
@@ -82,80 +82,72 @@ const ChangeEmail = () => {
     }
 
     return (
-        <motion.div
-            className={'Overlay'}
-            initial={{opacity: 0}}
-            animate={{opacity: 1}}
-            exit={{opacity: 0}}
-            transition={{duration: 0.2}}
-        >
-            <div className={`Surface ${styles.surface}`}>
-                <SwitchContainer selectedTab={currentPage}>
-                    <div className={styles.topHalf}>
-                        <div className={styles.infoContainer}>
-                            <div className={'Display'}>Verify your password</div>
-                            <div className={'Label'}>Please enter your password to verify your identity.</div>
-                        </div>
-                        <TextBoxInput type={'password'} width={'max'} size={'big'} placeholder={'Password'} value={password} setValue={setPassword} onKeydown={handleKeyDown}/>
+        <SurfaceContainer>
+            <SwitchContainer selectedTab={currentPage}>
+                <div className={styles.topHalf}>
+                    <div className={styles.infoContainer}>
+                        <div className={'Display'}>Verify your password</div>
+                        <div className={'Label'}>Please enter your password to verify your identity.</div>
                     </div>
-                    <div className={styles.topHalf}>
-                        <div className={styles.infoContainer}>
-                            <div className={'Display'}>Change your email</div>
-                            <div className={'Label'}>
-                                Your current email is {currentEmail}. <br/>
-                                Your email is not visible to anyone.
-                            </div>
+                    <TextBoxInput type={'password'} width={'max'} size={'big'} placeholder={'Password'} value={password} setValue={setPassword} onKeydown={handleKeyDown}/>
+                </div>
+                <div className={styles.topHalf}>
+                    <div className={styles.infoContainer}>
+                        <div className={'Display'}>Change your email</div>
+                        <div className={'Label'}>
+                            Your current email is {currentEmail}. <br/>
+                            Your email is not visible to anyone.
                         </div>
+                    </div>
+                    <TextBoxInput
+                        type={'email'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'New email address'}
+                        value={email}
+                        setValue={setEmail}
+                        onKeydown={handleKeyDown}
+                        invalid={email.length ? !validateEmail() : null}
+                    />
+                </div>
+                <div className={styles.topHalf}>
+                    <div className={styles.infoContainer}>
+                        <div className={'Display'}>We sent you a code</div>
+                        <div className={'Label'}>
+                            If the email you entered exists, is should receive a verification code.
+                            Enter the code below to verify your email.
+                        </div>
+                    </div>
+                    <div>
                         <TextBoxInput
-                            type={'email'}
                             width={'max'}
                             size={'big'}
-                            placeholder={'New email address'}
-                            value={email}
-                            setValue={setEmail}
+                            placeholder={'Verification code'}
+                            value={verificationCode}
+                            setValue={handleVerificationCode}
                             onKeydown={handleKeyDown}
-                            invalid={email.length ? !validateEmail() : null}
+                            invalid={verificationCode.length ? !(verificationCode.length === 6) : null}
                         />
+                        <TextButton>Didn't receive code?</TextButton>
                     </div>
-                    <div className={styles.topHalf}>
-                        <div className={styles.infoContainer}>
-                            <div className={'Display'}>We sent you a code</div>
-                            <div className={'Label'}>
-                                If the email you entered exists, is should receive a verification code.
-                                Enter the code below to verify your email.
-                            </div>
-                        </div>
-                        <div>
-                            <TextBoxInput
-                                width={'max'}
-                                size={'big'}
-                                placeholder={'Verification code'}
-                                value={verificationCode}
-                                setValue={handleVerificationCode}
-                                onKeydown={handleKeyDown}
-                                invalid={verificationCode.length ? !(verificationCode.length === 6) : null}
-                            />
-                            <TextButton>Didn't receive code?</TextButton>
-                        </div>
-                    </div>
-                    <div className={styles.topHalf}>
-                        <div className={styles.infoContainer}>
-                            <div className={'Display'}>Email changed successfully</div>
-                        </div>
-                    </div>
-                </SwitchContainer>
-                <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`} >
-                    {currentPage !== 3 ? <Button
-                        size={'big'}
-                        filled={false}
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </Button> : null}
-                    <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true}>{currentPage !== 3 ? 'Continue' : 'Finish'}</Button>
                 </div>
+                <div className={styles.topHalf}>
+                    <div className={styles.infoContainer}>
+                        <div className={'Display'}>Email changed successfully</div>
+                    </div>
+                </div>
+            </SwitchContainer>
+            <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`} >
+                {currentPage !== 3 ? <Button
+                    size={'big'}
+                    filled={false}
+                    onClick={handleCancel}
+                >
+                    Cancel
+                </Button> : null}
+                <Button size={'big'} filled={checkIfFilled()} onClick={handleNextPage} layout={true}>{currentPage !== 3 ? 'Continue' : 'Finish'}</Button>
             </div>
-        </motion.div>
+        </SurfaceContainer>
     );
 };
 

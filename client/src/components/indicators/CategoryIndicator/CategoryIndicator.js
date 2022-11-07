@@ -10,9 +10,9 @@ const CategoryIndicator = ({category, group, color, categoryId}) => {
             className={`${styles.container} Horizontal-Flex-Container ${color}`}
             onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: categoryId}})}
         >
-            <div>{category}</div>
+            <div className={styles.text}>{category}</div>
             {group && <div>|</div>}
-            {group && <div>{group}</div>}
+            {group && <div className={styles.text}>{group}</div>}
         </button>
     );
 };

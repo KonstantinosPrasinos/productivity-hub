@@ -83,14 +83,23 @@ export function useRenderTasks(usesTime) {
 
     // Add the tasks that aren't in a timeGroup
     tasks.forEach(task => {
-        // Check if the group should be rendered at the current time
-        if (usesTime && task.repeats && !task.timeGroup) {
-            if (!checkTime(task)) {
-                return;
+        // Check if the task should be rendered at the current time
+        // First checks if the component it will be rendered in even cares about time
+        // Then it checks if the task repeats
+        // And then it check if the task is in a timegroup
+        if (task.repeats) {
+            if (!task.timeGroup) {
+                if (usesTime) {
+                    if (checkTime(task)) {
+                        groupedTasks.push(task);
+                    }
+                } else {
+                    groupedTasks.push(task);
+                }
             }
+        } else {
+            groupedTasks.push(task);
         }
-
-        groupedTasks.push(task);
     })
 
     // Sort the tasks to be rendered in increasing priority

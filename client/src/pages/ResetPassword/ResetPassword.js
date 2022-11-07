@@ -1,5 +1,4 @@
 import {useContext, useState} from 'react';
-import styles from './ResetPassword.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
@@ -8,6 +7,7 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {useVerify} from "../../hooks/useVerify";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TextButton from "../../components/buttons/TextButton/TextButton";
+import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
 
 const ResetPassword = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -119,88 +119,86 @@ const ResetPassword = () => {
     }
 
     return (
-        <div className={`Overlay Opaque`}>
-            <div className={`Surface ${styles.surface}`}>
-                <SwitchContainer selectedTab={currentPage}>
-                    <div className={'Stack-Container'}>
-                        <div className={'Display'}>Enter your email</div>
-                        <div className={'Label'}>We will send you a password to verify it's you.</div>
-                        <TextBoxInput
-                            type={'email'}
-                            width={'max'}
-                            size={'big'}
-                            placeholder={'Email address'}
-                            value={email}
-                            setValue={setEmail}
-                            invalid={handleInvalidEmail()}
-                            onKeydown={handleKeyDown}
-                        />
-                    </div>
-                    <div className={'Stack-Container'}>
-                        <div className={'Display'}>We sent you a code</div>
-                        <div className={'Label'}>
-                            If the email you entered exists, is should receive a verification code.
-                            Enter the code below to verify your email.
-                        </div>
-                        <div>
-                            <TextBoxInput
-                                width={'max'}
-                                size={'big'}
-                                placeholder={'Verification code'}
-                                value={verificationCode}
-                                setValue={handleVerificationCode}
-                                onKeydown={handleKeyDown}
-                            />
-                            <TextButton>Didn't receive code?</TextButton>
-                        </div>
-                    </div>
-                    <div className={'Stack-Container'}>
-                        <div className={'Display'}>Enter new password</div>
-                        <TextBoxInput
-                            type={'password'}
-                            width={'max'}
-                            size={'big'}
-                            placeholder={'New password'}
-                            onKeydown={handleKeyDown}
-                            value={newPassword}
-                            setValue={setNewPassword}
-                            invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
-                        />
-                        <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore}/>
-                        <TextBoxInput
-                            type={'password'}
-                            width={'max'}
-                            size={'big'}
-                            placeholder={'Re-enter password'}
-                            onKeydown={handleKeyDown}
-                            value={reEnterPassword}
-                            setValue={setReEnterPassword}
-                        />
-                    </div>
-                    <div className={'Stack-Container'}>
-                        <div className={'Display'}>Password set successfully</div>
-                    </div>
-                </SwitchContainer>
-                <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`}>
-                    {currentPage !== 3 ? <Button
+        <SurfaceContainer isOpaque={true}>
+            <SwitchContainer selectedTab={currentPage}>
+                <div className={'Stack-Container'}>
+                    <div className={'Display'}>Enter your email</div>
+                    <div className={'Label'}>We will send you a password to verify it's you.</div>
+                    <TextBoxInput
+                        type={'email'}
+                        width={'max'}
                         size={'big'}
-                        filled={false}
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </Button> : null}
-                    <Button
-                        size={'big'}
-                        filled={checkIfFilled()}
-                        onClick={handleNextPage}
-                        layout={true}
-                        disabled={handleDisabledButton()}
-                    >
-                        {currentPage !== 4 ? 'Continue' : 'Finish'}
-                    </Button>
+                        placeholder={'Email address'}
+                        value={email}
+                        setValue={setEmail}
+                        invalid={handleInvalidEmail()}
+                        onKeydown={handleKeyDown}
+                    />
                 </div>
+                <div className={'Stack-Container'}>
+                    <div className={'Display'}>We sent you a code</div>
+                    <div className={'Label'}>
+                        If the email you entered exists, is should receive a verification code.
+                        Enter the code below to verify your email.
+                    </div>
+                    <div>
+                        <TextBoxInput
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Verification code'}
+                            value={verificationCode}
+                            setValue={handleVerificationCode}
+                            onKeydown={handleKeyDown}
+                        />
+                        <TextButton>Didn't receive code?</TextButton>
+                    </div>
+                </div>
+                <div className={'Stack-Container'}>
+                    <div className={'Display'}>Enter new password</div>
+                    <TextBoxInput
+                        type={'password'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'New password'}
+                        onKeydown={handleKeyDown}
+                        value={newPassword}
+                        setValue={setNewPassword}
+                        invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
+                    />
+                    <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore}/>
+                    <TextBoxInput
+                        type={'password'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'Re-enter password'}
+                        onKeydown={handleKeyDown}
+                        value={reEnterPassword}
+                        setValue={setReEnterPassword}
+                    />
+                </div>
+                <div className={'Stack-Container'}>
+                    <div className={'Display'}>Password set successfully</div>
+                </div>
+            </SwitchContainer>
+            <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`}>
+                {currentPage !== 3 ? <Button
+                    size={'big'}
+                    filled={false}
+                    onClick={handleCancel}
+                >
+                    Cancel
+                </Button> : null}
+                <Button
+                    size={'big'}
+                    filled={checkIfFilled()}
+                    onClick={handleNextPage}
+                    layout={true}
+                    disabled={handleDisabledButton()}
+                >
+                    {currentPage !== 4 ? 'Continue' : 'Finish'}
+                </Button>
             </div>
-        </div>
+        </SurfaceContainer>
     );
 };
 

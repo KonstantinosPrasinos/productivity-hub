@@ -50,6 +50,10 @@ body {
     position: relative;
 }
 
+* {
+    transition: background-color 0.2s;
+}
+
 .Button {
     display: inline-flex;
     justify-content: center;
@@ -143,37 +147,6 @@ body {
 
     &.Has-Shadow {
         box-shadow: $elevation-1;
-    }
-}
-
-.Overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: var(--overlay-color);
-    z-index: 4;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &.Opaque {
-        background-color: var(--background-color);
-    }
-}
-
-.Surface {
-    background-color: var(--surface-color);
-    padding: 40px 80px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-
-    & > * {
-        margin-top: 10px;
-        margin-bottom: 10px;
     }
 }
 
@@ -273,12 +246,6 @@ button {
         &.To-Edge {
             border-radius: 0;
         }
-    }
-
-    .Surface {
-        height: 100%;
-        width: 100%;
-        padding: 40px;
     }
 }
 
