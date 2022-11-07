@@ -12,10 +12,14 @@ export function useVerify() {
             credentials: 'include'
         });
 
-        if (!response.ok) {
+        const data = await response.json();
 
+        console.log(data.message);
+
+        if (!response.ok) {
+            console.log('not ok')
         } else {
-            console.log(response);
+            console.log('ok')
             return true;
         }
     }

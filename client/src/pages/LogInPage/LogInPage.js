@@ -11,6 +11,7 @@ import {useVerify} from "../../hooks/useVerify";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useAuth} from "../../hooks/useAuth";
 import {UserContext} from "../../context/UserContext";
+import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
 
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -101,68 +102,66 @@ const LogInPage = () => {
     }, [user, navigate])
 
     return (
-        <div className={'Overlay Opaque'}>
-            <div className={`Surface ${styles.surface}`}>
-                <SwitchContainer selectedTab={selectedTab}>
-                    <div className={styles.container}>
-                        <div className={'Display'}>Welcome to Productivity Hub</div>
-                        <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail}/>
+        <SurfaceContainer isLoading={true} isOpaque={true}>
+            <SwitchContainer selectedTab={selectedTab}>
+                <div className={styles.container}>
+                    <div className={'Display'}>Welcome to Productivity Hub</div>
+                    <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail}/>
+                    <TextBoxInput
+                        type={'password'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'Password'}
+                        value={password}
+                        setValue={setPassword}
+                        onKeydown={handleKeyDown}
+                    />
+                    <CollapsibleContainer isVisible={currentPage === 1} hasBorder={false}>
+                        <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} />
                         <TextBoxInput
                             type={'password'}
                             width={'max'}
                             size={'big'}
-                            placeholder={'Password'}
-                            value={password}
-                            setValue={setPassword}
+                            placeholder={'Repeat password'}
+                            value={repeatPassword}
+                            setValue={setRepeatPassword}
                             onKeydown={handleKeyDown}
                         />
-                        <CollapsibleContainer isVisible={currentPage === 1} hasBorder={false}>
-                            <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} />
-                            <TextBoxInput
-                                type={'password'}
-                                width={'max'}
-                                size={'big'}
-                                placeholder={'Repeat password'}
-                                value={repeatPassword}
-                                setValue={setRepeatPassword}
-                                onKeydown={handleKeyDown}
-                            />
-                        </CollapsibleContainer>
-                        <div className={'Horizontal-Flex-Container Space-Between'}>
-                            <Button filled={false} onClick={handleChangeAction}>{currentPage === 0 ? 'Register' : 'Log in'}</Button>
-                            <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
-                        </div>
-                        <Button filled={true} width={'max'} size={'big'} onClick={handleContinue}>{currentPage === 0 ? 'Log in' : 'Register'}</Button>
+                    </CollapsibleContainer>
+                    <div className={'Horizontal-Flex-Container Space-Between'}>
+                        <Button filled={false} onClick={handleChangeAction}>{currentPage === 0 ? 'Register' : 'Log in'}</Button>
+                        <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
-                    <div className={`${styles.container} ${styles.spaceBetween}`}>
-                        <div className={'Display'}>We sent you a code</div>
-                        <div className={'Label'}>
-                            If the email you entered exists, is should receive a verification code.
-                            Enter the code below to verify your email.
-                        </div>
-                        <div>
-                            <TextBoxInput
-                                width={'max'}
-                                size={'big'}
-                                placeholder={'Verification code'}
-                                value={verificationCode}
-                                setValue={handleVerificationCode}
-                                onKeydown={handleKeyDown}
-                            />
-                            <TextButton>Didn't receive code?</TextButton>
-                        </div>
-                        <Button
+                    <Button filled={true} width={'max'} size={'big'} onClick={handleContinue}>{currentPage === 0 ? 'Log in' : 'Register'}</Button>
+                </div>
+                <div className={`${styles.container} ${styles.spaceBetween}`}>
+                    <div className={'Display'}>We sent you a code</div>
+                    <div className={'Label'}>
+                        If the email you entered exists, is should receive a verification code.
+                        Enter the code below to verify your email.
+                    </div>
+                    <div>
+                        <TextBoxInput
                             width={'max'}
                             size={'big'}
-                            filled={verificationCode.length === 6}
-                            onClick={handleVerificationContinue}
-                        >
-                            {verificationCode.length === 6 ? 'Continue' : 'Cancel'}
-                        </Button>
+                            placeholder={'Verification code'}
+                            value={verificationCode}
+                            setValue={handleVerificationCode}
+                            onKeydown={handleKeyDown}
+                        />
+                        <TextButton>Didn't receive code?</TextButton>
                     </div>
-                </SwitchContainer>
-            </div>
-        </div>
+                    <Button
+                        width={'max'}
+                        size={'big'}
+                        filled={verificationCode.length === 6}
+                        onClick={handleVerificationContinue}
+                    >
+                        {verificationCode.length === 6 ? 'Continue' : 'Cancel'}
+                    </Button>
+                </div>
+            </SwitchContainer>
+        </SurfaceContainer>
     );
 };
 
