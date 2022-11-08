@@ -16,7 +16,7 @@ import SurfaceContainer from "../../components/utilities/SurfaceContainer/Surfac
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
-    const {verifyEmail, isLoading: isLoadingVerify} = useVerify();
+    const {verifyEmail, isLoading: isLoadingVerify, resendCode} = useVerify();
 
     const [currentPage, setCurrentPage] = useState(0);
     const [email, setEmail] = useState('');
@@ -73,10 +73,15 @@ const LogInPage = () => {
             if (await verifyEmail(email, verificationCode)) {
                 setSelectedTab(0);
                 setCurrentPage(0);
-            } else {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Verification code is invalid"}});
+                setEmail('');
+                setPassword('');
+                setRepeatPassword('');
             }
         }
+    }
+
+    const handleResendCode = () => {
+        resendCode(email);
     }
 
     const handleVerificationContinue = () => {
@@ -151,7 +156,7 @@ const LogInPage = () => {
                             setValue={handleVerificationCode}
                             onKeydown={handleKeyDown}
                         />
-                        <TextButton>Didn't receive code?</TextButton>
+                        <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
                     </div>
                     <Button
                         width={'max'}

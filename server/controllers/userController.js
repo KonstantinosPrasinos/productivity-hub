@@ -19,19 +19,23 @@ const signupUser = (req, res) => {
     }
 
     User.findOne({'local.email': email}, async (err, userExists) => {
-        if (userExists) {return res.status(409).json({message: 'User already exists.'})}
-
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        const user = await User.create({local: {email: email, password: hashedPassword}});
-        await Settings.create({userId: user._id});
+        if (userExists && userExists.active) {return res.status(409).json({message: 'User already exists.'})}
 
         let randomCode = crypto.randomInt(100000, 999999);
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        if (!userExists) {
+            const user = await User.create({local: {email: email, password: hashedPassword}});
+            await Settings.create({userId: user._id});
+        } else if (!userExists.active) {
+            await VerificationCode.findOneAndDelete({userEmail: email});
+        }
 
         await VerificationCode.create({userEmail: email, code: bcrypt.hashSync(randomCode.toString(), 10)});
 
         await sendEmail(randomCode, email);
 
-        return res.json({user: {...user._doc, local: {email, password: undefined}, google: undefined}});
+        return res.status(200).json({message: 'Email verification code sent.'});
     });
 }
 

@@ -2,15 +2,15 @@ const validator = require("validator");
 const VerificationCode = require('../models/verificationCodeSchema');
 const User = require('../models/userSchema');
 const bcrypt = require("bcrypt");
+const {sendEmail} = require('../email/sendEmail');
+const crypto = require('crypto');
 
 const verifyEmail = (req, res) => {
     const {email, code} = req.body;
 
     if (!email || !code) {return res.status(400).json({message: 'All fields must be filled.'})}
 
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({message: 'Email is invalid.'});
-    }
+    if (!validator.isEmail(email)) {return res.status(400).json({message: 'Email is invalid.'})}
 
     VerificationCode.findOne({userEmail: email}, async (err, verificationCode) => {
         if (err) {return res.statusCode(500).json({message: 'Internal server error.'})}
@@ -25,4 +25,20 @@ const verifyEmail = (req, res) => {
     })
 }
 
-module.exports = {verifyEmail};
+const resendVerifyEmail = async (req, res) => {
+    const {email} = req.body;
+
+    if (!email) {return res.status(400).json({message: 'All fields must be filled.'})}
+
+    if (!validator.isEmail(email)) {return res.status(400).json({message: 'Email is invalid.'})}
+
+    let randomCode = crypto.randomInt(100000, 999999);
+
+    await VerificationCode.findOneAndUpdate({userEmail: email}, {$set: {code: bcrypt.hashSync(randomCode.toString(), 10)}});
+
+    await sendEmail(randomCode, email);
+
+    return res.status(200).json({message: 'Email resent successfully.'});
+}
+
+module.exports = {verifyEmail, resendVerifyEmail};

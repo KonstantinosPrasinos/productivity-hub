@@ -27,7 +27,9 @@ const sendEmail = async (code, email) => {
 
 
 
-    await transporter.sendMail(verifyEmail(email, code));
+    await transporter.sendMail(verifyEmail(email, code), (err) => {
+        return !!err;
+    });
 }
 
 module.exports = {sendEmail};
