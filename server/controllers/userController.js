@@ -7,7 +7,6 @@ const {sendEmail} = require('../email/sendEmail');
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
 const VerificationCode = require('../models/verificationCodeSchema');
-const crypto = require('crypto');
 
 const signupUser = (req, res) => {
     const {email, password} = req.body;
@@ -21,19 +20,14 @@ const signupUser = (req, res) => {
     User.findOne({'local.email': email}, async (err, userExists) => {
         if (userExists && userExists.active) {return res.status(409).json({message: 'User already exists.'})}
 
-        let randomCode = crypto.randomInt(100000, 999999);
         const hashedPassword = bcrypt.hashSync(password, 10);
 
         if (!userExists) {
             const user = await User.create({local: {email: email, password: hashedPassword}});
             await Settings.create({userId: user._id});
-        } else if (!userExists.active) {
-            await VerificationCode.findOneAndDelete({userEmail: email});
         }
 
-        await VerificationCode.create({userEmail: email, code: bcrypt.hashSync(randomCode.toString(), 10)});
-
-        await sendEmail(randomCode, email);
+        await sendEmail(email, 'email');
 
         return res.status(200).json({message: 'Email verification code sent.'});
     });
@@ -77,7 +71,6 @@ const deleteUser = (req, res) => {
             if (err) {
                 return res.status(409).json({message: 'Failed to delete user.' })
             }
-
         });
 
         req.session.destroy();
@@ -89,27 +82,38 @@ const deleteUser = (req, res) => {
     }
 }
 
+const changeUserPassword = async (currentPassword, inputPassword, newPassword, email) => {
+    if (!inputPassword || !newPassword) {
+        return {status: 400, message: 'Password and new password required.'}
+    }
+
+    if (inputPassword === newPassword) {
+        return {status: 400, message: 'New password is the same as the old password.'}
+    }
+
+    if (currentPassword && !bcrypt.compareSync(inputPassword, currentPassword)) {
+        return {status: 400, message: 'Incorrect password.'}
+    }
+
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+    await User.findOneAndUpdate({'local.email': email}, {$set: {'local.password': hashedPassword}});
+
+    return {status: 200};
+}
+
 const changePassword = async (req, res) => {
     if (req.user) {
         const {password, newPassword}  = req.body;
 
-        if (!password || !newPassword) {
-            return res.status(400).json({message: 'Password and new password required.'});
+        const email = req.user.local.email;
+        const currentPassword = req.user.local.password;
+
+        const {status, message} = await changeUserPassword(currentPassword, password, newPassword, email);
+
+        if (status !== 200) {
+            return res.status(status).json({message});
         }
-
-        if (!bcrypt.compareSync(password, req.user.local.password)) {
-            res.status(400).json({message: 'Incorrect password.'});
-        }
-
-        if (password === newPassword) {
-            res.status(400).json({message: 'New password is the same as the old password.'})
-        }
-
-        const id = req.user._id.valueOf();
-
-        const hashedPassword = bcrypt.hashSync(newPassword, 10);
-
-        await User.findByIdAndUpdate(id, {$set: {'local.password': hashedPassword}});
 
         return res.status(200).json({message: 'Password changed successfully.'});
     }
@@ -141,4 +145,46 @@ const changeEmail = async (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail};
+const forgotPasswordSendEmail = async (req, res) => {
+    const {email}  = req.body;
+
+    if (!email) {
+        return res.status(400).json({message: 'Email must be filled.'});
+    }
+
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({message: 'Email is invalid.'})
+    }
+
+    User.findOne({'local.email': email}, async (err, userExists) => {
+        if (userExists && userExists.active) {
+            await sendEmail(email, 'resetPassword')
+        }
+    });
+
+    return res.status(200).json({message: 'If there is an account created with the email you entered, we sent it an email.'});
+}
+
+const forgotPasswordSetPassword = async (req, res) => {
+    const email = req?.session.userEmail;
+
+    if (email) {
+        const {newPassword} = req.body;
+
+        if (!newPassword) {
+            return res.status(400).json({message: 'Password must be filled.'})
+        }
+
+        await VerificationCode.findOneAndDelete({userEmail: email});
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        await User.findOneAndUpdate({'local.email': email}, {$set: {'local.password': hashedPassword}});
+
+        return res.status(200).json({message: 'Password changed successfully.'})
+    } else {
+        return res.status(401).json({message: 'Unauthorized.'})
+    }
+}
+
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail, forgotPasswordSetPassword};

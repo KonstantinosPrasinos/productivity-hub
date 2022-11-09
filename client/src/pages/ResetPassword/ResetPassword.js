@@ -8,6 +8,7 @@ import {useVerify} from "../../hooks/useVerify";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
+import {useAuth} from "../../hooks/useAuth";
 
 const ResetPassword = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -17,7 +18,8 @@ const ResetPassword = () => {
     const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyVerificationCode} = useVerify();
+    const {verifyForgotPassword} = useVerify();
+    const {resetPasswordEmail, setForgotPassword} = useAuth();
     const navigate = useNavigate();
     const alertsContext = useContext(AlertsContext);
 
@@ -67,27 +69,31 @@ const ResetPassword = () => {
         navigate(-1);
     }
 
-    const handleNextPage = () => {
+    const handleNextPage = async () => {
         switch (currentPage) {
             case 0:
                 // Verify email
                 if (validateEmail()) {
+                    await resetPasswordEmail(email);
                     setCurrentPage(1);
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
                 }
                 break;
             case 1:
-                // Verify code
-                if (verifyVerificationCode(verificationCode)) {
+                const redirect = await verifyForgotPassword(email, verificationCode);
+                if (redirect) {
                     setCurrentPage(2);
-                } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Verification code is invalid"}});
                 }
                 break;
             case 2:
                 // Check if password is strong enough
                 if (passwordScore !== 0) {
                     if (reEnterPassword === newPassword){
-                        setCurrentPage(3)
+                        const redirect = await setForgotPassword(newPassword);
+                        if (redirect) {
+                            setCurrentPage(3)
+                        }
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
                     }

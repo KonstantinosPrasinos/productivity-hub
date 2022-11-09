@@ -18,7 +18,7 @@ const LogInPage = () => {
     const {login, register, isLoading} = useAuth();
     const {verifyEmail, isLoading: isLoadingVerify, resendCode} = useVerify();
 
-    const [currentPage, setCurrentPage] = useState(0);
+    const [isSigningUp, setIsSigningUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
@@ -42,19 +42,22 @@ const LogInPage = () => {
     }
 
     const handleChangeAction = () => {
-        if (currentPage === 0) {
-            setCurrentPage(1);
+        if (!isSigningUp) {
+            setIsSigningUp(true);
         } else {
             setRepeatPassword('');
-            setCurrentPage(0);
+            setIsSigningUp(false);
         }
     }
 
     const handleContinue = async () => {
+        // selected tab 0 is login and register, selected tab 1 is verify email
         if (selectedTab === 0) {
-            if (currentPage === 0) {
+            if (!isSigningUp) {
+                // Attempt log in
                 await login(email, password);
             } else {
+                // Attempt sign up
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
                         const response = await register(email, password);
@@ -69,10 +72,11 @@ const LogInPage = () => {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
                 }
             }
-        } else {
+        } else if (selectedTab === 1) {
             if (await verifyEmail(email, verificationCode)) {
+                // Attempt verify email
                 setSelectedTab(0);
-                setCurrentPage(0);
+                setIsSigningUp(false);
                 setEmail('');
                 setPassword('');
                 setRepeatPassword('');
@@ -89,7 +93,7 @@ const LogInPage = () => {
             handleContinue();
         } else {
             setVerificationCode('');
-            setCurrentPage(0);
+            setIsSigningUp(false);
             setSelectedTab(0);
         }
     }
@@ -123,7 +127,7 @@ const LogInPage = () => {
                         setValue={setPassword}
                         onKeydown={handleKeyDown}
                     />
-                    <CollapsibleContainer isVisible={currentPage === 1} hasBorder={false}>
+                    <CollapsibleContainer isVisible={isSigningUp} hasBorder={false}>
                         <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} />
                         <TextBoxInput
                             type={'password'}
@@ -136,10 +140,10 @@ const LogInPage = () => {
                         />
                     </CollapsibleContainer>
                     <div className={'Horizontal-Flex-Container Space-Between'}>
-                        <Button filled={false} onClick={handleChangeAction}>{currentPage === 0 ? 'Register' : 'Log in'}</Button>
+                        <Button filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
                         <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
-                    <Button filled={true} width={'max'} size={'big'} onClick={handleContinue}>{currentPage === 0 ? 'Log in' : 'Register'}</Button>
+                    <Button filled={true} width={'max'} size={'big'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const {sendEmail} = require('../email/sendEmail');
 const crypto = require('crypto');
 
-const verifyEmail = (req, res) => {
+const verifyEmail = (req, res, deleteVerificationCode = true) => {
     const {email, code} = req.body;
 
     if (!email || !code) {return res.status(400).json({message: 'All fields must be filled.'})}
@@ -18,8 +18,13 @@ const verifyEmail = (req, res) => {
 
         if (!bcrypt.compareSync(code, verificationCode.code)) {return res.status(400).json({message: 'Incorrect email or verification code!'})}
 
-        await User.findOneAndUpdate({'local.email': email}, {$set: {'active': true}});
-        await VerificationCode.findOneAndDelete({userEmail: email});
+        if (deleteVerificationCode) {
+            await User.findOneAndUpdate({'local.email': email}, {$set: {'active': true}});
+            await VerificationCode.findOneAndDelete({userEmail: email});
+        } else {
+            req.session.userEmail = email;
+            req.session.cookie.expires = false;
+        }
 
         return res.status(200).json({message: 'Email verification successful.'});
     })
@@ -41,4 +46,8 @@ const resendVerifyEmail = async (req, res) => {
     return res.status(200).json({message: 'Email resent successfully.'});
 }
 
-module.exports = {verifyEmail, resendVerifyEmail};
+const verifyForgotPassword = async (req, res) => {
+    verifyEmail(req, res, false)
+}
+
+module.exports = {verifyEmail, resendVerifyEmail, verifyForgotPassword};

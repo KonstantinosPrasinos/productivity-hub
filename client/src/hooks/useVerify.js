@@ -5,8 +5,25 @@ export function useVerify() {
     const [isLoading, setIsLoading] = useState(false);
     const alertsContext = useContext(AlertsContext);
 
-    const verifyPassword = () => {
-        return true
+    const verifyForgotPassword = async (email, code) => {
+        setIsLoading(true);
+
+        const response = await fetch('http://localhost:5000/api/verify/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({email, code}),
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            setIsLoading(false);
+            return false;
+        } else {
+            setIsLoading(false);
+            return true;
+        }
     }
 
     const verifyEmail = async (email, code) => {
@@ -49,5 +66,5 @@ export function useVerify() {
         }
     }
 
-    return {verifyPassword, verifyEmail, isLoading, resendCode}
+    return {verifyForgotPassword, verifyEmail, isLoading, resendCode}
 }
