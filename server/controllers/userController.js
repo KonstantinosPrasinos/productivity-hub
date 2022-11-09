@@ -181,6 +181,9 @@ const forgotPasswordSetPassword = async (req, res) => {
 
         await User.findOneAndUpdate({'local.email': email}, {$set: {'local.password': hashedPassword}});
 
+        req.session.destroy();
+        res.clearCookie('connect.sid');
+
         return res.status(200).json({message: 'Password changed successfully.'})
     } else {
         return res.status(401).json({message: 'Unauthorized.'})

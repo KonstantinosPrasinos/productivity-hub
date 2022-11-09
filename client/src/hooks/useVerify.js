@@ -26,6 +26,24 @@ export function useVerify() {
         }
     }
 
+    const resendForgotPasswordCode = async (email) => {
+        const response = await fetch('http://localhost:5000/api/verify/forgot-password/resend', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email}),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            return false;
+        } else {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Email resent successfully"}});
+            return true;
+        }
+    }
+
     const verifyEmail = async (email, code) => {
         setIsLoading(true);
 
@@ -48,8 +66,8 @@ export function useVerify() {
         }
     }
 
-    const resendCode = async (email) => {
-        const response = await fetch('http://localhost:5000/api/verify/resend-email', {
+    const resendEmailCode = async (email) => {
+        const response = await fetch('http://localhost:5000/api/verify/email/resend', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email}),
@@ -66,5 +84,5 @@ export function useVerify() {
         }
     }
 
-    return {verifyForgotPassword, verifyEmail, isLoading, resendCode}
+    return {verifyForgotPassword, verifyEmail, isLoading, resendEmailCode, resendForgotPasswordCode}
 }

@@ -30,7 +30,7 @@ const verifyEmail = (req, res, deleteVerificationCode = true) => {
     })
 }
 
-const resendVerifyEmail = async (req, res) => {
+const resendVerifyEmail = async (req, res, type='email') => {
     const {email} = req.body;
 
     if (!email) {return res.status(400).json({message: 'All fields must be filled.'})}
@@ -41,7 +41,7 @@ const resendVerifyEmail = async (req, res) => {
 
     await VerificationCode.findOneAndUpdate({userEmail: email}, {$set: {code: bcrypt.hashSync(randomCode.toString(), 10)}});
 
-    await sendEmail(randomCode, email);
+    await sendEmail(email, type);
 
     return res.status(200).json({message: 'Email resent successfully.'});
 }
@@ -50,4 +50,8 @@ const verifyForgotPassword = async (req, res) => {
     verifyEmail(req, res, false)
 }
 
-module.exports = {verifyEmail, resendVerifyEmail, verifyForgotPassword};
+const resendForgotPasswordEmail = async (req, res) => {
+    await resendVerifyEmail(req, res, 'resetPassword');
+}
+
+module.exports = {verifyEmail, resendVerifyEmail, verifyForgotPassword, resendForgotPasswordEmail};

@@ -16,7 +16,7 @@ import SurfaceContainer from "../../components/utilities/SurfaceContainer/Surfac
 const LogInPage = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
-    const {verifyEmail, isLoading: isLoadingVerify, resendCode} = useVerify();
+    const {verifyEmail, isLoading: isLoadingVerify, resendEmailCode} = useVerify();
 
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [email, setEmail] = useState('');
@@ -84,8 +84,8 @@ const LogInPage = () => {
         }
     }
 
-    const handleResendCode = () => {
-        resendCode(email);
+    const handleResendCode = async () => {
+        await resendEmailCode(email);
     }
 
     const handleVerificationContinue = () => {

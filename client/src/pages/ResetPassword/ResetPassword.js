@@ -18,7 +18,7 @@ const ResetPassword = () => {
     const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyForgotPassword} = useVerify();
+    const {verifyForgotPassword, resendForgotPasswordCode} = useVerify();
     const {resetPasswordEmail, setForgotPassword} = useAuth();
     const navigate = useNavigate();
     const alertsContext = useContext(AlertsContext);
@@ -107,6 +107,10 @@ const ResetPassword = () => {
         }
     }
 
+    const handleResendCode = async () => {
+        await resendForgotPasswordCode(email)
+    }
+
     const handlePasswordScore = (score) => {
         setPasswordScore(score);
     }
@@ -156,7 +160,7 @@ const ResetPassword = () => {
                             setValue={handleVerificationCode}
                             onKeydown={handleKeyDown}
                         />
-                        <TextButton>Didn't receive code?</TextButton>
+                        <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
                     </div>
                 </div>
                 <div className={'Stack-Container'}>
