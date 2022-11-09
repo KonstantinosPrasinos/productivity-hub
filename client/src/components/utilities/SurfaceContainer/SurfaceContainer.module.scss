@@ -2,6 +2,7 @@
 
 @media (min-width: $tablet-breakpoint) {
   .surface {
+    padding: 40px 80px;
     border-radius: $base-border-radius;
     border: $base-border;
     width: 600px;
@@ -9,7 +10,7 @@
 }
 
 @media (max-width: $tablet-breakpoint) {
-  .Surface {
+  .surface {
     height: 100%;
     width: 100%;
     padding: 40px;
@@ -37,7 +38,6 @@
 .surface {
   position: relative;
   background-color: var(--surface-color);
-  padding: 40px 80px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

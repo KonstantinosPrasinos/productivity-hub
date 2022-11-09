@@ -57,6 +57,20 @@ const TextBoxInput = ({
         setPasswordVisible(current => !current);
     }
 
+    const handleType = () => {
+        switch (type) {
+            case 'email':
+                return 'email';
+            case 'password':
+                if (passwordVisible) {
+                    return 'text';
+                }
+                return 'password';
+            default:
+                return 'text';
+        }
+    }
+
     return (<div
         className={`
             ${styles.container}
@@ -70,7 +84,7 @@ const TextBoxInput = ({
         <span className={styles.inputWrapper}>
           <input
               disabled={isDisabled}
-              type={type === 'password' && !passwordVisible ? 'password' : 'text'}
+              type={handleType()}
               className={styles.input} placeholder={placeholder}
               value={value}
               onChange={handleChange}

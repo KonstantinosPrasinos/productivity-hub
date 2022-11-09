@@ -107,10 +107,12 @@ const LogInPage = () => {
     }
 
     useEffect(() => {
-        if (user?.id) {
-            navigate('/');
+        if (!isLoading && !isLoadingVerify) {
+            if (user?.id) {
+                navigate('/');
+            }
         }
-    }, [user, navigate])
+    }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
         <SurfaceContainer isLoading={isLoading || isLoadingVerify} isOpaque={true}>
@@ -128,7 +130,7 @@ const LogInPage = () => {
                         onKeydown={handleKeyDown}
                     />
                     <CollapsibleContainer isVisible={isSigningUp} hasBorder={false}>
-                        <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} />
+                        <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} style={{padding: '0 10px', marginTop: 0}} />
                         <TextBoxInput
                             type={'password'}
                             width={'max'}

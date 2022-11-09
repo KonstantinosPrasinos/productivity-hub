@@ -126,7 +126,7 @@ const Settings = () => {
                             placeholder={'New password'}
                             invalid={newPassword.length ? newPasswordScore === 0 : null}
                         />
-                        <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore} />
+                        <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore} style={{padding: '0 10px', marginTop: 0}} />
                     </InputWrapper>
                     <InputWrapper>
                         <Button filled={false} size={'small'} onClick={handleSavePassword}>Save</Button>
