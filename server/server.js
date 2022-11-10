@@ -66,9 +66,9 @@ passport.use(loginUser);
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/settings', settingsRoutes)
-app.use('/api/tasks', taskRoutes);
-app.use('/api/groups', groupRoutes);
-app.use('/api/categories', categoryRoutes);
+app.use('/api/task', taskRoutes);
+app.use('/api/group', groupRoutes);
+app.use('/api/category', categoryRoutes);
 app.use('/api/verify', verificationRoutes);
 
 // Connect to database

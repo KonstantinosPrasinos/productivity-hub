@@ -26,9 +26,9 @@ const Home = () => {
                         </motion.div>
                     }
                     {tasks.length > 0 && <AnimatePresence initial={false}>
-                        {tasks.map((task) => task.hasOwnProperty('timeGroup') ?
-                            (<Task key={task.id} tasks={[task]}></Task>) :
-                            (<Task key={task.tasks[0].id} tasks={task.tasks}></Task>)
+                        {tasks.map((task) => !task.hasOwnProperty('tasks') ?
+                            (<Task key={task._id} tasks={[task]}></Task>) :
+                            (<Task key={task.tasks[0]._id} tasks={task.tasks}></Task>)
                         )}
                     </AnimatePresence>}
                 </AnimatePresence>

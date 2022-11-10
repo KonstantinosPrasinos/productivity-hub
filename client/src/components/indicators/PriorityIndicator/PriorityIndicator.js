@@ -4,13 +4,12 @@ import {useSelector} from "react-redux";
 
 const PriorityIndicator = () => {
     // Placeholders for until I make the needed context
-    const {low, high} = useSelector((state) => state.user.priorityBounds);
-
+    const settings = useSelector((state) => state?.settings);
     return (
         <div className={`Horizontal-Flex-Container ${styles.container}`}>
-            {low}
+            {settings.priorityBounds.low}
             <TrendingUpIcon />
-            {high}
+            {settings.priorityBounds.high}
         </div>
     );
 };

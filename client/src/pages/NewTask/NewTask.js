@@ -6,8 +6,7 @@ import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import {useDispatch, useSelector} from "react-redux";
-import {v4 as uuidv4} from 'uuid';
-import {addTask, setTask} from "../../state/tasksSlice";
+import {setTask} from "../../state/tasksSlice";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -17,28 +16,29 @@ import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
+import {useTask} from "../../hooks/useTask";
 
 const NewTask = ({index, length, id}) => {
     const categories = useSelector((state) => state?.categories.categories);
     const categoryNames = categories?.map(category => category.title);
-    const {defaults} = useSelector((state) => state?.user.settings);
+    const settings = useSelector((state) => state?.settings);
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
-    const [step, setStep] = useState(defaults.step);
+    const [step, setStep] = useState(settings.defaults.step);
     const [goalType, setGoalType] = useState('At least');
-    const [goalNumber, setGoalNumber] = useState(defaults.goal);
+    const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
     const [category, setCategory] = useState('');
-    const [priority, setPriority] = useState(defaults.priority);
+    const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
-    const [longGoalNumber, setLongGoalNumber] = useState(defaults.goal);
+    const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
-    const [repeatNumber, setRepeatNumber] = useState(defaults.priority);
+    const [repeatNumber, setRepeatNumber] = useState(settings.defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
@@ -46,14 +46,14 @@ const NewTask = ({index, length, id}) => {
 
     const groups = useSelector((state) => state?.groups.groups);
 
-
     const tasks = useSelector((state) => state?.tasks.tasks);
-    const {low, high} = useSelector((state) => state?.user.priorityBounds);
 
     const dispatch = useDispatch();
 
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
+
+    const {addTaskToServer} = useTask();
 
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
@@ -79,7 +79,7 @@ const NewTask = ({index, length, id}) => {
 
     useEffect(() => {
         if (id) {
-            const task = tasks.find(task => task.id === id);
+            const task = tasks.find(task => task._id === id);
 
             setTitle(task.title);
             setType(task.type);
@@ -128,7 +128,7 @@ const NewTask = ({index, length, id}) => {
         setTimePeriod2([]);
     }, [timePeriod])
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const checkAllInputs = () => {
             if (title) {
                 return true
@@ -138,23 +138,10 @@ const NewTask = ({index, length, id}) => {
         }
 
         if (checkAllInputs()) {
-            let localId;
-
-            if (id) {
-                localId = id;
-            } else {
-                let idIsValid = true;
-
-                do {
-                    localId = uuidv4();
-                    idIsValid = !tasks.find(task => task.id === localId);
-                } while (idIsValid === false);
-            }
-
-            if (priority < low) {
+            if (priority < settings.priorityBounds.low) {
                 dispatch(setLowestPriority(priority));
             }
-            if (priority > high) {
+            if (priority > settings.priorityBounds.high) {
                 dispatch(setHighestPriority(priority));
             }
 
@@ -183,30 +170,29 @@ const NewTask = ({index, length, id}) => {
             });
 
             const task = {
-                id: localId,
                 title,
                 type,
-                step: type === 'Number' ? (step ? step : defaults.step) : null,
+                step: type === 'Number' ? (step ? step : settings.defaults.step) : undefined,
                 goal: type === 'Number' ? {
                     type: goalType,
-                    number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.goal)
-                } : null,
-                category: category ? categories.find(localCategory => localCategory.title === category)?.id : null,
-                priority: priority ? priority : defaults.priority,
+                    number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
+                } : undefined,
+                category: category ? categories.find(localCategory => localCategory.title === category)?.id : undefined,
+                priority: priority ? priority : settings.defaults.priority,
                 repeats,
                 longGoal: repeats ? {
-                    goalType: longGoalType,
-                    number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.goal)
-                } : null,
-                expiresAt: repeats ? expiresAt : null,
-                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : null,
+                    type: longGoalType,
+                    number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
+                } : undefined,
+                // expiresAt: repeats ? expiresAt : undefined, // need to fix
+                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : undefined,
                 repeatRate: repeats && !timeGroup ? {
                     number: repeatNumber,
                     bigTimePeriod: timePeriod,
                     smallTimePeriod: timePeriod2,
                     startingDate: startingDates
-                } : null,
-                lastEntryDate: null,
+                } : undefined,
+                lastEntryDate: undefined,
                 previousEntry: 0,
                 shortHistory: '000000'
             }
@@ -214,7 +200,7 @@ const NewTask = ({index, length, id}) => {
             if (id) {
                 dispatch(setTask(task));
             } else {
-                dispatch(addTask(task));
+                await addTaskToServer(task);
             }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})

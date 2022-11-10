@@ -25,9 +25,9 @@ const CurrentProgress = ({ task }) => {
     let percentage;
 
     if (task.type === 'Number') {
-      percentage = Math.round( task.previousEntry / task.goal.number * 100);
+      percentage = Math.round( task.previousEntries.mostRecent / task.goal.number * 100);
     } else {
-      percentage = task.previousEntry;
+      percentage = task.previousEntries.mostRecent;
     }
 
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
@@ -153,17 +153,17 @@ const CurrentProgress = ({ task }) => {
 
       </div>
       {task.type === 'Number' && <div className={`${styles.textContainer}`}>
-        <div>{task.previousEntry} / {task.goal.number} </div>
+        <div>{task.previousEntries.mostRecent} / {task.goal.number} </div>
         <div>|</div>
         <div onClick={() => dispatch(setTaskPreviousEntry({
-          id: task.id,
-          value: parseInt(task.previousEntry) + task.step
+          id: task._id,
+          value: parseInt(task.previousEntries.mostRecent) + task.step
         }))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}` : task.step}</div>
       </div>}
       {task.type === 'Checkbox' && <div className={`${styles.textContainer} ${styles.typeCheckbox}`}>
-        <IconButton color={task.previousEntry === 0 ? 'normal' : 'green'} selected={true} onClick={() => dispatch(setTaskPreviousEntry({
-          id: task.id,
-          value: parseInt(task.previousEntry) === 0 ? 1 : 0
+        <IconButton color={task.previousEntries.mostRecent === 0 ? 'normal' : 'green'} selected={true} onClick={() => dispatch(setTaskPreviousEntry({
+          id: task._id,
+          value: parseInt(task.previousEntries.mostRecent) === 0 ? 1 : 0
         }))}>
           <CheckIcon />
         </IconButton>

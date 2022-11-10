@@ -19,7 +19,7 @@ const MiniPagesHandler = () => {
             case 'new-category':
                 return (<NewCategory key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)
             case 'task-view':
-                return (<TaskView key={index} index={index} length={miniPagesContext.state.length} task={tasks.find(task => task.id === page.id)} />)
+                return (<TaskView key={index} index={index} length={miniPagesContext.state.length} task={tasks.find(task => task._id === page.id)} />)
             case 'category-view':
                 return (<CategoryView key={index} index={index} length={miniPagesContext.state.length} category={categories.find(category => category.id === page.id)} />)
             default: return ''

@@ -6,8 +6,9 @@ import CurrentProgress from "../CurrentProgress/CurrentProgress";
 const VisualStreak = ({ task }) => {
 
   // const [hoveredDate, setHoveredDate] = useState(null);
+  console.log(task);
 
-  const chars = task.shortHistory.split("");
+  const chars = task.previousEntries.value.split("");
   let date = new Date();
   date.setDate(date.getDate() - 7);
 

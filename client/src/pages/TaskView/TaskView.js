@@ -33,7 +33,7 @@ const TaskView = ({index, length, task}) => {
 
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        dispatch(removeTask(task.id))
+        dispatch(removeTask(task._id))
     }
 
     return (
@@ -44,7 +44,7 @@ const TaskView = ({index, length, task}) => {
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Title'}>{task.title}</div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task.id}})}><EditIcon /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}><EditIcon /></IconButton>
                     <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
                 </div>
             </section>

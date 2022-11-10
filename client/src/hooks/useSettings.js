@@ -16,9 +16,9 @@ export function useSettings () {
         } else {
             const data = await response.json();
 
-            dispatch(setSettings(data));
+            dispatch(setSettings({...data, priorityBounds: {low: 1, high: 1}}));
 
-            localStorage.setItem('settings', JSON.stringify(data));
+            localStorage.setItem('settings', JSON.stringify({...data, priorityBounds: {low: 1, high: 1}}));
         }
     }
 

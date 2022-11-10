@@ -21,8 +21,8 @@ const ListView = () => {
 
     const renderTasks = () => (<div className={`Centered Stack-Container ${styles.leftSide}`}>
         <AnimatePresence initial={false} exitBeforeEnter>
-            {tasks.map((task) => task.hasOwnProperty('timeGroup') ? (
-                <Task key={task.id} tasks={[task]}></Task>) : (
+            {tasks.map((task) => !task.hasOwnProperty('tasks') ? (
+                <Task key={task._id} tasks={[task]}></Task>) : (
                 <Task key={task.tasks[0].id} tasks={task.tasks}></Task>))}
             {tasks.length === 0 && <motion.div
                 initial={{opacity: 0, y: 50, scale: 0.3}}

@@ -14,7 +14,7 @@ export function useSafeDeleteCategory(category) {
         groups.map(group => dispatch(removeGroup(group.id)));
 
         // Set category to null for all children tasks
-        tasks.map(task => dispatch(setTaskCategory({id: task.id, value: null})));
+        tasks.map(task => dispatch(setTaskCategory({id: task._id, value: null})));
 
         // Finally delete the category
         dispatch(removeCategory(category.id));

@@ -9,9 +9,13 @@ const Task = new mongoose.Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: true
+    },
     step: Number,
     goal: {
-        goalType: Number,
+        type: String,
         number: Number
     },
     category: Number,
@@ -19,26 +23,34 @@ const Task = new mongoose.Schema({
         type: Number,
         required: true
     },
+    repeats: {
+        type: Boolean,
+        required: true
+    },
     longGoal: {
-        goalType: String,
+        type: {type: String},
         number: Number
     },
     expiresAt: {
-        type: String
+        type: String,
+        timePeriod: String
     },
     timeGroup: String,
     repeatRate: {
-        number: {
-            type: Number
-        },
-        bitTimePeriod: String,
-        smallTimePeriod: String,
-        startingDate: Date,
+        number: Number,
+        bigTimePeriod: String,
+        smallTimePeriod: [String],
+        startingDate: [Number],
         time: {
-            startingTime: Number,
-            endingTime: Number
+            starting: Number,
+            ending: Number
         }
+    },
+    previousEntries: {
+        value: {type: String},
+        latest: {type: Number},
+        mostRecent: {type: Number}
     }
-})
+}, {timestamps: true})
 
 module.exports = mongoose.model('Task', Task)

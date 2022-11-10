@@ -51,7 +51,7 @@ const Task = ({tasks}) => {
                     {(task.repeats || task.category) && <div className={styles.topLine}>
                         <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>
                             {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}
-                            {index === 0 && task.category !== null &&
+                            {index === 0 && task.category &&
                                 <div onClick={(e) => e.stopPropagation()}>
                                     <CategoryIndicator
                                         category={category.title}
