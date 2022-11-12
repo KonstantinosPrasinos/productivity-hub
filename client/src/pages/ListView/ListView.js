@@ -12,7 +12,7 @@ import Chip from "../../components/buttons/Chip/Chip";
 const ListView = () => {
     const miniPagesContext = useContext(MiniPagesContext);
     const screenSizeContext = useContext(ScreenSizeContext);
-    const {tasks} = useRenderTasks(true);
+    const {tasks} = useRenderTasks(false);
     const categories = useSelector(state => state?.categories.categories);
     const groups = useSelector(state => state?.groups.groups);
 

@@ -63,4 +63,20 @@ const createTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask};
+const deleteTask = async (req, res) => {
+    if (req.user) {
+        const {taskId} = req.body;
+
+        Task.findByIdAndDelete(taskId, (err) => {
+            if (err) {
+                return res.status(500).json({message: err});
+            }
+
+            return res.status(200).json({message: 'Task deleted successfully.'})
+        })
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+module.exports = {getTasks, createTask, deleteTask};

@@ -23,8 +23,7 @@ import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInp
 const NewCategory = ({index, length, id}) => {
     const categories = useSelector(state => state?.categories.categories);
     const groups = useSelector((state) => state?.groups.groups);
-    const {defaults} = useSelector((state) => state?.user.settings);
-    const {low, high} = useSelector((state) => state?.user.priorityBounds);
+    const settings = useSelector((state) => state?.settings);
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
@@ -38,7 +37,7 @@ const NewCategory = ({index, length, id}) => {
 
     const [timeGroupTitle, setTimeGroupTitle] = useState('');
     const [priority, setPriority] = useState(0);
-    const [timeGroupNumber, setTimeGroupNumber] = useState(defaults.priority);
+    const [timeGroupNumber, setTimeGroupNumber] = useState(settings.defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
@@ -82,10 +81,10 @@ const NewCategory = ({index, length, id}) => {
             }
 
             timeGroups.forEach(group => {
-                if (group.priority < low) {
+                if (group.priority < settings.priorityBounds.low) {
                     dispatch(setLowestPriority(group.priority));
                 }
-                if (group.priority > high) {
+                if (group.priority > settings.priorityBounds.high) {
                     dispatch(setHighestPriority(group.priority));
                 }
 
@@ -112,7 +111,7 @@ const NewCategory = ({index, length, id}) => {
         setTimeGroupNumber(1);
         setTimePeriod('Weeks');
         setTimePeriod2(null);
-        setPriority(defaults.priority);
+        setPriority(settings.defaults.priority);
     }
 
     const handleTimeGroupSave = () => {
