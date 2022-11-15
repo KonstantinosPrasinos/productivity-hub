@@ -4,7 +4,7 @@ import {useContext, useEffect, useRef, useState} from 'react';
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
-import {addCategory, setCategory} from "../../state/categoriesSlice";
+import {setCategory} from "../../state/categoriesSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -12,13 +12,12 @@ import AddIcon from "@mui/icons-material/Add";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
-import {v4 as uuidv4} from "uuid";
 import customStyles from './NewCategory.module.scss';
-import {addGroup, removeGroup, setGroup} from "../../state/groupsSlice";
+import {removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
-import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import {useCategory} from "../../hooks/useCategory";
 
 const NewCategory = ({index, length, id}) => {
     const categories = useSelector(state => state?.categories.categories);
@@ -26,6 +25,7 @@ const NewCategory = ({index, length, id}) => {
     const settings = useSelector((state) => state?.settings);
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
+    const {addCategoryToServer} = useCategory();
     const miniPagesContext = useContext(MiniPagesContext);
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years']
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
@@ -41,7 +41,7 @@ const NewCategory = ({index, length, id}) => {
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const checkAllInputs = () => {
             if (title) return true
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
@@ -54,53 +54,40 @@ const NewCategory = ({index, length, id}) => {
         }
 
         if (checkAllInputs()) {
-            let localId;
-
-            if (id) {
-                localId = id;
-            } else {
-                let idIsValid = true;
-
-                do {
-                    localId = uuidv4();
-                    idIsValid = !categories.find(category => category.id === localId);
-                } while (idIsValid === false);
-            }
-
             const category = {
-                id: localId,
                 title,
                 color,
-                timeGroups,
             }
 
             if (id) {
                 dispatch(setCategory(category));
+
+                for (const group of groups) {
+                    // Do set group things
+                }
+
             } else {
-                dispatch(addCategory(category));
+                for (index in timeGroups) {
+                    delete timeGroups[index].initial
+                }
+
+                await addCategoryToServer(category, timeGroups);
             }
 
-            timeGroups.forEach(group => {
-                if (group.priority < settings.priorityBounds.low) {
-                    dispatch(setLowestPriority(group.priority));
-                }
-                if (group.priority > settings.priorityBounds.high) {
-                    dispatch(setHighestPriority(group.priority));
-                }
-
-                const tempGroup = {
-                    ...group,
-                    parent: localId
-                }
-
-                delete tempGroup.initial;
-
-                if (id && group.initial) {
-                    dispatch(setGroup(tempGroup));
-                } else {
-                    dispatch(addGroup(tempGroup));
-                }
-            })
+            // for (const group of timeGroups) {
+            //     if (group.priority < settings.priorityBounds.low) {
+            //         dispatch(setLowestPriority(group.priority));
+            //     }
+            //     if (group.priority > settings.priorityBounds.high) {
+            //         dispatch(setHighestPriority(group.priority));
+            //     }
+            //
+            //     if (id && group.initial) {
+            //         dispatch(setGroup(tempGroup));
+            //     } else {
+            //         await addCategoryToServer()
+            //     }
+            // }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
         }
@@ -130,18 +117,7 @@ const NewCategory = ({index, length, id}) => {
             return;
         }
 
-        let id;
-
-        if (!currentEditedGroup.current) {
-            let idIsValid = true;
-
-            do {
-                id = uuidv4();
-                idIsValid = !groups.find(group => group.id === id);
-            } while (idIsValid === false);
-        } else {
-            id = currentEditedGroup.current?.id;
-        }
+        const id = currentEditedGroup.current?.id;
 
         let startingDates = [];
         
@@ -169,7 +145,6 @@ const NewCategory = ({index, length, id}) => {
         });
 
         const timeGroup = {
-            id,
             title: timeGroupTitle,
             priority,
             repeatRate: {
@@ -178,7 +153,6 @@ const NewCategory = ({index, length, id}) => {
                 smallTimePeriod: timePeriod2,
                 startingDate: startingDates
             },
-            parent: null,
             initial: currentEditedGroup.current?.initial
         }
 
@@ -278,7 +252,7 @@ const NewCategory = ({index, length, id}) => {
                     <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
                         <AddIcon/>
                     </IconButton>
-                    {timeGroups.map(group => (<Chip key={group.id} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
+                    {timeGroups.map((group, index) => (<Chip key={index} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
                         {group.title}
                         <IconButton onClick={() => handleDelete(group)}><CloseIcon /></IconButton>
                     </Chip>))}

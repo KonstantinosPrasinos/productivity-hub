@@ -32,7 +32,7 @@ const taskSchema = Joi.object({
 
 const getTasks = async (req, res) => {
     if (req.user) {
-        Task.find({userId: req.user.id}, (err, tasks) => {
+        Task.find({userId: req.user._id}, (err, tasks) => {
             if (tasks) {return res.status(200).json({tasks})}
 
             return res.status(404).json({message: 'Tasks not found.'});
@@ -49,11 +49,19 @@ const createTask = async (req, res) => {
         const validatedTask = taskSchema.validate(task);
 
         if (validatedTask.error) {
-            return res.status(400).json({message: validatedTask.error})
+            return res.status(400).json({message: validatedTask.error});
         }
 
         try {
-            const newTask = await Task.create({...validatedTask.value, userId: req.user._id, previousEntries: {value: '000000', latest: (new Date()).getTime(), mostRecent: 0}});
+            const newTask = await Task.create({
+                ...validatedTask.value,
+                userId: req.user._id,
+                previousEntries: {
+                    value: '000000',
+                    latest: (new Date()).getTime(),
+                    mostRecent: 0
+                }
+            });
             res.status(200).json(newTask);
         } catch (error) {
             res.status(500).json({message: error.message})

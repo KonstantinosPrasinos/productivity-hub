@@ -86,7 +86,7 @@ export function useRenderTasks(usesTime) {
         // Check if the task should be rendered at the current time
         // First checks if the component it will be rendered in even cares about time
         // Then it checks if the task repeats
-        // And then it check if the task is in a timegroup
+        // And then it check if the task is in a time group
         if (task.repeats) {
             if (!task.timeGroup) {
                 if (usesTime) {

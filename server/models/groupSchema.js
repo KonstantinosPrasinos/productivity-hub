@@ -16,14 +16,17 @@ const Group = new mongoose.Schema({
     repeatRate: {
         number: Number,
         bigTimePeriod: String,
-        smallTimePeriod: String,
-        startingDate: Date,
+        smallTimePeriod: [String],
+        startingDate: [Number],
         time: {
             startingTime: Number,
             endingTime: Number
         }
     },
-    parent: String
+    parent: {
+        type: String,
+        required: true
+    }
 })
 
 module.exports = mongoose.model('Group', Group);

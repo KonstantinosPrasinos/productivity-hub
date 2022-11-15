@@ -13,8 +13,7 @@ export const categoriesSlice = createSlice({
             return {categories: temp}
         },
         setCategories: (state, action) => {
-            state.categories.length = 0;
-            state.categories.push(...action.payload);
+            state.categories = action.payload;
         },
         setCategory: (state, action) => {
             const index = state.categories.findIndex(category => category.id === action.payload.id);
