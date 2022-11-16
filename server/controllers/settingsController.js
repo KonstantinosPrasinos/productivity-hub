@@ -1,4 +1,14 @@
-const Settings = require('../models/settingsSchema')
+const Settings = require('../models/settingsSchema');
+const Joi = require('joi');
+
+const settingsSchema = Joi.object({
+    theme: Joi.string().valid('Light', 'Dark', 'Default'),
+    defaults: Joi.object().keys({
+        step: Joi.number().min(0),
+        priority: Joi.number(),
+        goal: Joi.number().min(0)
+    })
+});
 
 const getSettings = async (req, res) => {
     if (req.user) {
@@ -7,7 +17,9 @@ const getSettings = async (req, res) => {
         Settings.findOne({'userId': userId}, async (err, settings) => {
             if (settings) {return res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined})}
 
-            return res.status(404).json({message: 'Settings not found.'});
+            const createdSettings = await Settings.create({userId: user._id});
+
+            return res.status(200).json({...createdSettings._doc, _id: undefined, __v: undefined, userId: undefined})
         });
     } else {
         res.status(401).send({message: "Not authorized."});
@@ -16,36 +28,22 @@ const getSettings = async (req, res) => {
 
 const updateSettings = async (req, res) => {
     if (req.user) {
-        const theme = ['Light', 'Dark', 'Default'].includes(req.body.theme) ? req.body.theme : undefined;
-        const defaultStep = !isNaN(req.body.defaults?.step) ? req.body.defaults?.step : undefined;
-        const defaultPriority = !isNaN(req.body.defaults?.priority) ? req.body.defaults?.priority : undefined;
-        const defaultGoal = !isNaN(req.body.defaults?.goal) ? req.body.defaults?.goal : undefined;
+        const {settings} = req.body;
+        const validatedSettings = settingsSchema.validate(settings);
 
-        let update = {};
-
-        if (theme) {
-            update['theme'] = theme;
+        if (validatedSettings.error) {
+            return res.status(400).json({message: validatedSettings.error});
         }
 
-        if (defaultStep) {
-            update['defaults.step'] = defaultStep;
-        }
+        Settings.findOneAndUpdate({'userId': req.user._id}, {$set: validatedSettings.value}, {new: true}, (err, doc) => {
+            if (err) {
+                return res.status(500).json({message: err});
+            }
 
-        if (defaultPriority) {
-            update['defaults.priority'] = defaultPriority;
-        }
+            console.log(doc);
 
-        if (defaultGoal) {
-            update['defaults.goal'] = defaultGoal;
-        }
-
-        const settings = await Settings.findOneAndUpdate({'userId': req.user._id}, {$set: update}, {new: true});
-
-        if (settings) {
-            res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined});
-        } else {
-            res.status(404).json({message: 'Settings not found.'})
-        }
+            return res.status(200).json({...doc._doc, _id: undefined, __v: undefined, userId: undefined});
+        });
     } else {
         res.status(401).send({message: "Not authorized."});
     }

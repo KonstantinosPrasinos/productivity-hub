@@ -3,9 +3,13 @@
 .container {
     width: 600px;
     height: calc(100% - 4em);
-    overflow-y: auto;
+    overflow: hidden;
     padding: $big-gap !important;
     position: relative;
+}
+
+.subContainer {
+    overflow-y: auto;
 }
 
 .middleContainer {
@@ -20,7 +24,7 @@
     border-bottom: $base-border;
     font-weight: 500;
     background-color: var(--surface-color);
-    z-index: 1;
+    //z-index: 1;
 }
 
 .redirectContainer {
@@ -53,6 +57,26 @@
     flex-direction: column;
     gap: 1.5em;
     width: 100%;
+}
+
+.emailLeftSide {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.emailWrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.saveSettingsContainer {
+    position: absolute;
+    bottom: 2em;
+    right: 2em;
 }
 
 @media (max-width: $tablet-breakpoint) {

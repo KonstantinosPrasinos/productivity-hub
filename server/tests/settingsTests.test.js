@@ -3,7 +3,7 @@ const server = require("../server");
 const mongoose = require('mongoose')
 const Settings = require('../models/settingsSchema');
 
-jest.setTimeout(10 * 1000)
+jest.setTimeout(100 * 1000)
 
 describe('Settings Tests', () => {
     afterAll(() => {
@@ -14,7 +14,7 @@ describe('Settings Tests', () => {
         // log in
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'settings@email.com', password: 'password'});
+            .send({email: 'konstantinos.prasinos@gmail.com', password: 'password1234'});
 
         const cookie = response.headers['set-cookie'];
 
@@ -43,7 +43,7 @@ describe('Settings Tests', () => {
         // log in
         const response = await request(server)
             .post('/api/user/login')
-            .send({email: 'settings@email.com', password: 'password'});
+            .send({email: 'konstantinos.prasinos@gmail.com', password: 'password1234'});
 
         const userId = response.body.user._id;
         const cookie = response.headers['set-cookie'];
@@ -51,7 +51,7 @@ describe('Settings Tests', () => {
         await request(server)
             .post('/api/settings/update')
             .set('Cookie', cookie)
-            .send({theme: 'Dark', defaults: {step: 10}})
+            .send({settings: {theme: 'Dark', defaults: {goal: 1, priority: 1, step: 10}}})
             .expect(200)
             .then(finalResponse => {
                 expect(finalResponse.body).toEqual(expect.objectContaining({

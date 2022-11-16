@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import styles from './LogInPage.module.scss';
+import styles from './LogIn.module.scss';
 import Button from "../../components/buttons/Button/Button";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
@@ -13,7 +13,7 @@ import {useAuth} from "../../hooks/useAuth";
 import {UserContext} from "../../context/UserContext";
 import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
 
-const LogInPage = () => {
+const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
     const {verifyEmail, isLoading: isLoadingVerify, resendEmailCode} = useVerify();
@@ -178,4 +178,4 @@ const LogInPage = () => {
     );
 };
 
-export default LogInPage;
+export default LogIn;

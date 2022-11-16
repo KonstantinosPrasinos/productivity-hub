@@ -1,7 +1,7 @@
 import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
-import LogInPage from "./pages/LogInPage/LogInPage";
+import LogIn from "./pages/LogIn/LogIn";
 import RequireAuth from "./components/etc/RequireAuth";
 import {useContext, useEffect, useRef, useState} from "react";
 
@@ -193,7 +193,7 @@ function App() {
                         exact
                         path="/log-in"
                         element={
-                            !user.state?.id ? <LogInPage/> : <Navigate to="/" />
+                            !user.state?.id ? <LogIn/> : <Navigate to="/" />
                         }
                     />
                     <Route
