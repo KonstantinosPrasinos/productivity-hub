@@ -14,8 +14,7 @@ export const groupsSlice = createSlice({
             return {groups: temp}
         },
         setGroups: (state, action) => {
-            state.groups.length = 0;
-            state.groups.push(...action.payload);
+            state.groups = action.payload;
         },
         setGroup: (state, action) => {
             const index = state.groups.findIndex(group => group.id === action.payload.id);

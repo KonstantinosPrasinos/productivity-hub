@@ -12,7 +12,7 @@ import Chip from "../../components/buttons/Chip/Chip";
 const ListView = () => {
     const miniPagesContext = useContext(MiniPagesContext);
     const screenSizeContext = useContext(ScreenSizeContext);
-    const {tasks} = useRenderTasks(false);
+    const {data, isLoading} = useRenderTasks(false);
     const categories = useSelector(state => state?.categories.categories);
     const groups = useSelector(state => state?.groups.groups);
 
@@ -21,10 +21,10 @@ const ListView = () => {
 
     const renderTasks = () => (<div className={`Centered Stack-Container ${styles.leftSide}`}>
         <AnimatePresence initial={false} exitBeforeEnter>
-            {tasks.map((task) => !task.hasOwnProperty('tasks') ? (
+            {data !== false && !isLoading && data.map((task) => !task.hasOwnProperty('tasks') ? (
                 <Task key={task._id} tasks={[task]}></Task>) : (
                 <Task key={task.tasks[0].id} tasks={task.tasks}></Task>))}
-            {tasks.length === 0 && <motion.div
+            {data !== false && !isLoading && data.length === 0 && <motion.div
                 initial={{opacity: 0, y: 50, scale: 0.3}}
                 animate={{opacity: 1, y: 0, scale: 1}}
                 exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}

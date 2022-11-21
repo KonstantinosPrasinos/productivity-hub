@@ -1,11 +1,19 @@
 import {useSelector} from "react-redux";
+import {useTask} from "./useTask";
+import {useEffect, useState} from "react";
+import {useGroup} from "./useGroup";
+import {useCategory} from "./useCategory";
 
-export function useRenderTasks(usesTime) {
+export function useRenderTasks(usesTime = false) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState(false);
+
     const tasks = useSelector((state) => state?.tasks.tasks);
     const groups = useSelector((state) => state?.groups.groups);
-
-    // Create array of tasks to be rendered
-    const groupedTasks = [];
+    const categories = useSelector((state) => state?.categories.categories);
+    const {isLoading: tasksLoading} = useTask();
+    const {isLoading: groupsLoading} = useGroup();
+    const {isLoading: categoriesLoading} = useCategory();
 
     const checkTime = (task) => {
         const currentDate = new Date();
@@ -59,84 +67,77 @@ export function useRenderTasks(usesTime) {
         return false;
     }
 
-    // Add tasks to array grouped by timeGroup sorted by task priority. Only if they have children tasks
-    groups.forEach(group => {
-
-        // Check if the group should be rendered at the current time
-        if (usesTime) {
-            if (!checkTime(group)) {
-                return;
-            }
-        }
-
-        const groupTasks = tasks.filter(task => task.timeGroup === group.id);
-
-        if (!groupTasks.length) {
+    useEffect(() => {
+        if (tasksLoading || groupsLoading || categoriesLoading) {
+            setIsLoading(true);
             return;
         }
 
-        groupedTasks.push({
-            priority: group.priority,
-            tasks: groupTasks.sort((a, b) => b.priority - a.priority)
-        });
-    });
+        if (tasks === false || groups === false || categories === false) {
+            setData(false);
+            setIsLoading(false);
+            return;
+        }
 
-    // Add the tasks that aren't in a timeGroup
-    tasks.forEach(task => {
-        // Check if the task should be rendered at the current time
-        // First checks if the component it will be rendered in even cares about time
-        // Then it checks if the task repeats
-        // And then it check if the task is in a time group
-        if (task.repeats) {
-            if (!task.timeGroup) {
-                if (usesTime) {
-                    if (checkTime(task)) {
-                        groupedTasks.push(task);
-                    }
-                } else {
-                    groupedTasks.push(task);
+        setIsLoading(true);
+
+        const groupedTasks = [];
+
+        addGroupsToArray(groupedTasks, usesTime);
+        addTasksToArray(groupedTasks, usesTime);
+
+        // Sort the tasks to be rendered in increasing priority
+        groupedTasks.sort((a, b) => b.priority - a.priority);
+
+        setData(groupedTasks);
+        setIsLoading(false);
+
+    }, [tasksLoading, groupsLoading, categoriesLoading]);
+
+    const addGroupsToArray = (groupedTasks, usesTime) => {
+        groups.forEach(group => {
+
+            // Check if the group should be rendered at the current time
+            if (usesTime) {
+                if (!checkTime(group)) {
+                    return;
                 }
             }
-        } else {
-            groupedTasks.push(task);
-        }
-    })
 
-    // Sort the tasks to be rendered in increasing priority
-    groupedTasks.sort((a, b) => b.priority - a.priority);
+            const groupTasks = tasks.filter(task => task.timeGroup === group.id);
 
+            if (!groupTasks.length) {
+                return;
+            }
 
-    // Create arrays for completed and
-    // const completedTasks = [];
-    // const incompleteTasks = [];
-    //
-    // groupedTasks.filter(task => {
-    //     const checkTaskCompletion = (task) => {
-    //         if (task.type === 'Checkbox') {
-    //             if (task.previousEntry === 1) {
-    //                 completedTasks.push(task);
-    //             } else {
-    //                 incompleteTasks.push(task);
-    //             }
-    //         } else {
-    //             if (task.goal.type === 'At least' && task.goal.number < task.previousEntry) {
-    //                 completedTasks.push(task);
-    //             } else {
-    //                 incompleteTasks.push(task);
-    //             }
-    //         }
-    //     }
-    //
-    //     if (Array.isArray(task)) {
-    //
-    //         task.forEach(subTask => {
-    //             checkTaskCompletion(subTask)
-    //         })
-    //
-    //     } else {
-    //         checkTaskCompletion(task);
-    //     }
-    // })
+            groupedTasks.push({
+                priority: group.priority,
+                tasks: groupTasks.sort((a, b) => b.priority - a.priority)
+            });
+        });
+    }
 
-    return {tasks: groupedTasks};
+    const addTasksToArray = (groupedTasks, usesTime) => {
+        tasks.forEach(task => {
+            // Check if the task should be rendered at the current time
+            // First checks if the component it will be rendered in even cares about time
+            // Then it checks if the task repeats
+            // And then it check if the task is in a time group
+            if (task.repeats) {
+                if (!task.timeGroup) {
+                    if (usesTime) {
+                        if (checkTime(task)) {
+                            groupedTasks.push(task);
+                        }
+                    } else {
+                        groupedTasks.push(task);
+                    }
+                }
+            } else {
+                groupedTasks.push(task);
+            }
+        })
+    }
+
+    return {isLoading, data};
 }

@@ -1,35 +1,39 @@
-import {useContext, useState} from "react";
-import {AlertsContext} from "../context/AlertsContext";
+import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {addGroup, setGroups} from "../state/groupsSlice";
 import {setHighestPriority, setLowestPriority} from "../state/settingsSlice";
 
 export function useGroup () {
+    const groups = useSelector((state) => state?.groups.groups);
     const dispatch = useDispatch();
-    const alertsContext = useContext(AlertsContext);
     const settings = useSelector((state) => state?.settings);
     const [isLoading, setIsLoading] = useState(false);
 
-    const getGroups = async () => {
-        setIsLoading(true);
+    useEffect(() => {
+        if (groups === false) {
+            let ignore = false;
 
-        const response = await fetch('http://localhost:5000/api/group', {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        });
+            setIsLoading(true);
 
-        const data = await response.json();
-        setIsLoading(false);
+            fetch('http://localhost:5000/api/group', {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(json => {
+                    if (!ignore) {
+                        dispatch(setGroups(json.groups))
+                    }
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: 'ADD_ALERT', payload: {type: 'error', message: data.message}})
-            return false;
+                    setIsLoading(false);
+                })
+
+            return () => {
+                ignore = true;
+            }
         }
-
-        dispatch(setGroups(data.groups));
-        return true;
-    }
+    }, [])
 
     const addGroupToServer = async (group) => {
         const response = await fetch('http://localhost:5000/api/group/create', {
@@ -55,5 +59,5 @@ export function useGroup () {
         return true;
     }
 
-    return {isLoading, getGroups, addGroupToServer};
+    return {isLoading, addGroupToServer};
 }

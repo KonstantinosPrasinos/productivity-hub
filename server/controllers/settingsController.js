@@ -40,8 +40,6 @@ const updateSettings = async (req, res) => {
                 return res.status(500).json({message: err});
             }
 
-            console.log(doc);
-
             return res.status(200).json({...doc._doc, _id: undefined, __v: undefined, userId: undefined});
         });
     } else {

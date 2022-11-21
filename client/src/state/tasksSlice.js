@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit'
 
 export const tasksSlice = createSlice({
     name: 'tasks',
-    initialState: {tasks: []},
+    initialState: {tasks: false},
     reducers: {
         addTask: (state, action) => {
             state.tasks.push(action.payload);

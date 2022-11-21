@@ -23,7 +23,6 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
 import {useSettings} from "./hooks/useSettings";
 import {setSettings} from "./state/settingsSlice";
-import {useTask} from "./hooks/useTask";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -35,7 +34,6 @@ function App() {
     const matchMediaHasEventListener = useRef(false);
 
     const {getSettings} = useSettings();
-    const {getTasks} = useTask();
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -57,8 +55,6 @@ function App() {
       } else {
           navigate('/log-in')
       }
-
-      await getTasks();
     }, []);
 
     function checkScreenWidth() {

@@ -1,35 +1,51 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {AlertsContext} from "../context/AlertsContext";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {addCategory, setCategories} from "../state/categoriesSlice";
 import {useGroup} from "./useGroup";
 
 export function useCategory () {
+    const categories = useSelector((state) => state?.categories.categories);
     const dispatch = useDispatch();
     const alertsContext = useContext(AlertsContext);
     const {addGroupToServer} = useGroup();
     const [isLoading, setIsLoading] = useState(false);
 
-    const getCategories = async () => {
-        setIsLoading(true);
+    useEffect(() => {
+        if (categories === false) {
+            let ignore = false;
 
-        const response = await fetch('http://localhost:5000/api/category', {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        });
+            setIsLoading(true);
 
-        const data = await response.json();
-        setIsLoading(false);
+            fetch('http://localhost:5000/api/category', {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: 'ADD_ALERT', payload: {type: 'error', message: data.message}})
-            return false;
+                    return Promise.reject(response);
+                })
+                .then(json => {
+                    if (!ignore) {
+                        dispatch(setCategories(json.categories));
+                    }
+
+                    setIsLoading(false);
+                })
+                .catch(error => alertsContext.dispatch({
+                    type: 'ADD_ALERT',
+                    payload: {type: 'error', message: error.message}
+                }))
+
+            return () => {
+                ignore = true;
+            }
         }
-
-        dispatch(setCategories(data.tasks));
-        return true;
-    }
+    }, [])
 
     const addCategoryToServer = async (category, groups) => {
         const response = await fetch('http://localhost:5000/api/category/create', {
@@ -53,5 +69,5 @@ export function useCategory () {
         }
     }
 
-    return {isLoading, getCategories, addCategoryToServer};
+    return {isLoading, addCategoryToServer};
 }

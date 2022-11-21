@@ -20,7 +20,7 @@ const groupSchema = Joi.object({
 const getGroups = async (req, res) => {
     if (req.user) {
         Group.find({userId: req.user._id}, (err, groups) => {
-            if (groups) {return res.status(200).json(groups)}
+            if (groups) {return res.status(200).json({groups})}
 
             return res.status(404).json({message: 'Groups not found.'});
         });
@@ -32,8 +32,6 @@ const getGroups = async (req, res) => {
 const createGroup = async (req, res) => {
     if (req.user) {
         const {group} = req.body;
-
-        console.log(group);
 
         const validatedGroup = groupSchema.validate(group);
 
