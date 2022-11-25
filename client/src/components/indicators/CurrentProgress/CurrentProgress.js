@@ -1,11 +1,12 @@
 import { useAnimation, motion  } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
 import {useDispatch} from "react-redux";
 import {setTaskPreviousEntry} from "../../../state/tasksSlice";
 import CheckIcon from '@mui/icons-material/Check';
 import IconButton from "../../buttons/IconButton/IconButton";
+import {debounce} from "lodash";
 
 const CurrentProgress = ({ task }) => {
   const topLeftControls = useAnimation();
@@ -129,6 +130,15 @@ const CurrentProgress = ({ task }) => {
 
   }, [prevPercentage, animationControls, task])
 
+  const handleCompleteClick = () => {console.log('testing');
+    dispatch(setTaskPreviousEntry({
+      id: task._id,
+      value: parseInt(task.previousEntries.mostRecent) === 0 ? 1 : 0
+    }))
+  }
+
+  const deboundeHandler = useCallback(debounce(handleCompleteClick, 300), []);
+
   return (
     <div className={`${styles.container} ${task.type === 'Checkbox' ? styles.typeCheckbox : ''}`}>
       <div className={`${styles.outlineContainer}`}>
@@ -161,10 +171,7 @@ const CurrentProgress = ({ task }) => {
         }))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}` : task.step}</div>
       </div>}
       {task.type === 'Checkbox' && <div className={`${styles.textContainer} ${styles.typeCheckbox}`}>
-        <IconButton color={task.previousEntries.mostRecent === 0 ? 'normal' : 'green'} selected={true} onClick={() => dispatch(setTaskPreviousEntry({
-          id: task._id,
-          value: parseInt(task.previousEntries.mostRecent) === 0 ? 1 : 0
-        }))}>
+        <IconButton color={task.previousEntries.mostRecent === 0 ? 'normal' : 'green'} selected={true} onClick={deboundeHandler}>
           <CheckIcon />
         </IconButton>
       </div>}
