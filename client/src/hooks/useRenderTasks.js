@@ -15,84 +15,65 @@ export function useRenderTasks(usesTime = false) {
     const {isLoading: groupsLoading} = useGroup();
     const {isLoading: categoriesLoading} = useCategory();
 
-    const checkTime = (task) => {
+    const tasksNextUpdate = {}; // has _id and nextUpdateTime pairs (used to cut down future calculations)
+
+    let timeOut;
+
+    const findNextUpdate = (startingTime, time, unit) => {
+        const date = new Date(startingTime);
         const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
-        let isCorrectTime = false;
+        let functionName;
+        let timeToAdd = time;
 
-        for (const startingTime of task.repeatRate.startingDate) {
-            const formattedDate = new Date();
-            formattedDate.setTime(startingTime);
-
-            const differenceInDays = (startingDate) => {
-                // Calculates the difference in days between two dates
-                const days = ((startingDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24))
-                return days < 0 ? Math.ceil(days) : Math.floor(days);
-            }
-
-            switch (task.repeatRate.bigTimePeriod) {
-                case 'Days':
-                    if (differenceInDays(formattedDate) % task.repeatRate.number === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Weeks':
-                    if (differenceInDays(formattedDate) % (task.repeatRate.number * 7) === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Months':
-                    const yearsDifference = currentDate.getFullYear() - formattedDate.getFullYear();
-                    const monthsDifference = currentDate.getMonth() * yearsDifference - formattedDate.getMonth();
-                    if (monthsDifference % task.repeatRate.number === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Years':
-                    if (currentDate.getFullYear() === formattedDate.getFullYear() &&
-                        (currentDate.getFullYear() - formattedDate.getFullYear()) % task.repeatRate.number === 0 &&
-                        currentDate.getMonth() === formattedDate.getMonth() &&
-                        currentDate.getDate() === formattedDate.getDate()
-                    ){
-                        isCorrectTime = true;
-                    }
-                    break;
-            }
-
-            if (isCorrectTime) {
-                return true;
-            }
+        switch(unit) {
+            case 'Days':
+                functionName = 'Date';
+                break;
+            case 'Weeks':
+                functionName = 'Date';
+                timeToAdd *= 7;
+                break;
+            case 'Months':
+                functionName = 'Month';
+                break;
+            case 'Years':
+                functionName = 'FullYear'
+                break;
+            default:
+                functionName = 'Date';
+                break;
         }
 
-        return false;
+        while(currentDate.getTime() > date.getTime()) {
+            date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+        }
+
+        return date;
     }
 
-    useEffect(() => {
-        if (tasksLoading || groupsLoading || categoriesLoading) {
-            setIsLoading(true);
-            return;
+    const checkTime = (task) => {
+        let isCorrectTime = false;
+        let taskNextUpdate = null;
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
+
+        for (const startingTime of task.repeatRate.startingDate) {
+            const nextUpdate = findNextUpdate(startingTime, task.repeatRate.number, task.repeatRate.bigTimePeriod);
+            if (taskNextUpdate === null || nextUpdate < taskNextUpdate) {
+                taskNextUpdate = nextUpdate;
+            }
+
+            nextUpdate.setHours(0, 0, 0, 0);
+
+            isCorrectTime = nextUpdate === currentDate;
+            if (isCorrectTime) break;
         }
 
-        if (tasks === false || groups === false || categories === false) {
-            setData(false);
-            setIsLoading(false);
-            return;
-        }
+        tasksNextUpdate[task._id] = taskNextUpdate.getTime();
 
-        setIsLoading(true);
-
-        const groupedTasks = [];
-
-        addGroupsToArray(groupedTasks, usesTime);
-        addTasksToArray(groupedTasks, usesTime);
-
-        // Sort the tasks to be rendered in increasing priority
-        groupedTasks.sort((a, b) => b.priority - a.priority);
-
-        setData(groupedTasks);
-        setIsLoading(false);
-
-    }, [tasksLoading, groupsLoading, categoriesLoading]);
+        return isCorrectTime;
+    }
 
     const addGroupsToArray = (groupedTasks, usesTime) => {
         groups.forEach(group => {
@@ -138,6 +119,53 @@ export function useRenderTasks(usesTime = false) {
             }
         })
     }
+
+    useEffect(() => {
+        if (tasksLoading || groupsLoading || categoriesLoading) {
+            setIsLoading(true);
+            return;
+        }
+
+        if (tasks === false || groups === false || categories === false) {
+            setData(false);
+            setIsLoading(false);
+            return;
+        }
+
+        const findLeastUpdateTime = () => {
+            let min = null;
+
+            Object.values(tasksNextUpdate).forEach(key => {
+                if (min === null || min > key) {
+                    min = key;
+                }
+            })
+
+            return min;
+        }
+
+        const addTasksToData = () => {
+            const groupedTasks = [];
+
+            addGroupsToArray(groupedTasks, usesTime);
+            addTasksToArray(groupedTasks, usesTime);
+
+            // Sort the tasks to be rendered in increasing priority
+            groupedTasks.sort((a, b) => b.priority - a.priority);
+
+            setData(groupedTasks);
+            setIsLoading(false);
+        }
+
+        addTasksToData();
+
+        timeOut = setTimeout(addTasksToData, findLeastUpdateTime() - (new Date).getTime());
+
+        return () => {
+            clearTimeout(timeOut);
+        }
+
+    }, [tasksLoading, groupsLoading, categoriesLoading]);
 
     return {isLoading, data};
 }
