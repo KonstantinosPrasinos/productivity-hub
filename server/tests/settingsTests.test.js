@@ -3,7 +3,7 @@ const server = require("../server");
 const mongoose = require('mongoose')
 const Settings = require('../models/settingsSchema');
 
-jest.setTimeout(100 * 1000)
+jest.setTimeout(10 * 1000)
 
 describe('Settings Tests', () => {
     afterAll(() => {

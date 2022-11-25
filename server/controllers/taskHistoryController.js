@@ -8,9 +8,11 @@ const taskHistorySchema = Joi.object({
 
 const getRecentEntries = async (req, res) => {
     if (req.user) {
-        const entries = await TaskHistory.find({userId: req.user._id}).limit(7);
+        const {taskId} = req.body;
 
-        console.log(entries);
+        const entries = await TaskHistory.find({"$and": [{userId: req.user._id}, {taskId: taskId}]}).sort({ $natural: -1 }).limit(7);
+
+        res.status(200).json({entries});
     } else {
         res.status(401).send({message: "Not authorized."});
     }
@@ -30,16 +32,15 @@ const getTaskEntries = (req, res) => {
     }
 }
 
-const addTaskEntries = async (req, res) => {
+const addTaskEntry = async (req, res) => {
     if (req.user) {
         const {entry} = req.body;
 
         const validatedEntry = taskHistorySchema.validate(entry);
 
         try {
-            await TaskHistory.create({...validatedEntry, userId: req.user._id});
-
-            res.status(200);
+            await TaskHistory.create({...validatedEntry.value, userId: req.user._id});
+            res.status(200).json({message: 'Entry added successfully.'});
         } catch (error) {
             res.status(500).json({message: error.message});
         }
@@ -80,10 +81,10 @@ const deleteTaskEntries = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
-        TaskHistory.deleteMany({taskId: taskId, userId: req.user.id});
+        TaskHistory.deleteMany({"$and": [{userId: req.user._id}, {taskId: taskId}]});
     } else {
         res.status(401).send({message: "Not authorized."});
     }
 }
 
-module.exports = {getRecentEntries, getTaskEntries, addTaskEntries, setEntryValue, deleteEntry, deleteTaskEntries};
+module.exports = {getRecentEntries, getTaskEntries, addTaskEntry, setEntryValue, deleteEntry, deleteTaskEntries};
