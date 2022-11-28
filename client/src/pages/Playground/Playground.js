@@ -78,11 +78,8 @@ const Playground = () => {
         <button onClick={() => {alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Hello there this is a warning"}})}}>Add error</button>
         <button onClick={() => {setPercentage(percentage + 5)}}>Increase percentage by 5</button>
         <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
-        <AlertHandler></AlertHandler>
-        <CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>
-        {/*<VisualStreak streak={"010111"}></VisualStreak>*/}
+        <VisualStreak streak={"0101110"}></VisualStreak>
         <InputWrapper label="Ends at:"><TextBoxInput placeholder={"Number"}></TextBoxInput></InputWrapper>
-        <PriorityIndicator></PriorityIndicator>
         <ColorInput selected={'red'} setSelected={() => {}}></ColorInput>
         {/*<Task tasks={[{title: 'Workout', streak: '100110'}, {title: 'Workout', streak: '100110'}]}></Task>*/}
     </div>

@@ -48,7 +48,7 @@ const Task = new mongoose.Schema({
     },
     previousEntries: {
         value: {type: String},
-        latest: {type: Number},
+        latest: {type: String},
         mostRecent: {type: Number}
     }
 }, {timestamps: true})
