@@ -57,7 +57,7 @@ const getDateAddDetails = (bigTimePeriod, number) => {
 }
 
 const findMostRecentDate = (task) => {
-    const date = new Date(task.mostRecentProperDate);
+    const date = new Date();
 
     const currentDate = new Date();
 
@@ -75,7 +75,7 @@ const assembleEntryHistory = (entries, task) => {
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
 
     const date = new Date(task.mostRecentProperDate);
-    date.setUTCHours(0, 0, 0, 0)
+    date.setUTCHours(0, 0, 0, 0);
 
     let properEntries = "0".repeat(7);
 
@@ -83,13 +83,53 @@ const assembleEntryHistory = (entries, task) => {
         date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
 
         const entryFound = entries.find(entry => {
-            entry.setUTCHours(0, 0, 0, 0);
+            entry.createdAt.setUTCHours(0, 0, 0, 0);
 
-            return entry.getTime() === date.getTime();
+            return entry.createdAt.getTime() === date.getTime();
         })
 
         if (entryFound) {
-            properEntries = properEntries.substring(0, properEntries.length - i - 1) + '1' + properEntries.substring(properEntries.length - i + 1);
+
+            let addedValue = '0';
+
+            if (task.type === 'Checkbox') {
+                if (entryFound?.value === 1) {
+                    addedValue = '3';
+                }
+            } else {
+                switch(task.goal.type) {
+                    case 'None':
+                        if (entryFound?.value > 0) {
+                            addedValue = '3';
+                        }
+                        break;
+                    case 'At most':
+                        if (entryFound?.value > 0) {
+                            if (entryFound?.value < task.goal.number) {
+                                addedValue = '3';
+                            } else if (entryFound?.value === task.goal.number) {
+                                addedValue = '1';
+                            }
+                        }
+                        break;
+                    case 'Exactly':
+                        if (entryFound?.value === task.goal.number) {
+                            addedValue = '3';
+                        }
+                        break;
+                    case 'At least':
+                        if (entryFound?.value >= task.goal.number) {
+                            addedValue = '3';
+                        } else if (entryFound?.value >= Math.ceil(task.goal.number / 2)) {
+                            addedValue = '2';
+                        } else if (entryFound?.value > 0) {
+                            addedValue = '1';
+                        }
+                        break;
+                }
+            }
+
+            properEntries = properEntries.substring(0, properEntries.length - 1 - i) + addedValue + properEntries.substring(properEntries.length, properEntries.length - i);
         }
     }
 
@@ -97,32 +137,51 @@ const assembleEntryHistory = (entries, task) => {
 }
 
 const getTasksWithHistory = async (tasks, userId) => {
-    let tasksWithHistory = []
+    let tasksWithHistory = [];
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
 
-    for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].repeats) {
+    // Add current entry to tasks
+    let tasksWithCurrentEntry = [];
+
+    for (const task of tasks) {
+        const currentEntry = await TaskHistory
+            .findOne({userId: userId, taskId: task._id, createdAt: {$gt: currentDate}})
+            .exec();
+
+        let currentEntryValue;
+
+        if (currentEntry) {
+            currentEntryValue = currentEntry.value;
+        } else {
+            currentEntryValue = 0;
+        }
+
+        tasksWithCurrentEntry.push({...task._doc, currentEntryValue: currentEntryValue})
+    }
+
+    // Add streak to tasks
+    for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
+        if (tasksWithCurrentEntry[i].repeats) {
             const entriesHistory = await TaskHistory
-                .find({"$and": [{userId: userId}, {taskId: tasks[i]._id}]})
+                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, createdAt: {$lt: currentDate}})
                 .sort({ $natural: -1 })
                 .limit(7)
                 .exec();
 
             if (entriesHistory.length) {
-                const entryDates = entriesHistory.map(entry => {
-                    return new Date(entry.createdAt);
-                })
+                const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
-                const mostRecentDate = findMostRecentDate(tasks[i]);
+                const editedTask = await Task.findByIdAndUpdate(tasksWithCurrentEntry[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
+                const streak = assembleEntryHistory(entriesHistory, editedTask);
 
-                const editedTask = await Task.findByIdAndUpdate(tasks[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
-                const streak = assembleEntryHistory(entryDates, editedTask);
-
-                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: 0})
+                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: tasksWithCurrentEntry[i].currentEntryValue});
             } else {
-                tasksWithHistory.push({...tasks[i]._doc, streak: "0000000", currentEntryValue: 0});
+
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000"});
             }
         } else {
-            tasksWithHistory.push({...tasks[i]._doc, currentEntryValue: 0});
+            tasksWithHistory.push(tasksWithCurrentEntry[i]);
         }
     }
 

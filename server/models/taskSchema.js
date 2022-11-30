@@ -46,7 +46,10 @@ const Task = new mongoose.Schema({
             ending: Number
         }
     },
-    mostRecentProperDate: Date
+    mostRecentProperDate: {
+        type: Date,
+        default: Date.now
+    }
 }, {timestamps: true})
 
 module.exports = mongoose.model('Task', Task)
