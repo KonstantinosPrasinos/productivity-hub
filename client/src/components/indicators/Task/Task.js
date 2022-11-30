@@ -1,4 +1,4 @@
-import VisualStreak from "../VisualStreak/VisualStreak";
+import Streak from "../Streak/Streak";
 
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
@@ -19,19 +19,19 @@ const Task = ({tasks}) => {
     const checkIfCompleted = () => {
         let isCompleted = false;
 
-        tasks.map(task => {
-            if (task.type === 'Checkbox') {
-                if (task.previousEntry !== 1) {
-                    isCompleted = true;
-                }
-            } else {
-                if (task.goal.type === 'At least' && task.goal.number >= task.previousEntry) {
-                    isCompleted = true;
-                }
-            }
-        });
+        // tasks.map(task => {
+        //     if (task.type === 'Checkbox') {
+        //         if (task.previousEntry !== 1) {
+        //             isCompleted = true;
+        //         }
+        //     } else {
+        //         if (task.goal.type === 'At least' && task.goal.number >= task.previousEntry) {
+        //             isCompleted = true;
+        //         }
+        //     }
+        // });
 
-        return isCompleted;
+        return isCompleted || true;
     }
 
     const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
@@ -48,28 +48,34 @@ const Task = ({tasks}) => {
         >
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`}>
-                    {(task.repeats || task.category) && <div className={styles.topLine}>
-                        <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>
-                            {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}
-                            {index === 0 && task.category &&
-                                <div onClick={(e) => e.stopPropagation()}>
-                                    <CategoryIndicator
-                                        category={category.title}
-                                        categoryId={category.id}
-                                        group={group?.title}
-                                        color={category.color}
-                                    />
-                                </div>
-                            }
+                    <div className={'Horizontal-Flex-Container Space-Between'}>
+                        <div className={'Horizontal-Flex-Container'}>
+                            {task.category && <CategoryIndicator />}
+                            {task.title}
                         </div>
-                    </div>}
-                    <div className={`Horizontal-Flex-Container ${!task.repeats ? 'Space-Between' : 'Align-Right'}`}>
-                        {!task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}
-                        <div onClick={(e) => e.stopPropagation()} className={styles.streakContainer}>
-                            <VisualStreak task={task}></VisualStreak>
-                        </div>
+                        {task.repeats && <Streak streak={task.previousEntries} />}
                     </div>
-
+                    {/*{(task.repeats || task.category) && <div className={styles.topLine}>*/}
+                    {/*    <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>*/}
+                    {/*        {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}*/}
+                    {/*        {index === 0 && task.category &&*/}
+                    {/*            <div onClick={(e) => e.stopPropagation()}>*/}
+                    {/*                <CategoryIndicator*/}
+                    {/*                    category={category.title}*/}
+                    {/*                    categoryId={category.id}*/}
+                    {/*                    group={group?.title}*/}
+                    {/*                    color={category.color}*/}
+                    {/*                />*/}
+                    {/*            </div>*/}
+                    {/*        }*/}
+                    {/*    </div>*/}
+                    {/*</div>}*/}
+                    {/*<div className={`Horizontal-Flex-Container ${!task.repeats ? 'Space-Between' : 'Align-Right'}`}>*/}
+                    {/*    {!task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}*/}
+                    {/*    <div onClick={(e) => e.stopPropagation()} className={styles.streakContainer}>*/}
+                    {/*        <Streak task={task}></Streak>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>))}
         </motion.div>
 

@@ -10,15 +10,13 @@ import {debounce} from "lodash";
 
 const CurrentProgress = ({ task }) => {
   const topLeftControls = useAnimation();
-  const topControls = useAnimation();
   const topRightControls = useAnimation();
   const bottomRightControls = useAnimation();
-  const bottomControls = useAnimation();
   const bottomLeftControls = useAnimation();
 
   const dispatch = useDispatch();
 
-  const animationControls = useMemo(() => {return [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]}, [topLeftControls, topControls, topRightControls, bottomRightControls, bottomControls, bottomLeftControls]);
+  const animationControls = useMemo(() => {return [topLeftControls, topRightControls, bottomRightControls, bottomLeftControls]}, [topLeftControls, topRightControls, bottomRightControls, bottomLeftControls]);
   const [prevPercentage, setPrevPercentage] = useState(0);
 
   useEffect(() => {
@@ -44,19 +42,10 @@ const CurrentProgress = ({ task }) => {
         let localPercentage = animationDirection > 0 ? 1 : 0;
 
         if (i === finish.index) {
-          if (i === 1 || i === 4) {
-            animationDuration = animationDirection > 0 ? ((32 - finish.remaining) / 100) * maxDuration : (finish.remaining / 100) * maxDuration;
-            localPercentage = animationDirection > 0 ? (32 - finish.remaining) / 32 : finish.remaining / 32;
-          } else {
-            animationDuration = animationDirection > 0 ? ((9 - finish.remaining) / 100) * maxDuration : (finish.remaining / 100) * maxDuration;
-            localPercentage = animationDirection > 0 ? (9 - finish.remaining) / 9 : finish.remaining / 9;
-          }
+          animationDuration = animationDirection > 0 ? ((9 - finish.remaining) / 100) * maxDuration : (finish.remaining / 100) * maxDuration;
+          localPercentage = animationDirection > 0 ? (9 - finish.remaining) / 9 : finish.remaining / 9;
         } else {
-          if (i === 1 || i === 4) {
-            animationDuration = 0.32 * maxDuration;
-          } else {
-            animationDuration = 0.09 * maxDuration;
-          }
+          animationDuration = 0.09 * maxDuration;
         }
 
         toAnimate.push({index: i, percentage: localPercentage, duration: animationDuration})
@@ -70,18 +59,14 @@ const CurrentProgress = ({ task }) => {
       // Note all the "animationDirection > 0" ternary statements are used to change the script in a way that supports the animation going backwards.
       // where the result of true indicates a forward direction and false indicates a backwards direction.
 
-      if (percentage < 9) {
-        return {index: 0, remaining: animationDirection > 0 ? 9 - percentage : percentage, goal: 9};
-      } else if (percentage < 41) {
-        return {index: 1, remaining: animationDirection > 0 ? 32 - (percentage - 9) : percentage - 9, goal: 32};
+      if (percentage < 25) {
+        return {index: 0, remaining: animationDirection > 0 ? 25 - percentage : percentage};
       } else if (percentage < 50) {
-        return {index: 2, remaining: animationDirection > 0 ? 9 - (percentage - 41) : percentage - 41, goal: 9};
-      } else if (percentage < 59) {
-        return {index: 3, remaining: animationDirection > 0 ? 9 - (percentage - 50) : percentage - 50, goal: 9};
-      } else if (percentage < 91) {
-        return {index: 4, remaining: animationDirection > 0 ? 32 - (percentage - 59) : percentage - 59, goal: 32};
+        return {index: 1, remaining: animationDirection > 0 ? 25 - (percentage - 25) : percentage - 25};
+      } else if (percentage < 75) {
+        return {index: 2, remaining: animationDirection > 0 ? 25 - (percentage - 50) : percentage - 50};
       } else if (percentage <= 100) {
-        return {index: 5, remaining: animationDirection > 0 ? 9 - (percentage - 91) : percentage - 91, goal: 9};
+        return {index: 3, remaining: animationDirection > 0 ? 25 - (percentage - 75) : percentage - 75};
       } else {
         return false;
       }
@@ -157,24 +142,16 @@ const CurrentProgress = ({ task }) => {
           <motion.div className={`${styles.circularBar} ${styles.bottomLeft}`} initial={{rotate: 270}} animate={animationControls[5]}></motion.div>
         </div>
 
-        {/* Edges */}
-        {task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.top}`} initial={{scaleX: 0}} animate={animationControls[1]} />}
-        {task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.bottom}`} initial={{scaleX: 0}} animate={animationControls[4]} />}
+        {/*/!* Edges *!/*/}
+        {/*{task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.top}`} initial={{scaleX: 0}} animate={animationControls[1]} />}*/}
+        {/*{task.type === 'Number' && <motion.div className={`${styles.straightBarContainer} ${styles.bottom}`} initial={{scaleX: 0}} animate={animationControls[4]} />}*/}
 
       </div>
-      {task.type === 'Number' && <div className={`${styles.textContainer}`}>
-        <div>{task.previousEntries.mostRecent} / {task.goal.number} </div>
-        <div>|</div>
-        <div onClick={() => dispatch(setTaskPreviousEntry({
-          id: task._id,
-          value: parseInt(task.previousEntries.mostRecent) + task.step
-        }))} className={`Button ${styles.button}`}>{task.step > 0 ? `+${task.step}` : task.step}</div>
-      </div>}
-      {task.type === 'Checkbox' && <div className={`${styles.textContainer} ${styles.typeCheckbox}`}>
+      <div className={`${styles.textContainer}`}>
         <IconButton color={task.previousEntries.mostRecent === 0 ? 'normal' : 'green'} selected={true} onClick={deboundeHandler}>
           <CheckIcon />
         </IconButton>
-      </div>}
+      </div>
     </div>
   );
 };

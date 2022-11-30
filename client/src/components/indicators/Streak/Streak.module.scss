@@ -1,0 +1,13 @@
+@import 'src/styles/variables.scss';
+
+.streakOval {
+    height: 0.5em;
+    width: 2.5em;
+    border-radius: 0.5em;
+
+    background-color: var(--error-color);
+
+    &.complete {
+        background-color: var(--success-color);
+    }
+}

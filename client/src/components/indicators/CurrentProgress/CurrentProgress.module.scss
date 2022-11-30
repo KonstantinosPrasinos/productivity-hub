@@ -1,19 +1,15 @@
 @import 'src/styles/variables.scss';
 
 .container {
-    width: 10em;
+    width: 2.6em;
     height: 2.6em;
-    border-radius: 10em;
+    border-radius: 2.6em;
     position: relative;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: var(--border-color);
-
-    &.typeCheckbox {
-        width: 2.6em;
-    }
 }
 
 .outlineContainer {

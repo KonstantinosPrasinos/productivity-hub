@@ -165,7 +165,7 @@ const NewTask = ({index, length, id}) => {
                         startingDate.setTime(smallTimePeriod?.getTime());
                         break;
                 }
-                startingDate.setHours(0, 0, 0, 0);
+                startingDate.setUTCHours(0, 0, 0, 0);
                 startingDates.push(startingDate.getTime());
             });
 

@@ -24,6 +24,7 @@ export function useTask () {
                 .then(json => {
                     if (!ignore) {
                         if (json.tasks) {
+                            console.log(json.tasks);
                             dispatch(setTasks(json.tasks));
                         } else {
                             alertsContext.dispatch({type: 'ADD_ALERT', payload: {type: 'error', message: json.message}})
@@ -40,6 +41,8 @@ export function useTask () {
     }, [])
 
     const addTaskToServer = async (task) => {
+
+        console.log(task)
         const response = await fetch('http://localhost:5000/api/task/create', {
             method: 'POST',
             body: JSON.stringify({task: {...task, lastEntryDate: undefined, previousEntry: undefined, shortHistory: undefined}}),

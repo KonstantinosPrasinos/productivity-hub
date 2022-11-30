@@ -39,6 +39,7 @@ const addTaskEntry = async (req, res) => {
         const validatedEntry = taskHistorySchema.validate(entry);
 
         try {
+            // Validate task exists
             await TaskHistory.create({...validatedEntry.value, userId: req.user._id});
             res.status(200).json({message: 'Entry added successfully.'});
         } catch (error) {

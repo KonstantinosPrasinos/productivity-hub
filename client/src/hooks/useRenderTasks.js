@@ -48,6 +48,8 @@ export function useRenderTasks(usesTime = false) {
             date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
         }
 
+        date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
+
         return date;
     }
 
@@ -55,7 +57,7 @@ export function useRenderTasks(usesTime = false) {
         let isCorrectTime = false;
         let taskNextUpdate = null;
         const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
+        currentDate.setUTCHours(0, 0, 0, 0);
 
 
         for (const startingTime of task.repeatRate.startingDate) {
@@ -64,9 +66,9 @@ export function useRenderTasks(usesTime = false) {
                 taskNextUpdate = nextUpdate;
             }
 
-            nextUpdate.setHours(0, 0, 0, 0);
+            nextUpdate.setUTCHours(0, 0, 0, 0);
 
-            isCorrectTime = nextUpdate === currentDate;
+            isCorrectTime = nextUpdate.getTime() === currentDate.getTime();
             if (isCorrectTime) break;
         }
 

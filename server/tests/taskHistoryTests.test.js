@@ -19,7 +19,7 @@ describe('Task History Tests', () => {
         await request(server)
             .post('/api/entries/')
             .set('Cookie', cookie)
-            .send({entry: {taskId: '63692d3d3e3f0b32f674ea6a', value: '1'}})
+            .send({entry: {taskId: '636d24552c9b7b529b0a6d8c', value: '1'}})
             .expect(200)
     })
 
@@ -33,7 +33,7 @@ describe('Task History Tests', () => {
         await request(server)
             .get('/api/entries/recent')
             .set('Cookie', cookie)
-            .send({taskId: '63692d3d3e3f0b32f674ea6a'})
+            .send({taskId: '636d24552c9b7b529b0a6d8c'})
             .expect(200)
             .then(finalResponse => {
                 expect(finalResponse.body).toEqual(expect.objectContaining({

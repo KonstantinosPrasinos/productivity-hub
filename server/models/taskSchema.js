@@ -46,11 +46,7 @@ const Task = new mongoose.Schema({
             ending: Number
         }
     },
-    previousEntries: {
-        value: {type: String},
-        latest: {type: String},
-        mostRecent: {type: Number}
-    }
+    mostRecentProperDate: Date
 }, {timestamps: true})
 
 module.exports = mongoose.model('Task', Task)

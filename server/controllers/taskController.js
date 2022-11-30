@@ -57,12 +57,13 @@ const getDateAddDetails = (bigTimePeriod, number) => {
 }
 
 const findMostRecentDate = (task) => {
-    const date = new Date(task.mostRecentProperEntry);
+    const date = new Date(task.mostRecentProperDate);
 
     const currentDate = new Date();
 
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
 
+    
     while(currentDate.getTime() > date.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
     }
@@ -73,56 +74,68 @@ const findMostRecentDate = (task) => {
 const assembleEntryHistory = (entries, task) => {
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
 
-    const date = new Date(task.mostRecentProperEntry);
-    date.setHours(0, 0, 0, 0)
+    const date = new Date(task.mostRecentProperDate);
+    date.setUTCHours(0, 0, 0, 0)
 
-    let properEntries = "0".repeat(entries.length);
+    let properEntries = "0".repeat(7);
 
     for (let i = 0; i < entries.length; i++) {
         date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
 
         const entryFound = entries.find(entry => {
-            entry.setHours(0, 0, 0, 0);
+            entry.setUTCHours(0, 0, 0, 0);
 
             return entry.getTime() === date.getTime();
         })
 
         if (entryFound) {
-            properEntries = properEntries.substring(0, i) + '1' + properEntries.substring(i + 1);
+            properEntries = properEntries.substring(0, properEntries.length - i - 1) + '1' + properEntries.substring(properEntries.length - i + 1);
         }
     }
 
     return properEntries;
 }
 
+const getTasksWithHistory = async (tasks, userId) => {
+    let tasksWithHistory = []
+
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].repeats) {
+            const entriesHistory = await TaskHistory
+                .find({"$and": [{userId: userId}, {taskId: tasks[i]._id}]})
+                .sort({ $natural: -1 })
+                .limit(7)
+                .exec();
+
+            if (entriesHistory.length) {
+                const entryDates = entriesHistory.map(entry => {
+                    return new Date(entry.createdAt);
+                })
+
+                const mostRecentDate = findMostRecentDate(tasks[i]);
+
+                const editedTask = await Task.findByIdAndUpdate(tasks[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
+                const streak = assembleEntryHistory(entryDates, editedTask);
+
+                tasksWithHistory.push({...editedTask._doc, streak: streak})
+            } else {
+                const temp = {...tasks[i]._doc, streak: "0000000"}
+                tasksWithHistory.push(temp);
+            }
+        } else {
+            tasksWithHistory.push(tasks[i]);
+        }
+    }
+
+    return tasksWithHistory;
+}
+
 const getTasks = async (req, res) => {
     if (req.user) {
-        Task.find({userId: req.user._id}, (err, tasks) => {
-            const tasksWithHistory = [];
+        Task.find({userId: req.user._id}, async (err, tasks) => {
+            if (err) return res.status(404).json({message: 'Tasks not found.'});
 
-            tasks.forEach(async (task) => {
-                if (task.repeats) {
-                    const entries = await TaskHistory.find({"$and": [{userId: req.user._id}, {taskId: task._id}]}).sort({ $natural: -1 }).limit(7);
-
-                    const entryDates = entries.map(entry => {
-                        return new Date(entry.createdAt);
-                    })
-
-                    const mostRecentDate = findMostRecentDate(task);
-
-                    Task.findByIdAndUpdate(task._id, {"$set": {"mostRecentDate": mostRecentDate}}, (err) => {
-                        if (err) {
-                            return res.status(500).json({message: 'Internal server error.'})
-                        }
-                    });
-
-
-
-                    tasksWithHistory.append({...task, previousEntries: assembleEntryHistory(entryDates, task)});
-                }
-            });
-
-            if (tasks) {return res.status(200).json({tasks: tasksWithHistory})}
+            if (tasks) {return res.status(200).json({tasks: await getTasksWithHistory(tasks, req.user._id)})}
 
             return res.status(404).json({message: 'Tasks not found.'});
         });
