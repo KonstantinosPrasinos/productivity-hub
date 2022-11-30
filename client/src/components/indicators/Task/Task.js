@@ -6,6 +6,7 @@ import {useContext, useMemo} from "react";
 import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import CurrentProgress from "../CurrentProgress/CurrentProgress";
 
 const Task = ({tasks}) => {
     const categories = useSelector((state) => state?.categories.categories);
@@ -53,8 +54,9 @@ const Task = ({tasks}) => {
                             {task.category && <CategoryIndicator />}
                             {task.title}
                         </div>
-                        {task.repeats && <Streak streak={task.previousEntries} />}
+                        <CurrentProgress task={task}/>
                     </div>
+                    {task.repeats && <Streak streak={task.streak} />}
                     {/*{(task.repeats || task.category) && <div className={styles.topLine}>*/}
                     {/*    <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>*/}
                     {/*        {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}*/}

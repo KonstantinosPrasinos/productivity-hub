@@ -24,9 +24,9 @@ const CurrentProgress = ({ task }) => {
     let percentage;
 
     if (task.type === 'Number') {
-      percentage = Math.round( task.previousEntries.mostRecent / task.goal.number * 100);
+      percentage = Math.round( task.currentEntryValue / task.goal.number * 100);
     } else {
-      percentage = task.previousEntries.mostRecent;
+      percentage = task.currentEntryValue;
     }
 
     let animationDirection = prevPercentage >= percentage ? -1 : 1;
@@ -118,7 +118,7 @@ const CurrentProgress = ({ task }) => {
   const handleCompleteClick = () => {console.log('testing');
     dispatch(setTaskPreviousEntry({
       id: task._id,
-      value: parseInt(task.previousEntries.mostRecent) === 0 ? 1 : 0
+      value: parseInt(task.currentEntryValue) === 0 ? 1 : 0
     }))
   }
 
@@ -148,7 +148,7 @@ const CurrentProgress = ({ task }) => {
 
       </div>
       <div className={`${styles.textContainer}`}>
-        <IconButton color={task.previousEntries.mostRecent === 0 ? 'normal' : 'green'} selected={true} onClick={deboundeHandler}>
+        <IconButton color={task.currentEntryValue === 0 ? 'normal' : 'green'} selected={true} onClick={deboundeHandler}>
           <CheckIcon />
         </IconButton>
       </div>

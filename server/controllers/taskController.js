@@ -117,13 +117,12 @@ const getTasksWithHistory = async (tasks, userId) => {
                 const editedTask = await Task.findByIdAndUpdate(tasks[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
                 const streak = assembleEntryHistory(entryDates, editedTask);
 
-                tasksWithHistory.push({...editedTask._doc, streak: streak})
+                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: 0})
             } else {
-                const temp = {...tasks[i]._doc, streak: "0000000"}
-                tasksWithHistory.push(temp);
+                tasksWithHistory.push({...tasks[i]._doc, streak: "0000000", currentEntryValue: 0});
             }
         } else {
-            tasksWithHistory.push(tasks[i]);
+            tasksWithHistory.push({...tasks[i]._doc, currentEntryValue: 0});
         }
     }
 
