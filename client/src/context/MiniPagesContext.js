@@ -5,7 +5,7 @@ export const MiniPagesContext = createContext();
 export const miniPagesReducer = (state, action) => {
     switch (action.type) {
         case 'ADD_PAGE':
-            if (state.filter(page => page.type === action.payload.type && page.id === action.payload.id).length === 0){
+            if (state.filter(page => page.type === action.payload.type && page.id === action.payload._id).length === 0){
                 return [...state, action.payload];
             }
             return state;

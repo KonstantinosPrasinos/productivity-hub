@@ -45,7 +45,7 @@ const Task = ({tasks}) => {
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
             layout
 
-            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0].id}})}
+            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}})}
         >
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`}>
