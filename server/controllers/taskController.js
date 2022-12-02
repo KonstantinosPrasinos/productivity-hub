@@ -59,10 +59,17 @@ const getDateAddDetails = (bigTimePeriod, number) => {
 const findMostRecentDate = (task) => {
     const date = new Date();
 
+    if (task.mostRecentProperDate) {
+        date.setTime(task.mostRecentProperDate.getTime());
+    } else {
+        date.setTime(task.repeatRate.startingDate.getTime());
+    }
+
+    date.setUTCHours(0, 0, 0, 0);
+
     const currentDate = new Date();
 
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
-
     
     while(currentDate.getTime() > date.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
