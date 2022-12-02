@@ -3,7 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
 import {useDispatch} from "react-redux";
-import {setTaskPreviousEntry} from "../../../state/tasksSlice";
+import {setTaskCurrentEntry} from "../../../state/tasksSlice";
 import CheckIcon from '@mui/icons-material/Check';
 import IconButton from "../../buttons/IconButton/IconButton";
 import {debounce} from "lodash";
@@ -18,7 +18,7 @@ const CurrentProgress = ({ task }) => {
   }, [task.currentEntryValue])
 
   const handleCompleteClick = () => {
-    dispatch(setTaskPreviousEntry({
+    dispatch(setTaskCurrentEntry({
       id: task._id,
       value: parseInt(task.currentEntryValue) === 0 ? 1 : 0
     }))

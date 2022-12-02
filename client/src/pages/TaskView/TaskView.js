@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import {useDispatch, useSelector} from "react-redux";
@@ -11,7 +11,11 @@ import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {removeTask} from "../../state/tasksSlice";
+import {removeTask, setTaskCurrentEntry} from "../../state/tasksSlice";
+import styles from './Taskview.module.scss';
+import {debounce} from "lodash";
+import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
+import CheckIcon from "@mui/icons-material/Check";
 
 const TaskView = ({index, length, task}) => {
     const categories = useSelector((state) => state?.categories.categories);
@@ -23,6 +27,7 @@ const TaskView = ({index, length, task}) => {
     const graphOptions = ['Average', 'Total'];
 
     const [date, setDate] = useState(new Date);
+    const [currentValue, setCurrentValue] = useState(task.currentEntryValue);
 
     const addToMonth = (adder) => {
         const newDate = new Date(date.getTime());
@@ -34,6 +39,22 @@ const TaskView = ({index, length, task}) => {
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
         dispatch(removeTask(task._id))
+    }
+
+    const setCurrentEntry = useCallback(debounce(() => {
+        dispatch(setTaskCurrentEntry({id: task._id, value: currentValue}));
+    }, 300), []);
+
+    const handleSetCurrentValueCheckbox = () => {
+        const newValue = currentValue === 1 ? 0 : 1
+
+        setCurrentValue(newValue);
+        setCurrentEntry();
+    }
+
+    const handleSetCurrentValueNumber = (value) => {
+        setCurrentValue(value);
+        setCurrentEntry();
     }
 
     return (
@@ -59,6 +80,25 @@ const TaskView = ({index, length, task}) => {
                     /> :
                     <div>None</div>
                 }
+            </section>
+            <section className={'Horizontal-Flex-Container'}>
+                <div className={'Label'}>Today's Entry:</div>
+                {task.type === 'Checkbox' ?
+                    <div className={`${styles.checkbox} ${currentValue === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
+                        <CheckIcon sx={{
+                            width: '100%',
+                            height: '100%',
+                            opacity: currentValue === 1 ? 1 : 0,
+                            "&:hover": {
+                                opacity: 1,
+                            }
+                        }} />
+                    </div> :
+                    <div className={'Horizontal-Flex-Container'}>
+                        <Button onClick={() => handleSetCurrentValueNumber(currentValue - task.step)}>-{task.step}</Button>
+                        <TextBoxInput value={currentValue} setValue={handleSetCurrentValueNumber}></TextBoxInput>
+                        <Button onClick={() => handleSetCurrentValueNumber(currentValue + task.step)}>+{task.step}</Button>
+                    </div>}
             </section>
             <Divider />
             <section className={'Grid-Container Two-By-Two'}>

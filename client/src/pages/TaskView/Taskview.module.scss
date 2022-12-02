@@ -1,0 +1,17 @@
+$base-size: 1.2em;
+
+.checkbox {
+  width: $base-size;
+  height: $base-size;
+  border: 2px solid var(--primary-color);
+  border-radius: $base-size;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.checked {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+  }
+}
