@@ -1,5 +1,5 @@
 import {motion} from "framer-motion";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
 import {useDispatch} from "react-redux";
@@ -12,6 +12,10 @@ const CurrentProgress = ({ task }) => {
   const dispatch = useDispatch();
 
   const [prevPercentage, setPrevPercentage] = useState(0.5);
+
+  useEffect(() => {
+    setPrevPercentage(getPercentage());
+  }, [task.currentEntryValue])
 
   const handleCompleteClick = () => {
     dispatch(setTaskPreviousEntry({
@@ -40,7 +44,6 @@ const CurrentProgress = ({ task }) => {
       let percentage = getPercentage();
       const duration = Math.min(1, Math.abs(percentage - prevPercentage) * 2);
 
-      setPrevPercentage(percentage);
       return {
         pathLength: percentage,
         opacity: percentage > 0 ? 1 : 0,
@@ -82,4 +85,3 @@ const CurrentProgress = ({ task }) => {
 };
 
 export default CurrentProgress;
-
