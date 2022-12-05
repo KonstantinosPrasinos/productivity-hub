@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useState} from 'react';
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -16,12 +16,17 @@ import styles from './Taskview.module.scss';
 import {debounce} from "lodash";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import CheckIcon from "@mui/icons-material/Check";
+import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 
 const TaskView = ({index, length, task}) => {
-    const categories = useSelector((state) => state?.categories.categories);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
+
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
-    const category = categories.find(category => category.id === task.category);
+    const category = categories?.find(category => category.id === task.category);
+    const group = groups?.find(group => group.id === task.group);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
@@ -71,12 +76,10 @@ const TaskView = ({index, length, task}) => {
             </section>
             <section className={'Horizontal-Flex-Container'}>
                 <div className={'Label'}>Category:</div>
-                {task.category ?
+                {task.category && !categoriesLoading && !groupsLoading ?
                     <CategoryIndicator
-                        category={category.title}
-                        categoryId={category.id}
-                        group={task.timeGroup}
-                        color={category.color}
+                        category={category}
+                        group={group}
                     /> :
                     <div>None</div>
                 }

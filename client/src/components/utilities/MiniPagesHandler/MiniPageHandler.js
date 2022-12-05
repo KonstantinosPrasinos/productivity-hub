@@ -4,15 +4,18 @@ import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {AnimatePresence} from 'framer-motion'
 import NewCategory from "../../../pages/NewCategory/NewCategory";
 import TaskView from "../../../pages/TaskView/TaskView";
-import {useSelector} from "react-redux";
 import CategoryView from "../../../pages/CategoryView/CategoryView";
+import {useGetTasks} from "../../../hooks/get-hooks/useGetTasks";
+import {useGetCategories} from "../../../hooks/get-hooks/useGetCategories";
 
 const MiniPagesHandler = () => {
     const miniPagesContext = useContext(MiniPagesContext);
-    const tasks = useSelector((state) => state?.tasks.tasks);
-    const categories = useSelector(state => state?.categories.categories);
+    const {isLoading: tasksLoading, data: tasks} = useGetTasks();
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
 
     const renderPage = (page, index) => {
+        if (tasksLoading || categoriesLoading) return '';
+
         switch (page.type) {
             case 'new-task':
                 return (<NewTask key={index} index={index} length={miniPagesContext.state.length} id={page.id} />)

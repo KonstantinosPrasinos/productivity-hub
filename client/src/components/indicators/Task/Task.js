@@ -3,17 +3,18 @@ import Streak from "../Streak/Streak";
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
 import {useContext, useMemo} from "react";
-import {useSelector} from "react-redux";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
+import {useGetCategories} from "../../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../../hooks/get-hooks/useGetGroups";
 
 const Task = ({tasks}) => {
-    const categories = useSelector((state) => state?.categories.categories);
-    const groups = useSelector((state) => state?.groups.groups);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
-    const category = tasks[0].category !== null ? categories.find(category => category.id === tasks[0].category) : null;
-    const group = tasks[0].timeGroup !== null ? groups.find(group => group.id === tasks[0].timeGroup) : null;
+    const category = tasks[0].category !== null ? categories?.find(category => category.id === tasks[0].category) : null;
+    const group = tasks[0].timeGroup !== null ? groups?.find(group => group.id === tasks[0].timeGroup) : null;
 
     const miniPagesContext = useContext(MiniPagesContext);
 
@@ -51,7 +52,11 @@ const Task = ({tasks}) => {
                 <div key={index} className={`Stack-Container`}>
                     <div className={'Horizontal-Flex-Container Space-Between'}>
                         <div className={'Horizontal-Flex-Container'}>
-                            {task.category && <CategoryIndicator />}
+                            {task.category && !categoriesLoading && !groupsLoading &&
+                                <CategoryIndicator
+                                    category={category}
+                                    group={group}
+                                />}
                             {task.title}
                         </div>
                         <CurrentProgress task={task}/>

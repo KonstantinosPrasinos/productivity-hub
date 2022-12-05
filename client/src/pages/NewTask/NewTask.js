@@ -17,9 +17,12 @@ import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchCo
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
 import {useTask} from "../../hooks/useTask";
+import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
+import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 
 const NewTask = ({index, length, id}) => {
-    const categories = useSelector((state) => state?.categories.categories);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const categoryNames = categories?.map(category => category.title);
     const settings = useSelector((state) => state?.settings);
 
@@ -44,9 +47,9 @@ const NewTask = ({index, length, id}) => {
 
     const [repeatType, setRepeatType] = useState('Custom Rules')
 
-    const groups = useSelector((state) => state?.groups.groups);
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
-    const tasks = useSelector((state) => state?.tasks.tasks);
+    const {isLoading, data: tasks} = useGetTasks();
 
     const dispatch = useDispatch();
 
@@ -70,7 +73,7 @@ const NewTask = ({index, length, id}) => {
 
 
     const findMatchingGroups = () => {
-        const categoryId = categories.find(localCategory => localCategory.title === category)?.id
+        const categoryId = categories?.find(localCategory => localCategory.title === category)?.id
 
         return groups.filter(group => group.parent === categoryId).map(group => group.title)
     }
@@ -78,7 +81,7 @@ const NewTask = ({index, length, id}) => {
     const groupTitles = ['None', ...findMatchingGroups()];
 
     useEffect(() => {
-        if (id) {
+        if (id && !isLoading) {
             const task = tasks.find(task => task._id === id);
 
             setTitle(task.title);
@@ -109,7 +112,7 @@ const NewTask = ({index, length, id}) => {
                 }
             }
         }
-    }, [])
+    }, [isLoading]);
 
     useEffect(() => {
         if (timeGroup) {
@@ -137,7 +140,7 @@ const NewTask = ({index, length, id}) => {
             return false;
         }
 
-        if (checkAllInputs()) {
+        if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
             if (priority < settings.priorityBounds.low) {
                 dispatch(setLowestPriority(priority));
             }
@@ -177,7 +180,7 @@ const NewTask = ({index, length, id}) => {
                     type: goalType,
                     number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
                 } : undefined,
-                category: category ? categories.find(localCategory => localCategory.title === category)?.id : undefined,
+                category: category ? categories?.find(localCategory => localCategory.title === category)?.id : undefined,
                 priority: priority ? priority : settings.defaults.priority,
                 repeats,
                 longGoal: repeats ? {

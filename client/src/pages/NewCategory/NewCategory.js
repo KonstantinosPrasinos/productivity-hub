@@ -18,10 +18,12 @@ import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import {useCategory} from "../../hooks/useCategory";
+import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 
 const NewCategory = ({index, length, id}) => {
-    const categories = useSelector(state => state?.categories.categories);
-    const groups = useSelector((state) => state?.groups.groups);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
     const settings = useSelector((state) => state?.settings);
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
@@ -222,14 +224,14 @@ const NewCategory = ({index, length, id}) => {
     }
 
     useEffect(() => {
-        if (id) {
-            const category = categories.find(category => category.id === id);
+        if (!categoriesLoading && !groupsLoading && id) {
+            const category = categories?.find(category => category.id === id);
 
             setTitle(category.title);
             setColor(category.color);
             setTimeGroups(groups.filter(group => group.parent === category.id).map(group => {return {...group, initial: true}}));
         }
-    }, [])
+    }, [categoriesLoading, groupsLoading])
 
     return (
         <MiniPageContainer

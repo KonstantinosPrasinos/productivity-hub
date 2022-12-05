@@ -23,6 +23,7 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
 import {useSettings} from "./hooks/useSettings";
 import {setSettings} from "./state/settingsSlice";
+import {QueryClientProvider, QueryClient} from "react-query";
 
 function App() {
     const screenSizeContext = useContext(ScreenSizeContext);
@@ -108,100 +109,103 @@ function App() {
     }
 
     const [theme, setTheme] = useState(getTheme());
+    const queryClient = new QueryClient();
 
     return (
         <div className={`App ${theme}`}>
-            <NavBar/>
-            <AlertHandler />
-            <MiniPagesHandler />
-            <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
-            <div className="Content-Container">
-                <Routes>
-                    <Route
-                        exact
-                        path="/"
-                        element={
-                            <RequireAuth>
-                                <HomePageContainer />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/home"
-                        element={
-                            <RequireAuth>
-                                <Navigate to="/"/>
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/list"
-                        element={
-                            <RequireAuth>
-                                <ListView />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/new-category"
-                        element={
-                            <RequireAuth>
-                                <NewCategory />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/new-task"
-                        element={
-                            <RequireAuth>
-                                <NewTask />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/settings"
-                        element={
-                            <RequireAuth>
-                                <Settings/>
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/settings/:tab"
-                        element={
-                            <RequireAuth>
-                                <Settings/>
-                            </RequireAuth>
-                        }
-                    />
-                    <Route path="/playground" element={<Playground/>}/>
-                    <Route
-                        exact
-                        path="/change-email"
-                        element={
-                            <RequireAuth>
-                                <ChangeEmail />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/log-in"
-                        element={
-                            !user.state?.id ? <LogIn/> : <Navigate to="/" />
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/password-reset"
-                        element={
-                            !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
-                        }
-                    />
-                    <Route path="*" element={<NotFound/>}/>
-                </Routes>
-            </div>
+            <QueryClientProvider client={queryClient}>
+                <NavBar/>
+                <AlertHandler />
+                <MiniPagesHandler />
+                <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
+                <div className="Content-Container">
+                    <Routes>
+                        <Route
+                            exact
+                            path="/"
+                            element={
+                                <RequireAuth>
+                                    <HomePageContainer />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/home"
+                            element={
+                                <RequireAuth>
+                                    <Navigate to="/"/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/list"
+                            element={
+                                <RequireAuth>
+                                    <ListView />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/new-category"
+                            element={
+                                <RequireAuth>
+                                    <NewCategory />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/new-task"
+                            element={
+                                <RequireAuth>
+                                    <NewTask />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/settings"
+                            element={
+                                <RequireAuth>
+                                    <Settings/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            path="/settings/:tab"
+                            element={
+                                <RequireAuth>
+                                    <Settings/>
+                                </RequireAuth>
+                            }
+                        />
+                        <Route path="/playground" element={<Playground/>}/>
+                        <Route
+                            exact
+                            path="/change-email"
+                            element={
+                                <RequireAuth>
+                                    <ChangeEmail />
+                                </RequireAuth>
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/log-in"
+                            element={
+                                !user.state?.id ? <LogIn/> : <Navigate to="/" />
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/password-reset"
+                            element={
+                                !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
+                            }
+                        />
+                        <Route path="*" element={<NotFound/>}/>
+                    </Routes>
+                </div>
+            </QueryClientProvider>
         </div>
     );
 }
