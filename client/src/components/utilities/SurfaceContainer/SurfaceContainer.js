@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './SurfaceContainer.module.scss';
 import {AnimatePresence, motion} from "framer-motion";
+import LoadingIndicator from "../../indicators/LoadingIndicator/LoadingIndicator";
 
 const SurfaceContainer = ({children, isLoading, isOpaque = false}) => {
     return (
@@ -14,7 +15,7 @@ const SurfaceContainer = ({children, isLoading, isOpaque = false}) => {
                         exit={{opacity: 0}}
                         transition={{duration: 0.2}}
                     >
-                        <div className={styles.loadingIndicator}></div>
+                        <LoadingIndicator size={'full'} />
                     </motion.div>}
                 </AnimatePresence>
                 {children}

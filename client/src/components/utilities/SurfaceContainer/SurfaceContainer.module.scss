@@ -66,35 +66,3 @@
   from {transform: rotate(0deg);}
   to {transform: rotate(360deg);}
 }
-
-.loadingIndicator {
-  position: relative;
-  height: 2em;
-  width: 2em;
-  border-radius: 2em;
-  background-color: var(--border-color);
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    background-color: var(--on-primary-color);
-    top: 0.25em;
-    left: 0.25em;
-    height: 1.5em;
-    width: 1.5em;
-    border-radius: 1.5em;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    background-color: var(--primary-color);
-    top: 0;
-    left: 0;
-    height: 1em;
-    width: 1em;
-    animation: rotating 0.75s linear infinite;
-    transform-origin: bottom right;
-  }
-}

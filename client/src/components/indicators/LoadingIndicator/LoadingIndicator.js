@@ -2,10 +2,10 @@ import React from 'react';
 import {motion} from 'framer-motion';
 import styles from './LoadingIndicator.module.scss'
 
-const LoadingIndicator = () => {
+const LoadingIndicator = ({size}) => {
     return (
         <motion.div
-            className={styles.container}
+            className={`Rounded-Container ${styles.container} ${size === 'full' ? styles.fullSize : ''}`}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}

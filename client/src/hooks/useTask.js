@@ -41,8 +41,6 @@ export function useTask () {
     }, [])
 
     const addTaskToServer = async (task) => {
-
-        console.log(task)
         const response = await fetch('http://localhost:5000/api/task/create', {
             method: 'POST',
             body: JSON.stringify({task: {...task, lastEntryDate: undefined, previousEntry: undefined, shortHistory: undefined}}),

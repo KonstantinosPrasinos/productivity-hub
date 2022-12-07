@@ -29,13 +29,11 @@ const Home = () => {
                         No tasks for now
                     </motion.div>
                 }
-                <AnimatePresence exitBeforeEnter initial={false}>
-                    {!isLoading && data.length > 0 && <AnimatePresence initial={false}>
-                        {data.map((task) => !task.hasOwnProperty('tasks') ?
+                <AnimatePresence exitBeforeEnter>
+                    {!isLoading && data.length > 0 && data.map((task) => !task.hasOwnProperty('tasks') ?
                             (<Task key={task._id} tasks={[task]}></Task>) :
                             (<Task key={task.tasks[0]._id} tasks={task.tasks}></Task>)
                         )}
-                    </AnimatePresence>}
                 </AnimatePresence>
             </div>
             {screenSizeContext.state !== 'small' &&

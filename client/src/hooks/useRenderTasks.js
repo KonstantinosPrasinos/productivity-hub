@@ -85,7 +85,6 @@ const addGroupsToArray = (groupedTasks, usesTime) => {
 }
 
 const addTasksToArray = (groupedTasks, usesTime, tasks) => {
-    console.log(tasks);
     tasks.forEach(task => {
         // Check if the task should be rendered at the current time
         // First checks if the component it will be rendered in even cares about time
@@ -122,8 +121,6 @@ const findLeastUpdateTime = () => {
 const addTasksToData = (usesTime, tasks) => {
     const groupedTasks = [];
 
-    console.log(tasks);
-
     // addGroupsToArray(groupedTasks, usesTime);
     addTasksToArray(groupedTasks, usesTime, tasks);
 
@@ -152,8 +149,6 @@ export function useRenderTasks(usesTime = false) {
             return addTasksToData(usesTime, data)
         }
     }, [data, isLoading]);
-
-    console.log(tasks);
 
     return {isLoading, isError, data: tasks};
 }

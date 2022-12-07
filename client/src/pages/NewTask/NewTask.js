@@ -20,11 +20,14 @@ import {useTask} from "../../hooks/useTask";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import {useAddTask} from "../../hooks/add-hooks/useAddTask";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const categoryNames = categories?.map(category => category.title);
     const settings = useSelector((state) => state?.settings);
+
+    const taskMutation = useAddTask();
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
@@ -55,8 +58,6 @@ const NewTask = ({index, length, id}) => {
 
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
-
-    const {addTaskToServer} = useTask();
 
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
@@ -187,7 +188,7 @@ const NewTask = ({index, length, id}) => {
                     type: longGoalType,
                     number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
                 } : undefined,
-                // expiresAt: repeats ? expiresAt : undefined, // need to fix
+                expiresAt: repeats ? expiresAt : undefined, // need to fix
                 timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : undefined,
                 repeatRate: repeats && !timeGroup ? {
                     number: repeatNumber,
@@ -195,15 +196,14 @@ const NewTask = ({index, length, id}) => {
                     smallTimePeriod: timePeriod2,
                     startingDate: startingDates
                 } : undefined,
-                lastEntryDate: undefined,
-                previousEntry: 0,
-                shortHistory: '000000'
+                currentEntryValue: 0,
+                streak: repeats ? "0000000" : undefined
             }
 
             if (id) {
                 dispatch(setTask(task));
             } else {
-                await addTaskToServer(task);
+                taskMutation.mutate(task);
             }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
