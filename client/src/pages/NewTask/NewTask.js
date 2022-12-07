@@ -16,7 +16,6 @@ import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
-import {useTask} from "../../hooks/useTask";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
