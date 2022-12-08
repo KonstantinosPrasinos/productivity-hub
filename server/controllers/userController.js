@@ -7,6 +7,10 @@ const {sendEmail} = require('../email/sendEmail');
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
 const VerificationCode = require('../models/verificationCodeSchema');
+const Task = require('../models/taskSchema');
+const Category = require('../models/categorySchema');
+const Group = require('../models/groupSchema');
+const TaskHistory = require('../models/taskHistorySchema');
 
 const signupUser = (req, res) => {
     const {email, password} = req.body;
@@ -53,19 +57,30 @@ const logoutUser = (req, res) => {
     }
 }
 
+const deleteAllEntries = (id) => {
+    try {
+        Task.deleteMany({userId: id});
+        TaskHistory.deleteMany({userId: id});
+        Group.deleteMany({userId: id});
+        Category.deleteMany({userId: id});
+    } catch (error) {
+        return error;
+    }
+}
+
 const deleteUser = (req, res) => {
     if (req.user) {
-        const {email, password} = req.body;
+        const {password} = req.body;
 
-        if (!email || !password) {
+        if (!password) {
             return res.status(400).json({message: 'All fields must be filled.'});
         }
 
         if (!bcrypt.compareSync(password, req.user.local.password)) {
-            res.status(400).json({message: 'Incorrect email or password.'});
+            res.status(400).json({message: 'Incorrect password.'});
         }
 
-        Settings.findOneAndDelete({'userId': req.user.id})
+        Settings.findOneAndDelete({'userId': req.user._id})
 
         User.findByIdAndDelete(req.user._id.toString(), (err) => {
             if (err) {
@@ -73,12 +88,42 @@ const deleteUser = (req, res) => {
             }
         });
 
+        const error = deleteAllEntries(req.user._id);
+
+        if (error) {
+            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
+        }
+
         req.session.destroy();
         res.clearCookie('connect.sid');
 
         return res.status(200).json({message: 'User deleted successfully.'});
     } else {
         res.status(401).send({message: "Not authorized"});
+    }
+}
+
+const resetUser = (req, res) => {
+    if (req.user) {
+        const {password} = req.body;
+
+        if (!password) {
+            return res.status(400).json({message: 'All fields must be filled.'});
+        }
+
+        if (!bcrypt.compareSync(password, req.user.local.password)) {
+            res.status(400).json({message: 'Incorrect password.'});
+        }
+
+        Settings.findOneAndUpdate({userId: req.user._id}, {$set: {'theme': 'Light', 'defaults': {'step': 1, 'goal': 1, 'priority': 1}}});
+
+        const error = deleteAllEntries(req.user._id);
+
+        if (error) {
+            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
+        }
+
+        return res.status(200).json({message: 'User deleted successfully.'});
     }
 }
 
@@ -190,4 +235,4 @@ const forgotPasswordSetPassword = async (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail, forgotPasswordSetPassword};
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail, forgotPasswordSetPassword, resetUser};
