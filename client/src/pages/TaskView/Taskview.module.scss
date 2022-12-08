@@ -9,6 +9,7 @@ $base-size: 1.2em;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 
   &.checked {
     background-color: var(--primary-color);

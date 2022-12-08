@@ -1,9 +1,10 @@
 import styles from './PriorityIndicator.module.scss';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import {useSelector} from "react-redux";
+import {useGetSettings} from "../../../hooks/get-hooks/useGetSettings";
 
 const PriorityIndicator = () => {
-    const settings = useSelector((state) => state?.settings);
+    const {data: settings} = useGetSettings();
+
     return (
         <div className={`Horizontal-Flex-Container ${styles.container}`}>
             {settings.priorityBounds.low}

@@ -62,27 +62,6 @@ const Task = ({tasks}) => {
                         <CurrentProgress task={task}/>
                     </div>
                     {task.repeats && <Streak streak={task.streak} />}
-                    {/*{(task.repeats || task.category) && <div className={styles.topLine}>*/}
-                    {/*    <div className={`${styles.infoContainer} ${task.repeats ? styles.repeats : ''}`}>*/}
-                    {/*        {task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}*/}
-                    {/*        {index === 0 && task.category &&*/}
-                    {/*            <div onClick={(e) => e.stopPropagation()}>*/}
-                    {/*                <CategoryIndicator*/}
-                    {/*                    category={category.title}*/}
-                    {/*                    categoryId={category.id}*/}
-                    {/*                    group={group?.title}*/}
-                    {/*                    color={category.color}*/}
-                    {/*                />*/}
-                    {/*            </div>*/}
-                    {/*        }*/}
-                    {/*    </div>*/}
-                    {/*</div>}*/}
-                    {/*<div className={`Horizontal-Flex-Container ${!task.repeats ? 'Space-Between' : 'Align-Right'}`}>*/}
-                    {/*    {!task.repeats && <div className={`${styles.titleContainer}`}>{task.title}</div>}*/}
-                    {/*    <div onClick={(e) => e.stopPropagation()} className={styles.streakContainer}>*/}
-                    {/*        <Streak task={task}></Streak>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                 </div>))}
         </motion.div>
 

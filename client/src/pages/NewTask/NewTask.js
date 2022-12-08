@@ -5,7 +5,7 @@ import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {setTask} from "../../state/tasksSlice";
 import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
@@ -20,11 +20,12 @@ import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {useAddTask} from "../../hooks/add-hooks/useAddTask";
+import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const categoryNames = categories?.map(category => category.title);
-    const settings = useSelector((state) => state?.settings);
+    const {data: settings} = useGetSettings();
 
     const taskMutation = useAddTask();
 
@@ -69,8 +70,6 @@ const NewTask = ({index, length, id}) => {
             handleSave();
         }
     }
-
-
 
     const findMatchingGroups = () => {
         const categoryId = categories?.find(localCategory => localCategory.title === category)?.id
@@ -180,7 +179,7 @@ const NewTask = ({index, length, id}) => {
                     type: goalType,
                     number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
                 } : undefined,
-                category: category ? categories?.find(localCategory => localCategory.title === category)?.id : undefined,
+                category: category ? categories?.find(localCategory => localCategory.title === category)?._id : undefined,
                 priority: priority ? priority : settings.defaults.priority,
                 repeats,
                 longGoal: repeats ? {

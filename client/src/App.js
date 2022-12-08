@@ -3,7 +3,7 @@ import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/LogIn/LogIn";
 import RequireAuth from "./components/etc/RequireAuth";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useMemo, useRef} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -15,44 +15,42 @@ import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/utilities/MiniPagesHandler/MiniPageHandler";
 import ListView from "./pages/ListView/ListView";
-import {useDispatch, useSelector} from "react-redux";
 import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import {ModalContext} from "./context/ModalContext";
 import {AnimatePresence} from "framer-motion";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
-import {useSettings} from "./hooks/useSettings";
-import {setSettings} from "./state/settingsSlice";
-import {QueryClientProvider, QueryClient} from "react-query";
+
+import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
+import {ReactQueryDevtools} from "react-query/devtools";
 
 function App() {
+
     const screenSizeContext = useContext(ScreenSizeContext);
     const modalContext = useContext(ModalContext);
 
-    const settings = useSelector((state) => state?.settings);
+    const {data: settings, isLoading: settingsLoading} = useGetSettings();
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
 
-    const {getSettings} = useSettings();
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     useEffect(async () => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
       const loggedInUser = localStorage.getItem("user");
-      const settings = localStorage.getItem("settings");
+      // const settings = localStorage.getItem("settings");
 
       if (loggedInUser) {
           const userObject = JSON.parse(loggedInUser);
           user.dispatch({type: "SET_USER", payload: userObject});
-
-          if (!settings) {
-              await getSettings();
-          } else {
-              dispatch(setSettings(JSON.parse(settings)));
-          }
+          //
+          // if (!settings) {
+          //     await getSettings();
+          // } else {
+          //     dispatch(setSettings(JSON.parse(settings)));
+          // }
       } else {
           navigate('/log-in')
       }
@@ -70,19 +68,21 @@ function App() {
         });
     }, [screenSizeContext]);
 
-    useEffect(() => {
-        setTheme(getTheme());
+    const defaultThemeChanged = useRef(false);
 
-        const handleDefaultTheme = () => {
-            setTheme(getTheme());
-        }
+    const setDefaultThemeChanged = () => {
+        defaultThemeChanged.current = !defaultThemeChanged.current;
+    }
+
+    useEffect(() => {
+        if (settingsLoading) return;
 
         if (settings?.theme === 'Device' && !matchMediaHasEventListener.current) {
             matchMediaHasEventListener.current = true;
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDefaultTheme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDefaultThemeChanged);
         } else if (matchMediaHasEventListener.current) {
             matchMediaHasEventListener.current = false;
-            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDefaultTheme);
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', setDefaultThemeChanged);
         }
 
     }, [settings?.theme])
@@ -96,6 +96,8 @@ function App() {
     }
 
     const getTheme = () => {
+        if (settingsLoading) return 'Light';
+
         switch (settings?.theme) {
             case 'Device':
                 return getDeviceTheme();
@@ -108,12 +110,10 @@ function App() {
         }
     }
 
-    const [theme, setTheme] = useState(getTheme());
-    const queryClient = new QueryClient();
+    const theme = useMemo(getTheme, [settings?.theme, defaultThemeChanged]);
 
     return (
         <div className={`App ${theme}`}>
-            <QueryClientProvider client={queryClient}>
                 <NavBar/>
                 <AlertHandler />
                 <MiniPagesHandler />
@@ -205,7 +205,7 @@ function App() {
                         <Route path="*" element={<NotFound/>}/>
                     </Routes>
                 </div>
-            </QueryClientProvider>
+            <ReactQueryDevtools />
         </div>
     );
 }

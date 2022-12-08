@@ -9,6 +9,9 @@ import MiniPagesContextProvider from "./context/MiniPagesContext";
 import ModalContextProvider from "./context/ModalContext";
 import UserContextProvider from "./context/UserContext";
 import {BrowserRouter} from "react-router-dom";
+import {QueryClientProvider, QueryClient} from "react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.render(
     <React.StrictMode>
@@ -19,7 +22,9 @@ ReactDOM.render(
                         <ModalContextProvider>
                             <UserContextProvider>
                                 <BrowserRouter>
-                                    <App/>
+                                    <QueryClientProvider client={queryClient}>
+                                        <App/>
+                                    </QueryClientProvider>
                                 </BrowserRouter>
                             </UserContextProvider>
                         </ModalContextProvider>

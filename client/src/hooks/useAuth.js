@@ -1,6 +1,5 @@
 import {useContext, useState} from "react";
 import {UserContext} from "../context/UserContext";
-import {useSettings} from "./useSettings";
 import {useDispatch} from "react-redux";
 import {removeSettings} from "../state/settingsSlice";
 import {AlertsContext} from "../context/AlertsContext";
@@ -8,7 +7,6 @@ import {AlertsContext} from "../context/AlertsContext";
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
-    const {getSettings} = useSettings();
     const reduxDispatch = useDispatch();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +28,6 @@ export function useAuth() {
 
             dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
             localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email}));
-
-            await getSettings();
         }
         setIsLoading(false);
     }

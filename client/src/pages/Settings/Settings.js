@@ -209,6 +209,7 @@ const Settings = () => {
                     </InputWrapper>
                     <InputWrapper label={'Account Removal'}>
                         <Button filled={false} size={'small'}>Delete Account</Button>
+                        <Button filled={false} size={'small'}>Reset Account</Button>
                     </InputWrapper>
                 </section>
                 <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><PaletteIcon/>Appearance</div>

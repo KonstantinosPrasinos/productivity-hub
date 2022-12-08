@@ -15,7 +15,9 @@ const fetchCategories = async () => {
 }
 
 export function useGetCategories() {
-    const queryObject = useQuery(["get-categories"], fetchCategories)
+    const queryObject = useQuery(["get-categories"], fetchCategories, {
+        staleTime: 30 * 60 * 60 * 1000
+    })
 
     return {...queryObject, data: queryObject.data?.categories};
 }
