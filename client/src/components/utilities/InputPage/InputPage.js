@@ -1,15 +1,14 @@
-import {useContext} from 'react';
 import styles from './InputPage.module.scss';
-import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import IconButton from "../../buttons/IconButton/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "../../buttons/Button/Button";
+import {useScreenSize} from "../../../hooks/useScreenSize";
 
 const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
-    const screenSizeContext = useContext(ScreenSizeContext);
+    const {screenSize} = useScreenSize();
     return (
         <div
-            className={`${screenSizeContext.state === 'small' ? 'Stack-Container' : 'Horizontal-Flex-Container'}
+            className={`${screenSize === 'small' ? 'Stack-Container' : 'Horizontal-Flex-Container'}
                 Rounded-Container
                 Symmetrical
                 ${styles.container}
@@ -21,17 +20,17 @@ const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
             <div
                 className={`Stack-Container
                     ${styles.rightSide}
-                    ${screenSizeContext.state === 'small' ? styles.small : ''}
+                    ${screenSize === 'small' ? styles.small : ''}
                     ${!toggleState ? styles.isDisabled : ''}`}
             >
                 {rightSide}
             </div>
             <div className={`Stack-Container}`}>
                 {
-                    screenSizeContext.state === 'big' && <div className={styles.exitButton}><IconButton><CloseIcon /></IconButton></div>
+                    screenSize === 'big' && <div className={styles.exitButton}><IconButton><CloseIcon /></IconButton></div>
                 }
 
-                <div className={`${styles.saveButton} ${screenSizeContext.state === 'small' && styles.small}`}>
+                <div className={`${styles.saveButton} ${screenSize === 'small' && styles.small}`}>
                     <Button onClick={handleSave}>Save</Button>
                 </div>
             </div>

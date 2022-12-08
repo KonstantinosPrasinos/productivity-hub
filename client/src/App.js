@@ -9,7 +9,6 @@ import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
 import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
-import {ScreenSizeContext} from "./context/ScreenSizeContext";
 import NewTask from "./pages/NewTask/NewTask";
 import HomePageContainer from "./pages/Home/Home";
 import AlertHandler from "./components/utilities/AlertHandler/AlertHandler";
@@ -25,8 +24,6 @@ import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
 import {ReactQueryDevtools} from "react-query/devtools";
 
 function App() {
-
-    const screenSizeContext = useContext(ScreenSizeContext);
     const modalContext = useContext(ModalContext);
 
     const {data: settings, isLoading: settingsLoading} = useGetSettings();
@@ -55,18 +52,6 @@ function App() {
           navigate('/log-in')
       }
     }, []);
-
-    function checkScreenWidth() {
-        if (window.innerWidth > 768) return 'big';
-        return 'small';
-    }
-
-    useEffect(() => {
-        screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()});
-        window.addEventListener('resize', () => {
-            screenSizeContext.dispatch({type: 'SET_SIZE', payload: checkScreenWidth()})
-        });
-    }, [screenSizeContext]);
 
     const defaultThemeChanged = useRef(false);
 

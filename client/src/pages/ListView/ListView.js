@@ -4,16 +4,16 @@ import {AnimatePresence, motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import {ScreenSizeContext} from "../../context/ScreenSizeContext";
 import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
 import Chip from "../../components/buttons/Chip/Chip";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
+import {useScreenSize} from "../../hooks/useScreenSize";
 
 const ListView = () => {
     const miniPagesContext = useContext(MiniPagesContext);
-    const screenSizeContext = useContext(ScreenSizeContext);
+    const {screenSize} = useScreenSize();
     const {data: tasks, isLoading: tasksLoading} = useRenderTasks(false);
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
@@ -89,15 +89,15 @@ const ListView = () => {
         </div>
     )
 
-    return (<div className={`${screenSizeContext.state !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}>
-        {screenSizeContext.state === 'small' &&
+    return (<div className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}>
+        {screenSize === 'small' &&
             <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
                 {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
             </div>
         }
         <AnimatePresence exitBeforeEnter>
-            {screenSizeContext.state !== 'small' ? renderTasks() : renderSwitchComponent()}
-            {screenSizeContext.state !== 'small' && renderCategories()}
+            {screenSize !== 'small' ? renderTasks() : renderSwitchComponent()}
+            {screenSize !== 'small' && renderCategories()}
         </AnimatePresence>
         </div>);
 };

@@ -1,16 +1,15 @@
-import {useContext} from "react";
-import {ScreenSizeContext} from "../../context/ScreenSizeContext";
 import styles from './Home.module.scss'
 import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import {motion} from "framer-motion";
 import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
+import {useScreenSize} from "../../hooks/useScreenSize";
 
 const Home = () => {
     const {isLoading, data} = useRenderTasks(true);
 
-    const screenSizeContext = useContext(ScreenSizeContext);
+    const {screenSize} = useScreenSize();
 
     if (isLoading) {
         return <LoadingIndicator />
@@ -36,7 +35,7 @@ const Home = () => {
                         )}
                 </AnimatePresence>
             </div>
-            {screenSizeContext.state !== 'small' &&
+            {screenSize !== 'small' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>
 
                 </div>}

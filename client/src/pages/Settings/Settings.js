@@ -19,7 +19,6 @@ import {AlertsContext} from "../../context/AlertsContext";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
-import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useSettings} from "../../hooks/useSettings";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 
@@ -170,11 +169,10 @@ const Settings = () => {
             <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
                 <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon/>Account</div>
                 <section className={'Stack-Container No-Gap'}>
-                    <InputWrapper label={'Email'}>
+                    <InputWrapper label={`Email (Click to ${emailVisible ? 'hide' : 'reveal'})`}>
                         <div className={styles.emailWrapper}>
-                            <div className={styles.emailLeftSide}>
+                            <div className={styles.emailLeftSide} onClick={handleToggleEmail}>
                                 {emailVisible ? email : hiddenEmail()}
-                                <TextButton onClick={handleToggleEmail}>{emailVisible ? 'Hide' : 'Reveal'}</TextButton>
                             </div>
                             <Button filled={false} size={'small'} onClick={handleChangeEmail}>Edit</Button>
                         </div>

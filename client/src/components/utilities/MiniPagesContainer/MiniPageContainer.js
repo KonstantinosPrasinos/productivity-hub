@@ -4,14 +4,14 @@ import {motion, useAnimation} from 'framer-motion';
 import Button from "../../buttons/Button/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "../../buttons/IconButton/IconButton";
-import {ScreenSizeContext} from "../../../context/ScreenSizeContext";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import {useScreenSize} from "../../../hooks/useScreenSize";
 
 const MiniPageContainer = ({children, onClickSave, length, index}) => {
     const containerRef = useRef();
     const animation = useAnimation();
 
-    const screenSizeContext = useContext(ScreenSizeContext);
+    const {screenSize} = useScreenSize();
     const miniPagesContext = useContext(MiniPagesContext);
 
     let startY;
@@ -56,14 +56,6 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
     }
 
     useEffect(() => {
-        if (screenSizeContext.state === 'big') {
-            containerRef.current.style.height = '100%'
-        } else {
-            containerRef.current.style.height = 'calc(100% - 4em - 32px)'
-        }
-    }, [screenSizeContext])
-
-    useEffect(() => {
         animation.start({
             y: 0
         });
@@ -80,13 +72,14 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
     return (
         <motion.div
             className={`${styles.container} Stack-Container Symmetrical Big-Padding`}
-            ref={containerRef} initial={{y: '100%'}}
+            ref={containerRef}
+            initial={{y: '100%'}}
             animate={animation}
             transition={{type: "tween"}}
             exit={{y: "100%"}}
         >
             <div className={styles.staticElements} onTouchMove={handleMove} onTouchEnd={handleEnd}>
-                {screenSizeContext.state === 'small' &&
+                {screenSize === 'small' &&
                     <div className={styles.topLineContainer}>
                         <div className={styles.topLine}></div>
                     </div>
