@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useState} from 'react';
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import {useDispatch} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";

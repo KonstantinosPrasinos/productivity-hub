@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { AlertsContext } from '../../../context/AlertsContext';
-import Alert from '../Alert/Alert';
+import Alert from '../../utilities/Alert/Alert';
 import styles from './AlertHandler.module.scss';
 import { AnimatePresence } from "framer-motion";
 

@@ -4,7 +4,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import Chip from "../../components/buttons/Chip/Chip";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";

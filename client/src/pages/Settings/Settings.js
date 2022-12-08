@@ -12,7 +12,7 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
-import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
+import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {ModalContext} from "../../context/ModalContext";
 import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";

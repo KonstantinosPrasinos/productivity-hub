@@ -5,9 +5,9 @@ import {useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../context/AlertsContext";
 import {useVerify} from "../../hooks/useVerify";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../components/buttons/TextButton/TextButton";
-import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
+import SurfaceContainer from "../../components/containers/SurfaceContainer/SurfaceContainer";
 import {useAuth} from "../../hooks/useAuth";
 
 const ResetPassword = () => {

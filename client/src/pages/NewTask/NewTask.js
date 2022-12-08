@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useMemo, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -7,13 +7,13 @@ import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import {useDispatch} from "react-redux";
 import {setTask} from "../../state/tasksSlice";
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
-import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
+import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
@@ -24,7 +24,19 @@ import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
-    const categoryNames = categories?.map(category => category.title);
+    
+    const getCategoryTitles = () => {
+        const titles = ['None'];
+        
+        if (categoriesLoading) return titles
+        
+        titles.push(...categories?.map(category => category.title));
+        
+        return titles;
+    }
+
+    const categoryTitles = useMemo(getCategoryTitles, [categoriesLoading])
+    
     const {data: settings} = useGetSettings();
 
     const taskMutation = useAddTask();
@@ -72,12 +84,17 @@ const NewTask = ({index, length, id}) => {
     }
 
     const findMatchingGroups = () => {
+        const titles = ['None'];
+
+        if (groupsLoading) return titles;
+
         const categoryId = categories?.find(localCategory => localCategory.title === category)?.id
 
-        return groups.filter(group => group.parent === categoryId).map(group => group.title)
-    }
+        titles.push(...groups.filter(group => group.parent === categoryId).map(group => group.title));
 
-    const groupTitles = ['None', ...findMatchingGroups()];
+        return titles;
+    }
+    const groupTitles = useMemo(findMatchingGroups, [groupsLoading]);
 
     useEffect(() => {
         if (id && !isLoading) {
@@ -254,7 +271,7 @@ const NewTask = ({index, length, id}) => {
             <InputWrapper label={"Category"}>
                 <DropDownInput
                     placeholder={'Category'}
-                    options={[...categoryNames,
+                    options={[...categoryTitles,
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                             Add new
                             <AddIcon />

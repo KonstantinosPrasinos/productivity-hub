@@ -8,7 +8,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 
 import Skeleton from "../../components/utilities/Skeleton/Skeleton";
-import AlertHandler from "../../components/utilities/AlertHandler/AlertHandler";
+import AlertHandler from "../../components/handlers/AlertHandler/AlertHandler";
 import { AlertsContext } from "../../context/AlertsContext";
 import Streak from "../../components/indicators/Streak/Streak";
 

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -15,7 +15,7 @@ const CategoryView = ({index, length, category}) => {
     const {safeDeleteCategory} = useSafeDeleteCategory(category);
     const miniPagesContext = useContext(MiniPagesContext);
 
-    const {isLoading: groupsLoading, data: unfilteredGroups} = useGetGroups();
+    const {data: unfilteredGroups} = useGetGroups();
 
     const groups = unfilteredGroups?.filter(group => group.parent === category.id);
 
