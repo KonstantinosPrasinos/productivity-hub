@@ -10,7 +10,6 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import Chip from "../../components/buttons/Chip/Chip";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
-import {useSelector} from "react-redux";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
@@ -22,9 +21,10 @@ import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useSettings} from "../../hooks/useSettings";
+import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 
 const Settings = () => {
-    const {theme, defaults} = useSelector((state) => state?.settings);
+    const {data: settings} = useGetSettings();
     const email = useContext(UserContext).state.email;
     const {setSettingsServer} = useSettings()
 
@@ -35,11 +35,11 @@ const Settings = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordScore, setNewPasswordScore] = useState();
-    const [selectedTheme, setSelectedTheme] = useState(theme);
+    const [selectedTheme, setSelectedTheme] = useState(settings.theme);
     const [emailVisible, setEmailVisible] = useState(false);
-    const [priority, setPriority] = useState(defaults.priority)
-    const [goal, setGoal] = useState(defaults.goal);
-    const [step, setStep] = useState(defaults.step);
+    const [priority, setPriority] = useState(settings.defaults.priority)
+    const [goal, setGoal] = useState(settings.defaults.goal);
+    const [step, setStep] = useState(settings.defaults.step);
     const [settingsChanges, setSettingsChanges] = useState({});
 
     const {logout} = useAuth();
@@ -68,7 +68,7 @@ const Settings = () => {
         if (selectedTheme !== e) {
             setSelectedTheme(e);
         }
-        if (theme !== e) {
+        if (settings.theme !== e) {
             setSettingsChanges({...settingsChanges, theme: e});
         } else {
             setSettingsChanges((current) => {
@@ -95,7 +95,7 @@ const Settings = () => {
 
     const handleSetPriority = (e) => {
         setPriority(e);
-        if (e != defaults.priority) {
+        if (e != settings.defaults.priority) {
             setSettingsChanges({...settingsChanges, priority: e});
         } else {
             setSettingsChanges((current) => {
@@ -108,7 +108,7 @@ const Settings = () => {
 
     const handleSetStep = (e) => {
         setStep(e);
-        if (e != defaults.step) {
+        if (e != settings.defaults.step) {
             setSettingsChanges({...settingsChanges, step: e});
         } else {
             setSettingsChanges((current) => {
@@ -121,7 +121,7 @@ const Settings = () => {
 
     const handleSetGoal = (e) => {
         setGoal(e);
-        if (e != defaults.goal) {
+        if (e != settings.defaults.goal) {
             setSettingsChanges({...settingsChanges, goal: e});
         } else {
             setSettingsChanges((current) => {
@@ -208,8 +208,8 @@ const Settings = () => {
                         <Button filled={false} size={'small'}>Download Data</Button>
                     </InputWrapper>
                     <InputWrapper label={'Account Removal'}>
-                        <Button filled={false} size={'small'}>Delete Account</Button>
-                        <Button filled={false} size={'small'}>Reset Account</Button>
+                        <Button filled={false} size={'small'} isWarning={true}>Delete Account</Button>
+                        <Button filled={false} size={'small'} isWarning={true}>Reset Account</Button>
                     </InputWrapper>
                 </section>
                 <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><PaletteIcon/>Appearance</div>

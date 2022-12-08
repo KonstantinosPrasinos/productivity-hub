@@ -6,16 +6,8 @@ import {useContext, useMemo} from "react";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
-import {useGetCategories} from "../../../hooks/get-hooks/useGetCategories";
-import {useGetGroups} from "../../../hooks/get-hooks/useGetGroups";
 
 const Task = ({tasks}) => {
-    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
-    const {isLoading: groupsLoading, data: groups} = useGetGroups();
-
-    const category = tasks[0].category !== null ? categories?.find(category => category.id === tasks[0].category) : null;
-    const group = tasks[0].timeGroup !== null ? groups?.find(group => group.id === tasks[0].timeGroup) : null;
-
     const miniPagesContext = useContext(MiniPagesContext);
 
     const checkIfCompleted = () => {
@@ -52,10 +44,10 @@ const Task = ({tasks}) => {
                 <div key={index} className={`Stack-Container`}>
                     <div className={'Horizontal-Flex-Container Space-Between'}>
                         <div className={'Horizontal-Flex-Container'}>
-                            {task.category && !categoriesLoading && !groupsLoading &&
+                            {task.category &&
                                 <CategoryIndicator
-                                    category={category}
-                                    group={group}
+                                    categoryId={task.category}
+                                    groupId={task?.group}
                                 />}
                             {task.title}
                         </div>
