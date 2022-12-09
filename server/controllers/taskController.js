@@ -185,10 +185,10 @@ const getTasksWithHistory = async (tasks, userId) => {
                 tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: tasksWithCurrentEntry[i].currentEntryValue, mostRecentProperDate: undefined});
             } else {
 
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000", mostRecentProperDate: undefined});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, streak: "0000000", mostRecentProperDate: undefined});
             }
         } else {
-            tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
+            tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, mostRecentProperDate: undefined});
         }
     }
 
@@ -229,7 +229,12 @@ const createTask = async (req, res) => {
                     mostRecent: 0
                 }
             });
-            res.status(200).json(newTask);
+
+            res.status(200).json({
+                ...newTask._doc,
+                currentEntryValue: 0,
+                streak: newTask.repeats ? "0000000" : undefined,
+                mostRecentProperDate: undefined});
         } catch (error) {
             res.status(500).json({message: error.message})
         }
@@ -242,12 +247,12 @@ const deleteTask = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
-        Task.findByIdAndDelete(taskId, (err) => {
+        Task.findByIdAndDelete(taskId, (err, doc) => {
             if (err) {
                 return res.status(500).json({message: err});
             }
 
-            return res.status(200).json({message: 'Task deleted successfully.'})
+            return res.status(200).json({taskId: doc._id});
         })
     } else {
         res.status(401).send({message: "Not authorized."});

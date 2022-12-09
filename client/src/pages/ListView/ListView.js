@@ -95,7 +95,7 @@ const ListView = () => {
                 {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
             </div>
         }
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence initial={false}>
             {screenSize !== 'small' ? renderTasks() : renderSwitchComponent()}
             {screenSize !== 'small' && renderCategories()}
         </AnimatePresence>

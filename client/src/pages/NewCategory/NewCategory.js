@@ -20,6 +20,7 @@ import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInp
 import {useCategory} from "../../hooks/useCategory";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import {findStartingDates} from "../../functions/findStartingDates";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -121,30 +122,7 @@ const NewCategory = ({index, length, id}) => {
 
         const id = currentEditedGroup.current?.id;
 
-        let startingDates = [];
-        
-        timePeriod2.forEach(smallTimePeriod => {
-            let startingDate = new Date();
-
-            switch (timePeriod) {
-                case 'Days':
-                    break;
-                case 'Weeks':
-                    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-                    const weekDaysDifference = days.findIndex(day => day === smallTimePeriod) + 1 - startingDate.getDay();
-                    startingDate.setDate(startingDate.getDate() + weekDaysDifference);
-                    break;
-                case 'Months':
-                    startingDate.setDate(smallTimePeriod?.getDate());
-                    break;
-                case 'Years':
-                    startingDate.setTime(smallTimePeriod?.getTime());
-                    break;
-            }
-            startingDate.setUTCHours(0, 0, 0, 0);
-            startingDates.push(startingDate.getTime());
-        });
+        const startingDates = findStartingDates(timePeriod, timePeriod2);
 
         const timeGroup = {
             title: timeGroupTitle,

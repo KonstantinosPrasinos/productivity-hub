@@ -18,7 +18,7 @@ const Task = new mongoose.Schema({
         type: String,
         number: Number
     },
-    category: Number,
+    category: String,
     priority: {
         type: Number,
         required: true
@@ -35,7 +35,7 @@ const Task = new mongoose.Schema({
         type: String,
         timePeriod: String
     },
-    timeGroup: String,
+    group: String,
     repeatRate: {
         number: Number,
         bigTimePeriod: String,

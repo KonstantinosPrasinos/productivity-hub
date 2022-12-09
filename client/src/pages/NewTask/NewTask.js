@@ -12,7 +12,6 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
-import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
 import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
@@ -21,6 +20,7 @@ import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {useAddTask} from "../../hooks/add-hooks/useAddTask";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
+import {findStartingDates} from "../../functions/findStartingDates";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -46,7 +46,7 @@ const NewTask = ({index, length, id}) => {
     const [step, setStep] = useState(settings.defaults.step);
     const [goalType, setGoalType] = useState('At least');
     const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState('None');
     const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
@@ -157,36 +157,7 @@ const NewTask = ({index, length, id}) => {
         }
 
         if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
-            if (priority < settings.priorityBounds.low) {
-                dispatch(setLowestPriority(priority));
-            }
-            if (priority > settings.priorityBounds.high) {
-                dispatch(setHighestPriority(priority));
-            }
-
-            let startingDates = [];
-            timePeriod2.forEach(smallTimePeriod => {
-                let startingDate = new Date();
-
-                switch (timePeriod) {
-                    case 'Days':
-                        break;
-                    case 'Weeks':
-                        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-                        const weekDaysDifference = days.findIndex(day => day === smallTimePeriod) + 1 - startingDate.getDay();
-                        startingDate.setDate(startingDate.getDate() + weekDaysDifference);
-                        break;
-                    case 'Months':
-                        startingDate.setDate(smallTimePeriod?.getDate());
-                        break;
-                    case 'Years':
-                        startingDate.setTime(smallTimePeriod?.getTime());
-                        break;
-                }
-                startingDate.setUTCHours(0, 0, 0, 0);
-                startingDates.push(startingDate.getTime());
-            });
+            const startingDates = findStartingDates(timePeriod, timePeriod2);
 
             const task = {
                 title,

@@ -11,22 +11,17 @@ import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {removeTask, setTaskCurrentEntry} from "../../state/tasksSlice";
+import {setTaskCurrentEntry} from "../../state/tasksSlice";
 import styles from './Taskview.module.scss';
 import {debounce} from "lodash";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import CheckIcon from "@mui/icons-material/Check";
-import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
-import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import {useDeleteTask} from "../../hooks/change-hooks/useDeleteTask";
 
 const TaskView = ({index, length, task}) => {
-    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
-    const {isLoading: groupsLoading, data: groups} = useGetGroups();
-
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
-    const category = categories?.find(category => category.id === task.category);
-    const group = groups?.find(group => group.id === task.group);
+    const {mutate: deleteTask} = useDeleteTask();
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
@@ -43,7 +38,7 @@ const TaskView = ({index, length, task}) => {
 
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        dispatch(removeTask(task._id))
+        deleteTask(task._id);
     }
 
     const setCurrentEntry = useCallback(debounce(() => {
@@ -76,10 +71,10 @@ const TaskView = ({index, length, task}) => {
             </section>
             <section className={'Horizontal-Flex-Container'}>
                 <div className={'Label'}>Category:</div>
-                {task.category && !categoriesLoading && !groupsLoading ?
+                {task.category ?
                     <CategoryIndicator
-                        category={category}
-                        group={group}
+                        categoryId={task.category}
+                        groupId={task.group}
                     /> :
                     <div>None</div>
                 }
