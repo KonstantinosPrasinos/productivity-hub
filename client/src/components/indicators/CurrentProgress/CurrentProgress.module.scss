@@ -1,19 +1,15 @@
 @import 'src/styles/variables.scss';
 
 .container {
-    width: 10em;
+    width: 2.6em;
     height: 2.6em;
-    border-radius: 10em;
+    border-radius: 2.6em;
     position: relative;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: var(--border-color);
-
-    &.typeCheckbox {
-        width: 2.6em;
-    }
 }
 
 .outlineContainer {
@@ -25,7 +21,7 @@
 }
 
 .textContainer {
-    width: 9.6em;
+    width: 2.2em;
     height: 2.2em;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
@@ -41,81 +37,10 @@
     }
 }
 
-.circularBarContainer {
-    position: absolute;
-    height: 1.3em;
-    width: 1.3em;
-    overflow: hidden;
-
-    &.topLeft {
-        top: 0;
-        left: 0;
-    }
-
-    &.topRight {
-        top: 0;
-        right: 0;
-    }
-
-    &.bottomRight {
-        right: 0;
-        bottom: 0;
-    }
-
-    &.bottomLeft {
-        bottom: 0;
-        left: 0;
-    }
-
-    .circularBar {
-        transform: rotate(270deg) translateZ(0px);
-        background-color: #26DE81;
-        width: 100%;
-        height: 100%;
-        
-        &.topLeft {
-            transform-origin: bottom right;
-        }
-
-        &.topRight {
-            transform-origin: bottom left;
-        }
-
-        &.bottomRight {
-            transform-origin: top left;
-        }
-
-        &.bottomLeft {
-            transform-origin: top right;
-        }
-    }
-}
-
-.straightBarContainer {
-    transform: scaleX(0) translateZ(0px);
-    height: 1.3em;
-    width: 7.4em;
-    position: absolute;
-    left: 1.3em;
-    background-color: #26DE81;
-
-    &.top {
-        top: 0;
-        transform-origin: left;
-    }
-
-    &.bottom {
-        bottom: 0;
-        transform-origin: right;
-    }
-}
-
-.button {
-    transition: transform 0.2s;
-    &:hover {
-        transform: scale(1.1);
-    }
-    &:active {
-        transform: scale(0.9);
-    }
+circle {
+    stroke-width: 10px;
+    stroke-linecap: round;
+    fill: transparent;
+    transform: rotate(180deg);
+    transform-origin: center;
 }

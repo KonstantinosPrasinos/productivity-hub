@@ -1,8 +1,12 @@
 const AWS = require('aws-sdk');
 const nodemailer = require("nodemailer");
-const verifyEmail = require('./verifyEmail');
+const verifyEmail = require('./verifyEmailTemplate');
+const passwordReset = require('./passwordResetTemplate');
+const crypto = require("crypto");
+const VerificationCode = require("../models/verificationCodeSchema");
+const bcrypt = require("bcrypt");
 
-const sendEmail = async (code, email) => {
+const sendEmail = async (email, type) => {
     let transporter;
 
     if (process.env.NODE_ENV !== 'production') {
@@ -25,9 +29,28 @@ const sendEmail = async (code, email) => {
         });
     }
 
+    await VerificationCode.findOneAndDelete({userEmail: email});
 
+    let randomCode = crypto.randomInt(100000, 999999);
 
-    await transporter.sendMail(verifyEmail(email, code));
+    const hashedCode = bcrypt.hashSync(randomCode.toString(), 10)
+
+    await VerificationCode.create({userEmail: email, code: hashedCode});
+
+    let emailTemplate;
+
+    switch (type) {
+        case 'email':
+            emailTemplate = verifyEmail(email, randomCode.toString());
+            break;
+        case 'resetPassword':
+            emailTemplate = passwordReset(email, randomCode.toString());
+            break;
+    }
+
+    await transporter.sendMail(emailTemplate, (err) => {
+        return !!err;
+    });
 }
 
 module.exports = {sendEmail};

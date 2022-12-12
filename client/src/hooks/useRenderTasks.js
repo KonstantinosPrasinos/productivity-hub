@@ -1,92 +1,95 @@
-import {useSelector} from "react-redux";
+import {useEffect, useMemo} from "react";
+import {useGetTasks} from "./get-hooks/useGetTasks";
 
-export function useRenderTasks(usesTime) {
-    const tasks = useSelector((state) => state?.tasks.tasks);
-    const groups = useSelector((state) => state?.groups.groups);
+const tasksNextUpdate = {}; // has _id and nextUpdateTime pairs (used to cut down future calculations)
 
-    // Create array of tasks to be rendered
-    const groupedTasks = [];
+const findNextUpdate = (startingTime, time, unit) => {
+    const date = new Date(startingTime);
+    const currentDate = new Date();
+    let functionName;
+    let timeToAdd = time;
 
-    const checkTime = (task) => {
-        const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
-        let isCorrectTime = false;
-
-        for (const startingTime of task.repeatRate.startingDate) {
-            const formattedDate = new Date();
-            formattedDate.setTime(startingTime);
-
-            const differenceInDays = (startingDate) => {
-                // Calculates the difference in days between two dates
-                const days = ((startingDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24))
-                return days < 0 ? Math.ceil(days) : Math.floor(days);
-            }
-
-            switch (task.repeatRate.bigTimePeriod) {
-                case 'Days':
-                    if (differenceInDays(formattedDate) % task.repeatRate.number === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Weeks':
-                    if (differenceInDays(formattedDate) % (task.repeatRate.number * 7) === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Months':
-                    const yearsDifference = currentDate.getFullYear() - formattedDate.getFullYear();
-                    const monthsDifference = currentDate.getMonth() * yearsDifference - formattedDate.getMonth();
-                    if (monthsDifference % task.repeatRate.number === 0) {
-                        isCorrectTime = true;
-                    }
-                    break;
-                case 'Years':
-                    if (currentDate.getFullYear() === formattedDate.getFullYear() &&
-                        (currentDate.getFullYear() - formattedDate.getFullYear()) % task.repeatRate.number === 0 &&
-                        currentDate.getMonth() === formattedDate.getMonth() &&
-                        currentDate.getDate() === formattedDate.getDate()
-                    ){
-                        isCorrectTime = true;
-                    }
-                    break;
-            }
-
-            if (isCorrectTime) {
-                return true;
-            }
-        }
-
-        return false;
+    switch(unit) {
+        case 'Days':
+            functionName = 'Date';
+            break;
+        case 'Weeks':
+            functionName = 'Date';
+            timeToAdd *= 7;
+            break;
+        case 'Months':
+            functionName = 'Month';
+            break;
+        case 'Years':
+            functionName = 'FullYear'
+            break;
+        default:
+            functionName = 'Date';
+            break;
     }
 
-    // Add tasks to array grouped by timeGroup sorted by task priority. Only if they have children tasks
-    groups.forEach(group => {
+    while(currentDate.getTime() > date.getTime()) {
+        date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+    }
 
-        // Check if the group should be rendered at the current time
-        if (usesTime) {
-            if (!checkTime(group)) {
-                return;
-            }
+    date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
+
+    return date;
+}
+
+const checkTime = (task) => {
+    let isCorrectTime = false;
+    let taskNextUpdate = null;
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+
+    for (const startingTime of task.repeatRate.startingDate) {
+        const nextUpdate = findNextUpdate(startingTime, task.repeatRate.number, task.repeatRate.bigTimePeriod);
+        if (taskNextUpdate === null || nextUpdate < taskNextUpdate) {
+            taskNextUpdate = nextUpdate;
         }
 
-        const groupTasks = tasks.filter(task => task.timeGroup === group.id);
+        nextUpdate.setUTCHours(0, 0, 0, 0);
 
-        if (!groupTasks.length) {
-            return;
-        }
+        isCorrectTime = nextUpdate.getTime() === currentDate.getTime();
+        if (isCorrectTime) break;
+    }
 
-        groupedTasks.push({
-            priority: group.priority,
-            tasks: groupTasks.sort((a, b) => b.priority - a.priority)
-        });
-    });
+    tasksNextUpdate[task._id] = taskNextUpdate.getTime();
 
-    // Add the tasks that aren't in a timeGroup
+    return isCorrectTime;
+}
+
+const addGroupsToArray = (groupedTasks, usesTime) => {
+    // groups.forEach(group => {
+    //
+    //     // Check if the group should be rendered at the current time
+    //     if (usesTime) {
+    //         if (!checkTime(group)) {
+    //             return;
+    //         }
+    //     }
+    //
+    //     const groupTasks = tasks.filter(task => task.timeGroup === group.id);
+    //
+    //     if (!groupTasks.length) {
+    //         return;
+    //     }
+    //
+    //     groupedTasks.push({
+    //         priority: group.priority,
+    //         tasks: groupTasks.sort((a, b) => b.priority - a.priority)
+    //     });
+    // });
+}
+
+const addTasksToArray = (groupedTasks, usesTime, tasks) => {
     tasks.forEach(task => {
         // Check if the task should be rendered at the current time
         // First checks if the component it will be rendered in even cares about time
         // Then it checks if the task repeats
-        // And then it check if the task is in a timegroup
+        // And then it check if the task is in a time group
         if (task.repeats) {
             if (!task.timeGroup) {
                 if (usesTime) {
@@ -101,42 +104,51 @@ export function useRenderTasks(usesTime) {
             groupedTasks.push(task);
         }
     })
+}
+
+const findLeastUpdateTime = () => {
+    let min = null;
+
+    Object.values(tasksNextUpdate).forEach(key => {
+        if (min === null || min > key) {
+            min = key;
+        }
+    })
+
+    return min;
+}
+
+const addTasksToData = (usesTime, tasks) => {
+    const groupedTasks = [];
+
+    // addGroupsToArray(groupedTasks, usesTime);
+    addTasksToArray(groupedTasks, usesTime, tasks);
 
     // Sort the tasks to be rendered in increasing priority
     groupedTasks.sort((a, b) => b.priority - a.priority);
 
+    return groupedTasks
+}
 
-    // Create arrays for completed and
-    // const completedTasks = [];
-    // const incompleteTasks = [];
-    //
-    // groupedTasks.filter(task => {
-    //     const checkTaskCompletion = (task) => {
-    //         if (task.type === 'Checkbox') {
-    //             if (task.previousEntry === 1) {
-    //                 completedTasks.push(task);
-    //             } else {
-    //                 incompleteTasks.push(task);
-    //             }
-    //         } else {
-    //             if (task.goal.type === 'At least' && task.goal.number < task.previousEntry) {
-    //                 completedTasks.push(task);
-    //             } else {
-    //                 incompleteTasks.push(task);
-    //             }
-    //         }
-    //     }
-    //
-    //     if (Array.isArray(task)) {
-    //
-    //         task.forEach(subTask => {
-    //             checkTaskCompletion(subTask)
-    //         })
-    //
-    //     } else {
-    //         checkTaskCompletion(task);
-    //     }
-    // })
+// useEffect(() => {
+//     timeOut = setTimeout(addTasksToData, findLeastUpdateTime() - (new Date).getTime());
+//
+//     return () => {
+//         clearTimeout(timeOut);
+//     }
+// }, [])
 
-    return {tasks: groupedTasks};
+// const data = useMemo(addTasksToData, [tasks, groups])
+
+export function useRenderTasks(usesTime = false) {
+
+    const {isLoading, isError, data} = useGetTasks();
+
+    const tasks = useMemo(() => {
+        if (!isLoading) {
+            return addTasksToData(usesTime, data)
+        }
+    }, [data, isLoading]);
+
+    return {isLoading, isError, data: tasks};
 }

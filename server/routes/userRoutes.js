@@ -1,6 +1,8 @@
 const express = require('express');
 const passport = require('passport');
-const {signupUser, logoutUser, deleteUser, changePassword, changeEmail} = require('../controllers/userController');
+const {signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail,
+    forgotPasswordSetPassword, resetUser
+} = require('../controllers/userController');
 
 const router = express.Router();
 
@@ -22,5 +24,8 @@ router.post('/logout', logoutUser);
 router.post('/delete', deleteUser);
 router.post('/change-password', changePassword);
 router.post('/change-email', changeEmail);
+router.post('/forgot-password/send-email', forgotPasswordSendEmail);
+router.post('/forgot-password/set-password', forgotPasswordSetPassword);
+router.post('/reset', resetUser);
 
 module.exports = router;

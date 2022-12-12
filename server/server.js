@@ -16,6 +16,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
+const taskHistoryRoutes = require('./routes/taskHistoryRoutes');
 
 // Express app
 const app = express();
@@ -52,7 +53,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    done(null, user._id);
 });
 
 passport.deserializeUser(function(user, done) {
@@ -66,10 +67,11 @@ passport.use(loginUser);
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/settings', settingsRoutes)
-app.use('/api/tasks', taskRoutes);
-app.use('/api/groups', groupRoutes);
-app.use('/api/categories', categoryRoutes);
+app.use('/api/task', taskRoutes);
+app.use('/api/group', groupRoutes);
+app.use('/api/category', categoryRoutes);
 app.use('/api/verify', verificationRoutes);
+app.use('/api/entries', taskHistoryRoutes);
 
 // Connect to database
 mongoose.connect(process.env.MONG_URI)

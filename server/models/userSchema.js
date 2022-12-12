@@ -6,21 +6,15 @@ const User = new mongoose.Schema({
             type: String, unique: true, required: true
         }, password: {
             type: String, required: true
-        },
-        username: {
+        }, username: {
             type: String, required: false
         }
-    },
-    google: {
+    }, google: {
         googleId: {type: String, required: false}
-    },
-    createdAt: {
-        type: Date,
-        default: new Date()
-    },
-    active: {
-        type: Boolean,
-        default: false
+    }, createdAt: {
+        type: Date, default: new Date()
+    }, active: {
+        type: Boolean, default: false
     }
 }, {timestamps: true});
 

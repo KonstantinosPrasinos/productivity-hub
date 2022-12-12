@@ -11,16 +11,35 @@ export function useSettings () {
             credentials: 'include'
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
 
         } else {
-            const data = await response.json();
+            dispatch(setSettings({...data, priorityBounds: {low: 1, high: 1}}));
 
-            dispatch(setSettings(data));
-
-            localStorage.setItem('settings', JSON.stringify(data));
+            localStorage.setItem('settings', JSON.stringify({...data, priorityBounds: {low: 1, high: 1}}));
         }
     }
 
-    return {getSettings};
+    const setSettingsServer = async (settings) => {
+        const response = await fetch('http://localhost:5000/api/settings/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({settings}),
+            credentials: 'include'
+        });
+
+        dispatch(setSettings({...settings, priorityBounds: {low: 1, high: 1}}));
+
+        localStorage.setItem('settings', JSON.stringify({...settings, priorityBounds: {low: 1, high: 1}}));
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+        }
+    }
+
+    return {getSettings, setSettingsServer};
 }

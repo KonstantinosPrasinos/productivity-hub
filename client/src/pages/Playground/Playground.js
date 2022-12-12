@@ -8,9 +8,9 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 
 import Skeleton from "../../components/utilities/Skeleton/Skeleton";
-import AlertHandler from "../../components/utilities/AlertHandler/AlertHandler";
+import AlertHandler from "../../components/handlers/AlertHandler/AlertHandler";
 import { AlertsContext } from "../../context/AlertsContext";
-import VisualStreak from "../../components/indicators/VisualStreak/VisualStreak";
+import Streak from "../../components/indicators/Streak/Streak";
 
 import EmailIcon from '@mui/icons-material/Email';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -25,8 +25,20 @@ const Playground = () => {
   const [percentage, setPercentage] = useState(0);
   const chipGroup = ["Option 1", "Option 2", "Option 3"];
 
+  const testingTask = {
+      type: 'Number',
+      goal: {
+          number: 100
+      },
+      previousEntries: {
+          mostRecent: 10,
+      },
+      _id: "22",
+      step: 10
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={'Stack-Container'}>
       <div>
         {chipGroup.map((chip, index) => (
           <Chip
@@ -78,11 +90,9 @@ const Playground = () => {
         <button onClick={() => {alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Hello there this is a warning"}})}}>Add error</button>
         <button onClick={() => {setPercentage(percentage + 5)}}>Increase percentage by 5</button>
         <button onClick={() => {setPercentage(percentage - 5)}}>Decrease percentage by 5</button>
-        <AlertHandler></AlertHandler>
-        <CurrentProgress current={percentage} total={100} setCurrent={setPercentage} step={5}></CurrentProgress>
-        {/*<VisualStreak streak={"010111"}></VisualStreak>*/}
+        <Streak streak={"0101110"}></Streak>
+        <CurrentProgress task={testingTask}></CurrentProgress>
         <InputWrapper label="Ends at:"><TextBoxInput placeholder={"Number"}></TextBoxInput></InputWrapper>
-        <PriorityIndicator></PriorityIndicator>
         <ColorInput selected={'red'} setSelected={() => {}}></ColorInput>
         {/*<Task tasks={[{title: 'Workout', streak: '100110'}, {title: 'Workout', streak: '100110'}]}></Task>*/}
     </div>

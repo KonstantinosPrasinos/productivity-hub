@@ -5,9 +5,10 @@ import {useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../context/AlertsContext";
 import {useVerify} from "../../hooks/useVerify";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../components/buttons/TextButton/TextButton";
-import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
+import SurfaceContainer from "../../components/containers/SurfaceContainer/SurfaceContainer";
+import {useAuth} from "../../hooks/useAuth";
 
 const ResetPassword = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -17,7 +18,8 @@ const ResetPassword = () => {
     const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyVerificationCode} = useVerify();
+    const {verifyForgotPassword, resendForgotPasswordCode} = useVerify();
+    const {resetPasswordEmail, setForgotPassword} = useAuth();
     const navigate = useNavigate();
     const alertsContext = useContext(AlertsContext);
 
@@ -67,27 +69,31 @@ const ResetPassword = () => {
         navigate(-1);
     }
 
-    const handleNextPage = () => {
+    const handleNextPage = async () => {
         switch (currentPage) {
             case 0:
                 // Verify email
                 if (validateEmail()) {
+                    await resetPasswordEmail(email);
                     setCurrentPage(1);
+                } else {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
                 }
                 break;
             case 1:
-                // Verify code
-                if (verifyVerificationCode(verificationCode)) {
+                const redirect = await verifyForgotPassword(email, verificationCode);
+                if (redirect) {
                     setCurrentPage(2);
-                } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Verification code is invalid"}});
                 }
                 break;
             case 2:
                 // Check if password is strong enough
                 if (passwordScore !== 0) {
                     if (reEnterPassword === newPassword){
-                        setCurrentPage(3)
+                        const redirect = await setForgotPassword(newPassword);
+                        if (redirect) {
+                            setCurrentPage(3)
+                        }
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
                     }
@@ -99,6 +105,10 @@ const ResetPassword = () => {
                 navigate(-1);
                 break;
         }
+    }
+
+    const handleResendCode = async () => {
+        await resendForgotPasswordCode(email)
     }
 
     const handlePasswordScore = (score) => {
@@ -150,7 +160,7 @@ const ResetPassword = () => {
                             setValue={handleVerificationCode}
                             onKeydown={handleKeyDown}
                         />
-                        <TextButton>Didn't receive code?</TextButton>
+                        <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
                     </div>
                 </div>
                 <div className={'Stack-Container'}>
@@ -165,7 +175,7 @@ const ResetPassword = () => {
                         setValue={setNewPassword}
                         invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
                     />
-                    <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore}/>
+                    <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore} style={{padding: '0 10px', marginTop: 0}} />
                     <TextBoxInput
                         type={'password'}
                         width={'max'}

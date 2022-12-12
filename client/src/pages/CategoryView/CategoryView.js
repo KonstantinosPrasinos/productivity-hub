@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
-import {useSelector} from "react-redux";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -10,12 +9,15 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CategoryView.module.scss';
 import {useSafeDeleteCategory} from "../../hooks/useSafeDeleteCategory";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 
 const CategoryView = ({index, length, category}) => {
     const {safeDeleteCategory} = useSafeDeleteCategory(category);
     const miniPagesContext = useContext(MiniPagesContext);
 
-    const groups = useSelector(state => state?.groups.groups).filter(group => group.parent === category.id);
+    const {data: unfilteredGroups} = useGetGroups();
+
+    const groups = unfilteredGroups?.filter(group => group.parent === category.id);
 
     const [selectedGroup, setSelectedGroup] = useState();
 

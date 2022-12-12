@@ -33,4 +33,9 @@
         opacity: $opacity-low;
         cursor: not-allowed;
     }
+
+    &.isWarning {
+        color: var(--error-color);
+        border-color: var(--error-color);
+    }
 }

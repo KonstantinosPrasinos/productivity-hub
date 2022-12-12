@@ -1,7 +1,7 @@
-import React, {useContext, useState} from 'react';
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import React, {useCallback, useContext, useState} from 'react';
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -11,18 +11,23 @@ import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {removeTask} from "../../state/tasksSlice";
+import {setTaskCurrentEntry} from "../../state/tasksSlice";
+import styles from './Taskview.module.scss';
+import {debounce} from "lodash";
+import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
+import CheckIcon from "@mui/icons-material/Check";
+import {useDeleteTask} from "../../hooks/change-hooks/useDeleteTask";
 
 const TaskView = ({index, length, task}) => {
-    const categories = useSelector((state) => state?.categories.categories);
     const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
-    const category = categories.find(category => category.id === task.category);
+    const {mutate: deleteTask} = useDeleteTask();
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
 
     const [date, setDate] = useState(new Date);
+    const [currentValue, setCurrentValue] = useState(task.currentEntryValue);
 
     const addToMonth = (adder) => {
         const newDate = new Date(date.getTime());
@@ -33,7 +38,23 @@ const TaskView = ({index, length, task}) => {
 
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        dispatch(removeTask(task.id))
+        deleteTask(task._id);
+    }
+
+    const setCurrentEntry = useCallback(debounce(() => {
+        dispatch(setTaskCurrentEntry({id: task._id, value: currentValue}));
+    }, 300), []);
+
+    const handleSetCurrentValueCheckbox = () => {
+        const newValue = currentValue === 1 ? 0 : 1
+
+        setCurrentValue(newValue);
+        setCurrentEntry();
+    }
+
+    const handleSetCurrentValueNumber = (value) => {
+        setCurrentValue(value);
+        setCurrentEntry();
     }
 
     return (
@@ -44,7 +65,7 @@ const TaskView = ({index, length, task}) => {
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Title'}>{task.title}</div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task.id}})}><EditIcon /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}><EditIcon /></IconButton>
                     <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
                 </div>
             </section>
@@ -52,13 +73,30 @@ const TaskView = ({index, length, task}) => {
                 <div className={'Label'}>Category:</div>
                 {task.category ?
                     <CategoryIndicator
-                        category={category.title}
-                        categoryId={category.id}
-                        group={task.timeGroup}
-                        color={category.color}
+                        categoryId={task.category}
+                        groupId={task.group}
                     /> :
                     <div>None</div>
                 }
+            </section>
+            <section className={'Horizontal-Flex-Container'}>
+                <div className={'Label'}>Today's Entry:</div>
+                {task.type === 'Checkbox' ?
+                    <div className={`${styles.checkbox} ${currentValue === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
+                        <CheckIcon sx={{
+                            width: '100%',
+                            height: '100%',
+                            opacity: currentValue === 1 ? 1 : 0,
+                            "&:hover": {
+                                opacity: 1,
+                            }
+                        }} />
+                    </div> :
+                    <div className={'Horizontal-Flex-Container'}>
+                        <Button onClick={() => handleSetCurrentValueNumber(currentValue - task.step)}>-{task.step}</Button>
+                        <TextBoxInput value={currentValue} setValue={handleSetCurrentValueNumber}></TextBoxInput>
+                        <Button onClick={() => handleSetCurrentValueNumber(currentValue + task.step)}>+{task.step}</Button>
+                    </div>}
             </section>
             <Divider />
             <section className={'Grid-Container Two-By-Two'}>

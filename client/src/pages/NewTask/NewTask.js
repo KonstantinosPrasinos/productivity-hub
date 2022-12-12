@@ -1,54 +1,70 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useMemo, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
-import {useDispatch, useSelector} from "react-redux";
-import {v4 as uuidv4} from 'uuid';
-import {addTask, setTask} from "../../state/tasksSlice";
-import MiniPageContainer from "../../components/utilities/MiniPagesContainer/MiniPageContainer";
+import {useDispatch} from "react-redux";
+import {setTask} from "../../state/tasksSlice";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import AddIcon from "@mui/icons-material/Add";
-import CollapsibleContainer from "../../components/utilities/CollapsibleContainer/CollapsibleContainer";
-import {setHighestPriority, setLowestPriority} from "../../state/settingsSlice";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import Divider from "../../components/utilities/Divider/Divider";
+import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
+import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import {useAddTask} from "../../hooks/add-hooks/useAddTask";
+import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
+import {findStartingDates} from "../../functions/findStartingDates";
 
 const NewTask = ({index, length, id}) => {
-    const categories = useSelector((state) => state?.categories.categories);
-    const categoryNames = categories?.map(category => category.title);
-    const {defaults} = useSelector((state) => state?.user.settings);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+    
+    const getCategoryTitles = () => {
+        const titles = ['None'];
+        
+        if (categoriesLoading) return titles
+        
+        titles.push(...categories?.map(category => category.title));
+        
+        return titles;
+    }
+
+    const categoryTitles = useMemo(getCategoryTitles, [categoriesLoading])
+    
+    const {data: settings} = useGetSettings();
+
+    const taskMutation = useAddTask();
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
-    const [step, setStep] = useState(defaults.step);
+    const [step, setStep] = useState(settings.defaults.step);
     const [goalType, setGoalType] = useState('At least');
-    const [goalNumber, setGoalNumber] = useState(defaults.goal);
-    const [category, setCategory] = useState('');
-    const [priority, setPriority] = useState(defaults.priority);
+    const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
+    const [category, setCategory] = useState('None');
+    const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
-    const [longGoalNumber, setLongGoalNumber] = useState(defaults.goal);
+    const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
-    const [repeatNumber, setRepeatNumber] = useState(defaults.priority);
+    const [repeatNumber, setRepeatNumber] = useState(settings.defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
     const [repeatType, setRepeatType] = useState('Custom Rules')
 
-    const groups = useSelector((state) => state?.groups.groups);
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
-
-    const tasks = useSelector((state) => state?.tasks.tasks);
-    const {low, high} = useSelector((state) => state?.user.priorityBounds);
+    const {isLoading, data: tasks} = useGetTasks();
 
     const dispatch = useDispatch();
 
@@ -67,19 +83,22 @@ const NewTask = ({index, length, id}) => {
         }
     }
 
-
-
     const findMatchingGroups = () => {
-        const categoryId = categories.find(localCategory => localCategory.title === category)?.id
+        const titles = ['None'];
 
-        return groups.filter(group => group.parent === categoryId).map(group => group.title)
+        if (groupsLoading) return titles;
+
+        const categoryId = categories?.find(localCategory => localCategory.title === category)?.id
+
+        titles.push(...groups.filter(group => group.parent === categoryId).map(group => group.title));
+
+        return titles;
     }
-
-    const groupTitles = ['None', ...findMatchingGroups()];
+    const groupTitles = useMemo(findMatchingGroups, [groupsLoading]);
 
     useEffect(() => {
-        if (id) {
-            const task = tasks.find(task => task.id === id);
+        if (id && !isLoading) {
+            const task = tasks.find(task => task._id === id);
 
             setTitle(task.title);
             setType(task.type);
@@ -109,7 +128,7 @@ const NewTask = ({index, length, id}) => {
                 }
             }
         }
-    }, [])
+    }, [isLoading]);
 
     useEffect(() => {
         if (timeGroup) {
@@ -128,7 +147,7 @@ const NewTask = ({index, length, id}) => {
         setTimePeriod2([]);
     }, [timePeriod])
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const checkAllInputs = () => {
             if (title) {
                 return true
@@ -137,84 +156,40 @@ const NewTask = ({index, length, id}) => {
             return false;
         }
 
-        if (checkAllInputs()) {
-            let localId;
-
-            if (id) {
-                localId = id;
-            } else {
-                let idIsValid = true;
-
-                do {
-                    localId = uuidv4();
-                    idIsValid = !tasks.find(task => task.id === localId);
-                } while (idIsValid === false);
-            }
-
-            if (priority < low) {
-                dispatch(setLowestPriority(priority));
-            }
-            if (priority > high) {
-                dispatch(setHighestPriority(priority));
-            }
-
-            let startingDates = [];
-            timePeriod2.forEach(smallTimePeriod => {
-                let startingDate = new Date();
-
-                switch (timePeriod) {
-                    case 'Days':
-                        break;
-                    case 'Weeks':
-                        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-                        const weekDaysDifference = days.findIndex(day => day === smallTimePeriod) + 1 - startingDate.getDay();
-                        startingDate.setDate(startingDate.getDate() + weekDaysDifference);
-                        break;
-                    case 'Months':
-                        startingDate.setDate(smallTimePeriod?.getDate());
-                        break;
-                    case 'Years':
-                        startingDate.setTime(smallTimePeriod?.getTime());
-                        break;
-                }
-                startingDate.setHours(0, 0, 0, 0);
-                startingDates.push(startingDate.getTime());
-            });
+        if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
+            const startingDates = findStartingDates(timePeriod, timePeriod2);
 
             const task = {
-                id: localId,
                 title,
                 type,
-                step: type === 'Number' ? (step ? step : defaults.step) : null,
+                step: type === 'Number' ? (step ? step : settings.defaults.step) : undefined,
                 goal: type === 'Number' ? {
                     type: goalType,
-                    number: goalType === 'None' ? null : (goalNumber ? goalNumber : defaults.goal)
-                } : null,
-                category: category ? categories.find(localCategory => localCategory.title === category)?.id : null,
-                priority: priority ? priority : defaults.priority,
+                    number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
+                } : undefined,
+                category: category ? categories?.find(localCategory => localCategory.title === category)?._id : undefined,
+                priority: priority ? priority : settings.defaults.priority,
                 repeats,
                 longGoal: repeats ? {
-                    goalType: longGoalType,
-                    number: longGoalType === 'None' ? null : (longGoalNumber ? longGoalNumber : defaults.goal)
-                } : null,
-                expiresAt: repeats ? expiresAt : null,
-                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : null,
+                    type: longGoalType,
+                    number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
+                } : undefined,
+                expiresAt: repeats ? expiresAt : undefined, // need to fix
+                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : undefined,
                 repeatRate: repeats && !timeGroup ? {
                     number: repeatNumber,
                     bigTimePeriod: timePeriod,
                     smallTimePeriod: timePeriod2,
                     startingDate: startingDates
-                } : null,
-                lastEntryDate: null,
-                previousEntry: 0,
-                shortHistory: '000000'
+                } : undefined,
+                currentEntryValue: 0,
+                streak: repeats ? "0000000" : undefined
             }
 
             if (id) {
                 dispatch(setTask(task));
             } else {
-                dispatch(addTask(task));
+                taskMutation.mutate(task);
             }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
@@ -267,7 +242,7 @@ const NewTask = ({index, length, id}) => {
             <InputWrapper label={"Category"}>
                 <DropDownInput
                     placeholder={'Category'}
-                    options={[...categoryNames,
+                    options={[...categoryTitles,
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                             Add new
                             <AddIcon />

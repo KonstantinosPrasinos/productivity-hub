@@ -2,15 +2,15 @@ const validator = require("validator");
 const VerificationCode = require('../models/verificationCodeSchema');
 const User = require('../models/userSchema');
 const bcrypt = require("bcrypt");
+const {sendEmail} = require('../email/sendEmail');
+const crypto = require('crypto');
 
-const verifyEmail = (req, res) => {
+const verifyEmail = (req, res, deleteVerificationCode = true) => {
     const {email, code} = req.body;
 
     if (!email || !code) {return res.status(400).json({message: 'All fields must be filled.'})}
 
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({message: 'Email is invalid.'});
-    }
+    if (!validator.isEmail(email)) {return res.status(400).json({message: 'Email is invalid.'})}
 
     VerificationCode.findOne({userEmail: email}, async (err, verificationCode) => {
         if (err) {return res.statusCode(500).json({message: 'Internal server error.'})}
@@ -18,11 +18,40 @@ const verifyEmail = (req, res) => {
 
         if (!bcrypt.compareSync(code, verificationCode.code)) {return res.status(400).json({message: 'Incorrect email or verification code!'})}
 
-        await User.findOneAndUpdate({'local.email': email}, {$set: {'active': true}});
-        await VerificationCode.findOneAndDelete({userEmail: email});
+        if (deleteVerificationCode) {
+            await User.findOneAndUpdate({'local.email': email}, {$set: {'active': true}});
+            await VerificationCode.findOneAndDelete({userEmail: email});
+        } else {
+            req.session.userEmail = email;
+            req.session.cookie.expires = false;
+        }
 
         return res.status(200).json({message: 'Email verification successful.'});
     })
 }
 
-module.exports = {verifyEmail};
+const resendVerifyEmail = async (req, res, type='email') => {
+    const {email} = req.body;
+
+    if (!email) {return res.status(400).json({message: 'All fields must be filled.'})}
+
+    if (!validator.isEmail(email)) {return res.status(400).json({message: 'Email is invalid.'})}
+
+    let randomCode = crypto.randomInt(100000, 999999);
+
+    await VerificationCode.findOneAndUpdate({userEmail: email}, {$set: {code: bcrypt.hashSync(randomCode.toString(), 10)}});
+
+    await sendEmail(email, type);
+
+    return res.status(200).json({message: 'Email resent successfully.'});
+}
+
+const verifyForgotPassword = async (req, res) => {
+    verifyEmail(req, res, false)
+}
+
+const resendForgotPasswordEmail = async (req, res) => {
+    await resendVerifyEmail(req, res, 'resetPassword');
+}
+
+module.exports = {verifyEmail, resendVerifyEmail, verifyForgotPassword, resendForgotPasswordEmail};

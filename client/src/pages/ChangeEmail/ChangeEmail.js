@@ -7,8 +7,8 @@ import {ModalContext} from "../../context/ModalContext";
 import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
 import TextButton from "../../components/buttons/TextButton/TextButton";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
-import SurfaceContainer from "../../components/utilities/SurfaceContainer/SurfaceContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
+import SurfaceContainer from "../../components/containers/SurfaceContainer/SurfaceContainer";
 
 const ChangeEmail = () => {
     const {verifyPassword, verifyVerificationCode} = useVerify();

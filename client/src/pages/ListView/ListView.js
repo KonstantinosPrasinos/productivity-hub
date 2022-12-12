@@ -3,28 +3,32 @@ import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence, motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import styles from './ListView.module.scss';
-import {useSelector} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import {ScreenSizeContext} from "../../context/ScreenSizeContext";
-import SwitchContainer from "../../components/utilities/SwitchContainer/SwitchContainer";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import Chip from "../../components/buttons/Chip/Chip";
+import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
+import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
+import {useScreenSize} from "../../hooks/useScreenSize";
 
 const ListView = () => {
     const miniPagesContext = useContext(MiniPagesContext);
-    const screenSizeContext = useContext(ScreenSizeContext);
-    const {tasks} = useRenderTasks(true);
-    const categories = useSelector(state => state?.categories.categories);
-    const groups = useSelector(state => state?.groups.groups);
+    const {screenSize} = useScreenSize();
+    const {data: tasks, isLoading: tasksLoading} = useRenderTasks(false);
+    const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+    const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
     const chipOptions = ['Tasks', 'Categories'];
     const [selectedSection, setSelectedSection] = useState('Tasks');
 
-    const renderTasks = () => (<div className={`Centered Stack-Container ${styles.leftSide}`}>
-        <AnimatePresence initial={false} exitBeforeEnter>
-            {tasks.map((task) => task.hasOwnProperty('timeGroup') ? (
-                <Task key={task.id} tasks={[task]}></Task>) : (
+    const renderTasks = () => {
+        if (tasksLoading || categoriesLoading || groupsLoading) return <LoadingIndicator />
+
+        return (<div className={`Stack-Container ${styles.leftSide}`}>
+            {tasks !== false && tasks.map((task) => !task.hasOwnProperty('tasks') ? (
+                <Task key={task._id} tasks={[task]}></Task>) : (
                 <Task key={task.tasks[0].id} tasks={task.tasks}></Task>))}
-            {tasks.length === 0 && <motion.div
+            {tasks !== false && tasks.length === 0 && <motion.div
                 initial={{opacity: 0, y: 50, scale: 0.3}}
                 animate={{opacity: 1, y: 0, scale: 1}}
                 exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
@@ -32,13 +36,15 @@ const ListView = () => {
             >
                 No tasks
             </motion.div>}
-        </AnimatePresence>
-    </div>)
+        </div>)
+    }
 
-    const renderCategories = () => (<div className={`Stack-Container Centered ${styles.rightSide}`}>
-        <AnimatePresence initial={false} exitBeforeEnter>
+    const renderCategories = () => {
+        if (categoriesLoading || groupsLoading) return <LoadingIndicator />
+
+        return (<div className={`Stack-Container ${styles.rightSide}`}>
             {categories?.length > 0 ? (categories.map(category => {
-                const categoryGroups = groups.filter(group => group.parent === category.id);
+                const categoryGroups = groups?.filter(group => group.parent === category._id);
 
                 return (<motion.div
                     initial={{ opacity: 0, y: 50, scale: 0.3 }}
@@ -47,10 +53,10 @@ const ListView = () => {
                     layout
 
                     className={`Rounded-Container Stack-Container ${styles.categoryContainer}`}
-                    key={category.id}
+                    key={category._id}
                     onClick={() => {
                         miniPagesContext.dispatch({
-                            type: 'ADD_PAGE', payload: {type: 'category-view', id: category.id}
+                            type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}
                         })
                     }}
                 >
@@ -71,8 +77,8 @@ const ListView = () => {
             >
                 No categories
             </motion.div>}
-        </AnimatePresence>
-    </div>)
+        </div>)
+    }
 
     const renderSwitchComponent = () => (
         <div className={`Stack-Container ${styles.mobileView}`}>
@@ -83,14 +89,16 @@ const ListView = () => {
         </div>
     )
 
-    return (<div className={`${screenSizeContext.state !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}>
-        {screenSizeContext.state === 'small' &&
+    return (<div className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}>
+        {screenSize === 'small' &&
             <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
                 {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
             </div>
         }
-            {screenSizeContext.state !== 'small' ? renderTasks() : renderSwitchComponent()}
-            {screenSizeContext.state !== 'small' && renderCategories()}
+        <AnimatePresence initial={false}>
+            {screenSize !== 'small' ? renderTasks() : renderSwitchComponent()}
+            {screenSize !== 'small' && renderCategories()}
+        </AnimatePresence>
         </div>);
 };
 

@@ -7,7 +7,10 @@ const {sendEmail} = require('../email/sendEmail');
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
 const VerificationCode = require('../models/verificationCodeSchema');
-const crypto = require('crypto');
+const Task = require('../models/taskSchema');
+const Category = require('../models/categorySchema');
+const Group = require('../models/groupSchema');
+const TaskHistory = require('../models/taskHistorySchema');
 
 const signupUser = (req, res) => {
     const {email, password} = req.body;
@@ -19,19 +22,18 @@ const signupUser = (req, res) => {
     }
 
     User.findOne({'local.email': email}, async (err, userExists) => {
-        if (userExists) {return res.status(409).json({message: 'User already exists.'})}
+        if (userExists && userExists.active) {return res.status(409).json({message: 'User already exists.'})}
 
         const hashedPassword = bcrypt.hashSync(password, 10);
-        const user = await User.create({local: {email: email, password: hashedPassword}});
-        await Settings.create({userId: user._id});
 
-        let randomCode = crypto.randomInt(100000, 999999);
+        if (!userExists) {
+            const user = await User.create({local: {email: email, password: hashedPassword}});
+            await Settings.create({userId: user._id});
+        }
 
-        await VerificationCode.create({userEmail: email, code: bcrypt.hashSync(randomCode.toString(), 10)});
+        await sendEmail(email, 'email');
 
-        await sendEmail(randomCode, email);
-
-        return res.json({user: {...user._doc, local: {email, password: undefined}, google: undefined}});
+        return res.status(200).json({message: 'Email verification code sent.'});
     });
 }
 
@@ -55,26 +57,42 @@ const logoutUser = (req, res) => {
     }
 }
 
+const deleteAllEntries = (id) => {
+    try {
+        Task.deleteMany({userId: id});
+        TaskHistory.deleteMany({userId: id});
+        Group.deleteMany({userId: id});
+        Category.deleteMany({userId: id});
+    } catch (error) {
+        return error;
+    }
+}
+
 const deleteUser = (req, res) => {
     if (req.user) {
-        const {email, password} = req.body;
+        const {password} = req.body;
 
-        if (!email || !password) {
+        if (!password) {
             return res.status(400).json({message: 'All fields must be filled.'});
         }
 
         if (!bcrypt.compareSync(password, req.user.local.password)) {
-            res.status(400).json({message: 'Incorrect email or password.'});
+            res.status(400).json({message: 'Incorrect password.'});
         }
 
-        Settings.findOneAndDelete({'userId': req.user.id})
+        Settings.findOneAndDelete({'userId': req.user._id})
 
         User.findByIdAndDelete(req.user._id.toString(), (err) => {
             if (err) {
                 return res.status(409).json({message: 'Failed to delete user.' })
             }
-
         });
+
+        const error = deleteAllEntries(req.user._id);
+
+        if (error) {
+            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
+        }
 
         req.session.destroy();
         res.clearCookie('connect.sid');
@@ -85,27 +103,62 @@ const deleteUser = (req, res) => {
     }
 }
 
-const changePassword = async (req, res) => {
+const resetUser = (req, res) => {
     if (req.user) {
-        const {password, newPassword}  = req.body;
+        const {password} = req.body;
 
-        if (!password || !newPassword) {
-            return res.status(400).json({message: 'Password and new password required.'});
+        if (!password) {
+            return res.status(400).json({message: 'All fields must be filled.'});
         }
 
         if (!bcrypt.compareSync(password, req.user.local.password)) {
             res.status(400).json({message: 'Incorrect password.'});
         }
 
-        if (password === newPassword) {
-            res.status(400).json({message: 'New password is the same as the old password.'})
+        Settings.findOneAndUpdate({userId: req.user._id}, {$set: {'theme': 'Light', 'defaults': {'step': 1, 'goal': 1, 'priority': 1}}});
+
+        const error = deleteAllEntries(req.user._id);
+
+        if (error) {
+            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
         }
 
-        const id = req.user._id.valueOf();
+        return res.status(200).json({message: 'User deleted successfully.'});
+    }
+}
 
-        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+const changeUserPassword = async (currentPassword, inputPassword, newPassword, email) => {
+    if (!inputPassword || !newPassword) {
+        return {status: 400, message: 'Password and new password required.'}
+    }
 
-        await User.findByIdAndUpdate(id, {$set: {'local.password': hashedPassword}});
+    if (inputPassword === newPassword) {
+        return {status: 400, message: 'New password is the same as the old password.'}
+    }
+
+    if (currentPassword && !bcrypt.compareSync(inputPassword, currentPassword)) {
+        return {status: 400, message: 'Incorrect password.'}
+    }
+
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+    await User.findOneAndUpdate({'local.email': email}, {$set: {'local.password': hashedPassword}});
+
+    return {status: 200};
+}
+
+const changePassword = async (req, res) => {
+    if (req.user) {
+        const {password, newPassword}  = req.body;
+
+        const email = req.user.local.email;
+        const currentPassword = req.user.local.password;
+
+        const {status, message} = await changeUserPassword(currentPassword, password, newPassword, email);
+
+        if (status !== 200) {
+            return res.status(status).json({message});
+        }
 
         return res.status(200).json({message: 'Password changed successfully.'});
     }
@@ -137,4 +190,49 @@ const changeEmail = async (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail};
+const forgotPasswordSendEmail = async (req, res) => {
+    const {email}  = req.body;
+
+    if (!email) {
+        return res.status(400).json({message: 'Email must be filled.'});
+    }
+
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({message: 'Email is invalid.'})
+    }
+
+    User.findOne({'local.email': email}, async (err, userExists) => {
+        if (userExists && userExists.active) {
+            await sendEmail(email, 'resetPassword')
+        }
+    });
+
+    return res.status(200).json({message: 'If there is an account created with the email you entered, we sent it an email.'});
+}
+
+const forgotPasswordSetPassword = async (req, res) => {
+    const email = req?.session.userEmail;
+
+    if (email) {
+        const {newPassword} = req.body;
+
+        if (!newPassword) {
+            return res.status(400).json({message: 'Password must be filled.'})
+        }
+
+        await VerificationCode.findOneAndDelete({userEmail: email});
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        await User.findOneAndUpdate({'local.email': email}, {$set: {'local.password': hashedPassword}});
+
+        req.session.destroy();
+        res.clearCookie('connect.sid');
+
+        return res.status(200).json({message: 'Password changed successfully.'})
+    } else {
+        return res.status(401).json({message: 'Unauthorized.'})
+    }
+}
+
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail, forgotPasswordSetPassword, resetUser};
