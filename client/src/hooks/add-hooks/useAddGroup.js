@@ -21,7 +21,7 @@ export function useAddGroup() {
     return useMutation({
         mutationFn: postGroup,
         onSuccess: data => {
-            queryClient.setQueryData(["get-groups"], (oldData) => {
+            queryClient.setQueryData(["groups"], (oldData) => {
                 return oldData ? {
                     groups: [...oldData.tasks, data]
                 } : oldData

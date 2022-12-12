@@ -10,7 +10,7 @@ const VerificationCode = require('../models/verificationCodeSchema');
 const Task = require('../models/taskSchema');
 const Category = require('../models/categorySchema');
 const Group = require('../models/groupSchema');
-const TaskHistory = require('../models/taskHistorySchema');
+const Entry = require('../models/entrySchema');
 
 const signupUser = (req, res) => {
     const {email, password} = req.body;
@@ -60,7 +60,7 @@ const logoutUser = (req, res) => {
 const deleteAllEntries = (id) => {
     try {
         Task.deleteMany({userId: id});
-        TaskHistory.deleteMany({userId: id});
+        Entry.deleteMany({userId: id});
         Group.deleteMany({userId: id});
         Category.deleteMany({userId: id});
     } catch (error) {

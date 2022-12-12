@@ -1,6 +1,6 @@
 const Task = require('../models/taskSchema');
 const Joi = require('joi');
-const TaskHistory = require("../models/taskHistorySchema");
+const Entry = require("../models/entrySchema");
 
 const taskSchema = Joi.object({
     title: Joi.string().required(),
@@ -152,25 +152,19 @@ const getTasksWithHistory = async (tasks, userId) => {
     let tasksWithCurrentEntry = [];
 
     for (const task of tasks) {
-        const currentEntry = await TaskHistory
-            .findOne({userId: userId, taskId: task._id, createdAt: {$gt: currentDate}})
-            .exec();
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gt: currentDate}});
 
-        let currentEntryValue;
-
-        if (currentEntry) {
-            currentEntryValue = currentEntry.value;
-        } else {
-            currentEntryValue = 0;
+        if (!currentEntry) {
+            currentEntry = await Entry.create({userId: userId, taskId: task._id})
         }
 
-        tasksWithCurrentEntry.push({...task._doc, currentEntryValue: currentEntryValue})
+        tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id})
     }
 
     // Add streak to tasks
     for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
         if (tasksWithCurrentEntry[i].repeats) {
-            const entriesHistory = await TaskHistory
+            const entriesHistory = await Entry
                 .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, createdAt: {$lt: currentDate}})
                 .sort({ $natural: -1 })
                 .limit(7)
@@ -182,13 +176,13 @@ const getTasksWithHistory = async (tasks, userId) => {
                 const editedTask = await Task.findByIdAndUpdate(tasksWithCurrentEntry[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
                 const streak = assembleEntryHistory(entriesHistory, editedTask);
 
-                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: tasksWithCurrentEntry[i].currentEntryValue, mostRecentProperDate: undefined});
+                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
             } else {
 
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, streak: "0000000", mostRecentProperDate: undefined});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000", mostRecentProperDate: undefined});
             }
         } else {
-            tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, mostRecentProperDate: undefined});
+            tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
         }
     }
 

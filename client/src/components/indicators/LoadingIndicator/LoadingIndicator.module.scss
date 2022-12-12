@@ -7,9 +7,18 @@
   justify-content: center;
   align-items: center;
 
+
   &.fullSize {
     height: 100%;
     width: 100%;
+  }
+
+  &.inline {
+    height: auto;
+    width: auto;
+    border: none;
+    padding: 0 !important;
+    border-radius: 2em !important;
   }
 }
 

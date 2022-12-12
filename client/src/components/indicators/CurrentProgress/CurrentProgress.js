@@ -1,42 +1,42 @@
 import {motion} from "framer-motion";
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
-import {useDispatch} from "react-redux";
-import {setTaskCurrentEntry} from "../../../state/tasksSlice";
 import CheckIcon from '@mui/icons-material/Check';
 import IconButton from "../../buttons/IconButton/IconButton";
-import {debounce} from "lodash";
+import {useChangeEntry} from "../../../hooks/change-hooks/useChangeEntry";
+import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
 
 const CurrentProgress = ({ task }) => {
-  const dispatch = useDispatch();
-
   const [prevPercentage, setPrevPercentage] = useState(0.5);
+  const {mutate: setTaskCurrentEntry} = useChangeEntry();
+  const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
   useEffect(() => {
-    setPrevPercentage(getPercentage());
-  }, [task.currentEntryValue])
+    if (isNaN(entry?.value)) return;
+
+    setPrevPercentage(entry.value)
+  }, [entry?.value])
 
   const handleCompleteClick = () => {
-    dispatch(setTaskCurrentEntry({
-      id: task._id,
-      value: parseInt(task.currentEntryValue) === 0 ? 1 : 0
-    }))
+    if (!isLoading) {
+      const number = entry.value === 0 ? 1 : 0
+      setTaskCurrentEntry({entryId: entry?._id, taskId: task._id, value: number});
+    }
   }
 
   const getPercentage = () => {
+    if (isLoading) return 0;
     let percentage;
 
     if (task.type === 'Checkbox') {
-      percentage = task.currentEntryValue;
+      percentage = entry.value;
     } else {
-      percentage = task.currentEntryValue / task.goal.number;
+      percentage = entry.value / task.goal.number;
     }
 
     return percentage;
   }
-
-  const deboundeHandler = useCallback(debounce(handleCompleteClick, 300), []);
 
   const circleVariants = {
     hidden: { pathLength: prevPercentage, opacity: getPercentage() > 0 ? 1 : 0 },
@@ -56,7 +56,7 @@ const CurrentProgress = ({ task }) => {
   };
 
   return (
-    <div className={`${styles.container} ${task.type === 'Checkbox' ? styles.typeCheckbox : ''}`}>
+    <div className={styles.container}>
       <div className={`${styles.outlineContainer}`}>
         <motion.svg
             width="100%"
@@ -66,7 +66,7 @@ const CurrentProgress = ({ task }) => {
             animate="visible"
         >
           <motion.circle
-              key={task.currentEntryValue}
+              key={entry?.value}
               cx="50%"
               cy="50%"
               r="calc(50% - 5px)"
@@ -76,7 +76,7 @@ const CurrentProgress = ({ task }) => {
         </motion.svg>
       </div>
       <div className={`${styles.textContainer}`}>
-        <IconButton color={task.currentEntryValue === 0 ? 'normal' : 'green'} selected={true} onClick={deboundeHandler}>
+        <IconButton color={entry?.value > 0 ? 'green' : 'normal'} selected={true} onClick={handleCompleteClick}>
           <CheckIcon />
         </IconButton>
       </div>

@@ -21,7 +21,7 @@ export function useAddCategory() {
     return useMutation({
         mutationFn: postCategory,
         onSuccess: data => {
-            queryClient.setQueryData(["get-categories"], (oldData) => {
+            queryClient.setQueryData(["categories"], (oldData) => {
                 return oldData ? {
                     tasks: [...oldData.tasks, data]
                 } : oldData

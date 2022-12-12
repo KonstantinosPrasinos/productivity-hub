@@ -21,7 +21,7 @@ export function useDeleteTask() {
     return useMutation({
         mutationFn: postDeleteTask,
         onSuccess: data => {
-            queryClient.setQueryData(["get-tasks"], (oldData) => {
+            queryClient.setQueryData(["tasks"], (oldData) => {
                 return oldData ? {
                     tasks: [...oldData.tasks.filter(task => task._id !== data.taskId)]
                 } : oldData

@@ -16,7 +16,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
-const taskHistoryRoutes = require('./routes/taskHistoryRoutes');
+const taskHistoryRoutes = require('./routes/entryRoutes');
 
 // Express app
 const app = express();
@@ -71,7 +71,7 @@ app.use('/api/task', taskRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/verify', verificationRoutes);
-app.use('/api/entries', taskHistoryRoutes);
+app.use('/api/entry', taskHistoryRoutes);
 
 // Connect to database
 mongoose.connect(process.env.MONG_URI)

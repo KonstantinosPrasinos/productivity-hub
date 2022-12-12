@@ -15,7 +15,7 @@ const fetchGroups = async () => {
 }
 
 export function useGetGroups() {
-    const queryObject = useQuery(["get-groups"], fetchGroups, {
+    const queryObject = useQuery(["groups"], fetchGroups, {
         staleTime: 30 * 60 * 60 * 1000
     });
 

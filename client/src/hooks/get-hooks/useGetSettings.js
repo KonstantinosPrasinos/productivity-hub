@@ -15,7 +15,7 @@ const fetchSettings = async () => {
 }
 
 export function useGetSettings() {
-    return useQuery(["get-settings"], fetchSettings, {
+    return useQuery(["settings"], fetchSettings, {
         staleTime: 30 * 60 * 60 * 1000
     });
 }
