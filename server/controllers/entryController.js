@@ -36,8 +36,6 @@ const getTaskEntryById = (req, res) => {
     if (req.user) {
         const {entryId} = req.params;
 
-        console.log(entryId, req.user._id);
-
         Entry.findOne({"$and": [{userId: req.user._id}, {_id: entryId}]}, (err, entry) => {
             if (err) return res.status(400).json({message: err.message});
             return res.status(200).json({entry});

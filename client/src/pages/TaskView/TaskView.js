@@ -1,7 +1,6 @@
-import React, {useCallback, useContext, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import {useDispatch} from "react-redux";
 import Divider from "../../components/utilities/Divider/Divider";
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -11,23 +10,23 @@ import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {setTaskCurrentEntry} from "../../state/tasksSlice";
 import styles from './Taskview.module.scss';
-import {debounce} from "lodash";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import CheckIcon from "@mui/icons-material/Check";
 import {useDeleteTask} from "../../hooks/change-hooks/useDeleteTask";
+import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
+import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 
 const TaskView = ({index, length, task}) => {
-    const dispatch = useDispatch();
     const miniPagesContext = useContext(MiniPagesContext);
     const {mutate: deleteTask} = useDeleteTask();
+    const {mutate: setTaskCurrentEntry} = useChangeEntry(task.title);
+    const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const graphOptions = ['Average', 'Total'];
 
     const [date, setDate] = useState(new Date);
-    const [currentValue, setCurrentValue] = useState(task.currentEntryValue);
 
     const addToMonth = (adder) => {
         const newDate = new Date(date.getTime());
@@ -41,20 +40,11 @@ const TaskView = ({index, length, task}) => {
         deleteTask(task._id);
     }
 
-    const setCurrentEntry = useCallback(debounce(() => {
-        dispatch(setTaskCurrentEntry({id: task._id, value: currentValue}));
-    }, 300), []);
-
     const handleSetCurrentValueCheckbox = () => {
-        const newValue = currentValue === 1 ? 0 : 1
-
-        setCurrentValue(newValue);
-        setCurrentEntry();
+        setTaskCurrentEntry(task._id, entry?._id, entry?.value === 0 ? 1 : 0);
     }
 
-    const handleSetCurrentValueNumber = (value) => {
-        setCurrentValue(value);
-        setCurrentEntry();
+    const handleSetCurrentValueNumber = () => {
     }
 
     return (
@@ -82,20 +72,20 @@ const TaskView = ({index, length, task}) => {
             <section className={'Horizontal-Flex-Container'}>
                 <div className={'Label'}>Today's Entry:</div>
                 {task.type === 'Checkbox' ?
-                    <div className={`${styles.checkbox} ${currentValue === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
+                    <div className={`${styles.checkbox} ${entry?.value === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
                         <CheckIcon sx={{
                             width: '100%',
                             height: '100%',
-                            opacity: currentValue === 1 ? 1 : 0,
+                            opacity: entry?.value ?? 0 === 1 ? 1 : 0,
                             "&:hover": {
                                 opacity: 1,
                             }
                         }} />
                     </div> :
                     <div className={'Horizontal-Flex-Container'}>
-                        <Button onClick={() => handleSetCurrentValueNumber(currentValue - task.step)}>-{task.step}</Button>
-                        <TextBoxInput value={currentValue} setValue={handleSetCurrentValueNumber}></TextBoxInput>
-                        <Button onClick={() => handleSetCurrentValueNumber(currentValue + task.step)}>+{task.step}</Button>
+                        <Button onClick={() => handleSetCurrentValueNumber(entry?.value ?? 0 - task.step)}>-{task.step}</Button>
+                        <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber}></TextBoxInput>
+                        <Button onClick={() => handleSetCurrentValueNumber(entry?.value ?? 0 + task.step)}>+{task.step}</Button>
                     </div>}
             </section>
             <Divider />

@@ -9,7 +9,7 @@ import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrent
 
 const CurrentProgress = ({ task }) => {
   const [prevPercentage, setPrevPercentage] = useState(0.5);
-  const {mutate: setTaskCurrentEntry} = useChangeEntry();
+  const {mutate: setTaskCurrentEntry} = useChangeEntry(task.title);
   const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const CurrentProgress = ({ task }) => {
   const handleCompleteClick = () => {
     if (!isLoading) {
       const number = entry.value === 0 ? 1 : 0
-      setTaskCurrentEntry({entryId: entry?._id, taskId: task._id, value: number});
+      setTaskCurrentEntry(task._id, entry?._id, number);
     }
   }
 

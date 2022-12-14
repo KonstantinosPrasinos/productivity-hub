@@ -1,6 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
-import {useCallback} from "react";
+import {useCallback, useContext, useRef} from "react";
 import {debounce} from "lodash";
+import {AlertsContext} from "../../context/AlertsContext";
 
 const postChangeEntryValue = async (data) => {
     const response = await fetch('http://localhost:5000/api/entry/set', {
@@ -17,45 +18,55 @@ const postChangeEntryValue = async (data) => {
     return response.json();
 }
 
-export function useChangeEntry() {
+export function useChangeEntry(taskTitle) {
     const queryClient = useQueryClient();
+    const currentServerValue = useRef();
+    const alertsContext = useContext(AlertsContext);
 
-    const debouncedChangeEntry = useCallback(debounce(postChangeEntryValue, 300), []);
-
-    return useMutation({
-        mutationFn: debouncedChangeEntry,
-        onMutate: async (data) => { // data has taskId, entryId and value
-            await queryClient.cancelQueries({queryKey: ["task-entries", data.taskId, data.entryId]});
-
-            const entryPreviously = queryClient.getQueryData(["task-entries", data.taskId, data.entryId]);
-
+    const mutation = useMutation({
+        mutationFn: postChangeEntryValue,
+        onSuccess: () => {
+            // If the mutation is a success reset serverValue ref
+            currentServerValue.current = undefined;
+        },
+        onError: (err, data) => {
+            // If the mutation fails reset the client state to the previous value and send an alert
             queryClient.setQueryData(["task-entries", data.taskId, data.entryId], (oldData) => {
-                console.log({
-                    entry: {
-                        ...oldData.entry,
-                        value: data.value
-                    }
-                })
-                return {
-                    entry: {
-                        ...oldData.entry,
-                        value: data.value
-                    }
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: `Couldn't apply changes to task "${taskTitle}"`}});
+
+                const entry = {
+                    ...oldData.entry,
+                    value: currentServerValue.current
                 }
-            })
 
-            console.log(entryPreviously, data);
+                // Reset server value ref
+                currentServerValue.current = undefined;
 
-            return {entryPreviously};
-        },
-        onSuccess: (data, variables, context) => {
-            console.log(data, variables, context);
-            // queryClient.invalidateQueries({queryKey: ["task-entries", taskId]});
-        },
-        onError: (err, newEntry, context) => {
-            // Todo alert for update failed
-            console.log(newEntry, context.entryPreviously);
-            // queryClient.setQueryData(["tasks"], context.entryPreviously);
+                return {entry};
+            });
         }
     })
+
+    const debouncedMutation = useCallback(debounce(mutation.mutate, 300), []);
+
+    const debounceMutate = (taskId, entryId, value) => {
+        // Set current data to value optimistically
+        queryClient.setQueryData(["task-entries", taskId, entryId], (oldData) => {
+            // Keep record of server value to rollback in case of error
+            if (currentServerValue.current === undefined) {
+                currentServerValue.current = oldData.entry.value;
+            }
+
+            return {
+                entry: {
+                    ...oldData.entry,
+                    value: value
+                }
+            }
+        });
+
+        debouncedMutation({taskId, entryId, value});
+    }
+
+    return {...mutation, mutate: debounceMutate};
 }
