@@ -30,6 +30,12 @@ const Task = ({tasks}) => {
 
     const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
 
+    const handleTaskClick = event => {
+        if (event.target.getAttribute("data-value") === 'Clickable') {
+            miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}});
+        }
+    }
+
     return (
         <motion.div
             className={`Rounded-Container Stack-Container ${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
@@ -38,12 +44,12 @@ const Task = ({tasks}) => {
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
             layout
 
-            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}})}
+            onClick={(event) => handleTaskClick(event)}
         >
             {tasks.map((task, index) => (
-                <div key={index} className={`Stack-Container`}>
-                    <div className={'Horizontal-Flex-Container Space-Between'}>
-                        <div className={'Horizontal-Flex-Container'}>
+                <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
+                    <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
+                        <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
                             {task.category &&
                                 <CategoryIndicator
                                     categoryId={task.category}

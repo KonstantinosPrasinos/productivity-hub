@@ -42,7 +42,7 @@ const CurrentProgress = ({ task }) => {
     hidden: { pathLength: prevPercentage, opacity: getPercentage() > 0 ? 1 : 0 },
     visible: () => {
       let percentage = getPercentage();
-      const duration = Math.min(1, Math.abs(percentage - prevPercentage) * 2);
+      const duration = Math.min(0.4, Math.abs(percentage - prevPercentage) * 2);
 
       return {
         pathLength: percentage,
