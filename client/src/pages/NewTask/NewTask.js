@@ -46,13 +46,13 @@ const NewTask = ({index, length, id}) => {
     const [step, setStep] = useState(settings.defaults.step);
     const [goalType, setGoalType] = useState('At least');
     const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
-    const [category, setCategory] = useState('None');
+    const [selectedCategory, setCategory] = useState('None');
     const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     const [expiresAt, setExpiresAt] = useState('Never');
-    const [timeGroup, setTimeGroup] = useState('');
+    const [selectedGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
@@ -84,17 +84,23 @@ const NewTask = ({index, length, id}) => {
     }
 
     const findMatchingGroups = () => {
-        const titles = ['None'];
+        const titles = [{title: 'None', id: undefined}];
 
         if (groupsLoading) return titles;
 
-        const categoryId = categories?.find(localCategory => localCategory.title === category)?._id
+        const categoryId = categories?.find(localCategory => localCategory.title === selectedCategory)?._id
 
-        titles.push(...groups.filter(group => group.parent === categoryId).map(group => group.title));
+        titles.push(...groups.filter(group => group.parent === categoryId).map(group => {
+            return {
+                title: group.title,
+                id: group._id
+            }
+        }));
 
         return titles;
     }
-    const groupTitles = useMemo(findMatchingGroups, [groupsLoading, categories, category]);
+
+    const groupTitles = useMemo(findMatchingGroups, [groupsLoading, categories, selectedCategory]);
 
     useEffect(() => {
         if (id && !isLoading) {
@@ -118,9 +124,9 @@ const NewTask = ({index, length, id}) => {
                 setLongGoalNumber(task.longGoal.number);
                 setExpiresAt(task.expiresAt);
 
-                if (task.timeGroup) {
+                if (task.group) {
                     setRepeatType('Time Group');
-                    setTimeGroup(groups.find(group => group.id === timeGroup).title)
+                    setTimeGroup(groups.find(group => group.id === selectedGroup).title)
                 } else {
                     setRepeatType(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
@@ -131,11 +137,11 @@ const NewTask = ({index, length, id}) => {
     }, [isLoading]);
 
     useEffect(() => {
-        if (timeGroup) {
+        if (selectedGroup) {
             setRepeatEvery('');
             setRepeatEverySub('');
         }
-    }, [timeGroup])
+    }, [selectedGroup])
 
     useEffect(() => {
         if (repeatEvery || repeatEverySub) {
@@ -159,14 +165,14 @@ const NewTask = ({index, length, id}) => {
         if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
             const startingDates = findStartingDates(timePeriod, timePeriod2);
 
-            let selectedGroup;
             const repeatProperties = {};
 
-            if (repeats && timeGroup) {
-                selectedGroup = groups.find(group => group.title === timeGroup)
+            if (repeats && selectedGroup) {
 
                 repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
             }
+
+            const categoryId = categories.find(category => category.title === selectedCategory)._id;
 
             const task = {
                 title,
@@ -176,14 +182,14 @@ const NewTask = ({index, length, id}) => {
                     type: goalType,
                     number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
                 } : undefined,
-                category: category ? categories?.find(localCategory => localCategory.title === category)?._id : undefined,
+                category: categoryId,
                 priority: priority ? priority : settings.defaults.priority,
                 repeats,
                 longGoal: repeats ? {
                     type: longGoalType,
                     number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
                 } : undefined,
-                group: repeats && timeGroup ? selectedGroup._id : undefined,
+                group: repeats ? selectedGroup.id : undefined,
                 currentEntryValue: 0,
                 streak: repeats ? "0000000" : undefined,
                 ...repeatProperties,
@@ -254,7 +260,7 @@ const NewTask = ({index, length, id}) => {
                             Add new
                             <AddIcon />
                         </div>]}
-                    selected={category}
+                    selected={selectedCategory}
                     setSelected={setCategory}
                 />
             </InputWrapper>
@@ -317,10 +323,10 @@ const NewTask = ({index, length, id}) => {
                             <Chip
                                 key={index}
                                 value={group}
-                                selected={timeGroup}
+                                selected={selectedGroup}
                                 setSelected={setTimeGroup}
                             >
-                                {group}
+                                {group.title}
                             </Chip>
                         ))}
                     </InputWrapper>

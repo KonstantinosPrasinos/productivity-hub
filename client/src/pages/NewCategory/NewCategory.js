@@ -48,9 +48,19 @@ const NewCategory = ({index, length, id}) => {
 
     const handleSave = async () => {
         const checkAllInputs = () => {
-            if (title) return true
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
-            return false;
+            if (!title) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
+                return false;
+            } else if (categories.find(category => category.title === title) !== undefined) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "A category with that title already exists"}})
+                return false;
+            }
+
+            return true;
+        }
+
+        if (categoriesLoading) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Categories currently loading"}})
         }
 
         if (creatingTimeGroup) {

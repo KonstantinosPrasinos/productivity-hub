@@ -1,5 +1,6 @@
 import {useEffect, useMemo} from "react";
 import {useGetTasks} from "./get-hooks/useGetTasks";
+import {useGetGroups} from "./get-hooks/useGetGroups";
 
 const tasksNextUpdate = {}; // has _id and nextUpdateTime pairs (used to cut down future calculations)
 
@@ -56,32 +57,35 @@ const checkTime = (task) => {
         if (isCorrectTime) break;
     }
 
-    tasksNextUpdate[task._id] = taskNextUpdate.getTime();
+    if (taskNextUpdate) {
+        tasksNextUpdate[task._id] = taskNextUpdate.getTime();
+    }
 
     return isCorrectTime;
 }
 
-const addGroupsToArray = (groupedTasks, usesTime) => {
-    // groups.forEach(group => {
-    //
-    //     // Check if the group should be rendered at the current time
-    //     if (usesTime) {
-    //         if (!checkTime(group)) {
-    //             return;
-    //         }
-    //     }
-    //
-    //     const groupTasks = tasks.filter(task => task.timeGroup === group.id);
-    //
-    //     if (!groupTasks.length) {
-    //         return;
-    //     }
-    //
-    //     groupedTasks.push({
-    //         priority: group.priority,
-    //         tasks: groupTasks.sort((a, b) => b.priority - a.priority)
-    //     });
-    // });
+const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
+
+    groups.forEach(group => {
+
+        // Check if the group should be rendered at the current time
+        if (usesTime) {
+            if (!checkTime(group)) {
+                return;
+            }
+        }
+
+        const groupTasks = tasks.filter(task => task.group === group._id);
+
+        if (!groupTasks.length) {
+            return;
+        }
+
+        groupedTasks.push({
+            priority: group.priority,
+            tasks: groupTasks.sort((a, b) => b.priority - a.priority)
+        });
+    });
 }
 
 const addTasksToArray = (groupedTasks, usesTime, tasks) => {
@@ -91,7 +95,7 @@ const addTasksToArray = (groupedTasks, usesTime, tasks) => {
         // Then it checks if the task repeats
         // And then it check if the task is in a time group
         if (task.repeats) {
-            if (!task.timeGroup) {
+            if (!task.group) {
                 if (usesTime) {
                     if (checkTime(task)) {
                         groupedTasks.push(task);
@@ -118,10 +122,10 @@ const findLeastUpdateTime = () => {
     return min;
 }
 
-const addTasksToData = (usesTime, tasks) => {
+const getCurrentTasks = (usesTime, tasks, groups) => {
     const groupedTasks = [];
 
-    // addGroupsToArray(groupedTasks, usesTime);
+    addGroupsToArray(groupedTasks, usesTime, tasks, groups);
     addTasksToArray(groupedTasks, usesTime, tasks);
 
     // Sort the tasks to be rendered in increasing priority
@@ -142,13 +146,15 @@ const addTasksToData = (usesTime, tasks) => {
 
 export function useRenderTasks(usesTime = false) {
 
-    const {isLoading, isError, data} = useGetTasks();
+    const {isLoading: tasksLoading, isError: tasksError, data: tasks} = useGetTasks();
+    const {isLoading: groupsLoading, isError: groupsError, data: groups} = useGetGroups();
 
-    const tasks = useMemo(() => {
-        if (!isLoading) {
-            return addTasksToData(usesTime, data)
+    const data = useMemo(() => {
+        if (tasksError || groupsError) return false;
+        if (!tasksLoading && !groupsLoading) {
+            return [...getCurrentTasks(usesTime, tasks, groups)]
         }
-    }, [data, isLoading]);
+    }, [tasksLoading, groupsLoading, groups, tasks]);
 
-    return {isLoading, isError, data: tasks};
+    return {isLoading: tasksLoading || groupsLoading, isError: groupsError || tasksError, data};
 }

@@ -46,16 +46,17 @@ const Task = ({tasks}) => {
 
             onClick={(event) => handleTaskClick(event)}
         >
+            {tasks.length > 0 && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
             {tasks.map((task, index) => (
                 <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
                     <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
                         <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
-                            {task.category &&
-                                <CategoryIndicator
-                                    categoryId={task.category}
-                                    groupId={task?.group}
-                                />}
-                            {task.title}
+                            {/*{tasks.length === 0 && task.category &&*/}
+                            {/*    <CategoryIndicator*/}
+                            {/*        categoryId={task.category}*/}
+                            {/*        groupId={task?.group}*/}
+                            {/*    />}*/}
+                            <div className={styles.titleContainer}>{task.title}</div>
                         </div>
                         <CurrentProgress task={task}/>
                     </div>
