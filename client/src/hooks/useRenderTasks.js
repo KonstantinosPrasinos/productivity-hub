@@ -46,7 +46,7 @@ const checkTime = (task) => {
 
     for (const startingTime of task.repeatRate.startingDate) {
         const nextUpdate = findNextUpdate(startingTime, task.repeatRate.number, task.repeatRate.bigTimePeriod);
-        if (taskNextUpdate === null || nextUpdate < taskNextUpdate) {
+        if (!taskNextUpdate || nextUpdate < taskNextUpdate) {
             taskNextUpdate = nextUpdate;
         }
 

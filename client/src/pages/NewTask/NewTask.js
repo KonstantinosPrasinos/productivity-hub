@@ -35,7 +35,7 @@ const NewTask = ({index, length, id}) => {
         return titles;
     }
 
-    const categoryTitles = useMemo(getCategoryTitles, [categoriesLoading])
+    const categoryTitles = useMemo(getCategoryTitles, [categoriesLoading, categories])
     
     const {data: settings} = useGetSettings();
 
@@ -88,13 +88,13 @@ const NewTask = ({index, length, id}) => {
 
         if (groupsLoading) return titles;
 
-        const categoryId = categories?.find(localCategory => localCategory.title === category)?.id
+        const categoryId = categories?.find(localCategory => localCategory.title === category)?._id
 
         titles.push(...groups.filter(group => group.parent === categoryId).map(group => group.title));
 
         return titles;
     }
-    const groupTitles = useMemo(findMatchingGroups, [groupsLoading]);
+    const groupTitles = useMemo(findMatchingGroups, [groupsLoading, categories, category]);
 
     useEffect(() => {
         if (id && !isLoading) {
@@ -159,6 +159,15 @@ const NewTask = ({index, length, id}) => {
         if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
             const startingDates = findStartingDates(timePeriod, timePeriod2);
 
+            let selectedGroup;
+            const repeatProperties = {};
+
+            if (repeats && timeGroup) {
+                selectedGroup = groups.find(group => group.title === timeGroup)
+
+                repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
+            }
+
             const task = {
                 title,
                 type,
@@ -174,16 +183,14 @@ const NewTask = ({index, length, id}) => {
                     type: longGoalType,
                     number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
                 } : undefined,
-                expiresAt: repeats ? expiresAt : undefined, // need to fix
-                timeGroup: repeats && timeGroup ? groups.find(group => group.title === timeGroup).id : undefined,
-                repeatRate: repeats && !timeGroup ? {
-                    number: repeatNumber,
-                    bigTimePeriod: timePeriod,
-                    smallTimePeriod: timePeriod2,
-                    startingDate: startingDates
-                } : undefined,
+                group: repeats && timeGroup ? selectedGroup._id : undefined,
                 currentEntryValue: 0,
-                streak: repeats ? "0000000" : undefined
+                streak: repeats ? "0000000" : undefined,
+                ...repeatProperties,
+                // expiresAt: {
+                //     type: "Never",
+                //     timePeriod: undefined
+                // },
             }
 
             if (id) {
@@ -192,7 +199,7 @@ const NewTask = ({index, length, id}) => {
                 taskMutation.mutate(task);
             }
 
-            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})
+            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
         }
     }
 

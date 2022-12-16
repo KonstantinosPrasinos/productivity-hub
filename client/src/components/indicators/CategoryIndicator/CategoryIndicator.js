@@ -30,7 +30,7 @@ const CategoryIndicator = ({categoryId, groupId}) => {
         <>
             {category && <button
                 className={`${styles.container} Horizontal-Flex-Container ${category.color}`}
-                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category.title}})}
+                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}})}
             >
                 <div className={styles.text}>{category.title}</div>
                 {group && <div>|</div>}

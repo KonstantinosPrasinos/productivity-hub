@@ -2,7 +2,7 @@ const validator = require("validator");
 const VerificationCode = require('../models/verificationCodeSchema');
 const User = require('../models/userSchema');
 const bcrypt = require("bcrypt");
-const {sendEmail} = require('../email/sendEmail');
+const {sendEmail} = require('../functions/sendEmail');
 const crypto = require('crypto');
 
 const verifyEmail = (req, res, deleteVerificationCode = true) => {

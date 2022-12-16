@@ -22,9 +22,14 @@ export function useAddCategory() {
         mutationFn: postCategory,
         onSuccess: data => {
             queryClient.setQueryData(["categories"], (oldData) => {
-                return oldData ? {
-                    tasks: [...oldData.tasks, data]
-                } : oldData
+                if (oldData?.categories?.length) {
+                    return {
+                        categories: [...oldData.categories, data],
+                    }
+                }
+                return {
+                    categories: [data]
+                }
             });
         }
     })

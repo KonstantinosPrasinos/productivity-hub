@@ -15,11 +15,11 @@ const getSettings = async (req, res) => {
         const userId = req.user._id;
 
         Settings.findOne({'userId': userId}, async (err, settings) => {
-            if (settings) {return res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined})}
+            if (settings) {return res.status(200).json({...settings._doc, _id: undefined, __v: undefined, userId: undefined, priorityBounds: {low: 1, high: 1}})}
 
             const createdSettings = await Settings.create({userId: user._id});
 
-            return res.status(200).json({...createdSettings._doc, _id: undefined, __v: undefined, userId: undefined})
+            return res.status(200).json({...createdSettings._doc, _id: undefined, __v: undefined, userId: undefined, priorityBounds: {low: 1, high: 1}})
         });
     } else {
         res.status(401).send({message: "Not authorized."});

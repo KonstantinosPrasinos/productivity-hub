@@ -8,18 +8,21 @@ import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CategoryView.module.scss';
-import {useSafeDeleteCategory} from "../../hooks/useSafeDeleteCategory";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
+import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
+import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
+import {useDeleteCategory} from "../../hooks/change-hooks/useDeleteCategory";
 
 const CategoryView = ({index, length, category}) => {
-    const {safeDeleteCategory} = useSafeDeleteCategory(category);
     const miniPagesContext = useContext(MiniPagesContext);
 
     const {data: unfilteredGroups} = useGetGroups();
 
-    const groups = unfilteredGroups?.filter(group => group.parent === category.id);
+    const groups = unfilteredGroups?.filter(group => group.parent === category._id);
 
     const [selectedGroup, setSelectedGroup] = useState();
+    const [deletePromptVisible, setDeletePromptVisible] = useState(false);
+    const {mutate: deleteCategory} = useDeleteCategory();
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
     // const graphOptions = ['Average', 'Total'];
@@ -33,9 +36,22 @@ const CategoryView = ({index, length, category}) => {
     //     setDate(newDate);
     // }
 
-    const handleDelete = () => {
+    const handleDeleteButton = () => {
+        setDeletePromptVisible(current => !current);
+    }
+
+    const handleCancelButton = () => {
+        setDeletePromptVisible(false);
+    }
+
+    const handleDeleteWithTasks = () => {
+        deleteCategory({categoryId: category._id, deleteTasks: true});
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        safeDeleteCategory();
+    }
+
+    const handleDeleteWithoutTasks = () => {
+        deleteCategory({categoryId: category._id, deleteTasks: false});
+        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
     }
 
     return (
@@ -50,9 +66,16 @@ const CategoryView = ({index, length, category}) => {
                 </div>
                 <div>
                     <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><EditIcon /></IconButton>
-                    <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
+                    <IconButton onClick={handleDeleteButton}><DeleteIcon /></IconButton>
                 </div>
             </section>
+            <CollapsibleContainer hasBorder={false} isVisible={deletePromptVisible}>
+                <InputWrapper label={"Are you sure?\n(this will also delete this category's groups)"} type={"vertical"}>
+                    <Button filled={false} onClick={handleDeleteWithTasks}>Yes (delete tasks)</Button>
+                    <Button filled={false} onClick={handleDeleteWithoutTasks}>Yes (keep tasks)</Button>
+                    <Button onClick={handleCancelButton}>Cancel</Button>
+                </InputWrapper>
+            </CollapsibleContainer>
             <Divider />
             <section className={'Grid-Container Two-By-Two'}>
                 <div className={'Rounded-Container Stack-Container'}>

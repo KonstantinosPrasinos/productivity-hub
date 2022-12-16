@@ -18,7 +18,7 @@ const taskSchema = Joi.object({
         type: Joi.string().valid('Never', 'Date', 'End of goal'),
         timePeriod: Joi.string()
     }),
-    timeGroup: Joi.string(),
+    group: Joi.string(),
     repeatRate: Joi.object().keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
@@ -194,7 +194,9 @@ const getTasks = async (req, res) => {
         Task.find({userId: req.user._id}, async (err, tasks) => {
             if (err) return res.status(404).json({message: 'Tasks not found.'});
 
-            if (tasks) {return res.status(200).json({tasks: await getTasksWithHistory(tasks, req.user._id)})}
+            const tasksWithHistory = await getTasksWithHistory(tasks, req.user._id)
+
+            if (tasks) {return res.status(200).json({tasks: tasksWithHistory})}
 
             return res.status(404).json({message: 'Tasks not found.'});
         });
@@ -214,21 +216,15 @@ const createTask = async (req, res) => {
         }
 
         try {
-            const newTask = await Task.create({
-                ...validatedTask.value,
-                userId: req.user._id,
-                previousEntries: {
-                    value: '000000',
-                    latest: (new Date()).getTime(),
-                    mostRecent: 0
-                }
-            });
+            const newTask = await Task.create({...validatedTask.value, userId: req.user._id});
+            const entry = await Entry.create({userId: req.user._id, taskId: newTask._id})
 
             res.status(200).json({
                 ...newTask._doc,
-                currentEntryValue: 0,
                 streak: newTask.repeats ? "0000000" : undefined,
-                mostRecentProperDate: undefined});
+                mostRecentProperDate: undefined,
+                currentEntryId: entry._id
+            });
         } catch (error) {
             res.status(500).json({message: error.message})
         }

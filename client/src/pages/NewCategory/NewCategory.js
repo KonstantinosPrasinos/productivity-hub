@@ -4,8 +4,7 @@ import {useContext, useEffect, useRef, useState} from 'react';
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
-import {setCategory} from "../../state/categoriesSlice";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -17,18 +16,21 @@ import {removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import CloseIcon from "@mui/icons-material/Close";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
-import {useCategory} from "../../hooks/useCategory";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {findStartingDates} from "../../functions/findStartingDates";
+import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
+import {useAddCategory} from "../../hooks/add-hooks/useAddCategory";
+import {useAddGroup} from "../../hooks/add-hooks/useAddGroup";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
-    const settings = useSelector((state) => state?.settings);
+    const {data: settings} = useGetSettings();
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
-    const {addCategoryToServer} = useCategory();
+    const {mutate: addCategoryToServer} = useAddCategory();
+    const {mutate: addGroupToServer} = useAddGroup();
     const miniPagesContext = useContext(MiniPagesContext);
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years']
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
@@ -63,18 +65,29 @@ const NewCategory = ({index, length, id}) => {
             }
 
             if (id) {
-                dispatch(setCategory(category));
 
                 for (const group of groups) {
                     // Do set group things
                 }
 
             } else {
+                await addCategoryToServer(category, {onSuccess: (data) => {
+                        // if (error) return;
+                        for (index in timeGroups) {
+                            delete timeGroups[index].initial
+                            timeGroups[index].parent = data._id;
+
+                            addGroupToServer(timeGroups[index]);
+                        }
+                    }});
                 for (index in timeGroups) {
-                    delete timeGroups[index].initial
+                    // delete timeGroups[index].initial
+
+                    // console.log(arguments);
+                    // await addGroupToServer(timeGroups[index]);
                 }
 
-                await addCategoryToServer(category, timeGroups);
+
             }
 
             // for (const group of timeGroups) {

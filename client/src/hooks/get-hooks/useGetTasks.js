@@ -28,8 +28,8 @@ export function useGetTasks() {
                 return {
                     ...oldData,
                     priorityBounds: {
-                        low: Math.min(...priorities),
-                        high: Math.max(...priorities)
+                        low: Math.min(...priorities) ?? 1,
+                        high: Math.max(...priorities) ?? 1
                     }
                 }
             });

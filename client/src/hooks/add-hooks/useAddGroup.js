@@ -23,7 +23,7 @@ export function useAddGroup() {
         onSuccess: data => {
             queryClient.setQueryData(["groups"], (oldData) => {
                 return oldData ? {
-                    groups: [...oldData.tasks, data]
+                    groups: [...oldData.groups, data]
                 } : oldData
             });
         }

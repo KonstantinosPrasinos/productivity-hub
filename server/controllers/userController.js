@@ -2,7 +2,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 
-const {sendEmail} = require('../email/sendEmail');
+const {sendEmail} = require('../functions/sendEmail');
 
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
