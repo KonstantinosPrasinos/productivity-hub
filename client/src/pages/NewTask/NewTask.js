@@ -168,8 +168,11 @@ const NewTask = ({index, length, id}) => {
             const repeatProperties = {};
 
             if (repeats && selectedGroup) {
-
                 repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
+            } else if (repeats && !selectedGroup) {
+                repeatProperties.repeatRate = undefined;
+                repeatProperties.repeats = false;
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You didn't set any repeat properties, so the repeat property was set to false"}})
             }
 
             const categoryId = categories.find(category => category.title === selectedCategory)._id;

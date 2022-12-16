@@ -12,11 +12,13 @@ import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import {useDeleteCategory} from "../../hooks/change-hooks/useDeleteCategory";
+import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 
 const CategoryView = ({index, length, category}) => {
     const miniPagesContext = useContext(MiniPagesContext);
 
     const {data: unfilteredGroups} = useGetGroups();
+    const {data: tasks} = useGetTasks();
 
     const groups = unfilteredGroups?.filter(group => group.parent === category._id);
 
@@ -37,6 +39,9 @@ const CategoryView = ({index, length, category}) => {
     // }
 
     const handleDeleteButton = () => {
+        if (groups.length === 0 || tasks.filter(task => task.category === category._id).length === 0) {
+            handleDeleteWithoutTasks();
+        }
         setDeletePromptVisible(current => !current);
     }
 
