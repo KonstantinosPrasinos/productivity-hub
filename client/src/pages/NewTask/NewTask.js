@@ -84,23 +84,18 @@ const NewTask = ({index, length, id}) => {
     }
 
     const findMatchingGroups = () => {
-        const titles = [{title: 'None', id: undefined}];
+        const tempGroups = [{title: "None", _id: undefined}];
 
-        if (groupsLoading) return titles;
+        if (groupsLoading) return tempGroups;
 
         const categoryId = categories?.find(localCategory => localCategory.title === selectedCategory)?._id
 
-        titles.push(...groups.filter(group => group.parent === categoryId).map(group => {
-            return {
-                title: group.title,
-                id: group._id
-            }
-        }));
+        tempGroups.push(...groups.filter(group => group.parent === categoryId));
 
-        return titles;
+        return tempGroups;
     }
 
-    const groupTitles = useMemo(findMatchingGroups, [groupsLoading, categories, selectedCategory]);
+    const categoryGroups = useMemo(findMatchingGroups, [groupsLoading, categories, selectedCategory]);
 
     useEffect(() => {
         if (id && !isLoading) {
@@ -168,6 +163,7 @@ const NewTask = ({index, length, id}) => {
             const repeatProperties = {};
 
             if (repeats && selectedGroup) {
+                console.log(selectedGroup);
                 repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
             } else if (repeats && !selectedGroup) {
                 repeatProperties.repeatRate = undefined;
@@ -192,7 +188,7 @@ const NewTask = ({index, length, id}) => {
                     type: longGoalType,
                     number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
                 } : undefined,
-                group: repeats ? selectedGroup.id : undefined,
+                group: repeats ? selectedGroup._id : undefined,
                 currentEntryValue: 0,
                 streak: repeats ? "0000000" : undefined,
                 ...repeatProperties,
@@ -201,6 +197,8 @@ const NewTask = ({index, length, id}) => {
                 //     timePeriod: undefined
                 // },
             }
+
+            console.log(task);
 
             if (id) {
                 dispatch(setTask(task));
@@ -322,7 +320,7 @@ const NewTask = ({index, length, id}) => {
                         </InputWrapper>}
                     </>
                     <InputWrapper label={"Select a category time group"}>
-                        {groupTitles.map((group, index) => (
+                        {categoryGroups.map((group, index) => (
                             <Chip
                                 key={index}
                                 value={group}

@@ -11,7 +11,7 @@ import styles from './CategoryView.module.scss';
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
-import {useDeleteCategory} from "../../hooks/change-hooks/useDeleteCategory";
+import {useDeleteCategory} from "../../hooks/delete-hooks/useDeleteCategory";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 
 const CategoryView = ({index, length, category}) => {

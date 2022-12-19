@@ -13,7 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './Taskview.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import CheckIcon from "@mui/icons-material/Check";
-import {useDeleteTask} from "../../hooks/change-hooks/useDeleteTask";
+import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 

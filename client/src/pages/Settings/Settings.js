@@ -19,13 +19,13 @@ import {AlertsContext} from "../../context/AlertsContext";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
-import {useSettings} from "../../hooks/useSettings";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
+import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
     const email = useContext(UserContext).state.email;
-    const {setSettingsServer} = useSettings()
+    const {mutate: setSettings} = useChangeSettings();
 
     const {verifyPassword} = useVerify();
     const alertsContext = useContext(AlertsContext);
@@ -51,7 +51,8 @@ const Settings = () => {
     }
 
     const handleSaveChanges = async () => {
-        await setSettingsServer({theme: selectedTheme, defaults: {step, goal, priority}});
+        await setSettings({theme: selectedTheme, defaults: {step, goal, priority}});
+        setSettingsChanges({});
     }
 
     const hiddenEmail = () => {
