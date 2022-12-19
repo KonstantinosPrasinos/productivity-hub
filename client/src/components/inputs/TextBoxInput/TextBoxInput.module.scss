@@ -19,6 +19,10 @@
         cursor: not-allowed;
     }
 
+    &.small {
+        width: 5em;
+    }
+
     &.max {
         width: 100%;
     }
@@ -49,6 +53,10 @@
 .input {
     font-size: inherit;
     width: 100%;
+
+    &.center {
+        text-align: center;
+    }
 }
 
 .buttonsContainer {

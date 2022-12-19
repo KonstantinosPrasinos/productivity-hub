@@ -17,6 +17,7 @@ const TextBoxInput = ({
                           width = 'medium',
                           onKeydown = () => {
                           },
+                            alignment = 'left',
                           invalid = null
                       }) => {
 
@@ -85,7 +86,7 @@ const TextBoxInput = ({
           <input
               disabled={isDisabled}
               type={handleType()}
-              className={styles.input} placeholder={placeholder}
+              className={`${styles.input} ${styles[alignment]}`} placeholder={placeholder}
               value={value}
               onChange={handleChange}
               onBlur={handleBlur}

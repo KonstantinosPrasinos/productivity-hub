@@ -22,7 +22,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Incorrect email or password."}});
+
         } else {
             const data = await response.json();
 

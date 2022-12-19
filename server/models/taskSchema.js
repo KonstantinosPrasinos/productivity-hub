@@ -15,7 +15,9 @@ const Task = new mongoose.Schema({
     },
     step: Number,
     goal: {
-        type: String,
+        type: {
+            type: String
+        },
         number: Number
     },
     category: String,

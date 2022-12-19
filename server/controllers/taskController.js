@@ -226,7 +226,8 @@ const createTask = async (req, res) => {
                 currentEntryId: entry._id
             });
         } catch (error) {
-            res.status(500).json({message: error.message})
+            console.log(error);
+            res.status(400).json({message: error.message})
         }
     } else {
         res.status(401).send({message: "Not authorized."});

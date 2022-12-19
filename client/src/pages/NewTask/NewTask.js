@@ -171,7 +171,7 @@ const NewTask = ({index, length, id}) => {
                 alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You didn't set any repeat properties, so the repeat property was set to false"}})
             }
 
-            const categoryId = categories.find(category => category.title === selectedCategory)._id;
+            const categoryId = categories.find(category => category.title === selectedCategory)?._id;
 
             const task = {
                 title,

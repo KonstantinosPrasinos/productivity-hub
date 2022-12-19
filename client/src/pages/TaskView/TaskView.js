@@ -44,7 +44,22 @@ const TaskView = ({index, length, task}) => {
         setTaskCurrentEntry(task._id, entry?._id, entry?.value === 0 ? 1 : 0);
     }
 
-    const handleSetCurrentValueNumber = () => {
+    const handlePlusCurrentValue = () => {
+        setTaskCurrentEntry(task._id, entry._id, entry?.value + task.step);
+    }
+
+    const handleMinusCurrentValue = () => {
+        setTaskCurrentEntry(task._id, entry._id, entry?.value - task.step);
+    }
+
+    const handleSetCurrentValueNumber = (e) => {
+        const eventNumber = parseInt(e);
+
+        if (isNaN(eventNumber) || eventNumber < 0) {
+            setTaskCurrentEntry(task._id, entry._id, 0);
+        } else {
+            setTaskCurrentEntry(task._id, entry._id, eventNumber);
+        }
     }
 
     return (
@@ -83,9 +98,9 @@ const TaskView = ({index, length, task}) => {
                         }} />
                     </div> :
                     <div className={'Horizontal-Flex-Container'}>
-                        <Button onClick={() => handleSetCurrentValueNumber(entry?.value ?? 0 - task.step)}>-{task.step}</Button>
-                        <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber}></TextBoxInput>
-                        <Button onClick={() => handleSetCurrentValueNumber(entry?.value ?? 0 + task.step)}>+{task.step}</Button>
+                        <Button type={"square"} size={"small"} onClick={handleMinusCurrentValue}>-{task.step}</Button>
+                        <TextBoxInput value={entry?.value ?? 0} alignment={"center"} setValue={handleSetCurrentValueNumber} width={'small'}></TextBoxInput>
+                        <Button type={"square"} size={"small"} onClick={handlePlusCurrentValue}>+{task.step}</Button>
                     </div>}
             </section>
             <Divider />
@@ -142,7 +157,7 @@ const TaskView = ({index, length, task}) => {
                     See all entries
                 </Button>
                 <div className={'Label'}>
-                    Created at: 02/10/2022
+                    {new Date(task.createdAt).toLocaleString()}
                 </div>
             </section>
         </MiniPageContainer>
