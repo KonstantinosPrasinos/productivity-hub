@@ -21,6 +21,7 @@ import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
+import {motion} from "framer-motion";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -166,7 +167,13 @@ const Settings = () => {
     }
 
     return (
-        <div className={`Rounded-Container ${styles.container}`}>
+        <motion.div
+            className={`Rounded-Container ${styles.container}`}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.1}}
+        >
             <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
                 <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><AccountCircleIcon/>Account</div>
                 <section className={'Stack-Container No-Gap'}>
@@ -253,7 +260,7 @@ const Settings = () => {
                     <Button onClick={handleSaveChanges}>Save changes</Button>
                 </div>
             }
-        </div>
+        </motion.div>
     );
 };
 

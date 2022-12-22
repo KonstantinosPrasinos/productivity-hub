@@ -1,5 +1,5 @@
 .container {
-  overflow-y: hidden;
+  width: 100%;
   > * {
     margin: 10px 0;
   }
@@ -9,6 +9,8 @@
   display: grid;
   grid-template: 1fr / 1 fr;
   overflow-x: hidden;
+  width: 100%;
+  justify-content: center;
 
   > * {
     grid-column: 1 / 1;

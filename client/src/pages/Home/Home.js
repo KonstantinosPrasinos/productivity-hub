@@ -16,7 +16,13 @@ const Home = () => {
     }
 
     return (
-        <div className={`${styles.container}`}>
+        <motion.div
+            className={`${styles.container}`}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.1}}
+        >
             <div className={`Stack-Container ${styles.leftSide}`}>
                 {!isLoading && data.length === 0 &&
                     <motion.div
@@ -39,7 +45,7 @@ const Home = () => {
                 <div className={`Stack-Container ${styles.rightSide}`}>
 
                 </div>}
-        </div>
+        </motion.div>
     );
 };
 

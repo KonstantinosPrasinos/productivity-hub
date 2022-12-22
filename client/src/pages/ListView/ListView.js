@@ -25,24 +25,29 @@ const ListView = () => {
         if (tasksLoading || categoriesLoading || groupsLoading) return <LoadingIndicator />
 
         return (<div className={`Stack-Container ${styles.leftSide}`}>
-            {tasks !== false && tasks.map((task) => !task.hasOwnProperty('tasks') ? (
-                <Task key={task._id} tasks={[task]}></Task>) : (
-                <Task key={task.tasks[0].id} tasks={task.tasks}></Task>))}
-            {tasks !== false && tasks.length === 0 && <motion.div
-                initial={{opacity: 0, y: 50, scale: 0.3}}
-                animate={{opacity: 1, y: 0, scale: 1}}
-                exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
-                className={`Empty-Indicator-Container`}
-            >
-                No tasks
-            </motion.div>}
+            {tasks !== false &&
+                tasks.map((task) => !task.hasOwnProperty('tasks') ? (
+                    <Task key={task._id} tasks={[task]}></Task>) : (
+                    <Task key={task.tasks[0]._id} tasks={task.tasks}></Task>
+                ))}
+            {tasks !== false && tasks.length === 0 &&
+                <motion.div
+                    initial={{opacity: 0, y: 50, scale: 0.3}}
+                    animate={{opacity: 1, y: 0, scale: 1}}
+                    exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
+                    className={`Empty-Indicator-Container`}
+                    key={"empty-tasks"}
+                >
+                    No tasks
+                </motion.div>
+            }
         </div>)
     }
 
     const renderCategories = () => {
         if (categoriesLoading || groupsLoading) return <LoadingIndicator />
 
-        return (<div className={`Stack-Container ${styles.rightSide}`}>
+        return (<div className={`Stack-Container ${styles.rightSide}`} key={'test2'}>
             {categories?.length > 0 ? (categories.map(category => {
                 const categoryGroups = groups?.filter(group => group.parent === category._id);
 
@@ -89,17 +94,24 @@ const ListView = () => {
         </div>
     )
 
-    return (<div className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}>
-        {screenSize === 'small' &&
-            <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
-                {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
-            </div>
-        }
-        <AnimatePresence initial={false}>
-            {screenSize !== 'small' ? renderTasks() : renderSwitchComponent()}
-            {screenSize !== 'small' && renderCategories()}
-        </AnimatePresence>
-        </div>);
+    return (
+        <motion.div
+            className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.1}}
+        >
+            {screenSize === 'small' &&
+                <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
+                    {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
+                </div>
+            }
+            <AnimatePresence initial={false}>
+                {screenSize !== 'small' ? renderTasks() : renderSwitchComponent()}
+                {screenSize !== 'small' && renderCategories()}
+            </AnimatePresence>
+        </motion.div>);
 };
 
 export default ListView;

@@ -1,4 +1,4 @@
-import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
+import {Routes, Route, Navigate, useNavigate, useLocation} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/LogIn/LogIn";
@@ -10,7 +10,7 @@ import Playground from "./pages/Playground/Playground";
 import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
 import NewTask from "./pages/NewTask/NewTask";
-import HomePageContainer from "./pages/Home/Home";
+import Home from "./pages/Home/Home";
 import AlertHandler from "./components/handlers/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/handlers/MiniPagesHandler/MiniPageHandler";
 import ListView from "./pages/ListView/ListView";
@@ -25,6 +25,7 @@ import {ReactQueryDevtools} from "react-query/devtools";
 
 function App() {
     const modalContext = useContext(ModalContext);
+    const location = useLocation();
 
     const {data: settings, isLoading: settingsLoading} = useGetSettings();
     
@@ -104,91 +105,93 @@ function App() {
                 <MiniPagesHandler />
                 <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
                 <div className="Content-Container">
-                    <Routes>
-                        <Route
-                            exact
-                            path="/"
-                            element={
-                                <RequireAuth>
-                                    <HomePageContainer />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            exact
-                            path="/home"
-                            element={
-                                <RequireAuth>
-                                    <Navigate to="/"/>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/list"
-                            element={
-                                <RequireAuth>
-                                    <ListView />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/new-category"
-                            element={
-                                <RequireAuth>
-                                    <NewCategory />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/new-task"
-                            element={
-                                <RequireAuth>
-                                    <NewTask />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/settings"
-                            element={
-                                <RequireAuth>
-                                    <Settings/>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            path="/settings/:tab"
-                            element={
-                                <RequireAuth>
-                                    <Settings/>
-                                </RequireAuth>
-                            }
-                        />
-                        <Route path="/playground" element={<Playground/>}/>
-                        <Route
-                            exact
-                            path="/change-email"
-                            element={
-                                <RequireAuth>
-                                    <ChangeEmail />
-                                </RequireAuth>
-                            }
-                        />
-                        <Route
-                            exact
-                            path="/log-in"
-                            element={
-                                !user.state?.id ? <LogIn/> : <Navigate to="/" />
-                            }
-                        />
-                        <Route
-                            exact
-                            path="/password-reset"
-                            element={
-                                !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
-                            }
-                        />
-                        <Route path="*" element={<NotFound/>}/>
-                    </Routes>
+                    <AnimatePresence exitBeforeEnter={true}>
+                        <Routes key={location.pathname}>
+                            <Route
+                                exact
+                                path="/"
+                                element={
+                                    <RequireAuth>
+                                        <Home />
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                exact
+                                path="/home"
+                                element={
+                                    <RequireAuth>
+                                        <Navigate to="/"/>
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                path="/list"
+                                element={
+                                    <RequireAuth>
+                                        <ListView />
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                path="/new-category"
+                                element={
+                                    <RequireAuth>
+                                        <NewCategory />
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                path="/new-task"
+                                element={
+                                    <RequireAuth>
+                                        <NewTask />
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                path="/settings"
+                                element={
+                                    <RequireAuth>
+                                        <Settings/>
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                path="/settings/:tab"
+                                element={
+                                    <RequireAuth>
+                                        <Settings/>
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route path="/playground" element={<Playground/>}/>
+                            <Route
+                                exact
+                                path="/change-email"
+                                element={
+                                    <RequireAuth>
+                                        <ChangeEmail />
+                                    </RequireAuth>
+                                }
+                            />
+                            <Route
+                                exact
+                                path="/log-in"
+                                element={
+                                    !user.state?.id ? <LogIn/> : <Navigate to="/" />
+                                }
+                            />
+                            <Route
+                                exact
+                                path="/password-reset"
+                                element={
+                                    !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
+                                }
+                            />
+                            <Route path="*" element={<NotFound/>}/>
+                        </Routes>
+                    </AnimatePresence>
                 </div>
             <ReactQueryDevtools />
         </div>
