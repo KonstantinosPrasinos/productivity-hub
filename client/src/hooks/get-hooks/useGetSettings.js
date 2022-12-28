@@ -14,8 +14,9 @@ const fetchSettings = async () => {
     return response.json();
 }
 
-export function useGetSettings() {
+export function useGetSettings(isAuthed) {
     return useQuery(["settings"], fetchSettings, {
-        staleTime: 30 * 60 * 60 * 1000
+        staleTime: 30 * 60 * 60 * 1000,
+        enabled: isAuthed
     });
 }

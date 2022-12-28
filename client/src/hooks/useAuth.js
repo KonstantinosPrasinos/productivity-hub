@@ -3,11 +3,13 @@ import {UserContext} from "../context/UserContext";
 import {useDispatch} from "react-redux";
 import {removeSettings} from "../state/settingsSlice";
 import {AlertsContext} from "../context/AlertsContext";
+import {useQueryClient} from "react-query";
 
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
     const reduxDispatch = useDispatch();
+    const queryClient = useQueryClient();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -25,9 +27,11 @@ export function useAuth() {
 
         } else {
             const data = await response.json();
-
+            const date = new Date();
+            date.setMonth(date.getMonth() + 1);
+            date.setHours(date.getHours() - 1);
             dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email}));
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date}));
         }
         setIsLoading(false);
     }
@@ -107,5 +111,25 @@ export function useAuth() {
         return response.ok;
     }
 
-    return {login, logout, register, isLoading, resetPasswordEmail, setForgotPassword}
+    const resetAccount = async (password) => {
+        const response = await fetch('http://localhost:5000/api/user/reset', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({password}),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            return;
+        }
+
+        await queryClient.invalidateQueries({queryKey: ["tasks"]});
+        await queryClient.invalidateQueries({queryKey: ["groups"]});
+        await queryClient.invalidateQueries({queryKey: ["categories"]});
+    }
+
+    return {login, logout, register, isLoading, resetPasswordEmail, setForgotPassword, resetAccount}
 }

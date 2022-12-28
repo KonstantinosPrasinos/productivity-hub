@@ -57,18 +57,14 @@ const logoutUser = (req, res) => {
     }
 }
 
-const deleteAllEntries = (id) => {
-    try {
-        Task.deleteMany({userId: id});
-        Entry.deleteMany({userId: id});
-        Group.deleteMany({userId: id});
-        Category.deleteMany({userId: id});
-    } catch (error) {
-        return error;
-    }
+const deleteAllData = async (id) => {
+    await Task.deleteMany({userId: id});
+    await Entry.deleteMany({userId: id});
+    await Group.deleteMany({userId: id});
+    await Category.deleteMany({userId: id});
 }
 
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
     if (req.user) {
         const {password} = req.body;
 
@@ -80,22 +76,17 @@ const deleteUser = (req, res) => {
             res.status(400).json({message: 'Incorrect password.'});
         }
 
-        Settings.findOneAndDelete({'userId': req.user._id})
+        try {
+            await Settings.findOneAndDelete({'userId': req.user._id})
 
-        User.findByIdAndDelete(req.user._id.toString(), (err) => {
-            if (err) {
-                return res.status(409).json({message: 'Failed to delete user.' })
-            }
-        });
+            await User.findByIdAndDelete(req.user._id.toString());
 
-        const error = deleteAllEntries(req.user._id);
-
-        if (error) {
-            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
+            req.session.destroy();
+            res.clearCookie('connect.sid');
+        } catch (error) {
+            console.log(error.message);
+            return res.status(400).json({message: error.message});
         }
-
-        req.session.destroy();
-        res.clearCookie('connect.sid');
 
         return res.status(200).json({message: 'User deleted successfully.'});
     } else {
@@ -103,7 +94,7 @@ const deleteUser = (req, res) => {
     }
 }
 
-const resetUser = (req, res) => {
+const resetUser = async (req, res) => {
     if (req.user) {
         const {password} = req.body;
 
@@ -114,16 +105,17 @@ const resetUser = (req, res) => {
         if (!bcrypt.compareSync(password, req.user.local.password)) {
             res.status(400).json({message: 'Incorrect password.'});
         }
-
-        Settings.findOneAndUpdate({userId: req.user._id}, {$set: {'theme': 'Light', 'defaults': {'step': 1, 'goal': 1, 'priority': 1}}});
-
-        const error = deleteAllEntries(req.user._id);
-
-        if (error) {
-            res.status(500).json({message: 'Entries couldn\'t be deleted.'})
+        
+        try {
+            await Settings.findOneAndUpdate({userId: req.user._id}, {$set: {'theme': 'Light', 'defaults': {'step': 1, 'goal': 1, 'priority': 1}}});
+            await deleteAllData(req.user._id)
+        } catch (error) {
+            return res.status(400).json({message: error.message});
         }
 
-        return res.status(200).json({message: 'User deleted successfully.'});
+        console.log('reset successful')
+
+        return res.status(200).json({message: 'User reset successfully.'});
     }
 }
 
@@ -201,13 +193,15 @@ const forgotPasswordSendEmail = async (req, res) => {
         return res.status(400).json({message: 'Email is invalid.'})
     }
 
+    console.log('test')
+
     User.findOne({'local.email': email}, async (err, userExists) => {
         if (userExists && userExists.active) {
             await sendEmail(email, 'resetPassword')
         }
-    });
 
-    return res.status(200).json({message: 'If there is an account created with the email you entered, we sent it an email.'});
+        return res.status(200).json({message: 'If there is an account created with the email you entered, we sent it an email.'});
+    });
 }
 
 const forgotPasswordSetPassword = async (req, res) => {

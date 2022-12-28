@@ -2,7 +2,7 @@ const Settings = require('../models/settingsSchema');
 const Joi = require('joi');
 
 const settingsSchema = Joi.object({
-    theme: Joi.string().valid('Light', 'Dark', 'Default'),
+    theme: Joi.string().valid('Light', 'Dark', 'Device'),
     defaults: Joi.object().keys({
         step: Joi.number().min(0),
         priority: Joi.number(),

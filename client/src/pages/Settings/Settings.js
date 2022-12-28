@@ -22,11 +22,15 @@ import {useAuth} from "../../hooks/useAuth";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 import {motion} from "framer-motion";
+import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
+import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
     const email = useContext(UserContext).state.email;
     const {mutate: setSettings} = useChangeSettings();
+    const {mutate: resetAccount} = useResetAccount();
+    const {mutate: deleteAccount} = useDeleteAccount();
 
     const {verifyPassword} = useVerify();
     const alertsContext = useContext(AlertsContext);
@@ -41,10 +45,11 @@ const Settings = () => {
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
     const [settingsChanges, setSettingsChanges] = useState({});
+    const [dangerAreaVisible, setDangerAreaVisible] = useState('none');
 
     const {logout} = useAuth();
 
-    const themeChips = ['Device', 'Light', 'Dark', 'Black'];
+    const themeChips = ['Device', 'Light', 'Dark']; // Add black
 
     const clearPasswords = () => {
         setNewPassword('');
@@ -138,6 +143,32 @@ const Settings = () => {
         setChangePasswordVisible(current => !current);
     }
 
+    const handleToggleDangerArea = (type) => {
+        clearPasswords();
+        setDangerAreaVisible((current) => {
+            if (current !== 'none') {
+                return 'none';
+            }
+            return type;
+        });
+    }
+
+    const handleAccountRemoval = () => {
+        clearPasswords();
+        setDangerAreaVisible('none');
+        console.log(dangerAreaVisible);
+        switch (dangerAreaVisible) {
+            case 'reset':
+                resetAccount(currentPassword);
+                break;
+            case 'delete':
+                deleteAccount(currentPassword);
+                break;
+            default:
+                break;
+        }
+    }
+
     const handlePasswordScore = (score) => {
         setNewPasswordScore(score);
     }
@@ -214,9 +245,24 @@ const Settings = () => {
                         <Button filled={false} size={'small'}>Download Data</Button>
                     </InputWrapper>
                     <InputWrapper label={'Account Removal'}>
-                        <Button filled={false} size={'small'} isWarning={true}>Delete Account</Button>
-                        <Button filled={false} size={'small'} isWarning={true}>Reset Account</Button>
+                        <Button filled={false} size={'small'} isWarning={true} onClick={() => {
+                            handleToggleDangerArea('delete');
+                        }}>Delete Account</Button>
+                        <Button filled={false} size={'small'} isWarning={true} onClick={() => {
+                            handleToggleDangerArea('reset');
+                        }}>Reset Account</Button>
                     </InputWrapper>
+                    <CollapsibleContainer isVisible={dangerAreaVisible !== 'none'}>
+                        <InputWrapper label={"Input your password to confirm"}>
+                            <TextBoxInput width={'max'} value={currentPassword} setValue={setCurrentPassword} type={"password"} placeholder={'Current password'}/>
+                        </InputWrapper>
+                        <InputWrapper>
+                            <Button filled={false} size={'small'} onClick={handleAccountRemoval}>Confirm</Button>
+                            <Button filled={false} size={'small'} onClick={() => {
+                                handleToggleDangerArea('none');
+                            }}>Cancel</Button>
+                        </InputWrapper>
+                    </CollapsibleContainer>
                 </section>
                 <div className={`Headline Horizontal-Flex-Container ${styles.header}`}><PaletteIcon/>Appearance</div>
                 <section className={'Stack-Container No-Gap'}>

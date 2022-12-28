@@ -3,7 +3,7 @@ import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/LogIn/LogIn";
 import RequireAuth from "./components/etc/RequireAuth";
-import {useContext, useEffect, useMemo, useRef} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -22,42 +22,46 @@ import {UserContext} from "./context/UserContext";
 
 import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
 import {ReactQueryDevtools} from "react-query/devtools";
+import {updateUserValidDate} from "./functions/updateUserValidDate";
 
 function App() {
     const modalContext = useContext(ModalContext);
     const location = useLocation();
 
-    const {data: settings, isLoading: settingsLoading} = useGetSettings();
+
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
 
-
     const navigate = useNavigate();
+
+    const {data: settings, isLoading: settingsLoading} = useGetSettings(user.state?.id && true);
 
     useEffect(async () => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
       const loggedInUser = localStorage.getItem("user");
-      // const settings = localStorage.getItem("settings");
 
       if (loggedInUser) {
           const userObject = JSON.parse(loggedInUser);
-          user.dispatch({type: "SET_USER", payload: userObject});
-          //
-          // if (!settings) {
-          //     await getSettings();
-          // } else {
-          //     dispatch(setSettings(JSON.parse(settings)));
-          // }
+
+          const dateValidUntil = new Date(userObject.validUntil);
+
+          if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
+              user.dispatch({type: "SET_USER", payload: userObject});
+              updateUserValidDate();
+          } else {
+              localStorage.removeItem("user");
+              navigate("/log-in");
+          }
       } else {
-          navigate('/log-in')
+          navigate('/log-in');
       }
     }, []);
 
-    const defaultThemeChanged = useRef(false);
+    const [defaultThemeChanged, setDefaultThemeChanged] = useState(false);
 
-    const setDefaultThemeChanged = () => {
-        defaultThemeChanged.current = !defaultThemeChanged.current;
+    const handleSetDefaultThemeChanged = () => {
+        setDefaultThemeChanged(current => !current)
     }
 
     useEffect(() => {
@@ -65,10 +69,10 @@ function App() {
 
         if (settings?.theme === 'Device' && !matchMediaHasEventListener.current) {
             matchMediaHasEventListener.current = true;
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDefaultThemeChanged);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleSetDefaultThemeChanged);
         } else if (matchMediaHasEventListener.current) {
             matchMediaHasEventListener.current = false;
-            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', setDefaultThemeChanged);
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSetDefaultThemeChanged);
         }
 
     }, [settings?.theme])
@@ -100,9 +104,9 @@ function App() {
 
     return (
         <div className={`App ${theme}`}>
-                <NavBar/>
+                {user.state?.id && <NavBar/>}
                 <AlertHandler />
-                <MiniPagesHandler />
+                {user.state?.id && < MiniPagesHandler />}
                 <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
                 <div className="Content-Container">
                     <AnimatePresence exitBeforeEnter={true}>

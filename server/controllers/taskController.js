@@ -226,7 +226,6 @@ const createTask = async (req, res) => {
                 currentEntryId: entry._id
             });
         } catch (error) {
-            console.log(error);
             res.status(400).json({message: error.message})
         }
     } else {
