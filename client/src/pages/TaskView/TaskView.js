@@ -16,11 +16,14 @@ import CheckIcon from "@mui/icons-material/Check";
 import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
+import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const {mutate: deleteTask} = useDeleteTask();
     const {mutate: setTaskCurrentEntry} = useChangeEntry(task.title);
+    const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id);
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
@@ -151,6 +154,30 @@ const TaskView = ({index, length, task}) => {
                         <ArrowForwardIosIcon />
                     </IconButton>
                 </div>
+            </section>
+            <section>
+                {/*Temp*/}
+                {!entriesLoading && <table>
+                    <tr>
+                        <th>
+                            Date:
+                            <IconButton color={'normal'}><KeyboardArrowDownIcon /></IconButton>
+                        </th>
+                        <th>Value:</th>
+                    </tr>
+                    <tr>
+                        <td>{new Date().toLocaleDateString()}</td>
+                        <td>0</td>
+                    </tr>
+                    {entries.sort((a, b) => a.date.getTime() < b.date.getTime()).map(entry => {
+                        const entryDate = new Date(entry.date);
+
+                        return <tr>
+                            <td>{entryDate.toLocaleDateString()}</td>
+                            <td>{entry.value}</td>
+                        </tr>
+                    })}
+                </table>}
             </section>
             <section className={'Horizontal-Flex-Container Space-Between'}>
                 <Button filled={false} size={'small'}>

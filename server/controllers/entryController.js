@@ -19,10 +19,14 @@ const getRecentEntries = async (req, res) => {
 }
 
 const getTaskEntries = (req, res) => {
+    console.log('test')
     if (req.user) {
-        const {taskId} = req.body;
+        const {taskId} = req.params;
 
-        Entry.find({"$and": [{userId: req.user._id}, {taskId: taskId}]}, (err, entries) => {
+        console.log(taskId);
+
+        Entry.find({userId: req.user._id, taskId: taskId}, (err, entries) => {
+            console.log(err, entries)
             if (entries) {return res.status(200).json({entries})}
 
             return res.status(404).json({message: 'Past entries not found.'});

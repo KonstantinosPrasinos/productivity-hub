@@ -1,7 +1,8 @@
-import {useQuery, useQueryClient} from "react-query";
+import {useQuery} from "react-query";
 
-const fetchTaskEntries = async () => {
-    const response = await fetch('http://localhost:5000/api/entry', {
+const fetchTaskEntries = async ({queryKey}) => {
+    const taskId = queryKey[1];
+    const response = await fetch(`http://localhost:5000/api/entry/all/${taskId}`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
@@ -16,22 +17,10 @@ const fetchTaskEntries = async () => {
 
 
 export function useGetTaskEntries(taskId) {
-    const queryClient = useQueryClient();
-
     const queryObject = useQuery(["task-entries", taskId], fetchTaskEntries, {
-        staleTime: 30 * 60 * 60 * 1000,
-        onSuccess: (data) => {
-            queryClient.setQueryData(["task-entries", taskId], (oldData) => {
-                const priorities = data.tasks.map(task => task.priority);
-
-                return {...oldData, priorityBounds: {
-                        low: Math.min(...priorities),
-                        high: Math.max(...priorities)
-                    }}
-            });
-        }
+        staleTime: 30 * 60 * 60 * 1000
     });
 
 
-    return {...queryObject, data: queryObject.data?.tasks}
+    return {...queryObject, data: queryObject.data?.entries}
 }
