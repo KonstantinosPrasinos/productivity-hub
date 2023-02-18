@@ -1,5 +1,5 @@
 import styles from "./Settings.module.scss";
-import {useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Chip from "../../components/buttons/Chip/Chip";
@@ -8,7 +8,6 @@ import Button from "../../components/buttons/Button/Button";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import {ModalContext} from "../../context/ModalContext";
-import {useVerify} from "../../hooks/useVerify";
 import {AlertsContext} from "../../context/AlertsContext";
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
@@ -19,6 +18,9 @@ import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
 import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 import EmailIcon from '@mui/icons-material/Email';
 import GoogleIcon from '@mui/icons-material/Google';
+import Modal from "../../components/containers/Modal/Modal";
+import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
+import PasswordStrengthBar from "react-password-strength-bar";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -27,42 +29,41 @@ const Settings = () => {
     const {mutate: resetAccount} = useResetAccount();
     const {mutate: deleteAccount} = useDeleteAccount();
 
-    const {verifyPassword} = useVerify();
     const alertsContext = useContext(AlertsContext);
     const modalContext = useContext(ModalContext);
-    const [changePasswordVisible, setChangePasswordVisible] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordScore, setNewPasswordScore] = useState();
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
-    const [emailVisible, setEmailVisible] = useState(false);
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
     const [settingsChanges, setSettingsChanges] = useState({});
-    const [dangerAreaVisible, setDangerAreaVisible] = useState('none');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [newEmail, setNewEmail] = useState("");
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [resetModalVisible, setResetModalVisible] = useState(false);
+    const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
+    const [changePasswordSelectedTab, setChangePasswordSelectedTab] = useState(0);
+    const [changeEmailModalVisible, setChangeEmailModalVisible] = useState(false);
+    const [changeEmailSelectedTab, setChangeEmailSelectedTab] = useState(0);
 
     const {logout} = useAuth();
 
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
-
-    const clearPasswords = () => {
-        setNewPassword('');
-        setCurrentPassword('');
-    }
 
     const handleSaveChanges = async () => {
         await setSettings({theme: selectedTheme, defaults: {step, goal, priority}});
         setSettingsChanges({});
     }
 
-    const hiddenEmail = () => {
-        const hidden = '*'.repeat(email.substring(0, email.indexOf('@')).length);
-        return (hidden.concat(email.substring(email.indexOf('@'), email.length)));
-    }
-
     const handleLogOut = async () => {
         await logout();
+    }
+
+    const handleSetPasswordScore = (score) => {
+        setNewPasswordScore(score);
     }
 
     const handleSetTheme = (e) => {
@@ -77,20 +78,6 @@ const Settings = () => {
 
                 return rest;
             });
-        }
-    }
-
-    const handleSavePassword = () => {
-        if (verifyPassword(currentPassword)) {
-            if (newPasswordScore > 0) {
-                setChangePasswordVisible(current => !current)
-                clearPasswords()
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Password updated!"}});
-            } else {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password is not strong enough"}});
-            }
-        } else {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
         }
     }
 
@@ -133,46 +120,8 @@ const Settings = () => {
         }
     }
 
-    const handleCancelPasswordChange = () => {
-        clearPasswords();
-        setChangePasswordVisible(current => !current);
-    }
-
-    const handleToggleDangerArea = (type) => {
-        clearPasswords();
-        setDangerAreaVisible((current) => {
-            if (current !== 'none') {
-                return 'none';
-            }
-            return type;
-        });
-    }
-
-    const handleAccountRemoval = () => {
-        clearPasswords();
-        setDangerAreaVisible('none');
-        switch (dangerAreaVisible) {
-            case 'reset':
-                resetAccount(currentPassword);
-                break;
-            case 'delete':
-                deleteAccount(currentPassword);
-                break;
-            default:
-                break;
-        }
-    }
-
-    const handlePasswordScore = (score) => {
-        setNewPasswordScore(score);
-    }
-
     const handleChangeEmail = () => {
         modalContext.dispatch({type: 'TOGGLE_MODAL'});
-    }
-
-    const handleProjectClick = () => {
-        window.open('https://github.com/KonstantinosPrasinos/productivity-hub');
     }
 
     const handleGithubClick = () => {
@@ -187,8 +136,73 @@ const Settings = () => {
         window.open('https://twitter.com/ConstantDeenos');
     }
 
-    const handleToggleEmail = () => {
-        setEmailVisible(current => !current);
+    const handleDelete = () => {
+        deleteAccount(currentPassword);
+        toggleDeleteAccountModal();
+        handleLogOut();
+        setCurrentPassword("");
+    }
+    const handleReset = () => {
+        resetAccount(currentPassword);
+        toggleResetAccountModal();
+        handleLogOut();
+        setCurrentPassword("");
+    }
+    const handleChangePasswordContinue = () => {
+        if (changePasswordSelectedTab === 0) {
+            // Do verification process.
+            setChangePasswordSelectedTab(1);
+            setVerificationCode("");
+        } else {
+            if (newPasswordScore > 1) {
+                // Set password on back end.
+                setChangePasswordModalVisible(false);
+                handleLogOut();
+            }
+        }
+    }
+
+    const handleChangeEmailContinue = () => {
+        if (changeEmailSelectedTab === 0) {
+            setChangeEmailSelectedTab(1);
+            setVerificationCode("");
+        } else {
+            const regex = /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+            if (newEmail.match(regex)){
+                // Set email on back end
+                setChangeEmailModalVisible(false);
+                handleLogOut();
+            }
+        }
+    }
+
+    // const handleSavePassword = () => {
+    //     if (verifyPassword(currentPassword)) {
+    //         if (newPasswordScore > 0) {
+    //             setChangePasswordVisible(current => !current)
+    //             clearPasswords()
+    //             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Password updated!"}});
+    //         } else {
+    //             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password is not strong enough"}});
+    //         }
+    //     } else {
+    //         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+    //     }
+    // }
+
+    const toggleDeleteAccountModal = () => {
+        setDeleteModalVisible(current => !current);
+    }
+    const toggleResetAccountModal = () => {
+        setResetModalVisible(current => !current);
+    }
+    const toggleChangePasswordModal = () => {
+        setChangePasswordSelectedTab(0);
+        setChangePasswordModalVisible(current => !current);
+    }
+    const toggleChangeEmailModal = () => {
+        setChangeEmailSelectedTab(0)
+        setChangeEmailModalVisible(current => !current);
     }
 
     return (
@@ -227,10 +241,10 @@ const Settings = () => {
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Email Password</div>
+                                <div className={'Horizontal-Flex-Container'}>Change Password</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>Change the password you use when logging in using your email.</div>
-                                    <Button filled={false} size={'small'} onClick={handleChangeEmail}>Change</Button>
+                                    <Button filled={false} size={'small'} onClick={toggleChangePasswordModal}>Change</Button>
                                 </div>
                             </div>
                         </section>
@@ -240,14 +254,14 @@ const Settings = () => {
                                 <div className={'Horizontal-Flex-Container'}>Delete Account</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>Delete all the data of your account.</div>
-                                    <Button filled={false} size={'small'} onClick={handleChangeEmail} isWarning={true}>Delete</Button>
+                                    <Button filled={false} size={'small'} onClick={toggleDeleteAccountModal} isWarning={true}>Delete</Button>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
                                 <div className={'Horizontal-Flex-Container'}>Reset Account</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>Keep your account but delete all the task data and reset settings.</div>
-                                    <Button filled={false} size={'small'} onClick={handleChangeEmail} isWarning={true}>Reset</Button>
+                                    <Button filled={false} size={'small'} onClick={toggleResetAccountModal} isWarning={true}>Reset</Button>
                                 </div>
                             </div>
                         </section>
@@ -295,8 +309,11 @@ const Settings = () => {
                     <div className={'Stack-Container BigGap'}>
                         <div className={'Horizontal-Flex-Container'}>App Details</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>Available as a Web App, on Android and on Windows.
-                                You can view the source code for this app on github.</div>
+                            <div className={'Label'}>
+                                Available as a Web App, on Android and on Windows.
+                                You can view the source code for this
+                                app <a href={"https://github.com/KonstantinosPrasinos/productivity-hub"} target="_blank">on github</a>.
+                            </div>
                         </div>
                     </div>
                     <div className={'Stack-Container BigGap'}>
@@ -312,8 +329,113 @@ const Settings = () => {
                     </div>
                 </section>
 
+                {/*// Modal for email verification in order to change email.*/}
+                {changeEmailModalVisible && <Modal
+                    dismountFunction={toggleChangeEmailModal}
+                    continueFunction={handleChangeEmailContinue}
+                >
+                    <SwitchContainer selectedTab={changePasswordSelectedTab}>
+                        <div className={'Stack-Container'}>
+                            <div className={'Display'}>Confirm your email</div>
+                            <div className={'label'}>We sent you an email with a verification code to verify it's you. Please enter it below to continue.</div>
+                            <TextBoxInput
+                                type={'password'}
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'Verification code'}
+                                value={verificationCode}
+                                setValue={setVerificationCode}
+                            />
+                        </div>
+                        <div className={'Stack-Container'}>
+                            <div className={'Display'}>Enter your new email</div>
+                            <div className={'label'}>We have verified your identity. Please enter the new email you want you use below.</div>
+                            <TextBoxInput
+                                type={'text'}
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'New email'}
+                                value={newEmail}
+                                setValue={setNewEmail}
+                            />
+                        </div>
+                    </SwitchContainer>
 
+                </Modal>}
 
+                {/*// Modal for password confirmation in order to delete account*/}
+                {deleteModalVisible && <Modal
+                    dismountFunction={toggleDeleteAccountModal}
+                    continueFunction={handleDelete}
+                >
+
+                    <div className={'Stack-Container'} >
+                        <div className={'Display'}>Confirm your password</div>
+                        <div className={'label'}>In order to delete your account you need to confirm your password.</div>
+                        <TextBoxInput
+                            type={'password'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Password'}
+                            value={currentPassword}
+                            setValue={setCurrentPassword}
+                        />
+                    </div>
+                </Modal>}
+
+                {/*// Modal for password confirmation in order to reset account*/}
+                {resetModalVisible && <Modal
+                    dismountFunction={toggleResetAccountModal}
+                    continueFunction={handleReset}
+                >
+
+                    <div className={'Stack-Container'} >
+                        <div className={'Display'}>Confirm your password</div>
+                        <div className={'label'}>In order to reset your account you need to confirm your password.</div>
+                        <TextBoxInput
+                            type={'password'}
+                            width={'max'}
+                            size={'big'}
+                            placeholder={'Password'}
+                            value={currentPassword}
+                            setValue={setCurrentPassword}
+                        />
+                    </div>
+                </Modal>}
+
+                {/*// Modal to change password*/}
+                {changePasswordModalVisible && <Modal
+                    dismountFunction={toggleChangePasswordModal}
+                    continueFunction={handleChangePasswordContinue}
+                >
+                    <SwitchContainer selectedTab={changePasswordSelectedTab}>
+                        <div className={'Stack-Container'}>
+                            <div className={'Display'}>Confirm your email</div>
+                            <div className={'label'}>We sent you an email with a verification code to verify it's you. Please enter it below to continue.</div>
+                            <TextBoxInput
+                                type={'password'}
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'Verification code'}
+                                value={verificationCode}
+                                setValue={setVerificationCode}
+                            />
+                        </div>
+                        <div className={'Stack-Container'}>
+                            <div className={'Display'}>Enter your new password</div>
+                            <div className={'label'}>We have verified your identity. Please enter the new password you want you use below.</div>
+                            <TextBoxInput
+                                type={'password'}
+                                width={'max'}
+                                size={'big'}
+                                placeholder={'New password'}
+                                value={newPassword}
+                                setValue={setNewPassword}
+                            />
+                            <PasswordStrengthBar password={newPassword} onChangeScore={handleSetPasswordScore} style={{padding: '0 10px', marginTop: 0}} />
+                        </div>
+                    </SwitchContainer>
+                </Modal>}
 
                 {/*<section className={'Stack-Container No-Gap'}>*/}
                 {/*    <InputWrapper label={`Email (Click to ${emailVisible ? 'hide' : 'reveal'})`}>*/}

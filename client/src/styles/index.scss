@@ -54,6 +54,21 @@ body {
     transition: background-color 0.2s;
 }
 
+a {
+    &:link {
+        color: var(--on-surface-color);
+    }
+    &:visited {
+        color: var(--on-surface-color);
+    }
+    &:hover {
+        text-decoration: none;
+    }
+    &:active {
+        color: var(--on-surface-color);
+    }
+}
+
 .Button {
     display: inline-flex;
     justify-content: center;

@@ -104,7 +104,7 @@ function App() {
         <div className={`App ${theme}`}>
                 {user.state?.id && <NavBar/>}
                 <AlertHandler />
-                {user.state?.id && < MiniPagesHandler />}
+                {user.state?.id && <MiniPagesHandler />}
                 <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
                 <div className="Content-Container">
                     <AnimatePresence exitBeforeEnter={true}>
