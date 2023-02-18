@@ -27,15 +27,13 @@ import {updateUserValidDate} from "./functions/updateUserValidDate";
 function App() {
     const modalContext = useContext(ModalContext);
     const location = useLocation();
-
-
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
 
     const navigate = useNavigate();
 
-    const {data: settings, isLoading: settingsLoading} = useGetSettings(user.state?.id && true);
+    const {data: settings, isLoading: settingsLoading} = useGetSettings();
 
     useEffect(async () => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
