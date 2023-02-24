@@ -1,17 +1,22 @@
-import {useContext, useState} from 'react';
-import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
-import Button from "../../components/buttons/Button/Button";
+import {useContext, useEffect, useState} from 'react';
+import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
+import Button from "../../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
-import {AlertsContext} from "../../context/AlertsContext";
-import {useVerify} from "../../hooks/useVerify";
-import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
-import TextButton from "../../components/buttons/TextButton/TextButton";
-import SurfaceContainer from "../../components/containers/SurfaceContainer/SurfaceContainer";
-import {useAuth} from "../../hooks/useAuth";
+import {AlertsContext} from "../../../context/AlertsContext";
+import {useVerify} from "../../../hooks/useVerify";
+import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
+import TextButton from "../../../components/buttons/TextButton/TextButton";
+import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
+import {useAuth} from "../../../hooks/useAuth";
+import {UserContext} from "../../../context/UserContext";
+import {removeSettings} from "../../../state/settingsSlice";
+import {useDispatch} from "react-redux";
 
 const ResetPassword = () => {
-    const [currentPage, setCurrentPage] = useState(0);
+    const user = useContext(UserContext);
+
+    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : 0);
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
@@ -22,6 +27,7 @@ const ResetPassword = () => {
     const {resetPasswordEmail, setForgotPassword} = useAuth();
     const navigate = useNavigate();
     const alertsContext = useContext(AlertsContext);
+    const dispatch = useDispatch();
 
     const validateEmail = () => {
         return email.match(
@@ -102,13 +108,19 @@ const ResetPassword = () => {
                 }
                 break;
             case 3:
-                navigate(-1);
+                if (user.state?.id) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('settings');
+                    user.dispatch({type: "REMOVE_USER"});
+                    dispatch(removeSettings());
+                }
+                navigate('/log-in');
                 break;
         }
     }
 
     const handleResendCode = async () => {
-        await resendForgotPasswordCode(email)
+        await resendForgotPasswordCode(email);
     }
 
     const handlePasswordScore = (score) => {
@@ -128,12 +140,20 @@ const ResetPassword = () => {
         }
     }
 
+    // When the user visits this page while logged in, the input email page is skipped.
+    // Because the continue button on said page is not pressed, we need to send the email manually.
+    useEffect(async () => {
+        if (user.state?.id) {
+            await resetPasswordEmail(email);
+        }
+    }, [])
+
     return (
-        <SurfaceContainer isOpaque={true}>
+        <SurfaceContainer>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container'}>
                     <div className={'Display'}>Enter your email</div>
-                    <div className={'Label'}>We will send you a password to verify it's you.</div>
+                    <div className={'Label'}>We will send you a code to verify it's you.</div>
                     <TextBoxInput
                         type={'email'}
                         width={'max'}
@@ -148,7 +168,11 @@ const ResetPassword = () => {
                 <div className={'Stack-Container'}>
                     <div className={'Display'}>We sent you a code</div>
                     <div className={'Label'}>
-                        If the email you entered exists, is should receive a verification code.
+                        {user.state?.id ?
+                            "In order to verify it's you we sent you a verification code." :
+                            "If the email you entered exists, is should receive a verification code."
+                        }
+                        <br />
                         Enter the code below to verify your email.
                     </div>
                     <div>

@@ -7,7 +7,6 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
-import {ModalContext} from "../../context/ModalContext";
 import {AlertsContext} from "../../context/AlertsContext";
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
@@ -21,6 +20,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import Modal from "../../components/containers/Modal/Modal";
 import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import PasswordStrengthBar from "react-password-strength-bar";
+import {useNavigate} from "react-router-dom";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -30,7 +30,6 @@ const Settings = () => {
     const {mutate: deleteAccount} = useDeleteAccount();
 
     const alertsContext = useContext(AlertsContext);
-    const modalContext = useContext(ModalContext);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordScore, setNewPasswordScore] = useState();
@@ -50,6 +49,7 @@ const Settings = () => {
     const [changeEmailSelectedTab, setChangeEmailSelectedTab] = useState(0);
 
     const {logout} = useAuth();
+    const navigate = useNavigate();
 
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
 
@@ -119,9 +119,8 @@ const Settings = () => {
             });
         }
     }
-
     const handleChangeEmail = () => {
-        modalContext.dispatch({type: 'TOGGLE_MODAL'});
+        navigate('/change-email')
     }
 
     const handleGithubClick = () => {
@@ -200,6 +199,9 @@ const Settings = () => {
         setChangePasswordSelectedTab(0);
         setChangePasswordModalVisible(current => !current);
     }
+    const handleChangePasswordClick = () => {
+        navigate('/reset-password');
+    }
     const toggleChangeEmailModal = () => {
         setChangeEmailSelectedTab(0)
         setChangeEmailModalVisible(current => !current);
@@ -226,25 +228,33 @@ const Settings = () => {
                         </div>
                         <div className={styles.subSectionTitle}>Account Details</div>
                         <section className={`Stack-Container ${styles.subSection}`}>
-                            <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><GoogleIcon />Google Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>{email}</div>
-                                    <Button filled={false} size={'small'} onClick={handleChangeEmail}>Unlink</Button>
-                                </div>
-                            </div>
+                            {/*<div className={'Stack-Container'}>*/}
+                            {/*    <div className={'Horizontal-Flex-Container'}><GoogleIcon />Google Account</div>*/}
+                            {/*    <div className={`Horizontal-Flex-Container Space-Between`}>*/}
+                            {/*        <div className={'Label'}>{email}</div>*/}
+                            {/*        <Button filled={false} size={'small'} onClick={handleChangeEmail}>Unlink</Button>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
                             <div className={'Stack-Container'}>
                                 <div className={'Horizontal-Flex-Container'}><EmailIcon />Email</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>{email}</div>
+                                    <div className={'Label'}>
+                                        {email}
+                                        <br/>
+                                        Note: if you change your email, you will be logged out.
+                                    </div>
                                     <Button filled={false} size={'small'} onClick={handleChangeEmail}>Change</Button>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
                                 <div className={'Horizontal-Flex-Container'}>Change Password</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>Change the password you use when logging in using your email.</div>
-                                    <Button filled={false} size={'small'} onClick={toggleChangePasswordModal}>Change</Button>
+                                    <div className={'Label'}>
+                                        Change the password you use when logging in using your email.
+                                        <br/>
+                                        Note: this action will log you out.
+                                    </div>
+                                    <Button filled={false} size={'small'} onClick={handleChangePasswordClick}>Change</Button>
                                 </div>
                             </div>
                         </section>

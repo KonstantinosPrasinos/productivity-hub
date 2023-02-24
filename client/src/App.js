@@ -1,8 +1,7 @@
-import {Routes, Route, Navigate, useNavigate, useLocation} from "react-router-dom";
+import {Routes, Route, Navigate, useNavigate, useLocation, Outlet} from "react-router-dom";
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
-import LogIn from "./pages/LogIn/LogIn";
-import RequireAuth from "./components/etc/RequireAuth";
+import LogIn from "./pages/Auth/LogIn/LogIn";
 import {useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import "./styles/index.scss";
@@ -14,18 +13,37 @@ import Home from "./pages/Home/Home";
 import AlertHandler from "./components/handlers/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/handlers/MiniPagesHandler/MiniPageHandler";
 import ListView from "./pages/ListView/ListView";
-import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
-import {ModalContext} from "./context/ModalContext";
+import ChangeEmail from "./pages/Auth/ChangeEmail/ChangeEmail";
 import {AnimatePresence} from "framer-motion";
-import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import ResetPassword from "./pages/Auth/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
 
 import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
 import {ReactQueryDevtools} from "react-query/devtools";
 import {updateUserValidDate} from "./functions/updateUserValidDate";
 
+
+const NavLayout = () => (
+    <>
+        <NavBar/>
+        <MiniPagesHandler />
+        <div className="Content-Container">
+            <Outlet />
+        </div>
+    </>
+)
+const ProtectedLayout = () => {
+    const userExists = useContext(UserContext).state?.id;
+    const location = useLocation();
+
+    if (!userExists) {
+        return <Navigate to="/log-in" replace state={{path: location.pathname}} />
+    }
+
+    return (<Outlet />)
+}
+
 function App() {
-    const modalContext = useContext(ModalContext);
     const location = useLocation();
     
     const user = useContext(UserContext);
@@ -102,99 +120,77 @@ function App() {
 
     return (
         <div className={`App ${theme}`}>
-                {user.state?.id && <NavBar/>}
-                <AlertHandler />
-                {user.state?.id && <MiniPagesHandler />}
-                <AnimatePresence>{modalContext.state && <ChangeEmail />}</AnimatePresence>
-                <div className="Content-Container">
-                    <AnimatePresence exitBeforeEnter={true}>
-                        <Routes key={location.pathname}>
+            <AlertHandler />
+            <AnimatePresence exitBeforeEnter={true}>
+                <Routes key={location.pathname}>
+                    <Route path="/" element={<ProtectedLayout />}>
+                        <Route path="/" element={<NavLayout />}>
                             <Route
                                 exact
                                 path="/"
                                 element={
-                                    <RequireAuth>
-                                        <Home />
-                                    </RequireAuth>
+                                    <Home />
                                 }
                             />
                             <Route
                                 exact
                                 path="/home"
                                 element={
-                                    <RequireAuth>
-                                        <Navigate to="/"/>
-                                    </RequireAuth>
+                                    <Navigate to="/"/>
                                 }
                             />
                             <Route
                                 path="/list"
                                 element={
-                                    <RequireAuth>
-                                        <ListView />
-                                    </RequireAuth>
+                                    <ListView />
                                 }
                             />
                             <Route
                                 path="/new-category"
                                 element={
-                                    <RequireAuth>
-                                        <NewCategory />
-                                    </RequireAuth>
+                                    <NewCategory />
                                 }
                             />
                             <Route
                                 path="/new-task"
                                 element={
-                                    <RequireAuth>
-                                        <NewTask />
-                                    </RequireAuth>
+                                    <NewTask />
                                 }
                             />
                             <Route
                                 path="/settings"
                                 element={
-                                    <RequireAuth>
-                                        <Settings/>
-                                    </RequireAuth>
-                                }
-                            />
-                            <Route
-                                path="/settings/:tab"
-                                element={
-                                    <RequireAuth>
-                                        <Settings/>
-                                    </RequireAuth>
+                                    <Settings/>
                                 }
                             />
                             <Route path="/playground" element={<Playground/>}/>
-                            <Route
-                                exact
-                                path="/change-email"
-                                element={
-                                    <RequireAuth>
-                                        <ChangeEmail />
-                                    </RequireAuth>
-                                }
-                            />
-                            <Route
-                                exact
-                                path="/log-in"
-                                element={
-                                    !user.state?.id ? <LogIn/> : <Navigate to="/" />
-                                }
-                            />
-                            <Route
-                                exact
-                                path="/password-reset"
-                                element={
-                                    !user.state?.id ? <ResetPassword/> : <Navigate to="/" />
-                                }
-                            />
-                            <Route path="*" element={<NotFound/>}/>
-                        </Routes>
-                    </AnimatePresence>
-                </div>
+                        </Route>
+                        <Route
+                            exact
+                            path="/change-email"
+                            element={
+                                <ChangeEmail />
+                            }
+                        />
+                    </Route>
+                    <Route
+                        exact
+                        path="/log-in"
+                        element={
+                            !user.state?.id ? <LogIn/> : <Navigate to="/" />
+                        }
+                    />
+                    <Route
+                        exact
+                        path="/reset-password"
+                        element={
+                            <ResetPassword/>
+                        }
+                    />
+                    <Route path="*" element={<Navigate to={"/not-found"} />}/>
+                    <Route path="/not-found" element={<NotFound/>}/>
+                </Routes>
+            </AnimatePresence>
             <ReactQueryDevtools />
         </div>
     );

@@ -1,17 +1,17 @@
 import React, {useContext, useEffect, useState} from 'react';
 import styles from './LogIn.module.scss';
-import Button from "../../components/buttons/Button/Button";
-import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
-import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
+import Button from "../../../components/buttons/Button/Button";
+import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
+import CollapsibleContainer from "../../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useNavigate} from "react-router-dom";
-import {AlertsContext} from "../../context/AlertsContext";
+import {AlertsContext} from "../../../context/AlertsContext";
 import PasswordStrengthBar from "react-password-strength-bar";
-import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
-import {useVerify} from "../../hooks/useVerify";
-import TextButton from "../../components/buttons/TextButton/TextButton";
-import {useAuth} from "../../hooks/useAuth";
-import {UserContext} from "../../context/UserContext";
-import SurfaceContainer from "../../components/containers/SurfaceContainer/SurfaceContainer";
+import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
+import {useVerify} from "../../../hooks/useVerify";
+import TextButton from "../../../components/buttons/TextButton/TextButton";
+import {useAuth} from "../../../hooks/useAuth";
+import {UserContext} from "../../../context/UserContext";
+import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -103,7 +103,7 @@ const LogIn = () => {
     }
 
     const handleForgotPassword = () => {
-        navigate('/password-reset')
+        navigate('/reset-password')
     }
 
     useEffect(() => {
@@ -115,7 +115,7 @@ const LogIn = () => {
     }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
-        <SurfaceContainer isLoading={isLoading || isLoadingVerify} isOpaque={true}>
+        <SurfaceContainer isLoading={isLoading || isLoadingVerify}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>

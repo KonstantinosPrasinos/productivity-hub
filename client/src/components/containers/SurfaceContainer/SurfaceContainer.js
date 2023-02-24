@@ -3,9 +3,9 @@ import styles from './SurfaceContainer.module.scss';
 import {AnimatePresence, motion} from "framer-motion";
 import LoadingIndicator from "../../indicators/LoadingIndicator/LoadingIndicator";
 
-const SurfaceContainer = ({children, isLoading, isOpaque = false}) => {
+const SurfaceContainer = ({children, isLoading}) => {
     return (
-        <div className={`${styles.container} ${isOpaque ? styles.opaque : ''} `}>
+        <div className={styles.container}>
             <div className={styles.surface}>
                 <AnimatePresence>
                     {isLoading && <motion.div

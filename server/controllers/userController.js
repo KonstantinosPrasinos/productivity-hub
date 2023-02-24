@@ -183,6 +183,12 @@ const changeEmail = async (req, res) => {
 }
 
 const forgotPasswordSendEmail = async (req, res) => {
+    if (req.user) {
+        const email = req.user.local.email;
+
+        await sendEmail(email, 'resetPassword');
+        return res.status(200).json({message: 'We sent you an email.'});
+    }
     const {email}  = req.body;
 
     if (!email) {
@@ -192,8 +198,6 @@ const forgotPasswordSendEmail = async (req, res) => {
     if (!validator.isEmail(email)) {
         return res.status(400).json({message: 'Email is invalid.'})
     }
-
-    console.log('test')
 
     User.findOne({'local.email': email}, async (err, userExists) => {
         if (userExists && userExists.active) {
