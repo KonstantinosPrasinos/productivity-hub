@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const {signupUser, logoutUser, deleteUser, changePassword, changeEmail, forgotPasswordSendEmail,
+const {signupUser, logoutUser, deleteUser, changeEmail, forgotPasswordSendEmail,
     forgotPasswordSetPassword, resetUser
 } = require('../controllers/userController');
 
@@ -22,10 +22,6 @@ router.post('/login',
 router.post('/signup', signupUser);
 router.post('/logout', logoutUser);
 router.post('/delete', deleteUser);
-router.post('/change-password', changePassword);
-router.post('/change-email', changeEmail);
-router.post('/forgot-password/send-email', forgotPasswordSendEmail);
-router.post('/forgot-password/set-password', forgotPasswordSetPassword);
 router.post('/reset', resetUser);
 
 module.exports = router;

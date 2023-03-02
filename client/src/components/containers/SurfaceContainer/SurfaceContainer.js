@@ -5,7 +5,7 @@ import LoadingIndicator from "../../indicators/LoadingIndicator/LoadingIndicator
 
 const SurfaceContainer = ({children, isLoading}) => {
     return (
-        <div className={styles.container}>
+        <motion.div className={styles.container}>
             <div className={styles.surface}>
                 <AnimatePresence>
                     {isLoading && <motion.div
@@ -20,7 +20,7 @@ const SurfaceContainer = ({children, isLoading}) => {
                 </AnimatePresence>
                 {children}
             </div>
-        </div>
+        </motion.div>
     );
 };
 

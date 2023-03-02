@@ -12,9 +12,9 @@ const CurrentProgress = ({task}) => {
     const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     useEffect(() => {
-        if (isNaN(entry?.value)) return;
-
-        setPrevPercentage(entry.value)
+        if (!isNaN(entry?.value)){
+            setPrevPercentage(entry.value)
+        }
     }, [entry?.value])
 
     const handleCheckboxClick = () => {

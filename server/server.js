@@ -15,7 +15,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
-const verificationRoutes = require('./routes/verificationRoutes');
+const securityRoutes = require('./routes/securityRoutes');
 const taskHistoryRoutes = require('./routes/entryRoutes');
 
 // Express app
@@ -70,7 +70,7 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/task', taskRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/category', categoryRoutes);
-app.use('/api/verify', verificationRoutes);
+app.use('/api/security', securityRoutes);
 app.use('/api/entry', taskHistoryRoutes);
 
 // Connect to database

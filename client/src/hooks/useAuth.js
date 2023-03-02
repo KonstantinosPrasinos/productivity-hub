@@ -73,44 +73,6 @@ export function useAuth() {
         }
     }
 
-    const resetPasswordEmail = async (email) => {
-        setIsLoading(true);
-
-        const response = await fetch('http://localhost:5000/api/user/forgot-password/send-email', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email}),
-            credentials: 'include'
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
-            setIsLoading(false);
-            return false;
-        }
-
-        setIsLoading(false);
-        return true;
-    }
-
-    const setForgotPassword = async (newPassword) => {
-        setIsLoading(true);
-
-        const response = await fetch('http://localhost:5000/api/user/forgot-password/set-password', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({newPassword}),
-            credentials: 'include'
-        });
-
-        const data = await response.json();
-        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: response.ok ? "success" : "error", message: data.message}});
-        setIsLoading(false);
-
-        return response.ok;
-    }
-
     const resetAccount = async (password) => {
         const response = await fetch('http://localhost:5000/api/user/reset', {
             method: 'POST',
@@ -131,5 +93,80 @@ export function useAuth() {
         await queryClient.invalidateQueries({queryKey: ["categories"]});
     }
 
-    return {login, logout, register, isLoading, resetPasswordEmail, setForgotPassword, resetAccount}
+    const sendCodeChangeEmail = async () => {
+        setIsLoading(true);
+
+        const response = await fetch('http://localhost:5000/api/user/forgot-password/send-email', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            setIsLoading(false);
+            return false;
+        }
+
+        setIsLoading(false);
+        return true;
+    }
+
+    const sendCodeResetPassword = async (email) => {
+        setIsLoading(true);
+
+        const response = await fetch('http://localhost:5000/api/user/forgot-password/send-email', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email}),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            setIsLoading(false);
+            return false;
+        }
+
+        setIsLoading(false);
+        return true;
+    }
+
+    const setChangeEmail = async (newEmail) => {
+        setIsLoading(true);
+
+        const response = await fetch('http://localhost:5000/api/user/forgot-password/set-password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({newEmail}),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: response.ok ? "success" : "error", message: data.message}});
+        setIsLoading(false);
+
+        return response.ok;
+    }
+
+    const setResetPassword = async (newPassword) => {
+        setIsLoading(true);
+
+        const response = await fetch('http://localhost:5000/api/user/forgot-password/set-password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({newPassword}),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: response.ok ? "success" : "error", message: data.message}});
+        setIsLoading(false);
+
+        return response.ok;
+    }
+
+    return {login, logout, register, isLoading, sendCodeResetPassword, setResetPassword, resetAccount}
 }

@@ -5,7 +5,7 @@ export function useVerify() {
     const [isLoading, setIsLoading] = useState(false);
     const alertsContext = useContext(AlertsContext);
 
-    const verifyForgotPassword = async (email, code) => {
+    const verifyCodeResetPassword = async (email, code) => {
         setIsLoading(true);
 
         const response = await fetch('http://localhost:5000/api/verify/forgot-password', {
@@ -26,7 +26,7 @@ export function useVerify() {
         }
     }
 
-    const resendForgotPasswordCode = async (email) => {
+    const resendCodeResetPassword = async (email) => {
         const response = await fetch('http://localhost:5000/api/verify/forgot-password/resend', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -84,5 +84,5 @@ export function useVerify() {
         }
     }
 
-    return {verifyForgotPassword, verifyEmail, isLoading, resendEmailCode, resendForgotPasswordCode}
+    return {verifyCodeResetPassword, verifyEmail, isLoading, resendEmailCode, resendCodeResetPassword}
 }

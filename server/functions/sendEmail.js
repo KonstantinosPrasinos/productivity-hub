@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 const nodemailer = require("nodemailer");
 const verifyEmail = require('../email/verifyEmailTemplate');
 const passwordReset = require('../email/passwordResetTemplate');
+const changeEmail = require('../email/changeEmailtemplate');
 const crypto = require("crypto");
 const VerificationCode = require("../models/verificationCodeSchema");
 const bcrypt = require("bcrypt");
@@ -18,15 +19,15 @@ const sendEmail = async (email, type) => {
             }
         })
     } else {
-        AWS.config.update({
-            accessKeyId: process.env.SES_ACCESS_KEY,
-            secretAccessKey: process.env.SES_SECRET_ACCESS_KEY,
-            region: 'eu-west-3'
-        })
-
-        transporter = nodemailer.createTransport({
-            SES: new AWS.SES()
-        });
+        // AWS.config.update({
+        //     accessKeyId: process.env.SES_ACCESS_KEY,
+        //     secretAccessKey: process.env.SES_SECRET_ACCESS_KEY,
+        //     region: 'eu-west-3'
+        // })
+        //
+        // transporter = nodemailer.createTransport({
+        //     SES: new AWS.SES()
+        // });
     }
 
     await VerificationCode.findOneAndDelete({userEmail: email});
@@ -40,12 +41,14 @@ const sendEmail = async (email, type) => {
     let emailTemplate;
 
     switch (type) {
-        case 'email':
+        case 'setEmail':
             emailTemplate = verifyEmail(email, randomCode.toString());
             break;
         case 'resetPassword':
             emailTemplate = passwordReset(email, randomCode.toString());
             break;
+        case 'changeEmail':
+            emailTemplate = changeEmail(email, randomCode.toString());
     }
 
     await transporter.sendMail(emailTemplate, (err) => {

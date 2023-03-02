@@ -46,3 +46,15 @@
   display: flex;
   gap: $huge-gap;
 }
+
+.even {
+  width: 500px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.odd {
+  width: 500px;
+  display: flex;
+  align-items: flex-end;
+}

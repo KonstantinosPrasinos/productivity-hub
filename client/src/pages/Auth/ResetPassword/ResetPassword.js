@@ -23,8 +23,8 @@ const ResetPassword = () => {
     const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyForgotPassword, resendForgotPasswordCode} = useVerify();
-    const {resetPasswordEmail, setForgotPassword} = useAuth();
+    const {verifyCodeResetPassword, resendCodeResetPassword} = useVerify();
+    const {sendCodeResetPassword, setResetPassword} = useAuth();
     const navigate = useNavigate();
     const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
@@ -57,15 +57,17 @@ const ResetPassword = () => {
             case 0:
                 return validateEmail();
             case 1:
-                return verificationCode.length === 6
+                return true;
             case 2:
+                return verificationCode.length === 6
+            case 3:
                 return checkPasswordStrength();
             default:
                 return true;
         }
     }
 
-    const handleVerificationCode = (e) => {
+    const handleVerificationCodeInput = (e) => {
         if (e.length <= 6) {
             setVerificationCode(e);
         }
@@ -78,25 +80,34 @@ const ResetPassword = () => {
     const handleNextPage = async () => {
         switch (currentPage) {
             case 0:
-                // Verify email
+                // Enter email tab,
                 if (validateEmail()) {
-                    await resetPasswordEmail(email);
-                    setCurrentPage(1);
+                    await sendCodeResetPassword(email);
+                    setCurrentPage(2);
                 } else {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
                 }
                 break;
             case 1:
-                const redirect = await verifyForgotPassword(email, verificationCode);
+                // Confirm send email tab.
+                if (user.state?.id) {
+                    await sendCodeResetPassword(email);
+                }
+                setCurrentPage(2);
+                break;
+            case 2:
+                // Enter verification code tab
+                const redirect = await verifyCodeResetPassword(email, verificationCode);
                 if (redirect) {
                     setCurrentPage(2);
                 }
                 break;
-            case 2:
+            case 3:
+                // Enter new password tab
                 // Check if password is strong enough
                 if (passwordScore !== 0) {
                     if (reEnterPassword === newPassword){
-                        const redirect = await setForgotPassword(newPassword);
+                        const redirect = await setResetPassword(newPassword);
                         if (redirect) {
                             setCurrentPage(3)
                         }
@@ -107,7 +118,8 @@ const ResetPassword = () => {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
                 }
                 break;
-            case 3:
+            case 4:
+                // Ending tab.
                 if (user.state?.id) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('settings');
@@ -120,7 +132,7 @@ const ResetPassword = () => {
     }
 
     const handleResendCode = async () => {
-        await resendForgotPasswordCode(email);
+        await resendCodeResetPassword(email);
     }
 
     const handlePasswordScore = (score) => {
@@ -132,26 +144,21 @@ const ResetPassword = () => {
             case 0:
                 return !validateEmail();
             case 1:
-                return !(verificationCode.length === 6);
+                return false;
             case 2:
+                return !(verificationCode.length === 6);
+            case 3:
                 return !passwordScore || !newPassword.length || !reEnterPassword.length;
             default:
                 return false
         }
     }
 
-    // When the user visits this page while logged in, the input email page is skipped.
-    // Because the continue button on said page is not pressed, we need to send the email manually.
-    useEffect(async () => {
-        if (user.state?.id) {
-            await resetPasswordEmail(email);
-        }
-    }, [])
-
     return (
         <SurfaceContainer>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container'}>
+                    {/* When the user is signed in, this tab (0) is skipped. */}
                     <div className={'Display'}>Enter your email</div>
                     <div className={'Label'}>We will send you a code to verify it's you.</div>
                     <TextBoxInput
@@ -164,6 +171,21 @@ const ResetPassword = () => {
                         invalid={handleInvalidEmail()}
                         onKeydown={handleKeyDown}
                     />
+                </div>
+                {/*
+                    We want to inform the user that an email will be sent to them, they also need to agree to it.
+                    When the user is not logged in the first tab asks them to input their email and informs them of this action.
+                    Since this tab is skipped when the user is logged in, a new tab is added to accomplish this.
+                    Said tab (1) is skipped when not logged in.
+                */}
+                <div className={'Stack-Container'}>
+                    {/* When the user is not signed in, this tab (1) is skipped. */}
+                    <div className={'Display'}>Verify your email</div>
+                    <div className={'Label'}>
+                        To change your password, we need you to verify your email address.
+                        <br />
+                        If you continue we will send a verification code to {user.state?.email}.
+                    </div>
                 </div>
                 <div className={'Stack-Container'}>
                     <div className={'Display'}>We sent you a code</div>
@@ -181,7 +203,7 @@ const ResetPassword = () => {
                             size={'big'}
                             placeholder={'Verification code'}
                             value={verificationCode}
-                            setValue={handleVerificationCode}
+                            setValue={handleVerificationCodeInput}
                             onKeydown={handleKeyDown}
                         />
                         <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
@@ -214,8 +236,8 @@ const ResetPassword = () => {
                     <div className={'Display'}>Password set successfully</div>
                 </div>
             </SwitchContainer>
-            <div className={`Horizontal-Flex-Container ${currentPage !== 3 ? 'Space-Between' : 'Align-Center'}`}>
-                {currentPage !== 3 ? <Button
+            <div className={`Horizontal-Flex-Container ${currentPage !== 4 ? 'Space-Between' : 'Align-Center'}`}>
+                {currentPage !== 4 ? <Button
                     size={'big'}
                     filled={false}
                     onClick={handleCancel}

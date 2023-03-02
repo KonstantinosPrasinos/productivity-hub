@@ -53,7 +53,7 @@ function App() {
 
     const {data: settings, isLoading: settingsLoading} = useGetSettings();
 
-    useEffect(async () => {
+    useEffect(() => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
       const loggedInUser = localStorage.getItem("user");
 
@@ -81,16 +81,15 @@ function App() {
     }
 
     useEffect(() => {
-        if (settingsLoading) return;
-
-        if (settings?.theme === 'Device' && !matchMediaHasEventListener.current) {
-            matchMediaHasEventListener.current = true;
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleSetDefaultThemeChanged);
-        } else if (matchMediaHasEventListener.current) {
-            matchMediaHasEventListener.current = false;
-            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSetDefaultThemeChanged);
+        if (!settingsLoading) {
+            if (settings?.theme === 'Device' && !matchMediaHasEventListener.current) {
+                matchMediaHasEventListener.current = true;
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleSetDefaultThemeChanged);
+            } else if (matchMediaHasEventListener.current) {
+                matchMediaHasEventListener.current = false;
+                window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSetDefaultThemeChanged);
+            }
         }
-
     }, [settings?.theme])
 
     const getDeviceTheme = () => {
@@ -121,7 +120,7 @@ function App() {
     return (
         <div className={`App ${theme}`}>
             <AlertHandler />
-            <AnimatePresence exitBeforeEnter={true}>
+            {/*<AnimatePresence mode="wait">*/}
                 <Routes key={location.pathname}>
                     <Route path="/" element={<ProtectedLayout />}>
                         <Route path="/" element={<NavLayout />}>
@@ -165,14 +164,14 @@ function App() {
                             />
                             <Route path="/playground" element={<Playground/>}/>
                         </Route>
-                        <Route
-                            exact
-                            path="/change-email"
-                            element={
-                                <ChangeEmail />
-                            }
-                        />
                     </Route>
+                    <Route
+                        exact
+                        path="/change-email"
+                        element={
+                            <ChangeEmail/>
+                        }
+                    />
                     <Route
                         exact
                         path="/log-in"
@@ -190,7 +189,7 @@ function App() {
                     <Route path="*" element={<Navigate to={"/not-found"} />}/>
                     <Route path="/not-found" element={<NotFound/>}/>
                 </Routes>
-            </AnimatePresence>
+            {/*</AnimatePresence>*/}
             <ReactQueryDevtools />
         </div>
     );

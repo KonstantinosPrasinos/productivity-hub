@@ -11,31 +11,34 @@ const Button = ({
                     exit,
                     transition,
                     animate,
-                    layout,
+                    layout = false,
                     width = 'medium',
                     disabled = false,
                     isWarning = false
                 }) => {
 
-    return <motion.button
-        onClick={onClick}
-        className={`Button Horizontal-Flex-Container
-          ${styles.container}
-          ${styles[size]}
-          ${type === 'round' ? '' : styles.square}
-          ${filled ? '' : styles.outlined}
-          ${styles[width]}
-          ${isWarning ? styles.isWarning : ''}
-          `}
-        disabled={disabled}
+    return <motion.div
         initial={initial}
         animate={animate}
         exit={exit}
-        layout={layout}
+        layout={"size"}
         transition={transition}
     >
-        {children}
-    </motion.button>;
+        <button
+            onClick={onClick}
+            className={`Button Horizontal-Flex-Container
+                ${styles.container}
+                  ${styles[size]}
+                  ${type === 'round' ? '' : styles.square}
+                  ${filled ? '' : styles.outlined}
+                  ${styles[width]}
+                  ${isWarning ? styles.isWarning : ''}
+            `}
+            disabled={disabled}
+        >
+            {children}
+        </button>
+    </motion.div>;
 };
 
 export default Button;

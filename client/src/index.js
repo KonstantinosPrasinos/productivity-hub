@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import App from './App';
 import {store} from './state/store';
 import {Provider} from 'react-redux';
@@ -8,11 +7,15 @@ import MiniPagesContextProvider from "./context/MiniPagesContext";
 import UserContextProvider from "./context/UserContext";
 import {BrowserRouter} from "react-router-dom";
 import {QueryClientProvider, QueryClient} from "react-query";
+import {createRoot} from "react-dom/client";
 
 const queryClient = new QueryClient();
 
-ReactDOM.render(
-    <React.StrictMode>
+const container = document.getElementById("root");
+const root = createRoot(container)
+
+root.render(
+    // <React.StrictMode>
         <Provider store={store}>
             <AlertsContextProvider>
                 <MiniPagesContextProvider>
@@ -26,6 +29,5 @@ ReactDOM.render(
                 </MiniPagesContextProvider>
             </AlertsContextProvider>
         </Provider>
-    </React.StrictMode>,
-    document.getElementById('root')
+    // </React.StrictMode>
 );
