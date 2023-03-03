@@ -3,7 +3,6 @@ const VerificationCode = require('../models/verificationCodeSchema');
 const User = require('../models/userSchema');
 const bcrypt = require("bcrypt");
 const {sendEmail} = require('../functions/sendEmail');
-const crypto = require('crypto');
 
 
 const checkVerificationCode = (email, code) => {
@@ -109,6 +108,22 @@ const resetPasswordSetPassword = async (req, res) => {
     }
 }
 
+const changeEmailVerifyPassword = async (req, res) => {
+    if (req.user) {
+        const {password} = req.body;
+
+        if (!password) return res.status(400).json({message: 'Password required,'});
+
+        if (!bcrypt.compareSync(password, req.user.local.password)) return res.status(400).json({message: 'Incorrect password.'});
+
+        req.session.changeEmailUntil = new Date((new Date).getTime() + 30 * 60 * 1000).getTime(); // Current time +30 minutes
+
+        return res.status(200).json("Correct password.");
+    } else {
+        res.status(401).send({message: "Not authorized"});
+    }
+}
+
 const changeEmailSendCode = async (req, res) => {
     if (req.user) {
         const {password, newEmail} = req.body;
@@ -126,7 +141,6 @@ const changeEmailSendCode = async (req, res) => {
         }
 
         req.session.newEmail = newEmail;
-        req.session.newEmailValidUntil = new Date((new Date).getTime() + 30 * 60 * 1000).getTime(); // Current time +30mins.
 
         try {
             await sendEmail(newEmail, "changeEmail");
@@ -143,13 +157,14 @@ const changeEmailSendCode = async (req, res) => {
 const changeEmailResendCode = async (req, res) => {
     await changeEmailSendCode(req, res);
 }
+
 const changeEmailVerifyCode = async (req, res) => {
     if (req.user) {
         const currentEmail = req.user.local.email;
-        const {newEmail, newEmailValidUntil} = req.session;
+        const {newEmail, changeEmailValidUntil} = req.session;
         const {code} = req.body;
 
-        if (!newEmail || !newEmailValidUntil || newEmailValidUntil < (new Date()).getTime()) return res.status(400).json({message: "Unauthorized."});
+        if (!newEmail || !changeEmailValidUntil || changeEmailValidUntil < (new Date()).getTime()) return res.status(400).json({message: "Unauthorized."});
 
         const {verificationError, errorCode} = checkVerificationCode(newEmail, code);
 
@@ -164,11 +179,11 @@ const changeEmailVerifyCode = async (req, res) => {
         }
 
         req.session.newEmail = undefined;
-        req.session.newEmailValidUntil = undefined;
+        req.session.changeEmailUntil = undefined;
 
     } else {
         return res.status(401).json({message: 'Unauthorized.'})
     }
 }
 
-module.exports = {resetPasswordSendCode, resetPasswordResendCode, resetPasswordVerifyCode, resetPasswordSetPassword, changeEmailSendCode, changeEmailVerifyCode, changeEmailResendCode};
+module.exports = {resetPasswordSendCode, resetPasswordResendCode, resetPasswordVerifyCode, resetPasswordSetPassword, changeEmailVerifyPassword,changeEmailSendCode, changeEmailVerifyCode, changeEmailResendCode};
