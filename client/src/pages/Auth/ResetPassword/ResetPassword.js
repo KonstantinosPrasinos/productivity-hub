@@ -6,7 +6,7 @@ import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../../context/AlertsContext";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
-import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
+import Modal from "../../../components/containers/Modal/Modal";
 import {UserContext} from "../../../context/UserContext";
 import {useResetPassword} from "../../../hooks/auth-hooks/useResetPassword";
 import {useQueryClient} from "react-query";
@@ -139,7 +139,7 @@ const ResetPassword = () => {
     }, [user.state?.isLoading])
 
     return (
-        <SurfaceContainer isLoading={user.state?.isLoading && true}>
+        <Modal isLoading={user.state?.isLoading && true}>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container Big-Gap'}>
                     {/* When the user is signed in, this tab (0) is skipped. */}
@@ -232,13 +232,12 @@ const ResetPassword = () => {
                     size={'big'}
                     filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
-                    layout={true}
                     disabled={checkIfContinueActive()}
                 >
                     {currentPage !== 4 ? 'Continue' : 'Finish'}
                 </Button>
             </div>
-        </SurfaceContainer>
+        </Modal>
     );
 };
 

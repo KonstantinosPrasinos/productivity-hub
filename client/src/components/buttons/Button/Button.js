@@ -11,7 +11,6 @@ const Button = ({
                     exit,
                     transition,
                     animate,
-                    layout = false,
                     width = 'medium',
                     disabled = false,
                     isWarning = false

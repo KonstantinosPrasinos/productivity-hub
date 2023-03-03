@@ -4,10 +4,10 @@ import Button from "../../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
-import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
 import {UserContext} from "../../../context/UserContext";
 import {useChangeEmail} from "../../../hooks/auth-hooks/useChangeEmail";
 import {useQueryClient} from "react-query";
+import Modal from "../../../components/containers/Modal/Modal";
 
 const ChangeEmail = () => {
     const user = useContext(UserContext);
@@ -101,7 +101,7 @@ const ChangeEmail = () => {
     }
 
     return (
-        <SurfaceContainer>
+        <Modal>
             <SwitchContainer selectedTab={currentPage}>
                 {/* We want to inform the user that an email will be sent to them, they also need to agree to it. */}
                 <div className={'Stack-Container Big-Gap'}>
@@ -172,13 +172,12 @@ const ChangeEmail = () => {
                     size={'big'}
                     filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
-                    layout={true}
                     disabled={checkIfContinueActive()}
                 >
                     {currentPage !== 4 ? 'Continue' : 'Finish'}
                 </Button>
             </div>
-        </SurfaceContainer>
+        </Modal>
     );
 };
 

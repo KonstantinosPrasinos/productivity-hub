@@ -11,7 +11,7 @@ import {useVerify} from "../../../hooks/useVerify";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
 import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
-import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
+import Modal from "../../../components/containers/Modal/Modal";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -115,7 +115,7 @@ const LogIn = () => {
     }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
-        <SurfaceContainer isLoading={isLoading || isLoadingVerify}>
+        <Modal isLoading={isLoading || isLoadingVerify}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>
@@ -175,7 +175,7 @@ const LogIn = () => {
                     </Button>
                 </div>
             </SwitchContainer>
-        </SurfaceContainer>
+        </Modal>
     );
 };
 

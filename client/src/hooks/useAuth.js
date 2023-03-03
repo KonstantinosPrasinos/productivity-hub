@@ -1,14 +1,11 @@
 import {useContext, useState} from "react";
 import {UserContext} from "../context/UserContext";
-import {useDispatch} from "react-redux";
-import {removeSettings} from "../state/settingsSlice";
 import {AlertsContext} from "../context/AlertsContext";
 import {useQueryClient} from "react-query";
 
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
-    const reduxDispatch = useDispatch();
     const queryClient = useQueryClient();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +66,7 @@ export function useAuth() {
             localStorage.removeItem('user');
             localStorage.removeItem('settings');
             dispatch({type: "REMOVE_USER"});
-            reduxDispatch(removeSettings());
+            queryClient.removeQueries(["settings"]);
         }
     }
 
