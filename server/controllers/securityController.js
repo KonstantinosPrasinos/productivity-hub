@@ -137,6 +137,10 @@ const changeEmailSendCode = async (req, res) => {
             return res.status(400).json({message: 'Email is invalid.'})
         }
 
+        const emailAlreadyExists = await User.findOne({"local.email": newEmail});
+
+        if (emailAlreadyExists) return res.status(400).json({message: 'Email already in use.'});
+
         req.session.newEmail = newEmail;
 
         try {
@@ -171,6 +175,7 @@ const changeEmailVerifyCode = async (req, res) => {
 
         try {
             await User.findOneAndUpdate({'local.email': currentEmail}, {$set: {'local.email': newEmail}});
+            await sendEmail(currentEmail, "emailChanged");
         } catch (error) {
             return res.status(400).json({message: error.message});
         }

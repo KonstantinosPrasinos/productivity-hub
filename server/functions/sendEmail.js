@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const verifyEmail = require('../email/verifyEmailTemplate');
 const passwordReset = require('../email/passwordResetTemplate');
 const changeEmail = require('../email/changeEmailtemplate');
+const emailChanged = require('../email/emailChangedTemplate');
 const crypto = require("crypto");
 const VerificationCode = require("../models/verificationCodeSchema");
 const bcrypt = require("bcrypt");
@@ -49,6 +50,9 @@ const sendEmail = async (email, type) => {
             break;
         case 'changeEmail':
             emailTemplate = changeEmail(email, randomCode.toString());
+            break;
+        case 'emailChanged':
+            emailTemplate = emailChanged(email);
     }
 
     await transporter.sendMail(emailTemplate, (err) => {
