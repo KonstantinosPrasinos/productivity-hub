@@ -9,12 +9,15 @@ const SwitchContainer = ({children, selectedTab}) => {
         previousTab.current = selectedTab;
     }, [selectedTab])
 
+    if (selectedTab === null) return <div></div>
+
     return (
         <div className={styles.bigContainer}>
             <AnimatePresence initial={false}>
                 {selectedTab >= 0 && selectedTab < children.length && <motion.div
                     className={styles.container}
                     key={selectedTab}
+                    layout
 
                     initial={{
                         x: previousTab.current < selectedTab ? 500 : -500,

@@ -126,14 +126,11 @@ const changeEmailVerifyPassword = async (req, res) => {
 
 const changeEmailSendCode = async (req, res) => {
     if (req.user) {
-        const {password, newEmail} = req.body;
+        const {newEmail} = req.body;
+        const {changeEmailValidUntil} = req.session;
 
-        if (!password || !newEmail) {
+        if (!newEmail || !changeEmailValidUntil || changeEmailValidUntil < (new Date()).getTime()) {
             return res.status(400).json({message: 'All fields must be filled.'});
-        }
-
-        if (!bcrypt.compareSync(password, req.user.local.password)) {
-            res.status(400).json({message: 'Incorrect password.'});
         }
 
         if (!validator.isEmail(newEmail)) {

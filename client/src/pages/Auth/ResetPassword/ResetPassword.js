@@ -4,29 +4,27 @@ import Button from "../../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../../context/AlertsContext";
-import {useVerify} from "../../../hooks/useVerify";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
 import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
-import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
 import {removeSettings} from "../../../state/settingsSlice";
 import {useDispatch} from "react-redux";
+import {useResetPassword} from "../../../hooks/auth-hooks/useResetPassword";
 
 const ResetPassword = () => {
     const user = useContext(UserContext);
+    const alertsContext = useContext(AlertsContext);
 
-    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : 0);
+    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : null);
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
     const [passwordScore, setPasswordScore] = useState();
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyCodeResetPassword, resendCodeResetPassword} = useVerify();
-    const {sendCodeResetPassword, setResetPassword} = useAuth();
+    const {sendCode, verifyCode, setPassword} = useResetPassword();
     const navigate = useNavigate();
-    const alertsContext = useContext(AlertsContext);
     const dispatch = useDispatch();
 
     const validateEmail = () => {
@@ -52,21 +50,6 @@ const ResetPassword = () => {
         return true;
     }
 
-    const checkIfFilled = () => {
-        switch (currentPage) {
-            case 0:
-                return validateEmail();
-            case 1:
-                return true;
-            case 2:
-                return verificationCode.length === 6
-            case 3:
-                return checkPasswordStrength();
-            default:
-                return true;
-        }
-    }
-
     const handleVerificationCodeInput = (e) => {
         if (e.length <= 6) {
             setVerificationCode(e);
@@ -78,11 +61,12 @@ const ResetPassword = () => {
     }
 
     const handleNextPage = async () => {
+        setCurrentPage(current => current + 1);
         switch (currentPage) {
             case 0:
                 // Enter email tab,
                 if (validateEmail()) {
-                    await sendCodeResetPassword(email);
+                    await sendCode(email);
                     setCurrentPage(2);
                 } else {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
@@ -91,13 +75,13 @@ const ResetPassword = () => {
             case 1:
                 // Confirm send email tab.
                 if (user.state?.id) {
-                    await sendCodeResetPassword(email);
+                    await sendCode(user.state?.email);
                 }
                 setCurrentPage(2);
                 break;
             case 2:
                 // Enter verification code tab
-                const redirect = await verifyCodeResetPassword(email, verificationCode);
+                const redirect = await verifyCode(verificationCode, user.state?.id ? user.state?.email : email);
                 if (redirect) {
                     setCurrentPage(2);
                 }
@@ -107,7 +91,7 @@ const ResetPassword = () => {
                 // Check if password is strong enough
                 if (passwordScore !== 0) {
                     if (reEnterPassword === newPassword){
-                        const redirect = await setResetPassword(newPassword);
+                        const redirect = await setPassword(user.state?.id ? user.state?.email : email, verificationCode, newPassword);
                         if (redirect) {
                             setCurrentPage(3)
                         }
@@ -132,7 +116,7 @@ const ResetPassword = () => {
     }
 
     const handleResendCode = async () => {
-        await resendCodeResetPassword(email);
+        await sendCode(user.state?.id ? user.state?.email : email);
     }
 
     const handlePasswordScore = (score) => {
@@ -154,8 +138,29 @@ const ResetPassword = () => {
         }
     }
 
+    const checkIfFilled = () => {
+        switch (currentPage) {
+            case 0:
+                return validateEmail();
+            case 1:
+                return true;
+            case 2:
+                return verificationCode.length === 6
+            case 3:
+                return checkPasswordStrength();
+            default:
+                return true;
+        }
+    }
+
+    useEffect(() => {
+        if (!user.state?.isLoading) {
+            setCurrentPage(user.state?.id ? 1 : 0);
+        }
+    }, [user.state?.isLoading])
+
     return (
-        <SurfaceContainer>
+        <SurfaceContainer isLoading={user.state?.isLoading && true}>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container'}>
                     {/* When the user is signed in, this tab (0) is skipped. */}

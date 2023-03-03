@@ -14,7 +14,6 @@ import AlertHandler from "./components/handlers/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/handlers/MiniPagesHandler/MiniPageHandler";
 import ListView from "./pages/ListView/ListView";
 import ChangeEmail from "./pages/Auth/ChangeEmail/ChangeEmail";
-import {AnimatePresence} from "framer-motion";
 import ResetPassword from "./pages/Auth/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
 
@@ -70,6 +69,7 @@ function App() {
               navigate("/log-in");
           }
       } else {
+          user.dispatch({type: "SET_USER", payload: {isLoading: false}})
           navigate('/log-in');
       }
     }, []);

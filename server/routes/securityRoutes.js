@@ -7,9 +7,9 @@ const {
 const router = express.Router();
 
 router.post('/reset-password/send-code', resetPasswordSendCode);
-router.post('/forgot-password/resend-code', resetPasswordResendCode);
-router.post('/forgot-password/verify-code', resetPasswordVerifyCode);
-router.post('/forgot-password/set-password', resetPasswordSetPassword);
+router.post('/reset-password/resend-code', resetPasswordResendCode);
+router.post('/reset-password/verify-code', resetPasswordVerifyCode);
+router.post('/reset-password/set-password', resetPasswordSetPassword);
 
 router.post('/change-email/verify-password', changeEmailVerifyPassword);
 router.post('/change-email/send-code', changeEmailSendCode);
