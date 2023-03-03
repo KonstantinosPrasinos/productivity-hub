@@ -6,7 +6,6 @@ const {sendEmail} = require('../functions/sendEmail');
 
 const User = require('../models/userSchema');
 const Settings = require('../models/settingsSchema');
-const VerificationCode = require('../models/verificationCodeSchema');
 const Task = require('../models/taskSchema');
 const Category = require('../models/categorySchema');
 const Group = require('../models/groupSchema');
@@ -84,7 +83,6 @@ const deleteUser = async (req, res) => {
             req.session.destroy();
             res.clearCookie('connect.sid');
         } catch (error) {
-            console.log(error.message);
             return res.status(400).json({message: error.message});
         }
 

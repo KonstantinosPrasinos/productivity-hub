@@ -7,7 +7,6 @@ import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import TwitterIcon from '@mui/icons-material/Twitter';
-import {AlertsContext} from "../../context/AlertsContext";
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
@@ -25,7 +24,7 @@ import {useNavigate} from "react-router-dom";
 const Settings = () => {
     const {data: settings} = useGetSettings();
     const email = useContext(UserContext).state.email;
-    const {mutate: setSettings} = useChangeSettings();
+    const {mutate: setSettings, isError: isErrorSetSettings} = useChangeSettings();
     const {mutate: resetAccount} = useResetAccount();
     const {mutate: deleteAccount} = useDeleteAccount();
 
@@ -53,8 +52,10 @@ const Settings = () => {
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
 
     const handleSaveChanges = async () => {
-        await setSettings({theme: selectedTheme, defaults: {step, goal, priority}});
-        setSettingsChanges({});
+        if (!isErrorSetSettings) {
+            await setSettings({theme: selectedTheme, defaults: {step, goal, priority}});
+            setSettingsChanges({});
+        }
     }
 
     const handleLogOut = async () => {
