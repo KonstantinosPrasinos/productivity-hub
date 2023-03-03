@@ -8,13 +8,13 @@ import SwitchContainer from "../../../components/containers/SwitchContainer/Swit
 import TextButton from "../../../components/buttons/TextButton/TextButton";
 import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
 import {UserContext} from "../../../context/UserContext";
-import {removeSettings} from "../../../state/settingsSlice";
-import {useDispatch} from "react-redux";
 import {useResetPassword} from "../../../hooks/auth-hooks/useResetPassword";
+import {useQueryClient} from "react-query";
 
 const ResetPassword = () => {
     const user = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
+    const queryClient = useQueryClient();
 
     const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : null);
     const [email, setEmail] = useState('');
@@ -25,7 +25,6 @@ const ResetPassword = () => {
 
     const {sendCode, verifyCode, setPassword} = useResetPassword();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const validateEmail = () => {
         return email.match(
@@ -43,11 +42,6 @@ const ResetPassword = () => {
         if (email.length === 0) {
             return null;
         } else return !validateEmail();
-    }
-
-    const checkPasswordStrength = () => {
-        // Temp
-        return true;
     }
 
     const handleVerificationCodeInput = (e) => {
@@ -108,7 +102,7 @@ const ResetPassword = () => {
                     localStorage.removeItem('user');
                     localStorage.removeItem('settings');
                     user.dispatch({type: "REMOVE_USER"});
-                    dispatch(removeSettings());
+                    queryClient.removeQueries(["settings"]);
                 }
                 navigate('/log-in');
                 break;
@@ -123,7 +117,7 @@ const ResetPassword = () => {
         setPasswordScore(score);
     }
 
-    const handleDisabledButton = () => {
+    const checkIfContinueActive = () => {
         switch (currentPage) {
             case 0:
                 return !validateEmail();
@@ -138,21 +132,6 @@ const ResetPassword = () => {
         }
     }
 
-    const checkIfFilled = () => {
-        switch (currentPage) {
-            case 0:
-                return validateEmail();
-            case 1:
-                return true;
-            case 2:
-                return verificationCode.length === 6
-            case 3:
-                return checkPasswordStrength();
-            default:
-                return true;
-        }
-    }
-
     useEffect(() => {
         if (!user.state?.isLoading) {
             setCurrentPage(user.state?.id ? 1 : 0);
@@ -162,7 +141,7 @@ const ResetPassword = () => {
     return (
         <SurfaceContainer isLoading={user.state?.isLoading && true}>
             <SwitchContainer selectedTab={currentPage}>
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
                     {/* When the user is signed in, this tab (0) is skipped. */}
                     <div className={'Display'}>Enter your email</div>
                     <div className={'Label'}>We will send you a code to verify it's you.</div>
@@ -173,7 +152,7 @@ const ResetPassword = () => {
                         placeholder={'Email address'}
                         value={email}
                         setValue={setEmail}
-                        invalid={handleInvalidEmail()}
+                        invalid={email.length === 0 ? null : handleInvalidEmail()}
                         onKeydown={handleKeyDown}
                     />
                 </div>
@@ -183,7 +162,7 @@ const ResetPassword = () => {
                     Since this tab is skipped when the user is logged in, a new tab is added to accomplish this.
                     Said tab (1) is skipped when not logged in.
                 */}
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
                     {/* When the user is not signed in, this tab (1) is skipped. */}
                     <div className={'Display'}>Verify your email</div>
                     <div className={'Label'}>
@@ -192,7 +171,7 @@ const ResetPassword = () => {
                         If you continue we will send a verification code to {user.state?.email}.
                     </div>
                 </div>
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
                     <div className={'Display'}>We sent you a code</div>
                     <div className={'Label'}>
                         {user.state?.id ?
@@ -214,7 +193,7 @@ const ResetPassword = () => {
                         <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
                     </div>
                 </div>
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
                     <div className={'Display'}>Enter new password</div>
                     <TextBoxInput
                         type={'password'}
@@ -251,10 +230,10 @@ const ResetPassword = () => {
                 </Button> : null}
                 <Button
                     size={'big'}
-                    filled={checkIfFilled()}
+                    filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
                     layout={true}
-                    disabled={handleDisabledButton()}
+                    disabled={checkIfContinueActive()}
                 >
                     {currentPage !== 4 ? 'Continue' : 'Finish'}
                 </Button>

@@ -29,7 +29,6 @@ const Settings = () => {
     const {mutate: resetAccount} = useResetAccount();
     const {mutate: deleteAccount} = useDeleteAccount();
 
-    const alertsContext = useContext(AlertsContext);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordScore, setNewPasswordScore] = useState();
@@ -216,9 +215,9 @@ const Settings = () => {
             transition={{duration: 0.1}}
         >
             <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
-                <section className={'Stack-Container BigGap'}>
+                <section className={'Stack-Container Big-Gap'}>
                     <div className={`Horizontal-Flex-Container Title`}>Profile</div>
-                    <div className={'Stack-Container BigGap'}>
+                    <div className={'Stack-Container Big-Gap'}>
                         <div className={'Stack-Container'}>
                             <div className={'Horizontal-Flex-Container'}>Logout</div>
                             <div className={`Horizontal-Flex-Container Space-Between`}>
@@ -277,9 +276,9 @@ const Settings = () => {
                         </section>
                     </div>
                 </section>
-                <section className={'Stack-Container BigGap'}>
+                <section className={'Stack-Container Big-Gap'}>
                     <div className={`Horizontal-Flex-Container Title`}>General</div>
-                    <div className={'Stack-Container BigGap'}>
+                    <div className={'Stack-Container Big-Gap'}>
                         <div className={'Horizontal-Flex-Container'}>App Theme</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
                             <div className={'Label'}>The color theme the app uses.</div>
@@ -313,10 +312,10 @@ const Settings = () => {
                         </section>
                     </div>
                 </section>
-                <section className={'Stack-Container BigGap'}>
+                <section className={'Stack-Container Big-Gap'}>
                     <div className={`Horizontal-Flex-Container Title`}>About</div>
                     <div className={'Horizontal-Flex-Container'}>App Version<div className={'Label'}>1.0</div></div>
-                    <div className={'Stack-Container BigGap'}>
+                    <div className={'Stack-Container Big-Gap'}>
                         <div className={'Horizontal-Flex-Container'}>App Details</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
                             <div className={'Label'}>
@@ -326,7 +325,7 @@ const Settings = () => {
                             </div>
                         </div>
                     </div>
-                    <div className={'Stack-Container BigGap'}>
+                    <div className={'Stack-Container Big-Gap'}>
                         <div className={'Horizontal-Flex-Container'}>About the App Creator</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
                             <div className={'Label'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>

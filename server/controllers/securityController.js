@@ -127,9 +127,9 @@ const changeEmailVerifyPassword = async (req, res) => {
 const changeEmailSendCode = async (req, res) => {
     if (req.user) {
         const {newEmail} = req.body;
-        const {changeEmailValidUntil} = req.session;
+        const {changeEmailUntil} = req.session;
 
-        if (!newEmail || !changeEmailValidUntil || changeEmailValidUntil < (new Date()).getTime()) {
+        if (!newEmail || !changeEmailUntil || changeEmailUntil < (new Date()).getTime()) {
             return res.status(400).json({message: 'All fields must be filled.'});
         }
 
@@ -158,10 +158,10 @@ const changeEmailResendCode = async (req, res) => {
 const changeEmailVerifyCode = async (req, res) => {
     if (req.user) {
         const currentEmail = req.user.local.email;
-        const {newEmail, changeEmailValidUntil} = req.session;
+        const {newEmail, changeEmailUntil} = req.session;
         const {code} = req.body;
 
-        if (!newEmail || !changeEmailValidUntil || changeEmailValidUntil < (new Date()).getTime()) return res.status(400).json({message: "Unauthorized."});
+        if (!newEmail || !changeEmailUntil || changeEmailUntil < (new Date()).getTime()) return res.status(400).json({message: "Unauthorized."});
 
         const {verificationError, errorCode} = checkVerificationCode(newEmail, code);
 
@@ -178,6 +178,10 @@ const changeEmailVerifyCode = async (req, res) => {
         req.session.newEmail = undefined;
         req.session.changeEmailUntil = undefined;
 
+        req.session.destroy();
+        res.clearCookie('connect.sid');
+
+        return res.status(200).json({message: "Email changed."});
     } else {
         return res.status(401).json({message: 'Unauthorized.'})
     }

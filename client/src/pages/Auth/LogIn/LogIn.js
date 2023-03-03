@@ -151,6 +151,7 @@ const LogIn = () => {
                     <div className={'Display'}>We sent you a code</div>
                     <div className={'Label'}>
                         If the email you entered exists, is should receive a verification code.
+                        <br />
                         Enter the code below to verify your email.
                     </div>
                     <div>

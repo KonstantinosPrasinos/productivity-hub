@@ -1,30 +1,26 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useState} from 'react';
 import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
-import PasswordStrengthBar from "react-password-strength-bar";
-import {AlertsContext} from "../../../context/AlertsContext";
-import {useVerify} from "../../../hooks/useVerify";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
 import SurfaceContainer from "../../../components/containers/SurfaceContainer/SurfaceContainer";
-import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
-import {removeSettings} from "../../../state/settingsSlice";
-import {useDispatch} from "react-redux";
+import {useChangeEmail} from "../../../hooks/auth-hooks/useChangeEmail";
+import {useQueryClient} from "react-query";
 
 const ChangeEmail = () => {
     const user = useContext(UserContext);
+    const queryClient = useQueryClient();
 
-    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : 0);
+    const [currentPage, setCurrentPage] = useState(0);
     const [newEmail, setNewEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
 
-    const {verifyCodeResetPassword, resendCodeResetPassword} = useVerify();
-    const {ChangeEmailEmail, setResetPassword} = useAuth();
+    const [password, setPassword] = useState('');
+
+    const {verifyPassword, verifyCode, sendCode} = useChangeEmail();
     const navigate = useNavigate();
-    const alertsContext = useContext(AlertsContext);
-    const dispatch = useDispatch();
 
     const validateEmail = () => {
         return newEmail.match(
@@ -39,24 +35,10 @@ const ChangeEmail = () => {
     }
 
     const handleInvalidEmail = () => {
-        if (newEmail.length === 0) {
-            return false;
-        } else return !validateEmail();
-    }
-
-    const checkIfFilled = () => {
-        switch (currentPage) {
-            case 0:
-                return validateEmail();
-            case 1:
-                return true;
-            case 2:
-                return verificationCode.length === 6
-            case 3:
-                return handleInvalidEmail();
-            default:
-                return true;
+        if (newEmail.length > 0) {
+            return !validateEmail();
         }
+        return true;
     }
 
     const handleVerificationCodeInput = (e) => {
@@ -70,95 +52,96 @@ const ChangeEmail = () => {
     }
 
     const handleNextPage = async () => {
-        // switch (currentPage) {
-        //     case 0:
-        //         // Enter email tab,
-        //         if (validateEmail()) {
-        //             await ChangeEmailEmail(user.state?.email);
-        //             setCurrentPage(2);
-        //         } else {
-        //             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
-        //         }
-        //         break;
-        //     case 1:
-        //         // Confirm send email tab.
-        //         if (user.state?.id) {
-        //             await ChangeEmailEmail(user.state?.email);
-        //         }
-        //         setCurrentPage(2);
-        //         break;
-        //     case 2:
-        //         // Enter verification code tab
-        //         const redirect = await verifyCodeResetPassword(user.state?.email, verificationCode);
-        //         if (redirect) {
-        //             setCurrentPage(2);
-        //         }
-        //         break;
-        //     case 3:
-        //         // Enter new password tab
-        //         // Check if password is strong enough
-        //         if (passwordScore !== 0) {
-        //             if (reEnterPassword === newPassword){
-        //                 const redirect = await setResetPassword(newPassword);
-        //                 if (redirect) {
-        //                     setCurrentPage(3)
-        //                 }
-        //             } else {
-        //                 alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
-        //             }
-        //         } else {
-        //             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
-        //         }
-        //         break;
-        //     case 4:
-        //         // Ending tab.
-        //         if (user.state?.id) {
-        //             localStorage.removeItem('user');
-        //             localStorage.removeItem('settings');
-        //             user.dispatch({type: "REMOVE_USER"});
-        //             dispatch(removeSettings());
-        //         }
-        //         navigate('/log-in');
-        //         break;
-        // }
+        switch (currentPage) {
+            case 0:
+                // Enter password tab.
+                if (await verifyPassword(password)) {
+                    setCurrentPage(1);
+                }
+                break;
+            case 1:
+                // Enter new email tab.
+                if (await sendCode(newEmail)) {
+                    setCurrentPage(2);
+                }
+                break;
+            case 2:
+                // Enter verification code tab
+                if (await verifyCode(verificationCode)) {
+                    setCurrentPage(3);
+                }
+                break;
+            case 3:
+                if (user.state?.id) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('settings');
+                    user.dispatch({type: "REMOVE_USER"});
+                    queryClient.removeQueries(["settings"]);
+                }
+                navigate('/log-in');
+                break;
+        }
     }
 
     const handleResendCode = async () => {
-        await resendCodeResetPassword(user.state?.email);
+        await sendCode(newEmail);
     }
 
-    const handleDisabledButton = () => {
-        // switch (currentPage) {
-        //     case 0:
-        //         return !validateEmail();
-        //     case 1:
-        //         return false;
-        //     case 2:
-        //         return !(verificationCode.length === 6);
-        //     case 3:
-        //         return !passwordScore || !newPassword.length || !reEnterPassword.length;
-        //     default:
-        //         return false
-        // }
+    const checkIfContinueActive = () => {
+        switch (currentPage) {
+            case 0:
+                return password.length < 1;
+            case 1:
+                return handleInvalidEmail();
+            case 2:
+                return !(verificationCode.length === 6);
+            default:
+                return false
+        }
     }
 
     return (
         <SurfaceContainer>
             <SwitchContainer selectedTab={currentPage}>
                 {/* We want to inform the user that an email will be sent to them, they also need to agree to it. */}
-                <div className={'Stack-Container'}>
-                    <div className={'Display'}>Verify your email</div>
+                <div className={'Stack-Container Big-Gap'}>
+                    <div className={'Display'}>Enter your password</div>
                     <div className={'Label'}>
-                        To change your email, we need you to verify your old email address.
-                        <br />
-                        If you continue we will send a verification code to {user.state?.email}.
+                        To change your email, you first need to enter your password below.
                     </div>
+                    <TextBoxInput
+                        type={'password'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'New password'}
+                        onKeydown={handleKeyDown}
+                        value={password}
+                        setValue={setPassword}
+                    />
                 </div>
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
+                    <div className={'Display'}>Enter new email</div>
+                    <div className={'Label'}>
+                        Please enter the new email you want to use below.
+                        <br />
+                        We will send your new email a verification code in order to make sure you are it's owner.
+                    </div>
+                    <TextBoxInput
+                        type={'email'}
+                        width={'max'}
+                        size={'big'}
+                        placeholder={'New email'}
+                        onKeydown={handleKeyDown}
+                        value={newEmail}
+                        setValue={setNewEmail}
+                        invalid={newEmail.length === 0 ? null : handleInvalidEmail()}
+                    />
+                </div>
+                <div className={'Stack-Container Big-Gap'}>
                     <div className={'Display'}>We sent you a code</div>
                     <div className={'Label'}>
-                        In order to verify it's you we sent you a verification code.
-                        <br />
+                        If the email you entered exists, is should receive a verification code.
+                        <br/>
                         Enter the code below to verify your email.
                     </div>
                     <div>
@@ -173,20 +156,7 @@ const ChangeEmail = () => {
                         <TextButton onClick={handleResendCode}>Didn't receive code?</TextButton>
                     </div>
                 </div>
-                <div className={'Stack-Container'}>
-                    <div className={'Display'}>Enter new email</div>
-                    <TextBoxInput
-                        type={'email'}
-                        width={'max'}
-                        size={'big'}
-                        placeholder={'New email'}
-                        onKeydown={handleKeyDown}
-                        value={newEmail}
-                        setValue={setNewEmail}
-                        invalid={handleInvalidEmail()}
-                    />
-                </div>
-                <div className={'Stack-Container'}>
+                <div className={'Stack-Container Big-Gap'}>
                     <div className={'Display'}>Email set successfully</div>
                 </div>
             </SwitchContainer>
@@ -200,10 +170,10 @@ const ChangeEmail = () => {
                 </Button> : null}
                 <Button
                     size={'big'}
-                    filled={checkIfFilled()}
+                    filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
                     layout={true}
-                    disabled={handleDisabledButton()}
+                    disabled={checkIfContinueActive()}
                 >
                     {currentPage !== 4 ? 'Continue' : 'Finish'}
                 </Button>

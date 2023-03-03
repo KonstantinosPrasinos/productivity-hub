@@ -22,6 +22,7 @@ export function useMakeFetch(setIsLoading) {
         }
 
         setIsLoading(false);
+        return true;
     }
 
     return {makeFetch};

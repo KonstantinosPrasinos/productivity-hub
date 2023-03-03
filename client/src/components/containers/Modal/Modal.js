@@ -15,7 +15,7 @@ const Modal = ({dismountFunction, continueFunction, children}) => {
             animate={{opacity: 1}}
             transition={{duration: 0.1}}
         >
-            <div className={`Stack-Container ${styles.subContainer} BigGap`}>
+            <div className={`Stack-Container ${styles.subContainer} Big-Gap`}>
                 <div className={styles.content}>
                     {children}
                 </div>
