@@ -6,7 +6,7 @@
   }
 
   .navBar {
-    height: 4em;
+    height: 3em;
     background-color: var(--surface-color);
     display: flex;
     align-items: center;
@@ -25,7 +25,7 @@
 
   .navBar {
     position: fixed;
-    width: 4em;
+    width: 3em;
     height: 100%;
     background: var(--surface-color);
     padding: 40px 0 40px 0;
@@ -38,6 +38,7 @@
 .navBar {
   display: flex;
   align-items: center;
+  font-size: $font-xxl;
 }
 
 .container {

@@ -14,10 +14,11 @@
 }
 
 .titleContainer {
-  font-size: $font-xl;
+  font-size: $font-m;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-weight: 550;
 }
 
 .infoContainer {

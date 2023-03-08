@@ -16,14 +16,7 @@ const Button = ({
                     isWarning = false
                 }) => {
 
-    return <motion.div
-        initial={initial}
-        animate={animate}
-        exit={exit}
-        layout={"size"}
-        transition={transition}
-    >
-        <button
+    return <motion.button
             onClick={onClick}
             className={`Button Horizontal-Flex-Container
                 ${styles.container}
@@ -34,10 +27,14 @@ const Button = ({
                   ${isWarning ? styles.isWarning : ''}
             `}
             disabled={disabled}
+            initial={initial}
+            animate={animate}
+            exit={exit}
+            layout={"size"}
+            transition={transition}
         >
             {children}
-        </button>
-    </motion.div>;
+        </motion.button>;
 };
 
 export default Button;

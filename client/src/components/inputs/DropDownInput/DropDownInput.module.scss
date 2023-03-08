@@ -24,12 +24,8 @@
     }
 }
 
-.arrowIndicator {
-    position: relative;
-    transition: transform 2s linear;
-    &.extended {
-        transform: rotate(180deg); 
-    }
+.arrowIcon {
+    transform-origin: center;
 }
 
 .optionsContainer {

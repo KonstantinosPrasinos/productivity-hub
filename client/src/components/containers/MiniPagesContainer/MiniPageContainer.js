@@ -2,10 +2,10 @@ import styles from './MiniPageContainer.module.scss';
 import {useContext, useEffect, useRef} from "react";
 import {motion, useAnimation} from 'framer-motion';
 import Button from "../../buttons/Button/Button";
-import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {useScreenSize} from "../../../hooks/useScreenSize";
+import {FaTimes} from "react-icons/fa";
 
 const MiniPageContainer = ({children, onClickSave, length, index}) => {
     const containerRef = useRef();
@@ -86,7 +86,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
                 }
 
                 <div className={styles.actionButtonsContainer}>
-                    <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><CloseIcon /></IconButton>
+                    <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><FaTimes /></IconButton>
                     <Button onClick={onClickSave}>Save</Button>
                 </div>
             </div>

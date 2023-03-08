@@ -1,12 +1,9 @@
 import styles from "./Settings.module.scss";
 import React, {useContext, useState} from "react";
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import Chip from "../../components/buttons/Chip/Chip";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import IconButton from "../../components/buttons/IconButton/IconButton";
-import TwitterIcon from '@mui/icons-material/Twitter';
 import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
@@ -14,9 +11,9 @@ import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 import {motion} from "framer-motion";
 import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
 import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
-import EmailIcon from '@mui/icons-material/Email';
 import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
+import {FaGithub, FaTwitter, FaEnvelope, FaLinkedin} from "react-icons/fa";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -187,7 +184,7 @@ const Settings = () => {
                             {/*    </div>*/}
                             {/*</div>*/}
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><EmailIcon />Email</div>
+                                <div className={'Horizontal-Flex-Container'}><FaEnvelope />Email</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>
                                         {email}
@@ -283,9 +280,9 @@ const Settings = () => {
                             <div className={'Label'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
                         </div>
                         <div className={'Horizontal-Flex-Container'}>
-                            <IconButton onClick={handleGithubClick}><GitHubIcon/></IconButton>
-                            <IconButton onClick={handleLinkedInClick}><LinkedInIcon/></IconButton>
-                            <IconButton onClick={handleTwitterClick}><TwitterIcon/></IconButton>
+                            <IconButton onClick={handleGithubClick}><FaGithub/></IconButton>
+                            <IconButton onClick={handleLinkedInClick}><FaLinkedin/></IconButton>
+                            <IconButton onClick={handleTwitterClick}><FaTwitter/></IconButton>
                         </div>
                     </div>
                 </section>

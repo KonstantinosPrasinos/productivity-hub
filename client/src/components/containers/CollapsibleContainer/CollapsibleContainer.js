@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {AnimatePresence, motion} from "framer-motion";
 import styles from './CollapsibleContainer.module.scss';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {FaChevronDown} from "react-icons/fa";
 
 const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) => {
     const [extended, setExtended] = useState(false);
@@ -24,7 +24,7 @@ const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) =>
                         }}}
                         transition={{type: 'tween'}}
                     >
-                        <ExpandMoreIcon />
+                        <FaChevronDown />
                     </motion.div>
                 </div>
             }

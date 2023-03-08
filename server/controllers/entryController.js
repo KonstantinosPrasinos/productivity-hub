@@ -22,7 +22,12 @@ const getTaskEntries = (req, res) => {
     if (req.user) {
         const {taskId} = req.params;
 
-        Entry.find({userId: req.user._id, taskId: taskId}, (err, entries) => {
+        const startDay = new Date();
+        startDay.setHours(0, 0, 0, 0);
+        const endDay = new Date();
+        endDay.setHours(23, 59, 59, 999);
+
+        Entry.find({userId: req.user._id, taskId: taskId, date: {$not: {$gte: startDay, $lte: endDay}}}, (err, entries) => {
             if (entries) {return res.status(200).json({entries})}
 
             return res.status(404).json({message: 'Past entries not found.'});

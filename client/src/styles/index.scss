@@ -259,7 +259,7 @@ table {
         }
     }
 
-    tr:last-child {
+    &> *:last-child > tr:last-of-type {
         td:first-child {
             border-bottom-left-radius: $base-border-radius;
         }
@@ -269,7 +269,12 @@ table {
     }
 }
 
-th {
+*:disabled {
+    opacity: $opacity-very-low;
+    cursor: not-allowed;
+}
+
+thead {
     vertical-align: center;
     border: none;
     background-color: var(--primary-color);
@@ -291,6 +296,7 @@ button {
     background-color: transparent;
     border: none;
     cursor: pointer;
+    color: inherit;
 }
 
 

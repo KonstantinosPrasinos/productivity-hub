@@ -2,9 +2,8 @@ import {useContext, useRef, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
-
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import {FaChevronDown} from "react-icons/fa";
 
 const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected }) => {
   const [extended, setExtended] = useState(false);
@@ -31,14 +30,16 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
       <div
         className={`Horizontal-Flex-Container Rounded-Container ${isDisabled ? styles.disabled : ''} ${styles.inputContainer}`}
         onClick={handleExtension}
-
       >
         <div className={styles.selected}>{selected ? selected : placeholder}</div>
-        <ArrowDropDownIcon
-          className={`${styles.arrowIndicator} ${
-            extended ? styles.extended : ""
-          }`}
-        />
+        <motion.div
+            className={styles.arrowIcon}
+            key={extended}
+            initial={{rotate: extended ? 0 : 180}}
+            animate={{rotate: extended ? 180 : 0}}
+        >
+            <FaChevronDown />
+        </motion.div>
       </div>
         <div >
             <AnimatePresence>

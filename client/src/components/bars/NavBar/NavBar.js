@@ -2,11 +2,8 @@ import {useContext, useEffect, useState} from 'react';
 
 import styles from './NavBar.module.scss'
 import IconButton from "../../buttons/IconButton/IconButton";
-import HomeIcon from "@mui/icons-material/Home";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import SettingsIcon from "@mui/icons-material/Settings";
 import Button from "../../buttons/Button/Button";
-import AddIcon from "@mui/icons-material/Add";
+import {FaHome, FaListUl, FaCog, FaPlus} from "react-icons/fa";
 import {useLocation, useNavigate} from "react-router-dom";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
@@ -47,7 +44,8 @@ const NavBar = () => {
                     selected={selected === 'home'}
                     setSelected={() => setSelected('home')}
                 >
-                    <HomeIcon sx={{fontSize: '1.5em'}}/>
+                    <FaHome />
+                    {/*<HomeIcon sx={{fontSize: '1.5em'}}/>*/}
                 </IconButton>
                 {/*<IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}*/}
                 {/*            setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>*/}
@@ -58,19 +56,19 @@ const NavBar = () => {
                     }}
                     selected={selected === 'list'}
                 >
-                    <FormatListBulletedIcon sx={{fontSize: '1.5em'}}/>
+                    <FaListUl />
                 </IconButton>
                 <IconButton
                     onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'}
                     setSelected={() => setSelected('settings')}
                 >
-                    <SettingsIcon sx={{fontSize: '1.5em'}}/>
+                    <FaCog />
                 </IconButton>
                 <Button
                     type='square'
                     onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}
                 >
-                    <AddIcon sx={{fontSize: '1.5em'}}/>
+                    <FaPlus />
                 </Button>
             </div>
         </div>

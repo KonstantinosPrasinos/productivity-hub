@@ -2,22 +2,124 @@ import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import Divider from "../../components/utilities/Divider/Divider";
-import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './Taskview.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
-import CheckIcon from "@mui/icons-material/Check";
 import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
+import {AnimatePresence, motion} from 'framer-motion';
+import {
+    FaPen,
+    FaTrash,
+    FaChevronLeft,
+    FaMinus,
+    FaChevronRight,
+    FaSortDown,
+    FaSortUp,
+    FaCheck,
+    FaPlus
+} from "react-icons/fa";
+import TextButton from "../../components/buttons/TextButton/TextButton";
+
+const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, currentEntry}) => {
+    const [pageNumber, setPageNumber] = useState(0);
+
+    if (isLoading) return (
+        <tbody>
+        <tr>
+            <td colSpan={2} className={styles.loadingIndicatorContainer}>
+                <LoadingIndicator size={"inline"} />
+            </td>
+        </tr>
+        </tbody>
+    )
+
+    const entries = [...pastEntries, currentEntry];
+
+    if (entries.length === 0) return (
+        <tr>
+            No entries
+        </tr>
+    )
+
+    let sortedEntries;
+
+    if (sortOrderDate !== 0) {
+        sortedEntries = entries.sort((a, b) => {
+            const dA = Date.parse(a.date);
+            const dB = Date.parse(b.date);
+
+            return sortOrderDate * (dA - dB);
+        });
+    } else {
+        sortedEntries = entries.sort((a, b) => {
+            return sortOrderValue * (a.value - b.value);
+        });
+    }
+
+    const lastEntryNumber = () => {
+        if (entries.length - 10 * pageNumber > 10) return (pageNumber * 10  + 10);
+        return entries.length - 10 * pageNumber;
+    }
+
+    const increasePageNumber = () => {
+        setPageNumber(current => current + 1);
+    }
+    const decreasePageNumber = () => {
+        setPageNumber(current => current - 1);
+    }
+
+    return (
+        <>
+            <tbody>
+            {sortedEntries.slice(pageNumber * 10, pageNumber * 10 + 10).map(entry => {
+                const entryDate = new Date(entry.date);
+
+                return <tr key={entry._id}>
+                    <td>{entryDate.toLocaleDateString()}</td>
+                    <td>{entry.value}</td>
+                </tr>
+            })}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>{pageNumber * 10 + 1}-{lastEntryNumber()} of {entries.length}</td>
+                <td className={styles.pageButtons}>
+                    <IconButton
+                        onClick={decreasePageNumber}
+                        disabled={pageNumber === 0}
+                    >
+                        <FaChevronLeft />
+                    </IconButton>
+                    <IconButton
+                        onClick={increasePageNumber}
+                        disabled={pageNumber === Math.floor(entries.length / 10)}
+                    >
+                        <FaChevronRight />
+                    </IconButton>
+                </td>
+            </tr>
+            </tfoot>
+        </>
+    )
+}
+
+const SortIcon = ({sortOrder}) => {
+    switch (sortOrder) {
+        case 0:
+            return <FaMinus/>
+        case 1:
+            return <FaSortDown/>
+        case -1:
+            return <FaSortUp/>
+    }
+}
 
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -27,9 +129,12 @@ const TaskView = ({index, length, task}) => {
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
+    const [sortOrderDate, setSortOrderDate] = useState(1); // 1 for most recent -> less recent, -1 for less recent -> most recent, 0 if sorting by other type.
+    const [sortOrderValue, setSortOrderValue] = useState(0);
+
     const graphOptions = ['Average', 'Total'];
 
-    const [date, setDate] = useState(new Date);
+    const [date, setDate] = useState(new Date());
 
     const addToMonth = (adder) => {
         const newDate = new Date(date.getTime());
@@ -47,14 +152,6 @@ const TaskView = ({index, length, task}) => {
         setTaskCurrentEntry(task._id, entry?._id, entry?.value === 0 ? 1 : 0);
     }
 
-    const handlePlusCurrentValue = () => {
-        setTaskCurrentEntry(task._id, entry._id, entry?.value + task.step);
-    }
-
-    const handleMinusCurrentValue = () => {
-        setTaskCurrentEntry(task._id, entry._id, entry?.value - task.step);
-    }
-
     const handleSetCurrentValueNumber = (e) => {
         const eventNumber = parseInt(e);
 
@@ -65,6 +162,36 @@ const TaskView = ({index, length, task}) => {
         }
     }
 
+    const handleChangeSortOrderValue = () => {
+        switch (sortOrderValue) {
+            case 0:
+                setSortOrderValue(1);
+                setSortOrderDate(0);
+                break;
+            case 1:
+                setSortOrderValue(-1);
+                break;
+            case -1:
+                setSortOrderValue(1);
+                break;
+        }
+    }
+
+    const handleChangeSortOrderDate = () => {
+        switch (sortOrderDate) {
+            case 0:
+                setSortOrderDate(1);
+                setSortOrderValue(0);
+                break;
+            case 1:
+                setSortOrderDate(-1);
+                break;
+            case -1:
+                setSortOrderDate(1);
+                break;
+        }
+    }
+
     return (
         <MiniPageContainer
             index={index}
@@ -72,9 +199,9 @@ const TaskView = ({index, length, task}) => {
         >
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Title'}>{task.title}</div>
-                <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}><EditIcon /></IconButton>
-                    <IconButton onClick={handleDelete}><DeleteIcon /></IconButton>
+                <div className={`Horizontal-Flex-Container ${styles.editIcons}`}>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}><FaPen /></IconButton>
+                    <IconButton onClick={handleDelete}><FaTrash /></IconButton>
                 </div>
             </section>
             <section className={'Horizontal-Flex-Container'}>
@@ -91,19 +218,10 @@ const TaskView = ({index, length, task}) => {
                 <div className={'Label'}>Today's Entry:</div>
                 {task.type === 'Checkbox' ?
                     <div className={`${styles.checkbox} ${entry?.value === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
-                        <CheckIcon sx={{
-                            width: '100%',
-                            height: '100%',
-                            opacity: entry?.value ?? 0 === 1 ? 1 : 0,
-                            "&:hover": {
-                                opacity: 1,
-                            }
-                        }} />
+                        <FaCheck />
                     </div> :
                     <div className={'Horizontal-Flex-Container'}>
-                        <Button type={"square"} size={"small"} onClick={handleMinusCurrentValue}>-{task.step}</Button>
-                        <TextBoxInput value={entry?.value ?? 0} alignment={"center"} setValue={handleSetCurrentValueNumber} width={'small'}></TextBoxInput>
-                        <Button type={"square"} size={"small"} onClick={handlePlusCurrentValue}>+{task.step}</Button>
+                        <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber} type={"number"}></TextBoxInput>
                     </div>}
             </section>
             <Divider />
@@ -145,39 +263,65 @@ const TaskView = ({index, length, task}) => {
                 </div>
                 <div className={'Horizontal-Flex-Container Space-Between'}>
                     <IconButton onClick={() => addToMonth(-1)}>
-                        <ArrowBackIosIcon />
+                        <FaChevronLeft />
                     </IconButton>
                     <div>
                         {`${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`}
                     </div>
                     <IconButton onClick={() => addToMonth(1)}>
-                        <ArrowForwardIosIcon />
+                        <FaChevronRight />
                     </IconButton>
                 </div>
             </section>
             <section>
-                {/*Temp*/}
-                {!entriesLoading && <table>
+                <table>
+                    <thead>
                     <tr>
                         <th>
-                            Date:
-                            <IconButton color={'normal'}><KeyboardArrowDownIcon /></IconButton>
+                            <button className={styles.tableButton} onClick={handleChangeSortOrderDate}>
+                                Date:
+                                <AnimatePresence mode={"wait"}>
+                                    <motion.div
+                                        key={sortOrderDate}
+                                        initial={{scale: 0}}
+                                        animate={{scale: 1}}
+                                        exit={{scale: 0}}
+                                        transition={{duration: 0.1}}
+                                    >
+                                        <SortIcon sortOrder={sortOrderDate} />
+                                    </motion.div>
+                                </AnimatePresence>
+                            </button>
                         </th>
-                        <th>Value:</th>
+                        <th>
+                            <button className={styles.tableButton} onClick={handleChangeSortOrderValue}>
+                                Value:
+                                <AnimatePresence mode={"wait"}>
+                                    <motion.div
+                                        key={sortOrderValue}
+                                        initial={{scale: 0}}
+                                        animate={{scale: 1}}
+                                        exit={{scale: 0}}
+                                        transition={{duration: 0.1}}
+                                    >
+                                        <SortIcon sortOrder={sortOrderValue} />
+                                    </motion.div>
+                                </AnimatePresence>
+                            </button>
+                        </th>
                     </tr>
-                    <tr>
-                        <td>{new Date().toLocaleDateString()}</td>
-                        <td>0</td>
-                    </tr>
-                    {entries.sort((a, b) => a.date.getTime() < b.date.getTime()).map(entry => {
-                        const entryDate = new Date(entry.date);
-
-                        return <tr>
-                            <td>{entryDate.toLocaleDateString()}</td>
-                            <td>{entry.value}</td>
-                        </tr>
-                    })}
-                </table>}
+                    </thead>
+                    <TaskTableContents
+                        pastEntries={entries}
+                        sortOrderDate={sortOrderDate}
+                        isLoading={entriesLoading}
+                        sortOrderValue={sortOrderValue}
+                        currentEntry={entry}
+                    />
+                </table>
+                <TextButton>
+                    Add new entry <FaPlus />
+                </TextButton>
             </section>
             <section className={'Horizontal-Flex-Container Space-Between'}>
                 <Button filled={false} size={'small'}>
