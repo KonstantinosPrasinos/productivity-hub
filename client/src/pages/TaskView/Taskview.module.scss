@@ -34,3 +34,14 @@ $base-size: 1.2em;
 .editIcons {
   font-size: $font-xl;
 }
+
+.table {
+  tr {
+    td {
+      width: 45%;
+    }
+    &:last-of-type(td) {
+      width: 10%;
+    }
+  }
+}

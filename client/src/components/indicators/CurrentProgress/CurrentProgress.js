@@ -4,11 +4,11 @@ import {useEffect, useMemo, useState} from "react";
 import styles from "./CurrentProgress.module.scss";
 import CheckIcon from '@mui/icons-material/Check';
 import IconButton from "../../buttons/IconButton/IconButton";
-import {useChangeEntry} from "../../../hooks/change-hooks/useChangeEntry";
+import {useChangeEntryValue} from "../../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
 
 const CurrentProgress = ({task}) => {
-    const {mutate: setTaskCurrentEntry} = useChangeEntry(task.title);
+    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
     const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     useEffect(() => {
@@ -22,7 +22,7 @@ const CurrentProgress = ({task}) => {
             setPrevPercentage(getPercentage());
 
             const number = entry.value === 0 ? 1 : 0
-            setTaskCurrentEntry(task._id, entry?._id, number);
+            setTaskCurrentEntry({taskId: task._id, entryId: entry?._id, value: number});
         }
     }
 
@@ -30,7 +30,7 @@ const CurrentProgress = ({task}) => {
         if (isLoading) return;
 
         setPrevPercentage(getPercentage());
-        setTaskCurrentEntry(task._id, entry._id, entry?.value + task.step);
+        setTaskCurrentEntry({taskId: task._id, entryId: entry._id, value: entry?.value + task.step});
     }
 
     const getPercentage = () => {

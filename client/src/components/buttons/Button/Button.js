@@ -5,7 +5,7 @@ const Button = ({
                     onClick,
                     children,
                     type = 'round',
-                    filled = 'true',
+                    filled = true,
                     size,
                     initial,
                     exit,

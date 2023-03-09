@@ -1,5 +1,9 @@
 const Entry = require('../models/entrySchema');
 
+const checkIfDate = (date) => {
+    return (new Date(date) !== "Invalid Date") && isNaN(date)
+}
+
 const getRecentEntries = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
@@ -86,6 +90,29 @@ const setEntryValue = (req, res) => {
     }
 }
 
+const setEntry = async (req, res) => {
+    if (req.user) {
+        const {entryId, value, date} = req.body;
+
+        let changes = {};
+
+        if (!isNaN(value)) {
+            changes.value = value;
+        }
+
+        if (date && checkIfDate(date)) {
+            changes.date = new Date(date);
+        }
+
+        try {
+            const entry = await Entry.findOneAndUpdate({_id: entryId, userId: req.user._id}, {$set: changes});
+            return res.status(200).json({entry});
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    }
+}
+
 const deleteEntry = (req, res) => {
     if (req.user) {
         const {id} = req.body;
@@ -109,7 +136,7 @@ const deleteTaskEntries = async (req, res) => {
         if (!taskId) return res.status(400).json({message: "Task id required."});
 
         Entry.deleteMany({"$and": [{userId: req.user._id}, {taskId: taskId}]});
-} else {
+    } else {
         res.status(401).send({message: "Not authorized."});
     }
 }
@@ -124,7 +151,6 @@ const addEntry = async (req, res) => {
             const entry = await Entry.create({date, value, taskId, userId: req.user._id});
             res.status(200).json({entry});
         } catch (error) {
-            console.log(error.message);
             res.status(500).json({message: error.message});
         }
     } else {
@@ -132,4 +158,4 @@ const addEntry = async (req, res) => {
     }
 }
 
-module.exports = {getRecentEntries, getTaskEntries, setEntryValue, deleteEntry, deleteTaskEntries, getTaskEntryById, addEntry};
+module.exports = {getRecentEntries, getTaskEntries, setEntryValue, deleteEntry, deleteTaskEntries, getTaskEntryById, addEntry, setEntry};

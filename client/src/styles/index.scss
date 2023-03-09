@@ -241,10 +241,10 @@ table {
         border: 1px solid var(--border-color);
         border-top: none;
 
-        &:first-child {
+        &:first-child:not(:last-child) {
             border-right: none !important;
         }
-        &:last-child {
+        &:last-child:not(:first-child) {
             border-left: none !important;
         }
     }

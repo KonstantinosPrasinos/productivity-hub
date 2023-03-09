@@ -9,7 +9,7 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import styles from './Taskview.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
-import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
+import {useChangeEntryValue} from "../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
 import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
@@ -23,7 +23,8 @@ import {
     FaSortDown,
     FaSortUp,
     FaCheck,
-    FaPlus
+    FaPlus,
+    FaEllipsisV
 } from "react-icons/fa";
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
@@ -31,7 +32,7 @@ import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
 
-const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, currentEntry}) => {
+const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, currentEntry, setEditedEntry, setIsVisibleNewEntryModal}) => {
     const [pageNumber, setPageNumber] = useState(0);
 
     if (isLoading) return (
@@ -79,6 +80,11 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
         setPageNumber(current => current - 1);
     }
 
+    const handleEditEntry = (entry) => {
+        setEditedEntry(entry);
+        setIsVisibleNewEntryModal(true);
+    }
+
     return (
         <>
             <tbody>
@@ -88,25 +94,34 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
                 return <tr key={entry._id}>
                     <td>{entryDate.toLocaleDateString()}</td>
                     <td>{entry.value}</td>
+                    <td>
+                        <IconButton onClick={() => handleEditEntry(entry)}>
+                            <FaEllipsisV />
+                        </IconButton>
+                    </td>
                 </tr>
             })}
             </tbody>
             <tfoot>
             <tr>
-                <td>{pageNumber * 5 + 1}-{lastEntryNumber()} of {entries.length}</td>
-                <td className={styles.pageButtons}>
-                    <IconButton
-                        onClick={decreasePageNumber}
-                        disabled={pageNumber === 0}
-                    >
-                        <FaChevronLeft />
-                    </IconButton>
-                    <IconButton
-                        onClick={increasePageNumber}
-                        disabled={pageNumber === Math.floor(entries.length / 5)}
-                    >
-                        <FaChevronRight />
-                    </IconButton>
+                <td colSpan={3}>
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div>{pageNumber * 5 + 1}-{lastEntryNumber()} of {entries.length}</div>
+                        <div>
+                            <IconButton
+                                onClick={decreasePageNumber}
+                                disabled={pageNumber === 0}
+                            >
+                                <FaChevronLeft />
+                            </IconButton>
+                            <IconButton
+                                onClick={increasePageNumber}
+                                disabled={pageNumber === Math.floor(entries.length / 5)}
+                            >
+                                <FaChevronRight />
+                            </IconButton>
+                        </div>
+                    </div>
                 </td>
             </tr>
             </tfoot>
@@ -114,11 +129,12 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
     )
 }
 
-const EntryModal = ({toggleNewEntryModal, taskId}) => {
-    const [value, setValue] = useState(0);
-    const [date, setDate] = useState();
+const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
+    const [value, setValue] = useState(editedEntry ? editedEntry.value : '');
+    const [date, setDate] = useState(editedEntry ? (new Date(editedEntry.date)).toLocaleDateString() : '');
     const [isVisibleCalendar, setIsVisibleCalendar] = useState(false);
     const {mutateAsync: addEntry, isLoading, isError} = useAddEntry();
+    const {mutateAsync: changeEntry, isLoading: isLoadingChange, isError: isErrorChange} = useChangeEntryValue();
 
     const toggleCalendar = () => {
         setIsVisibleCalendar(current => !current);
@@ -130,9 +146,18 @@ const EntryModal = ({toggleNewEntryModal, taskId}) => {
     }
 
     const handleContinue = async () => {
-        await addEntry({date, value, taskId});
-        if (!isError) {
-            toggleNewEntryModal();
+        if (editedEntry) {
+            if (date !== editedEntry.date && value !== editedEntry.value) {
+                await changeEntry({taskId, entryId: editedEntry._id, value, date});
+            }
+            if (!isErrorChange) {
+                toggleNewEntryModal();
+            }
+        } else {
+            await addEntry({date, value, taskId});
+            if (!isError) {
+                toggleNewEntryModal();
+            }
         }
     }
 
@@ -140,11 +165,20 @@ const EntryModal = ({toggleNewEntryModal, taskId}) => {
         <Modal
             isOverlay={true}
             dismountFunction={toggleNewEntryModal}
-            isLoading={isLoading}
+            isLoading={isLoading || isLoadingChange}
         >
             <div className={"Stack-Container Big-Gap"}>
-                <div className={"Display"}>New entry</div>
-                <div className={"Label"}>In order to create a new entry you need to enter a valid date and value.</div>
+                <div className={"Horizontal-Flex-Container Space-Around"}>
+                    <div className={"Display"}>{editedEntry ? "Existing entry" : "New Entry"}</div>
+                </div>
+                <div className={"Label"}>{editedEntry ?
+                    <div>
+                        The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
+                        <br />
+                        You can edit the entry below.
+                    </div>:
+                    "In order to create a new entry you need to enter a valid date and value."
+                }</div>
             </div>
             <div className={'Horizontal-Flex-Container Space-Between'}>
                 <InputWrapper label={"Date"}>
@@ -209,11 +243,12 @@ const SortIcon = ({sortOrder}) => {
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const {mutate: deleteTask} = useDeleteTask();
-    const {mutate: setTaskCurrentEntry} = useChangeEntry(task.title);
+    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
     const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id);
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
+    const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
     const [sortOrderDate, setSortOrderDate] = useState(1); // 1 for most recent -> less recent, -1 for less recent -> most recent, 0 if sorting by other type.
     const [sortOrderValue, setSortOrderValue] = useState(0);
@@ -369,7 +404,7 @@ const TaskView = ({index, length, task}) => {
                 {/*    </div>*/}
                 {/*</section>*/}
                 <section>
-                    <table>
+                    <motion.table animate={{height: "auto"}} className={styles.table}>
                         <thead>
                         <tr>
                             <th>
@@ -404,6 +439,7 @@ const TaskView = ({index, length, task}) => {
                                     </AnimatePresence>
                                 </button>
                             </th>
+                            <th></th>
                         </tr>
                         </thead>
                         <TaskTableContents
@@ -412,8 +448,10 @@ const TaskView = ({index, length, task}) => {
                             isLoading={entriesLoading}
                             sortOrderValue={sortOrderValue}
                             currentEntry={entry}
+                            setEditedEntry={setEditedEntry}
+                            setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
                         />
-                    </table>
+                    </motion.table>
 
                 </section>
                 <section className={'Horizontal-Flex-Container Space-Between'}>
@@ -426,7 +464,7 @@ const TaskView = ({index, length, task}) => {
                     </div>
                 </section>
             </MiniPageContainer>
-            {isVisibleNewEntryModal && <EntryModal toggleNewEntryModal={toggleNewEntryModal} taskId={task._id} />}
+            {isVisibleNewEntryModal && <EntryModal toggleNewEntryModal={toggleNewEntryModal} taskId={task._id} editedEntry={editedEntry} />}
         </div>
     );
 };
