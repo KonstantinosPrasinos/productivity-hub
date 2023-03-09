@@ -20,6 +20,7 @@ import {UserContext} from "./context/UserContext";
 import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
 import {ReactQueryDevtools} from "react-query/devtools";
 import {updateUserValidDate} from "./functions/updateUserValidDate";
+import 'react-day-picker/dist/style.css';
 
 
 const NavLayout = () => (

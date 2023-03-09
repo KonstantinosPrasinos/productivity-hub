@@ -43,7 +43,6 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
       </div>
         <div >
             <AnimatePresence>
-
                 {extended && !isDisabled && (
                     <motion.div
                         className={`${

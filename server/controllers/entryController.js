@@ -1,10 +1,4 @@
 const Entry = require('../models/entrySchema');
-const Joi = require('joi');
-
-const taskHistorySchema = Joi.object({
-    taskId: Joi.string().required(),
-    value: Joi.string().required()
-})
 
 const getRecentEntries = async (req, res) => {
     if (req.user) {
@@ -50,38 +44,38 @@ const getTaskEntryById = (req, res) => {
     }
 }
 
-const addEntryFunc = async (entry, userId) => {
-    const validatedEntry = taskHistorySchema.validate(entry);
-
-    try {
-        // Validate task exists
-        return await Entry.create({...validatedEntry.value, userId: userId});
-    } catch (error) {
-        return {error};
-    }
-}
-
-const addTaskEntry = async (req, res) => {
-    if (req.user) {
-        const {entry} = req.body;
-
-        const {error} = addEntryFunc(entry, req.user._id)
-
-        if (error) {
-            return res.status(500).json({message: error.message});
-        }
-
-        return res.status(200).json({message: 'Entry added successfully.'});
-    } else {
-        res.status(401).send({message: "Not authorized."});
-    }
-}
+// const addEntryFunc = async (entry, userId) => {
+//     const validatedEntry = taskHistorySchema.validate(entry);
+//
+//     try {
+//         // Validate task exists
+//         return await Entry.create({...validatedEntry.value, userId: userId});
+//     } catch (error) {
+//         return {error};
+//     }
+// }
+//
+// const addTaskEntry = async (req, res) => {
+//     if (req.user) {
+//         const {entry} = req.body;
+//
+//         const {error} = addEntryFunc(entry, req.user._id)
+//
+//         if (error) {
+//             return res.status(500).json({message: error.message});
+//         }
+//
+//         return res.status(200).json({message: 'Entry added successfully.'});
+//     } else {
+//         res.status(401).send({message: "Not authorized."});
+//     }
+// }
 
 const setEntryValue = (req, res) => {
     if (req.user) {
         const {taskId, entryId, value} = req.body;
 
-        if (isNaN(value) || !taskId || !entryId) return res.status(400).json({message: 'Ping!'})
+        if (isNaN(value) || !taskId || !entryId) return res.status(400).json({message: 'Invalid task id, entry id or value.'})
 
         Entry.findOneAndUpdate({_id: entryId}, {$set: {value: value}}, (err, entry) => {
             if (err) return res.status(400).json({message: 'Failed to set entry value.'});
@@ -95,6 +89,8 @@ const setEntryValue = (req, res) => {
 const deleteEntry = (req, res) => {
     if (req.user) {
         const {id} = req.body;
+
+        if (!id) return res.status(400).json({message: "Id required."});
 
         Entry.findByIdAndDelete(id, (err) => {
             if (err) res.status(500).json({message: "Failed to delete entry."});
@@ -110,10 +106,30 @@ const deleteTaskEntries = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
+        if (!taskId) return res.status(400).json({message: "Task id required."});
+
         Entry.deleteMany({"$and": [{userId: req.user._id}, {taskId: taskId}]});
+} else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+const addEntry = async (req, res) => {
+    if (req.user) {
+        const {date, value, taskId} = req.body;
+
+        if (!date || isNaN(value) || !taskId) return res.status(400).json({message: "Date, value and task id required."});
+
+        try {
+            const entry = await Entry.create({date, value, taskId, userId: req.user._id});
+            res.status(200).json({entry});
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({message: error.message});
+        }
     } else {
         res.status(401).send({message: "Not authorized."});
     }
 }
 
-module.exports = {getRecentEntries, getTaskEntries, addTaskEntry, setEntryValue, deleteEntry, deleteTaskEntries, getTaskEntryById};
+module.exports = {getRecentEntries, getTaskEntries, setEntryValue, deleteEntry, deleteTaskEntries, getTaskEntryById, addEntry};

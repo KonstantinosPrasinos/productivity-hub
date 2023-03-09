@@ -5,6 +5,54 @@ import {useState} from "react";
 import IconButton from "../../buttons/IconButton/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import {FaCalendar} from "react-icons/fa";
+
+const TypePassword = ({passwordVisible, setPasswordVisible}) => {
+
+
+    const handleShowPassword = () => {
+        setPasswordVisible(current => !current);
+    }
+
+    return (
+        <IconButton onClick={handleShowPassword}>
+            {passwordVisible ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+        </IconButton>
+    );
+}
+
+const TypeNumber = ({isDisabled, increment, decrement}) => {
+    return (
+        <div className={styles.buttonsContainer}>
+            <button
+                disabled={isDisabled}
+                className={`${styles.button}`}
+                onClick={increment}
+            >
+                <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+            </button>
+            <button
+                disabled={isDisabled}
+                className={`${styles.button}`}
+                onClick={decrement}
+            >
+                <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+            </button>
+        </div>
+    )
+}
+
+const TypeCalendar = ({toggleCalendar, isDisabled}) => {
+    return (
+        <button
+            // className={styles.button}
+            disabled={isDisabled}
+            onClick={toggleCalendar}
+        >
+            <FaCalendar></FaCalendar>
+        </button>
+    )
+}
 
 const TextBoxInput = ({
                           placeholder = "placeholder",
@@ -18,10 +66,11 @@ const TextBoxInput = ({
                           onKeydown = () => {
                           },
                             alignment = 'left',
-                          invalid = null
+                          invalid = null,
+                            toggleCalendar = null
                       }) => {
 
-    const [passwordVisible, setPasswordVisible] = useState(false)
+    const [passwordVisible, setPasswordVisible] = useState(false);
 
     const handleChange = (event) => {
         if (type === 'number') {
@@ -34,7 +83,16 @@ const TextBoxInput = ({
 
     const handleBlur = () => {
         if (type === 'number') {
-            checkIfNull()
+            checkIfNull();
+        }
+        if (type === 'calendar') {
+            checkIfDate();
+        }
+    }
+
+    const checkIfDate = () => {
+        if ((new Date(value) === "Invalid Date") || !isNaN(value)) {
+            setValue("");
         }
     }
 
@@ -52,10 +110,6 @@ const TextBoxInput = ({
     const decrement = () => {
         checkIfNull();
         setValue(parseInt(value) - 1);
-    }
-
-    const handleShowPassword = () => {
-        setPasswordVisible(current => !current);
     }
 
     const handleType = () => {
@@ -93,25 +147,9 @@ const TextBoxInput = ({
               onKeyDown={onKeydown}
           />
       </span>
-        {type === "number" && (<div className={styles.buttonsContainer}>
-            <button
-                disabled={isDisabled}
-                className={`${styles.button}`}
-                onClick={increment}
-            >
-                <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
-            </button>
-            <button
-                disabled={isDisabled}
-                className={`${styles.button}`}
-                onClick={decrement}
-            >
-                <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
-            </button>
-        </div>)}
-        {type === 'password' && <IconButton onClick={handleShowPassword}>
-            {passwordVisible ? <VisibilityOffIcon/> : <VisibilityIcon/>}
-        </IconButton>}
+        {type === "number" && <TypeNumber decrement={decrement} increment={increment} isDisabled={isDisabled} />}
+        {type === "password" && <TypePassword passwordVisible={passwordVisible} setPasswordVisible={setPasswordVisible} />}
+        {type === "calendar" && <TypeCalendar toggleCalendar={toggleCalendar} isDisabled={isDisabled} />}
     </div>);
 };
 
