@@ -5,6 +5,7 @@ const Chip = ({ children, value, selected, setSelected, type='select', onClick, 
     <div
       className={`Button ${styles[style]} ${styles.container} ${type === 'select' && value === selected ? styles.filled : ""} ${type === 'icon'} ${styles[size]}`}
       onClick={(e) => {
+          console.log(value)
           switch (type) {
               case 'select':
                   setSelected(value);

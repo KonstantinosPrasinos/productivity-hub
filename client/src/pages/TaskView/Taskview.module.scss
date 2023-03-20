@@ -36,6 +36,7 @@ $base-size: 1.2em;
 }
 
 .table {
+  height: auto;
   tr {
     td {
       width: 45%;
@@ -44,4 +45,8 @@ $base-size: 1.2em;
       width: 10%;
     }
   }
+}
+
+.tBody {
+  height: auto;
 }

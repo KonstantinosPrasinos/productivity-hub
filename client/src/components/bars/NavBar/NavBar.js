@@ -3,7 +3,7 @@ import {useContext, useEffect, useState} from 'react';
 import styles from './NavBar.module.scss'
 import IconButton from "../../buttons/IconButton/IconButton";
 import Button from "../../buttons/Button/Button";
-import {FaHome, FaListUl, FaCog, FaPlus} from "react-icons/fa";
+import {TbHome, TbList, TbPlus, TbSettings} from "react-icons/tb";
 import {useLocation, useNavigate} from "react-router-dom";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 
@@ -22,9 +22,6 @@ const NavBar = () => {
             case '/home':
                 setSelected('home')
                 break;
-            // case '/timer':
-            //     setSelected('timer')
-            //     break;
             case '/list':
                 setSelected('list')
                 break;
@@ -39,36 +36,47 @@ const NavBar = () => {
     return (
         <div className={styles.container}>
             <div className={`${styles.navBar}`}>
-                <IconButton
-                    onClick={() => navigate('/', {replace: true})}
-                    selected={selected === 'home'}
-                    setSelected={() => setSelected('home')}
-                >
-                    <FaHome />
-                    {/*<HomeIcon sx={{fontSize: '1.5em'}}/>*/}
-                </IconButton>
-                {/*<IconButton onClick={() => navigate('/timer', {replace: true})} selected={selected === 'timer'}*/}
-                {/*            setSelected={() => setSelected('timer')}><TimerIcon sx={{fontSize: '1.5em'}}/></IconButton>*/}
-                <IconButton
-                    onClick={() => {
-                        setSelected('tasks');
-                        navigate('/list', {replace: true});
-                    }}
-                    selected={selected === 'list'}
-                >
-                    <FaListUl />
-                </IconButton>
-                <IconButton
-                    onClick={() => navigate('/settings', {replace: true})} selected={selected === 'settings'}
-                    setSelected={() => setSelected('settings')}
-                >
-                    <FaCog />
-                </IconButton>
+                <div className={styles.item}>
+                    <IconButton
+                        onClick={() => navigate('/', {replace: true})}
+                        selected={selected === 'home'}
+                        // setSelected={() => setSelected('home')}
+                    >
+                        <TbHome />
+                    </IconButton>
+                    {selected === 'home' &&
+                        <div className={styles.selectedBar}/>
+                    }
+                </div>
+                <div className={styles.item}>
+                    <IconButton
+                        onClick={() => {
+                            navigate('/list', {replace: true});
+                        }}
+                        selected={selected === 'list'}
+                    >
+                        <TbList />
+                    </IconButton>
+                    {selected === 'list' &&
+                        <div className={styles.selectedBar}/>
+                    }
+                </div>
+                <div className={styles.item}>
+                    <IconButton
+                        onClick={() => navigate('/settings', {replace: true})}
+                        selected={selected === 'settings'}
+                    >
+                        <TbSettings />
+                    </IconButton>
+                    {selected === 'settings' &&
+                        <div className={styles.selectedBar}/>
+                    }
+                </div>
                 <Button
                     type='square'
                     onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}})}
                 >
-                    <FaPlus />
+                    <TbPlus />
                 </Button>
             </div>
         </div>

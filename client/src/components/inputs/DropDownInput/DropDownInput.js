@@ -3,25 +3,33 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
-import {FaChevronDown} from "react-icons/fa";
+import {TbChevronDown} from "react-icons/tb";
 
 const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected }) => {
   const [extended, setExtended] = useState(false);
   const containerRef = useRef();
+  const iconRef = useRef();
+  const hasEventListener = useRef(false);
   const miniPagesContext = useContext(MiniPagesContext);
 
   const handleExtension = () => {
       const collapse = (event) => {
-          if (event.target !== containerRef.current && !containerRef.current?.contains(event.target)) {
+          if (
+              event.target !== containerRef.current &&
+              !containerRef.current?.contains(event.target) &&
+              event.target !== iconRef.current &&
+              iconRef.current?.contains(event.target)
+          ) {
               setExtended(false);
+              document.body.removeEventListener('click', collapse);
+              hasEventListener.current = false;
           }
       }
 
       setExtended(current => !current);
-      if (!extended) {
+      if (!extended && !hasEventListener.current) {
+          hasEventListener.current = true;
           document.body.addEventListener('click', collapse);
-      } else {
-          document.body.removeEventListener('click', collapse);
       }
   }
 
@@ -37,8 +45,9 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
             key={extended}
             initial={{rotate: extended ? 0 : 180}}
             animate={{rotate: extended ? 180 : 0}}
+            ref={iconRef}
         >
-            <FaChevronDown />
+            <TbChevronDown />
         </motion.div>
       </div>
         <div >

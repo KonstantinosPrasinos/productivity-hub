@@ -10,7 +10,7 @@ import {setTask} from "../../state/tasksSlice";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import AddIcon from "@mui/icons-material/Add";
+import { FaPlus } from "react-icons/fa";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
@@ -259,7 +259,7 @@ const NewTask = ({index, length, id}) => {
                     options={[...categoryTitles,
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                             Add new
-                            <AddIcon />
+                            <FaPlus />
                         </div>]}
                     selected={selectedCategory}
                     setSelected={setCategory}

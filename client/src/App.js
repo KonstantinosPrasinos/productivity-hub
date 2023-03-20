@@ -163,7 +163,6 @@ function App() {
                                     <Settings/>
                                 }
                             />
-                            <Route path="/playground" element={<Playground/>}/>
                         </Route>
                     </Route>
                     <Route
@@ -187,6 +186,7 @@ function App() {
                             <ResetPassword/>
                         }
                     />
+                    <Route path="/playground" element={<Playground/>}/>
                     <Route path="*" element={<Navigate to={"/not-found"} />}/>
                     <Route path="/not-found" element={<NotFound/>}/>
                 </Routes>

@@ -295,7 +295,7 @@ const Settings = () => {
                         <TextBoxInput
                             type={'password'}
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Password'}
                             value={currentPassword}
                             setValue={setCurrentPassword}
@@ -303,14 +303,14 @@ const Settings = () => {
                     </div>
                     <div className={`Horizontal-Flex-Container Space-Between`}>
                         <Button
-                            size={'big'}
+                            size={'large'}
                             filled={false}
                             onClick={handleDeleteCancel}
                         >
                             Cancel
                         </Button>
                         <Button
-                            size={'big'}
+                            size={'large'}
                             filled={!checkIfContinueActive()}
                             onClick={handleDeleteContinue}
                             disabled={checkIfContinueActive()}
@@ -328,7 +328,7 @@ const Settings = () => {
                         <TextBoxInput
                             type={'password'}
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Password'}
                             value={currentPassword}
                             setValue={setCurrentPassword}
@@ -336,14 +336,14 @@ const Settings = () => {
                     </div>
                     <div className={`Horizontal-Flex-Container Space-Between`}>
                         <Button
-                            size={'big'}
+                            size={'large'}
                             filled={false}
                             onClick={handleResetCancel}
                         >
                             Cancel
                         </Button>
                         <Button
-                            size={'big'}
+                            size={'large'}
                             filled={!checkIfContinueActive()}
                             onClick={handleResetContinue}
                             disabled={checkIfContinueActive()}

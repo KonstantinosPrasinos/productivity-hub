@@ -104,7 +104,7 @@ const ListView = () => {
         >
             {screenSize === 'small' &&
                 <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
-                    {chipOptions.map((chip, index) => <Chip size={'big'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
+                    {chipOptions.map((chip, index) => <Chip size={'large'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
                 </div>
             }
             <AnimatePresence initial={false}>

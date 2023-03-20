@@ -1,8 +1,8 @@
 import styles from './InputPage.module.scss';
 import IconButton from "../../buttons/IconButton/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import Button from "../../buttons/Button/Button";
 import {useScreenSize} from "../../../hooks/useScreenSize";
+import {FaTimes} from "react-icons/fa";
 
 const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
     const {screenSize} = useScreenSize();
@@ -27,7 +27,7 @@ const InputPage = ({leftSide, rightSide, toggleState, handleSave}) => {
             </div>
             <div className={`Stack-Container}`}>
                 {
-                    screenSize === 'big' && <div className={styles.exitButton}><IconButton><CloseIcon /></IconButton></div>
+                    screenSize === 'big' && <div className={styles.exitButton}><IconButton><FaTimes /></IconButton></div>
                 }
 
                 <div className={`${styles.saveButton} ${screenSize === 'small' && styles.small}`}>

@@ -148,7 +148,7 @@ const ResetPassword = () => {
                     <TextBoxInput
                         type={'email'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'Email address'}
                         value={email}
                         setValue={setEmail}
@@ -184,7 +184,7 @@ const ResetPassword = () => {
                     <div>
                         <TextBoxInput
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Verification code'}
                             value={verificationCode}
                             setValue={handleVerificationCodeInput}
@@ -198,7 +198,7 @@ const ResetPassword = () => {
                     <TextBoxInput
                         type={'password'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'New password'}
                         onKeydown={handleKeyDown}
                         value={newPassword}
@@ -209,7 +209,7 @@ const ResetPassword = () => {
                     <TextBoxInput
                         type={'password'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'Re-enter password'}
                         onKeydown={handleKeyDown}
                         value={reEnterPassword}
@@ -222,14 +222,14 @@ const ResetPassword = () => {
             </SwitchContainer>
             <div className={`Horizontal-Flex-Container ${currentPage !== 4 ? 'Space-Between' : 'Align-Center'}`}>
                 {currentPage !== 4 ? <Button
-                    size={'big'}
+                    size={'large'}
                     filled={false}
                     onClick={handleCancel}
                 >
                     Cancel
                 </Button> : null}
                 <Button
-                    size={'big'}
+                    size={'large'}
                     filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
                     disabled={checkIfContinueActive()}

@@ -2,7 +2,7 @@ import {motion} from "framer-motion";
 import {useEffect, useMemo, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
-import CheckIcon from '@mui/icons-material/Check';
+import { FaCheck } from "react-icons/fa";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {useChangeEntryValue} from "../../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
@@ -123,7 +123,7 @@ const CurrentProgress = ({task}) => {
                 </button>}
                 {task.type === 'Checkbox' && <IconButton color={entry?.value > 0 ? 'green' : 'normal'} selected={true}
                                                          onClick={handleCheckboxClick}>
-                    <CheckIcon/>
+                    <FaCheck />
                 </IconButton>}
             </div>
         </div>);

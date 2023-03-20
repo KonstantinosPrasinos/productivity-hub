@@ -119,11 +119,11 @@ const LogIn = () => {
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>
-                    <TextBoxInput type={'email'} width={'max'} size={'big'} placeholder={'Email address'} value={email} setValue={setEmail}/>
+                    <TextBoxInput type={'email'} width={'max'} size={'large'} placeholder={'Email address'} value={email} setValue={setEmail}/>
                     <TextBoxInput
                         type={'password'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'Password'}
                         value={password}
                         setValue={setPassword}
@@ -134,7 +134,7 @@ const LogIn = () => {
                         <TextBoxInput
                             type={'password'}
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Repeat password'}
                             value={repeatPassword}
                             setValue={setRepeatPassword}
@@ -145,7 +145,7 @@ const LogIn = () => {
                         <Button filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
                         <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
-                    <Button filled={true} width={'max'} size={'big'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
+                    <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>
@@ -157,7 +157,7 @@ const LogIn = () => {
                     <div>
                         <TextBoxInput
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Verification code'}
                             value={verificationCode}
                             setValue={handleVerificationCode}
@@ -167,7 +167,7 @@ const LogIn = () => {
                     </div>
                     <Button
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         filled={verificationCode.length === 6}
                         onClick={handleVerificationContinue}
                     >

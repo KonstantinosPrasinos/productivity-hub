@@ -7,14 +7,15 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {useDispatch} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
-import AddIcon from "@mui/icons-material/Add";
+
+import {FaPlus, FaTimes} from "react-icons/fa";
+
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import customStyles from './NewCategory.module.scss';
 import {removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
-import CloseIcon from "@mui/icons-material/Close";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
@@ -253,11 +254,11 @@ const NewCategory = ({index, length, id}) => {
             <InputWrapper label="Time Groups">
                 <div className={customStyles.groupsContainer}>
                     <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
-                        <AddIcon/>
+                        <FaPlus/>
                     </IconButton>
                     {timeGroups.map((group, index) => (<Chip key={index} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
                         {group.title}
-                        <IconButton onClick={() => handleDelete(group)}><CloseIcon /></IconButton>
+                        <IconButton onClick={() => handleDelete(group)}><FaTimes /></IconButton>
                     </Chip>))}
                 </div>
             </InputWrapper>

@@ -1,14 +1,24 @@
 @import 'src/styles/variables.scss';
+@import 'src/styles/index.scss';
 
 .container {
+    @extend .Stack-Container, .Rounded-Container;
+    background-color: var(--surface-color);
     display: flex;
     flex-direction: column;
     gap: 10px;
     overflow-y: auto;
     width: 90%;
     height: 90%;
+    margin: $base-margin;
 }
 
 .test {
     font-size: $font-m;
+}
+
+.alignTopContainer {
+    @extend .Horizontal-Flex-Container;
+
+    align-items: start;
 }

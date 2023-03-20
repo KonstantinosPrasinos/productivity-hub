@@ -1,18 +1,17 @@
 import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import Divider from "../../components/utilities/Divider/Divider";
-import EditIcon from '@mui/icons-material/Edit';
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CategoryView.module.scss';
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import {useDeleteCategory} from "../../hooks/delete-hooks/useDeleteCategory";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
+import {FaPen, FaTrash} from "react-icons/fa";
 
 const CategoryView = ({index, length, category}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -70,8 +69,8 @@ const CategoryView = ({index, length, category}) => {
                     <div className={'Title'}>{category.title}</div>
                 </div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><EditIcon /></IconButton>
-                    <IconButton onClick={handleDeleteButton}><DeleteIcon /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><FaPen /></IconButton>
+                    <IconButton onClick={handleDeleteButton}><FaTrash /></IconButton>
                 </div>
             </section>
             <CollapsibleContainer hasBorder={false} isVisible={deletePromptVisible}>

@@ -1,11 +1,8 @@
 import styles from "./Alert.module.scss";
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorIcon from "@mui/icons-material/Error";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import InfoIcon from "@mui/icons-material/Info";
 import { useContext, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AlertsContext } from "../../../context/AlertsContext";
+import { TbAlertCircle, TbX } from "react-icons/tb";
 
 const Alert = ({ type, message, id }) => {
   const alertsContext = useContext(AlertsContext);
@@ -18,20 +15,6 @@ const Alert = ({ type, message, id }) => {
       clearTimeout(timer);
     };
   }, [id, alertsContext]);
-
-  const displayIcon = () => {
-    switch (type) {
-      case "error":
-      case "warning":
-        return <ErrorIcon />;
-      case "success":
-        return <CheckCircleIcon />;
-      case "info":
-        return <InfoIcon />;
-      default:
-        break;
-    }
-  };
 
   const variants = {
     enter: {
@@ -54,7 +37,7 @@ const Alert = ({ type, message, id }) => {
       transition={{ duration: 0.15, delay: 0.15 }}
     >
       <div className={styles.textContainer}>
-        {displayIcon()} {message}
+        <TbAlertCircle /> {message}
       </div>
       <div
         className={styles.iconContainer}
@@ -62,7 +45,7 @@ const Alert = ({ type, message, id }) => {
           alertsContext.dispatch({ type: "DELETE_ALERT", payload: id })
         }
       >
-        <CloseIcon />
+        <TbX />
       </div>
     </motion.div>
   );

@@ -6,7 +6,7 @@ const Button = ({
                     children,
                     type = 'round',
                     filled = true,
-                    size,
+                    size = 'medium',
                     initial,
                     exit,
                     transition,

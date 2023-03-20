@@ -4,7 +4,6 @@ import CategoryIndicator from "../../components/indicators/CategoryIndicator/Cat
 import Divider from "../../components/utilities/Divider/Divider";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
-import Chip from "../../components/buttons/Chip/Chip";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import styles from './Taskview.module.scss';
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
@@ -38,7 +37,7 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
     if (isLoading) return (
         <tbody>
         <tr>
-            <td colSpan={2} className={styles.loadingIndicatorContainer}>
+            <td colSpan={3} className={styles.loadingIndicatorContainer}>
                 <LoadingIndicator size={"inline"} />
             </td>
         </tr>
@@ -49,7 +48,7 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
 
     if (entries.length === 0) return (
         <tr>
-            No entries
+            <td colspan={3}>No entries</td>
         </tr>
     )
 
@@ -87,21 +86,26 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
 
     return (
         <>
-            <tbody>
-            {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
-                const entryDate = new Date(entry.date);
+            <motion.tbody className={styles.tBody} key={pageNumber}>
+                    {/*<AnimatePresence>*/}
+                        {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
+                            const entryDate = new Date(entry.date);
 
-                return <tr key={entry._id}>
-                    <td>{entryDate.toLocaleDateString()}</td>
-                    <td>{entry.value}</td>
-                    <td>
-                        <IconButton onClick={() => handleEditEntry(entry)}>
-                            <FaEllipsisV />
-                        </IconButton>
-                    </td>
-                </tr>
-            })}
-            </tbody>
+                            return <tr
+
+                                key={entry._id}
+                            >
+                                <td>{entryDate.toLocaleDateString()}</td>
+                                <td>{entry.value}</td>
+                                <td>
+                                    <IconButton onClick={() => handleEditEntry(entry)}>
+                                        <FaEllipsisV />
+                                    </IconButton>
+                                </td>
+                            </tr>
+                        })}
+                    {/*</AnimatePresence>*/}
+            </motion.tbody>
             <tfoot>
             <tr>
                 <td colSpan={3}>
@@ -210,14 +214,14 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
             </CollapsibleContainer>
             <div className={'Horizontal-Flex-Container Space-Between'}>
                 <Button
-                    size={"big"}
+                    size={'large'}
                     filled={false}
                     onClick={toggleNewEntryModal}
                 >
                     Cancel
                 </Button>
                 <Button
-                    size={"big"}
+                    size={'large'}
                     disabled={date?.length <= 0}
                     onClick={handleContinue}
                 >
@@ -404,7 +408,7 @@ const TaskView = ({index, length, task}) => {
                 {/*    </div>*/}
                 {/*</section>*/}
                 <section>
-                    <motion.table animate={{height: "auto"}} className={styles.table}>
+                    <motion.table className={styles.table}>
                         <thead>
                         <tr>
                             <th>

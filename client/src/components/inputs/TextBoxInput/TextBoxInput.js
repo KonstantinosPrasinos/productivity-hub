@@ -1,22 +1,16 @@
 import styles from "./TextBoxInput.module.scss";
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {useState} from "react";
 import IconButton from "../../buttons/IconButton/IconButton";
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import {FaCalendar} from "react-icons/fa";
+import { TbEye, TbEyeOff, TbCaretDown, TbCaretUp, TbCalendar } from "react-icons/tb";
 
 const TypePassword = ({passwordVisible, setPasswordVisible}) => {
-
-
     const handleShowPassword = () => {
         setPasswordVisible(current => !current);
     }
 
     return (
         <IconButton onClick={handleShowPassword}>
-            {passwordVisible ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+            {passwordVisible ? <TbEye/> : <TbEyeOff/>}
         </IconButton>
     );
 }
@@ -29,14 +23,14 @@ const TypeNumber = ({isDisabled, increment, decrement}) => {
                 className={`${styles.button}`}
                 onClick={increment}
             >
-                <ArrowDropUpIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+                <TbCaretUp />
             </button>
             <button
                 disabled={isDisabled}
                 className={`${styles.button}`}
                 onClick={decrement}
             >
-                <ArrowDropDownIcon sx={{position: "absolute", top: "-0.25em", left: "-0.25em"}}/>
+                <TbCaretDown />
             </button>
         </div>
     )
@@ -44,13 +38,12 @@ const TypeNumber = ({isDisabled, increment, decrement}) => {
 
 const TypeCalendar = ({toggleCalendar, isDisabled}) => {
     return (
-        <button
-            // className={styles.button}
+        <IconButton
             disabled={isDisabled}
             onClick={toggleCalendar}
         >
-            <FaCalendar></FaCalendar>
-        </button>
+            <TbCalendar />
+        </IconButton>
     )
 }
 

@@ -1,5 +1,22 @@
 @import 'src/styles/variables.scss';
 
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes slideInBottom {
+  0% {
+    transform: translateY(6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: $tablet-breakpoint) {
   .container {
     order: 3;
@@ -16,7 +33,20 @@
     z-index: 3;
     flex-direction: row;
   }
+  .item {
+    height: 100%;
+  }
+  .selectedBar {
+    width: 1.5em;
+    height: 6px;
+    bottom: 0;
+    left: 0;
+    border-radius: 6px 6px 0 0;
+
+    animation: slideInBottom 0.2s forwards;
+  }
 }
+
 @media (min-width: $tablet-breakpoint) {
   .container {
     height: 100%;
@@ -33,6 +63,19 @@
     border-right: $base-border;
     flex-direction: column;
   }
+
+  .item {
+    width: 100%;
+  }
+
+  .selectedBar {
+    width: 6px;
+    height: 1.5em;
+    top: 0;
+    left: 0;
+    border-radius: 0 6px 6px 0;
+    animation: slideInLeft 0.2s forwards;
+  }
 }
 
 .navBar {
@@ -43,4 +86,16 @@
 
 .container {
   z-index: 4;
+}
+
+.selectedBar {
+  position: absolute;
+  background-color: var(--primary-color);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

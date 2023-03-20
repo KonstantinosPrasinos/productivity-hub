@@ -112,7 +112,7 @@ const ChangeEmail = () => {
                     <TextBoxInput
                         type={'password'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'New password'}
                         onKeydown={handleKeyDown}
                         value={password}
@@ -129,7 +129,7 @@ const ChangeEmail = () => {
                     <TextBoxInput
                         type={'email'}
                         width={'max'}
-                        size={'big'}
+                        size={'large'}
                         placeholder={'New email'}
                         onKeydown={handleKeyDown}
                         value={newEmail}
@@ -147,7 +147,7 @@ const ChangeEmail = () => {
                     <div>
                         <TextBoxInput
                             width={'max'}
-                            size={'big'}
+                            size={'large'}
                             placeholder={'Verification code'}
                             value={verificationCode}
                             setValue={handleVerificationCodeInput}
@@ -162,14 +162,14 @@ const ChangeEmail = () => {
             </SwitchContainer>
             <div className={`Horizontal-Flex-Container ${currentPage !== 4 ? 'Space-Between' : 'Align-Center'}`}>
                 {currentPage !== 4 ? <Button
-                    size={'big'}
+                    size={'large'}
                     filled={false}
                     onClick={handleCancel}
                 >
                     Cancel
                 </Button> : null}
                 <Button
-                    size={'big'}
+                    size={'large'}
                     filled={!checkIfContinueActive()}
                     onClick={handleNextPage}
                     disabled={checkIfContinueActive()}
