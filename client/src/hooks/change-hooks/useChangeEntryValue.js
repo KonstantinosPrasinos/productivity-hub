@@ -4,7 +4,7 @@ import {debounce} from "lodash";
 import {AlertsContext} from "../../context/AlertsContext";
 
 const postChangeEntryValue = async (data) => {
-    const response = await fetch('http://localhost:5000/api/entry/set-entry', {
+    const response = await fetch('http://localhost:5000/api/entry/set-value', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'},
@@ -32,7 +32,7 @@ export function useChangeEntryValue(taskTitle) {
         onError: (err, data) => {
             // If the mutation fails reset the client state to the previous value and send an alert
             queryClient.setQueryData(["task-entries", data.taskId, data.entryId], (oldData) => {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: `Couldn't apply changes to task "${taskTitle}"`}});
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: `Couldn't apply changes to entry "${taskTitle}"`}});
 
                 const entry = {
                     ...oldData.entry,

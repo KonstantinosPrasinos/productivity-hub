@@ -92,7 +92,7 @@ const setEntryValue = (req, res) => {
 
 const setEntry = async (req, res) => {
     if (req.user) {
-        const {entryId, value, date} = req.body;
+        const {entryId, taskId, value, date} = req.body;
 
         let changes = {};
 
@@ -105,8 +105,8 @@ const setEntry = async (req, res) => {
         }
 
         try {
-            const entry = await Entry.findOneAndUpdate({_id: entryId, userId: req.user._id}, {$set: changes});
-            return res.status(200).json({entry});
+            const entry = await Entry.findOneAndUpdate({_id: entryId, userId: req.user._id, taskId}, {$set: changes}, {returnDocument: 'after'});
+            return res.status(200).json(entry);
         } catch (error) {
             res.status(500).json({message: error.message});
         }
@@ -115,14 +115,17 @@ const setEntry = async (req, res) => {
 
 const deleteEntry = (req, res) => {
     if (req.user) {
-        const {id} = req.body;
+        const {entryId, taskId} = req.body;
+        const userId = req.user._id;
 
-        if (!id) return res.status(400).json({message: "Id required."});
+        if (!entryId) return res.status(400).json({message: "Entry Id required."});
 
-        Entry.findByIdAndDelete(id, (err) => {
+        if (!taskId) return res.status(400).json({message: "Task Id required."})
+
+        Entry.findByIdAndDelete({userId, taskId, _id: entryId}, (err) => {
             if (err) res.status(500).json({message: "Failed to delete entry."});
 
-            res.status(200);
+            res.status(200).json({message: "Entry deleted successfully."});
         });
     } else {
         res.status(401).send({message: "Not authorized."});

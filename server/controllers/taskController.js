@@ -152,7 +152,7 @@ const getTasksWithHistory = async (tasks, userId) => {
     let tasksWithCurrentEntry = [];
 
     for (const task of tasks) {
-        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gt: currentDate}});
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gte: currentDate}});
 
         if (!currentEntry) {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})

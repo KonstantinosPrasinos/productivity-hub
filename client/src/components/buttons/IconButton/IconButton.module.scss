@@ -33,21 +33,14 @@
     color: var(--green-color);
   }
 
-  &:hover {
-    opacity: 1;
-  }
-  &:active {
-    opacity: 1;
-  }
-
-  &:hover {
+  &:hover:enabled {
     .icon {
       transform: scale(1.1);
       opacity: 1;
     }
   }
 
-  &:active {
+  &:active:enabled {
     .icon {
       transform: scale(0.9);
       opacity: 1;
@@ -56,6 +49,9 @@
 }
 
 .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s ease-in-out;
   transform-origin: center center;
 }

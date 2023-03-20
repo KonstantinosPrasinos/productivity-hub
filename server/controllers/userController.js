@@ -111,8 +111,6 @@ const resetUser = async (req, res) => {
             return res.status(400).json({message: error.message});
         }
 
-        console.log('reset successful')
-
         return res.status(200).json({message: 'User reset successfully.'});
     }
 }

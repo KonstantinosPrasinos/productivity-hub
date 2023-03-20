@@ -24,12 +24,17 @@ import {
     TbChevronLeft,
     TbChevronRight, TbChevronUp,
     TbEdit,
-    TbMinus, TbPlus,
+    TbMinus, TbPlus, TbRefresh,
     TbTrash
 } from "react-icons/tb";
+import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
+import TextButton from "../../components/buttons/TextButton/TextButton";
+import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 
-const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, currentEntry, setEditedEntry, setIsVisibleNewEntryModal}) => {
+const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal}) => {
     const [pageNumber, setPageNumber] = useState(0);
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     if (isLoading) return (
         <tbody>
@@ -40,8 +45,6 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
         </tr>
         </tbody>
     )
-
-    const entries = [...pastEntries, currentEntry];
 
     if (entries.length === 0) return (
         <tr>
@@ -127,12 +130,26 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
     )
 }
 
-const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
-    const [value, setValue] = useState(editedEntry ? editedEntry.value : '');
-    const [date, setDate] = useState(editedEntry ? (new Date(editedEntry.date)).toLocaleDateString() : '');
+const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates}) => {
+    const [value, setValue] = useState(editedEntry ? editedEntry.value : '0');
+    const [date, setDate] = useState(editedEntry ? new Date(editedEntry.date) : "");
     const [isVisibleCalendar, setIsVisibleCalendar] = useState(false);
     const {mutateAsync: addEntry, isLoading, isError} = useAddEntry();
-    const {mutateAsync: changeEntry, isLoading: isLoadingChange, isError: isErrorChange} = useChangeEntryValue();
+    const {mutateAsync: changeEntry, isLoading: isLoadingChange, isError: isErrorChange} = useChangeEntry();
+    const {mutateAsync: deleteEntry, isLoading: isLoadingDelete, isError: isErrorDelete} = useDeleteEntry();
+
+    const checkIsToday = (dateString) => {
+        const currentDate = new Date();
+        const date = new Date(dateString)
+
+        return (
+            date.getFullYear() === currentDate.getFullYear() &&
+            date.getMonth() === currentDate.getMonth() &&
+            date.getDate() === currentDate.getDate()
+        );
+    }
+
+    const isToday = editedEntry ? checkIsToday(editedEntry.date) : false;
 
     const toggleCalendar = () => {
         setIsVisibleCalendar(current => !current);
@@ -140,40 +157,98 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
 
     const handleDateClick = (e) => {
         setIsVisibleCalendar(false);
-        setDate(e.toLocaleDateString());
+        setDate(e);
     }
 
     const handleContinue = async () => {
         if (editedEntry) {
-            if (date !== editedEntry.date && value !== editedEntry.value) {
+            if (date !== editedEntry.date || value !== editedEntry.value) {
                 await changeEntry({taskId, entryId: editedEntry._id, value, date});
             }
             if (!isErrorChange) {
-                toggleNewEntryModal();
+                dismountNewEntryModal();
             }
         } else {
             await addEntry({date, value, taskId});
             if (!isError) {
-                toggleNewEntryModal();
+                dismountNewEntryModal();
             }
         }
+    }
+
+    const resetToOriginalValues = () => {
+        if (editedEntry) {
+            setValue(editedEntry.value);
+            setDate((new Date(editedEntry.date)).toLocaleDateString());
+        }
+    }
+
+    const handleDelete = async () => {
+        if (editedEntry) {
+            if (isToday) {
+                await changeEntry({taskId, entryId: editedEntry._id, value: 0});
+
+                if (!isErrorChange) {
+                    dismountNewEntryModal();
+                }
+            } else {
+                await deleteEntry({taskId, entryId: editedEntry._id});
+
+                if (!isErrorDelete) {
+                    dismountNewEntryModal();
+                }
+            }
+        }
+    }
+
+    const renderDisplayIcon = () => {
+        if (isToday) return (
+            <IconButton
+                onClick={handleDelete}
+            >
+                <TbRefresh />
+            </IconButton>
+        );
+        return (
+            <IconButton
+                onClick={handleDelete}
+            >
+                <TbTrash />
+            </IconButton>
+        );
+    }
+
+    const disabledDates = () => {
+        if (editedEntry) {
+            const editedEntryDate = new Date(editedEntry.date);
+
+            return entryDates.filter(date => editedEntryDate.getTime() !== date.getTime());
+        }
+        return entryDates;
     }
 
     return (
         <Modal
             isOverlay={true}
-            dismountFunction={toggleNewEntryModal}
-            isLoading={isLoading || isLoadingChange}
+            dismountFunction={dismountNewEntryModal}
+            isLoading={isLoading || isLoadingChange || isLoadingDelete}
         >
             <div className={"Stack-Container Big-Gap"}>
                 <div className={"Horizontal-Flex-Container Space-Around"}>
-                    <div className={"Display"}>{editedEntry ? "Existing entry" : "New Entry"}</div>
+                    <div className={`Display Horizontal-Flex-Container`}>
+                        {editedEntry ? (isToday ? "Today's entry" : "Existing entry") : "New Entry"}
+                        {editedEntry &&
+                            renderDisplayIcon()
+                        }
+                    </div>
                 </div>
                 <div className={"Label"}>{editedEntry ?
                     <div>
                         The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
                         <br />
-                        You can edit the entry below.
+                        You can edit the entry below. {isToday && (<><br />You cannot delete today's entry, you can only reset it's value.</>)}
+                        <br />
+                        <TextButton onClick={resetToOriginalValues}>Reset to original values.</TextButton>
                     </div>:
                     "In order to create a new entry you need to enter a valid date and value."
                 }</div>
@@ -184,8 +259,9 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
                         type={"calendar"}
                         placeholder={"Date"}
                         toggleCalendar={toggleCalendar}
-                        value={date}
+                        value={date ? date.toLocaleDateString() : ''}
                         setValue={setDate}
+                        isDisabled={isToday}
                     />
                 </InputWrapper>
                 <InputWrapper label={"Value"}>
@@ -203,6 +279,7 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
                         mode={"single"}
                         selected={date}
                         onDayClick={handleDateClick}
+                        disabled={disabledDates()}
                     />
                 </div>
             </CollapsibleContainer>
@@ -210,19 +287,18 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
                 <Button
                     size={'large'}
                     filled={false}
-                    onClick={toggleNewEntryModal}
+                    onClick={dismountNewEntryModal}
                 >
                     Cancel
                 </Button>
                 <Button
                     size={'large'}
-                    disabled={date?.length <= 0}
+                    disabled={!date || date.toLocaleDateString()?.length <= 0}
                     onClick={handleContinue}
                 >
                     Continue
                 </Button>
             </div>
-
         </Modal>
     );
 }
@@ -232,9 +308,9 @@ const SortIcon = ({sortOrder}) => {
         case 0:
             return <TbMinus/>
         case 1:
-            return <TbChevronDown />
-        case -1:
             return <TbChevronUp />
+        case -1:
+            return <TbChevronDown />
     }
 }
 
@@ -242,13 +318,13 @@ const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const {mutate: deleteTask} = useDeleteTask();
     const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
-    const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id);
+    const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id, task.currentEntryId);
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
-    const [sortOrderDate, setSortOrderDate] = useState(1); // 1 for most recent -> less recent, -1 for less recent -> most recent, 0 if sorting by other type.
+    const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
     const [sortOrderValue, setSortOrderValue] = useState(0);
 
     const graphOptions = ['Average', 'Total'];
@@ -281,14 +357,17 @@ const TaskView = ({index, length, task}) => {
         }
     }
 
-    const toggleNewEntryModal = () => {
-        setIsVisibleNewEntryModal(current => !current);
+    const dismountNewEntryModal = () => {
+        setIsVisibleNewEntryModal(false);
+        if (editedEntry) {
+            setEditedEntry(null);
+        }
     }
 
     const handleChangeSortOrderValue = () => {
         switch (sortOrderValue) {
             case 0:
-                setSortOrderValue(1);
+                setSortOrderValue(-1);
                 setSortOrderDate(0);
                 break;
             case 1:
@@ -305,7 +384,7 @@ const TaskView = ({index, length, task}) => {
     const handleChangeSortOrderDate = () => {
         switch (sortOrderDate) {
             case 0:
-                setSortOrderDate(1);
+                setSortOrderDate(-1);
                 setSortOrderValue(0);
                 break;
             case 1:
@@ -445,11 +524,10 @@ const TaskView = ({index, length, task}) => {
                         </tr>
                         </thead>
                         <TaskTableContents
-                            pastEntries={entries}
+                            entries={entries ? [...entries, entry] : [entry]}
                             sortOrderDate={sortOrderDate}
                             isLoading={entriesLoading}
                             sortOrderValue={sortOrderValue}
-                            currentEntry={entry}
                             setEditedEntry={setEditedEntry}
                             setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
                         />
@@ -457,7 +535,7 @@ const TaskView = ({index, length, task}) => {
 
                 </section>
                 <section className={'Horizontal-Flex-Container Space-Between'}>
-                    <Button onClick={toggleNewEntryModal}>
+                    <Button onClick={() => setIsVisibleNewEntryModal(true)}>
                         Add new entry <TbPlus />
                     </Button>
                     <div className={'Label Stack-Container'}>
@@ -466,7 +544,13 @@ const TaskView = ({index, length, task}) => {
                     </div>
                 </section>
             </MiniPageContainer>
-            {isVisibleNewEntryModal && <EntryModal toggleNewEntryModal={toggleNewEntryModal} taskId={task._id} editedEntry={editedEntry} />}
+            {isVisibleNewEntryModal &&
+                <EntryModal
+                    dismountNewEntryModal={dismountNewEntryModal}
+                    taskId={task._id}
+                    editedEntry={editedEntry}
+                    entryDates={!entriesLoading ? [...entries, entry].map(tempEntry => new Date(tempEntry.date)) : [new Date(entry.date)]}
+                />}
         </div>
     );
 };

@@ -2,9 +2,10 @@
 
 .container {
   display: inline;
-  font-size: $font-m;
   color: var(--primary-color);
   text-decoration: none;
+  padding: 0;
+  font-weight: bold;
 
   &:hover {
     text-decoration: underline;

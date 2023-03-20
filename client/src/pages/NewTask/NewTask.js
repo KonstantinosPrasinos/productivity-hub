@@ -162,7 +162,6 @@ const NewTask = ({index, length, id}) => {
             const repeatProperties = {};
 
             if (repeats && selectedGroup) {
-                console.log(selectedGroup);
                 repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
             } else if (repeats && !selectedGroup) {
                 repeatProperties.repeatRate = undefined;

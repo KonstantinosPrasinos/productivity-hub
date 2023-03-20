@@ -20,9 +20,9 @@ export function useDeleteCategory() {
 
     return useMutation({
         mutationFn: postDeleteCategory,
-        onSuccess: data => {
-            queryClient.invalidateQueries({queryKey: ["tasks"]});
-            queryClient.invalidateQueries({queryKey: ["groups"]});
+        onSuccess: async (data) => {
+            await queryClient.invalidateQueries({queryKey: ["tasks"]});
+            await queryClient.invalidateQueries({queryKey: ["groups"]});
             queryClient.setQueryData(["categories"], (oldData) => {
                 return oldData ? {
                     categories: [...oldData.categories.filter(category => category._id !== data.categoryId)]
