@@ -13,23 +13,20 @@ import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEnt
 import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
 import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
 import {AnimatePresence, motion} from 'framer-motion';
-import {
-    FaPen,
-    FaTrash,
-    FaChevronLeft,
-    FaMinus,
-    FaChevronRight,
-    FaSortDown,
-    FaSortUp,
-    FaCheck,
-    FaPlus,
-    FaEllipsisV
-} from "react-icons/fa";
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
+import {
+    TbCheck,
+    TbChevronDown,
+    TbChevronLeft,
+    TbChevronRight, TbChevronUp,
+    TbEdit,
+    TbMinus, TbPlus,
+    TbTrash
+} from "react-icons/tb";
 
 const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, currentEntry, setEditedEntry, setIsVisibleNewEntryModal}) => {
     const [pageNumber, setPageNumber] = useState(0);
@@ -87,24 +84,21 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
     return (
         <>
             <motion.tbody className={styles.tBody} key={pageNumber}>
-                    {/*<AnimatePresence>*/}
                         {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
                             const entryDate = new Date(entry.date);
 
                             return <tr
-
                                 key={entry._id}
                             >
                                 <td>{entryDate.toLocaleDateString()}</td>
                                 <td>{entry.value}</td>
                                 <td>
                                     <IconButton onClick={() => handleEditEntry(entry)}>
-                                        <FaEllipsisV />
+                                        <TbEdit />
                                     </IconButton>
                                 </td>
                             </tr>
                         })}
-                    {/*</AnimatePresence>*/}
             </motion.tbody>
             <tfoot>
             <tr>
@@ -116,13 +110,13 @@ const TaskTableContents = ({pastEntries, isLoading = false, sortOrderDate = 1, s
                                 onClick={decreasePageNumber}
                                 disabled={pageNumber === 0}
                             >
-                                <FaChevronLeft />
+                                <TbChevronLeft />
                             </IconButton>
                             <IconButton
                                 onClick={increasePageNumber}
                                 disabled={pageNumber === Math.floor(entries.length / 5)}
                             >
-                                <FaChevronRight />
+                                <TbChevronRight />
                             </IconButton>
                         </div>
                     </div>
@@ -236,11 +230,11 @@ const EntryModal = ({toggleNewEntryModal, taskId, editedEntry = null}) => {
 const SortIcon = ({sortOrder}) => {
     switch (sortOrder) {
         case 0:
-            return <FaMinus/>
+            return <TbMinus/>
         case 1:
-            return <FaSortDown/>
+            return <TbChevronDown />
         case -1:
-            return <FaSortUp/>
+            return <TbChevronUp />
     }
 }
 
@@ -334,8 +328,12 @@ const TaskView = ({index, length, task}) => {
                 <section className={`Horizontal-Flex-Container Space-Between`}>
                     <div className={'Title'}>{task.title}</div>
                     <div className={`Horizontal-Flex-Container ${styles.editIcons}`}>
-                        <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}><FaPen /></IconButton>
-                        <IconButton onClick={handleDelete}><FaTrash /></IconButton>
+                        <IconButton
+                            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}
+                        >
+                            <TbEdit />
+                        </IconButton>
+                        <IconButton onClick={handleDelete}><TbTrash /></IconButton>
                     </div>
                 </section>
                 <section className={'Horizontal-Flex-Container'}>
@@ -352,7 +350,7 @@ const TaskView = ({index, length, task}) => {
                     <div className={'Label'}>Today's Entry:</div>
                     {task.type === 'Checkbox' ?
                         <div className={`${styles.checkbox} ${entry?.value === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
-                            <FaCheck />
+                            <TbCheck />
                         </div> :
                         <div className={'Horizontal-Flex-Container'}>
                             <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber} type={"number"}></TextBoxInput>
@@ -460,7 +458,7 @@ const TaskView = ({index, length, task}) => {
                 </section>
                 <section className={'Horizontal-Flex-Container Space-Between'}>
                     <Button onClick={toggleNewEntryModal}>
-                        Add new entry <FaPlus />
+                        Add new entry <TbPlus />
                     </Button>
                     <div className={'Label Stack-Container'}>
                         <div>Created at:</div>

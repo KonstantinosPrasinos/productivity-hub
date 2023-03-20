@@ -8,7 +8,7 @@ import {useDispatch} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 
-import {FaPlus, FaTimes} from "react-icons/fa";
+import {TbPlus, TbX} from "react-icons/tb";
 
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
@@ -254,11 +254,11 @@ const NewCategory = ({index, length, id}) => {
             <InputWrapper label="Time Groups">
                 <div className={customStyles.groupsContainer}>
                     <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
-                        <FaPlus/>
+                        <TbPlus/>
                     </IconButton>
                     {timeGroups.map((group, index) => (<Chip key={index} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
                         {group.title}
-                        <IconButton onClick={() => handleDelete(group)}><FaTimes /></IconButton>
+                        <IconButton onClick={() => handleDelete(group)}><TbX /></IconButton>
                     </Chip>))}
                 </div>
             </InputWrapper>

@@ -11,7 +11,7 @@ import CollapsibleContainer from "../../components/containers/CollapsibleContain
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import {useDeleteCategory} from "../../hooks/delete-hooks/useDeleteCategory";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
-import {FaPen, FaTrash} from "react-icons/fa";
+import {TbEdit, TbTrash} from "react-icons/tb";
 
 const CategoryView = ({index, length, category}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -69,8 +69,8 @@ const CategoryView = ({index, length, category}) => {
                     <div className={'Title'}>{category.title}</div>
                 </div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><FaPen /></IconButton>
-                    <IconButton onClick={handleDeleteButton}><FaTrash /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><TbEdit /></IconButton>
+                    <IconButton onClick={handleDeleteButton}><TbTrash /></IconButton>
                 </div>
             </section>
             <CollapsibleContainer hasBorder={false} isVisible={deletePromptVisible}>

@@ -22,7 +22,6 @@ import {ReactQueryDevtools} from "react-query/devtools";
 import {updateUserValidDate} from "./functions/updateUserValidDate";
 import 'react-day-picker/dist/style.css';
 
-
 const NavLayout = () => (
     <>
         <NavBar/>

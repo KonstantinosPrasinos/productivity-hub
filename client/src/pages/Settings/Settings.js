@@ -13,7 +13,7 @@ import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
 import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
-import {FaGithub, FaTwitter, FaEnvelope, FaLinkedin} from "react-icons/fa";
+import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin} from "react-icons/tb";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -184,7 +184,7 @@ const Settings = () => {
                             {/*    </div>*/}
                             {/*</div>*/}
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><FaEnvelope />Email</div>
+                                <div className={'Horizontal-Flex-Container'}><TbMail />Email</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>
                                         {email}
@@ -280,9 +280,9 @@ const Settings = () => {
                             <div className={'Label'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
                         </div>
                         <div className={'Horizontal-Flex-Container'}>
-                            <IconButton onClick={handleGithubClick}><FaGithub/></IconButton>
-                            <IconButton onClick={handleLinkedInClick}><FaLinkedin/></IconButton>
-                            <IconButton onClick={handleTwitterClick}><FaTwitter/></IconButton>
+                            <IconButton onClick={handleGithubClick}><TbBrandGithub/></IconButton>
+                            <IconButton onClick={handleLinkedInClick}><TbBrandLinkedin/></IconButton>
+                            <IconButton onClick={handleTwitterClick}><TbBrandTwitter/></IconButton>
                         </div>
                     </div>
                 </section>

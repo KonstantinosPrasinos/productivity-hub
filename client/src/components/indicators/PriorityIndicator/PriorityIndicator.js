@@ -1,6 +1,6 @@
 import styles from './PriorityIndicator.module.scss';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {useGetSettings} from "../../../hooks/get-hooks/useGetSettings";
+import {TbTrendingUp} from "react-icons/tb";
 
 const PriorityIndicator = () => {
     const {data: settings} = useGetSettings();
@@ -8,7 +8,7 @@ const PriorityIndicator = () => {
     return (
         <div className={`Horizontal-Flex-Container ${styles.container}`}>
             {settings.priorityBounds.low}
-            <TrendingUpIcon />
+            <TbTrendingUp />
             {settings.priorityBounds.high}
         </div>
     );

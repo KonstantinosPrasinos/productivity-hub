@@ -5,7 +5,7 @@ import Button from "../../buttons/Button/Button";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {useScreenSize} from "../../../hooks/useScreenSize";
-import {FaTimes} from "react-icons/fa";
+import {TbX} from "react-icons/tb";
 
 const MiniPageContainer = ({children, onClickSave, length, index}) => {
     const containerRef = useRef();
@@ -86,7 +86,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
                 }
 
                 <div className={styles.actionButtonsContainer}>
-                    <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><FaTimes /></IconButton>
+                    <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><TbX /></IconButton>
                     <Button onClick={onClickSave}>Save</Button>
                 </div>
             </div>
