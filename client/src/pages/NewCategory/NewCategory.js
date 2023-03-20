@@ -4,7 +4,6 @@ import {useContext, useEffect, useRef, useState} from 'react';
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
-import {useDispatch} from "react-redux";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 
@@ -14,7 +13,6 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import Button from "../../components/buttons/Button/Button";
 import customStyles from './NewCategory.module.scss';
-import {removeGroup} from "../../state/groupsSlice";
 import Chip from "../../components/buttons/Chip/Chip";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
@@ -29,7 +27,6 @@ const NewCategory = ({index, length, id}) => {
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
     const {data: settings} = useGetSettings();
     const alertsContext = useContext(AlertsContext);
-    const dispatch = useDispatch();
     const {mutate: addCategoryToServer} = useAddCategory();
     const {mutate: addGroupToServer} = useAddGroup();
     const miniPagesContext = useContext(MiniPagesContext);
@@ -215,7 +212,7 @@ const NewCategory = ({index, length, id}) => {
 
         setTimeGroups(timeGroups.filter(filterGroup => filterGroup.id !== group.id));
         if (group.initial) {
-            dispatch(removeGroup(group.id));
+            // dispatch(removeGroup(group.id));
         }
     }
 

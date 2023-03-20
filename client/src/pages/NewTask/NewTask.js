@@ -5,8 +5,6 @@ import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import Chip from "../../components/buttons/Chip/Chip";
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
-import {useDispatch} from "react-redux";
-import {setTask} from "../../state/tasksSlice";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -21,6 +19,7 @@ import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {useAddTask} from "../../hooks/add-hooks/useAddTask";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {findStartingDates} from "../../functions/findStartingDates";
+import {useChangeTask} from "../../hooks/change-hooks/useChangeTask";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -39,7 +38,9 @@ const NewTask = ({index, length, id}) => {
     
     const {data: settings} = useGetSettings();
 
-    const taskMutation = useAddTask();
+    const {mutate: addTask} = useAddTask();
+    const {mutate: changeTask} = useChangeTask();
+
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
@@ -65,8 +66,6 @@ const NewTask = ({index, length, id}) => {
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
     const {isLoading, data: tasks} = useGetTasks();
-
-    const dispatch = useDispatch();
 
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
@@ -199,9 +198,9 @@ const NewTask = ({index, length, id}) => {
             }
 
             if (id) {
-                dispatch(setTask(task));
+                changeTask(task)
             } else {
-                taskMutation.mutate(task);
+                addTask(task);
             }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});

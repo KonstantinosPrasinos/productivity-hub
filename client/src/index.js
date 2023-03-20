@@ -1,7 +1,5 @@
 import React from 'react';
 import App from './App';
-import {store} from './state/store';
-import {Provider} from 'react-redux';
 import AlertsContextProvider from './context/AlertsContext';
 import MiniPagesContextProvider from "./context/MiniPagesContext";
 import UserContextProvider from "./context/UserContext";
@@ -16,18 +14,16 @@ const root = createRoot(container)
 
 root.render(
     // <React.StrictMode>
-        <Provider store={store}>
-            <AlertsContextProvider>
-                <MiniPagesContextProvider>
-                    <UserContextProvider>
-                        <BrowserRouter>
-                            <QueryClientProvider client={queryClient}>
-                                <App/>
-                            </QueryClientProvider>
-                        </BrowserRouter>
-                    </UserContextProvider>
-                </MiniPagesContextProvider>
-            </AlertsContextProvider>
-        </Provider>
+    <AlertsContextProvider>
+        <MiniPagesContextProvider>
+            <UserContextProvider>
+                <BrowserRouter>
+                    <QueryClientProvider client={queryClient}>
+                        <App/>
+                    </QueryClientProvider>
+                </BrowserRouter>
+            </UserContextProvider>
+        </MiniPagesContextProvider>
+    </AlertsContextProvider>
     // </React.StrictMode>
 );
