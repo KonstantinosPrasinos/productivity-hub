@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import Divider from "../../components/utilities/Divider/Divider";
@@ -30,6 +30,33 @@ import {
 import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
+
+const StatSection = ({entries}) => {
+    return (
+        <section className={'Grid-Container Two-By-Two'}>
+            <div className={'Rounded-Container Stack-Container'}>
+                <div className={'Label'}>Current Streak</div>
+                <div>2 days</div>
+                <div className={'Label'}>Since: 05/10/2022</div>
+            </div>
+            <div className={'Rounded-Container Stack-Container'}>
+                <div className={'Label'}>Best Streak</div>
+                <div>2 days</div>
+                <div className={'Label'}>Ended at: 05/10/2022</div>
+            </div>
+            <div className={'Rounded-Container Stack-Container'}>
+                <div className={'Label'}>Total</div>
+                <div>3 days</div>
+                <div></div>
+            </div>
+            <div className={'Rounded-Container Stack-Container'}>
+                <div className={'Label'}>Unfilled Days</div>
+                <div>2 days</div>
+                <div className={'Label'}>Ended at: 05/10/2022</div>
+            </div>
+        </section>
+    );
+}
 
 const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal}) => {
     const [pageNumber, setPageNumber] = useState(0);
@@ -436,28 +463,7 @@ const TaskView = ({index, length, task}) => {
                         </div>}
                 </section>
                 <Divider />
-                <section className={'Grid-Container Two-By-Two'}>
-                    <div className={'Rounded-Container Stack-Container'}>
-                        <div className={'Label'}>Current Streak</div>
-                        <div>2 days</div>
-                        <div className={'Label'}>Since: 05/10/2022</div>
-                    </div>
-                    <div className={'Rounded-Container Stack-Container'}>
-                        <div className={'Label'}>Best Streak</div>
-                        <div>2 days</div>
-                        <div className={'Label'}>Ended at: 05/10/2022</div>
-                    </div>
-                    <div className={'Rounded-Container Stack-Container'}>
-                        <div className={'Label'}>Total</div>
-                        <div>2 days</div>
-                        <div className={'Label'}>Since: 05/10/2022</div>
-                    </div>
-                    <div className={'Rounded-Container Stack-Container'}>
-                        <div className={'Label'}>Unfilled Days</div>
-                        <div>2 days</div>
-                        <div className={'Label'}>Ended at: 05/10/2022</div>
-                    </div>
-                </section>
+                <StatSection entries={entries ? [...entries, entry] : [entry]} />
                 <Divider />
                 {/*<section className={'Stack-Container'}>*/}
                 {/*    <div className={'Horizontal-Flex-Container'}>*/}
