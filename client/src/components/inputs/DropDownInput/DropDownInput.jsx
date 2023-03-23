@@ -45,21 +45,22 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
             key={extended}
             initial={{rotate: extended ? 0 : 180}}
             animate={{rotate: extended ? 180 : 0}}
+            transition={{type: "tween"}}
             ref={iconRef}
         >
             <TbChevronDown />
         </motion.div>
       </div>
-        <div >
+        <div>
             <AnimatePresence>
                 {extended && !isDisabled && (
                     <motion.div
                         className={`${
                             styles.optionsContainer
                         } Stack-Container Rounded-Container Has-Shadow`}
-                        initial={{height: 0}}
-                        animate={{height: 'auto'}}
-                        exit={{height: 0}}
+                        initial={{height: 0, padding: "0 12px"}}
+                        animate={{height: 'auto', padding: '6px 12px'}}
+                        exit={{height: 0, padding: "0 12px"}}
                         transition={{duration: 0.15}}
                     >
                         {options.map((option, index) => {

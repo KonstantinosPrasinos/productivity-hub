@@ -77,7 +77,7 @@ const ResetPassword = () => {
                 // Enter verification code tab
                 const redirect = await verifyCode(verificationCode, user.state?.id ? user.state?.email : email);
                 if (redirect) {
-                    setCurrentPage(2);
+                    setCurrentPage(3);
                 }
                 break;
             case 3:
@@ -87,7 +87,7 @@ const ResetPassword = () => {
                     if (reEnterPassword === newPassword){
                         const redirect = await setPassword(user.state?.id ? user.state?.email : email, verificationCode, newPassword);
                         if (redirect) {
-                            setCurrentPage(3)
+                            setCurrentPage(4)
                         }
                     } else {
                         alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});

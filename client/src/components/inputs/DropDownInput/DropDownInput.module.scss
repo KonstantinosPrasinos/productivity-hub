@@ -3,6 +3,7 @@
 .container {
     width: 10em;
     position: relative;
+    border-radius: 8px;
 }
 
 .inputContainer {
@@ -25,7 +26,7 @@
 }
 
 .arrowIcon {
-    transform-origin: center;
+    transform-origin: center center;
 }
 
 .optionsContainer {
@@ -40,17 +41,19 @@
     z-index: 1;
     margin-top: 5px;
     overflow-y: hidden;
+    padding: $base-padding;
 }
 
 .option {
     position: relative;
     padding: $base-padding;
-    font-size: $font-m;
-    line-height: $font-m;
+    font-size: $font-l;
+    line-height: 1.5em;
     cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    box-sizing: border-box;
     
     &:hover {
         &::after {
@@ -58,11 +61,11 @@
             background-color: var(--on-surface-color);
             position: absolute;
             width: 100%;
-            height: 1.75em;
-            bottom: calc(50% - 0.875em);
+            height: 100%;
+            top: 0;
             left: 0;
             opacity: 0.05;
-            border-radius: $base-border-radius;
+            border-radius: 8px;
         }
     }
 }
