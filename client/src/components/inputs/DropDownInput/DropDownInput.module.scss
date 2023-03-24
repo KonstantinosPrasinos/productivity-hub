@@ -32,16 +32,15 @@
 .optionsContainer {
     box-sizing: border-box;
     position: absolute;
-    width: 100%;
     gap: 5px;
     transform-origin: top;
-    left: 0;
-    top: 2.5em;
+    width: 10em;
     
     z-index: 1;
     margin-top: 5px;
     overflow-y: hidden;
     padding: $base-padding;
+    box-shadow: $elevation-1;
 }
 
 .option {

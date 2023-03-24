@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 
 const postCategory = async (category) => {
-    const response = await fetch('http://localhost:5000/api/category/create', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/create`, {
         method: 'POST',
         body: JSON.stringify({category}),
         headers: {'Content-Type': 'application/json'},

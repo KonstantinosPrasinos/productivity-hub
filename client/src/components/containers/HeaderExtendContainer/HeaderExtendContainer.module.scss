@@ -1,0 +1,27 @@
+@import 'src/styles/index.scss';
+
+.container {
+  @extend .Stack-Container, .Rounded-Container;
+  border: $base-border;
+  padding: 12px 12px 0 12px;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 0;
+}
+
+.headerContainer {
+  text-align: left;
+  padding: 0 0 12px;
+  cursor: pointer;
+  transition: opacity 0.2s linear;
+
+  &.disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+}
+
+.contentContainer {
+  @extend .Stack-Container;
+  overflow-y: hidden;
+}

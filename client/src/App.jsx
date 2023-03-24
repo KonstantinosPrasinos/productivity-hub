@@ -121,9 +121,9 @@ function App() {
         <div className={`App ${theme}`}>
             <AlertHandler />
             {/*<AnimatePresence mode="wait">*/}
-                <Routes key={location.pathname}>
-                    <Route path="/" element={<ProtectedLayout />}>
-                        <Route path="/" element={<NavLayout />}>
+                <Routes>
+                    <Route element={<ProtectedLayout />}>
+                        <Route element={<NavLayout />}>
                             <Route
                                 exact
                                 path="/"
@@ -142,18 +142,6 @@ function App() {
                                 path="/list"
                                 element={
                                     <ListView />
-                                }
-                            />
-                            <Route
-                                path="/new-category"
-                                element={
-                                    <NewCategory />
-                                }
-                            />
-                            <Route
-                                path="/new-task"
-                                element={
-                                    <NewTask />
                                 }
                             />
                             <Route

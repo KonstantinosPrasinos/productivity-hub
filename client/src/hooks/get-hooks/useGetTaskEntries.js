@@ -2,7 +2,7 @@ import {useQuery} from "react-query";
 
 const fetchTaskEntries = async ({queryKey}) => {
     const taskId = queryKey[1];
-    const response = await fetch(`http://localhost:5000/api/entry/all/${taskId}`, {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/all/${taskId}`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'

@@ -1,7 +1,7 @@
 import {useQuery} from "react-query";
 
 const fetchCategories = async () => {
-    const response = await fetch('http://localhost:5000/api/category', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'

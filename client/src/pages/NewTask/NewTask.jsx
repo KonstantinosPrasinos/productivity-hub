@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -8,7 +8,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import { TbPlus } from "react-icons/tb";
+import {TbChevronDown, TbPlus} from "react-icons/tb";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
@@ -20,6 +20,10 @@ import {useAddTask} from "../../hooks/add-hooks/useAddTask";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {findStartingDates} from "../../functions/findStartingDates";
 import {useChangeTask} from "../../hooks/change-hooks/useChangeTask";
+import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
+import IconButton from "../../components/buttons/IconButton/IconButton";
+import {motion} from "framer-motion";
+import styles from "./NewTask.module.scss";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -70,11 +74,22 @@ const NewTask = ({index, length, id}) => {
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
 
+    const [extendedSection, setExtendedSection] = useState(0);
+
     const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
     const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
+
+    const headerVariants = {
+        extended: {
+            rotate: 180
+        },
+        collapsed: {
+            rotate: 0
+        }
+    }
 
     const handleKeyDown = (e) => {
         if (e.code === 'Enter') {
@@ -214,31 +229,87 @@ const NewTask = ({index, length, id}) => {
         >
             <input
                 type="text"
-                className="Title Title-Input"
+                className="Title-Large"
                 placeholder="Add task title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
-            <InputWrapper label="Type">
-                <div className={`Horizontal-Flex-Container`}>
-                    {taskType.map((task, index) => (
-                        <Chip
-                            selected={type}
-                            setSelected={setType}
-                            value={task}
-                            key={index}
-                        >
-                            {task}
-                        </Chip>
-                    ))
-                    }
-                </div>
-            </InputWrapper>
-            <CollapsibleContainer isVisible={type === 'Number'}>
-                <InputWrapper label="Step">
-                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+            <HeaderExtendContainer
+                header={(
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Stack-Container"}>
+                            <div className={"Title-Medium"}>General options</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>Type: {type}, Category: None, Priority: 10</div>
+                        </div>
+                        <IconButton>
+                            <motion.div
+                                className={"Title-Large"}
+                                key={extendedSection === 0}
+                                initial={{rotate: extendedSection === 0 ? 0 : 180}}
+                                animate={{rotate: !(extendedSection === 0) ? 0 : 180}}
+                            >
+                                <TbChevronDown />
+                            </motion.div>
+                        </IconButton>
+                    </div>
+                )}
+                setExtendedInherited={() => {setExtendedSection(extendedSection === 0 ? null : 0)}}
+                extendedInherited={extendedSection === 0}
+            >
+                <InputWrapper label="Type">
+                    <div className={`Horizontal-Flex-Container`}>
+                        {taskType.map((task, index) => (
+                            <Chip
+                                selected={type}
+                                setSelected={setType}
+                                value={task}
+                                key={index}
+                            >
+                                {task}
+                            </Chip>
+                        ))
+                        }
+                    </div>
                 </InputWrapper>
+                <InputWrapper label={"Category"}>
+                    <DropDownInput
+                        placeholder={'Category'}
+                        options={[...categoryTitles,
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                                Add new
+                                <TbPlus />
+                            </div>]}
+                        selected={selectedCategory}
+                        setSelected={setCategory}
+                    />
+                </InputWrapper>
+                <InputWrapper label="Priority">
+                    <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
+                    <PriorityIndicator/>
+                </InputWrapper>
+            </HeaderExtendContainer>
+            <HeaderExtendContainer
+                header={(
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Stack-Container"}>
+                            <div className={"Title-Medium"}>Number type options</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>Goal: at least 10, Step 1</div>
+                        </div>
+                        <motion.div
+                            className={"Title-Large"}
+                            key={extendedSection === 1}
+                            initial={{rotate: extendedSection === 1 ? 0 : 180}}
+                            animate={{rotate: !(extendedSection === 1) ? 0 : 180}}
+                        >
+                            <TbChevronDown />
+                        </motion.div>
+                    </div>
+                )}
+                setExtendedInherited={() => {setExtendedSection(extendedSection === 1 ? null : 1)}}
+                extendedInherited={extendedSection === 1}
+                isDisabled={type !== 'Number'}
+            >
                 <InputWrapper label={"Goal"}>
                     <DropDownInput
                         placeholder={'Type'}
@@ -248,27 +319,35 @@ const NewTask = ({index, length, id}) => {
                     />
                     <TextBoxInput type="number" placeholder="Number" value={goalNumber} setValue={setGoalNumber}/>
                 </InputWrapper>
-            </CollapsibleContainer>
-            <InputWrapper label={"Category"}>
-                <DropDownInput
-                    placeholder={'Category'}
-                    options={[...categoryTitles,
-                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                            Add new
-                            <TbPlus />
-                        </div>]}
-                    selected={selectedCategory}
-                    setSelected={setCategory}
-                />
-            </InputWrapper>
-            <InputWrapper label="Priority">
-                <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
-                <PriorityIndicator/>
-            </InputWrapper>
-            <InputWrapper label="Repeats">
-                <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
-            </InputWrapper>
-            <CollapsibleContainer isVisible={repeats}>
+                <InputWrapper label="Step">
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+                </InputWrapper>
+            </HeaderExtendContainer>
+            <HeaderExtendContainer
+                header={(
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Stack-Container"}>
+                            <div className={"Title-Medium"}>Repeat options</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>Repeats: true, Long term goal: At least 1</div>
+                        </div>
+                        <IconButton>
+                            <motion.div
+                                className={"Title-Large"}
+                                key={extendedSection === 2}
+                                initial={{rotate: extendedSection === 2 ? 0 : 180}}
+                                animate={{rotate: !(extendedSection === 2) ? 0 : 180}}
+                            >
+                                <TbChevronDown />
+                            </motion.div>
+                        </IconButton>
+                    </div>
+                )}
+                setExtendedInherited={() => {setExtendedSection(extendedSection === 2 ? null : 2)}}
+                extendedInherited={extendedSection === 2}
+            >
+                <InputWrapper label="Repeats">
+                    <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
+                </InputWrapper>
                 <InputWrapper label={"Long term goal"}>
                     <DropDownInput
                         placeholder={'Type'}
@@ -279,56 +358,33 @@ const NewTask = ({index, length, id}) => {
                     <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
                                   setValue={setLongGoalNumber}/>
                 </InputWrapper>
-                <InputWrapper label={"Expires at"}>
-                    <DropDownInput
-                        placeholder={'Never'}
-                        options={causesOfExpiration}
-                        selected={expiresAt}
-                        setSelected={setExpiresAt}
-                    />
+                <InputWrapper label={"Repeat using"}>
+                    {repeatTypes.map(item => (
+                        <Chip>{item}</Chip>
+                    ))}
                 </InputWrapper>
-                <Divider />
-                <InputWrapper label="Repeat with">
-                    <div className={`Horizontal-Flex-Container`}>
-                        {repeatTypes.map((type, index) => (
-                            <Chip
-                                selected={repeatType}
-                                setSelected={setRepeatType}
-                                value={type}
-                                key={index}
-                            >
-                                {type}
-                            </Chip>
-                        ))
-                        }
-                    </div>
+                <InputWrapper label={"Select a category time group"}>
+                    {categoryGroups.map((group, index) => (
+                        <Chip
+                            key={index}
+                            value={group}
+                            selected={selectedGroup}
+                            setSelected={setTimeGroup}
+                        >
+                            {group.title}
+                        </Chip>
+                    ))}
                 </InputWrapper>
-                <SwitchContainer selectedTab={repeatType === 'Custom Rules' ? 0 : 1}>
-                    <>
-                        <InputWrapper label={'Repeat every'}>
-                            <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
-                        </InputWrapper>
-                        <InputWrapper label={'Time period'}>
-                            <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
-                        </InputWrapper>
-                        {timePeriod !== 'Days' && <InputWrapper label={'On'}>
-                            <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
-                        </InputWrapper>}
-                    </>
-                    <InputWrapper label={"Select a category time group"}>
-                        {categoryGroups.map((group, index) => (
-                            <Chip
-                                key={index}
-                                value={group}
-                                selected={selectedGroup}
-                                setSelected={setTimeGroup}
-                            >
-                                {group.title}
-                            </Chip>
-                        ))}
-                    </InputWrapper>
-                </SwitchContainer>
-            </CollapsibleContainer>
+                <InputWrapper label={'Repeat every'}>
+                    <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
+                </InputWrapper>
+                <InputWrapper label={'Time period'}>
+                    <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
+                </InputWrapper>
+                {timePeriod !== 'Days' && <InputWrapper label={'On'}>
+                    <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
+                </InputWrapper>}
+            </HeaderExtendContainer>
         </MiniPageContainer>
     );
 };

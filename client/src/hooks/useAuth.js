@@ -13,7 +13,7 @@ export function useAuth() {
     const login = async (email, password) => {
         setIsLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/user/login', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password}),

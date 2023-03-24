@@ -1,4 +1,4 @@
-import {useContext, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
@@ -40,16 +40,18 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
         onClick={handleExtension}
       >
         <div className={styles.selected}>{selected ? selected : placeholder}</div>
-        <motion.div
-            className={styles.arrowIcon}
-            key={extended}
-            initial={{rotate: extended ? 0 : 180}}
-            animate={{rotate: extended ? 180 : 0}}
-            transition={{type: "tween"}}
-            ref={iconRef}
-        >
-            <TbChevronDown />
-        </motion.div>
+        <AnimatePresence initial={false} mode={"wait"}>
+            <motion.div
+                className={styles.arrowIcon}
+                key={extended}
+                initial={{rotate: extended ? 0 : 180}}
+                animate={{rotate: extended ? 180 : 0}}
+                transition={{type: "tween"}}
+                ref={iconRef}
+            >
+                <TbChevronDown />
+            </motion.div>
+        </AnimatePresence>
       </div>
         <div>
             <AnimatePresence>
@@ -57,7 +59,7 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                     <motion.div
                         className={`${
                             styles.optionsContainer
-                        } Stack-Container Rounded-Container Has-Shadow`}
+                        } Stack-Container Rounded-Container`}
                         initial={{height: 0, padding: "0 12px"}}
                         animate={{height: 'auto', padding: '6px 12px'}}
                         exit={{height: 0, padding: "0 12px"}}

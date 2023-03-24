@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {UserContext} from "../../context/UserContext";
 
 const fetchSettings = async () => {
-    const response = await fetch('http://localhost:5000/api/settings', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/settings`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'

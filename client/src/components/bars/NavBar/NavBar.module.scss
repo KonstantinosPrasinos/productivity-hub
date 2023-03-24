@@ -1,22 +1,5 @@
 @import 'src/styles/variables.scss';
 
-@keyframes slideInLeft {
-  0% {
-    transform: translateX(-6px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-@keyframes slideInBottom {
-  0% {
-    transform: translateY(6px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: $tablet-breakpoint) {
   .container {
     order: 3;
@@ -42,8 +25,6 @@
     bottom: 0;
     left: 0;
     border-radius: 6px 6px 0 0;
-
-    animation: slideInBottom 0.2s forwards;
   }
 }
 
@@ -74,7 +55,6 @@
     top: 0;
     left: 0;
     border-radius: 0 6px 6px 0;
-    animation: slideInLeft 0.2s forwards;
   }
 }
 

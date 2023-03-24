@@ -6,6 +6,7 @@ import Button from "../../buttons/Button/Button";
 import {TbHome, TbList, TbPlus, TbSettings} from "react-icons/tb";
 import {useLocation, useNavigate} from "react-router-dom";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import {motion} from "framer-motion";
 
 const NavBar = () => {
     const navigate = useNavigate();
@@ -45,7 +46,7 @@ const NavBar = () => {
                         <TbHome />
                     </IconButton>
                     {selected === 'home' &&
-                        <div className={styles.selectedBar}/>
+                        <motion.div className={styles.selectedBar} layoutId={"underline"} />
                     }
                 </div>
                 <div className={styles.item}>
@@ -58,7 +59,7 @@ const NavBar = () => {
                         <TbList />
                     </IconButton>
                     {selected === 'list' &&
-                        <div className={styles.selectedBar}/>
+                        <motion.div className={styles.selectedBar} layoutId={"underline"} />
                     }
                 </div>
                 <div className={styles.item}>
@@ -69,7 +70,7 @@ const NavBar = () => {
                         <TbSettings />
                     </IconButton>
                     {selected === 'settings' &&
-                        <div className={styles.selectedBar}/>
+                        <motion.div className={styles.selectedBar} layoutId={"underline"} />
                     }
                 </div>
                 <Button

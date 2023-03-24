@@ -18,6 +18,7 @@ import TextButton from "../../components/buttons/TextButton/TextButton";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import {TbHome} from "react-icons/tb";
+import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -43,13 +44,14 @@ const Playground = () => {
       step: 10
   }
 
+
   return (
     <div className={styles.container}>
         <InputWrapper label={"Alerts"} type={"vertical"}>
-            <Alert type={"error"} message={"This is an error"}></Alert>
-            <Alert type={"warning"} message={"This is a warning"}></Alert>
-            <Alert type={"success"} message={"This is a success"}></Alert>
-            <Alert type={"info"} message={"This is an info"}></Alert>
+            {/*<Alert type={"error"} message={"This is an error"}></Alert>*/}
+            {/*<Alert type={"warning"} message={"This is a warning"}></Alert>*/}
+            {/*<Alert type={"success"} message={"This is a success"}></Alert>*/}
+            {/*<Alert type={"info"} message={"This is an info"}></Alert>*/}
             <Button
                 onClick={() => {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Hello there, this is a warning"}})
@@ -165,6 +167,16 @@ const Playground = () => {
                 <Chip key={index} selected={selected} value={value} setSelected={setSelected}>{value}</Chip>
             ))}
         </InputWrapper>
+        <InputWrapper label={"Header Extension Container"}>
+            <HeaderExtendContainer header={<div>header</div>}>
+                <div>Hello</div>
+            </HeaderExtendContainer>
+        </InputWrapper>
+        <div style={{position: "relative"}}>
+            <div style={{position: "absolute"}}>
+                <div style={{position: "fixed"}}>test</div>
+            </div>
+        </div>
       {/*<Button onClick={() => console.log("Clicked!")}>*/}
       {/*  Click me*/}
       {/*</Button>*/}

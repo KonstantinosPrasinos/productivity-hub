@@ -19,7 +19,7 @@ $theme: 'light';
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
-        --border-color: #E2E3E6;
+        --border-color: #79747E;
     } @else if $theme == 'dark' {
         $theme: 'dark';
 
@@ -58,7 +58,6 @@ $base-border-thickness: 1px;
 
 $base-border-radius: 8px;
 $button-border-radius: 100px;
-$chip-border-radius: 10px;
 
 $base-border: $base-border-thickness solid var(--border-color);
 
@@ -70,12 +69,14 @@ $font-xl: 20px;
 $font-xxl: 24px;
 $font-xxxl: 32px;
 
+$font-weight-medium: 500;
+
 // box shadow
-$elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.15);
+$elevation-1: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
 
 // opacity
 $opacity-low: 0.6;
-$opacity-very-low: 0.4;
+$opacity-very-low: 0.38;
 
 // breakpoints
 $phone-breakpoint: 320px;
