@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
 import Divider from "../../components/utilities/Divider/Divider";
@@ -30,6 +30,7 @@ import {
 import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
+import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 
 const StatSection = ({entries}) => {
     return (
@@ -330,6 +331,53 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     );
 }
 
+const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction}) => {
+    const [neverShowAgain, setNeverShowAgain] = useState(false);
+
+    const handleContinue = () => {
+        if (neverShowAgain) {
+            // Set equivalent setting
+        }
+        dismountConfirmDeleteModal();
+        deleteFunction();
+    }
+
+    return (
+        <Modal
+            isOverlay={true} dismountFunction={dismountConfirmDeleteModal}
+        >
+            <div className={"Stack-Container Big-Gap"}>
+                <div className={"Display"}>
+                    Are you sure you want to delete this task?
+                </div>
+                <div className={"Label"}>
+                    If you continue you will be able to undo this action for <b>15 seconds</b> (or until you dismiss the undo prompt),
+                    after which the task will be deleted permanently.
+                </div>
+                <div className={"Label Horizontal-Flex-Container "}>
+                    Never show this again:
+                    <ToggleButton isToggled={neverShowAgain} setIsToggled={setNeverShowAgain} />
+                </div>
+            </div>
+            <div className={'Horizontal-Flex-Container Space-Between'}>
+                <Button
+                    size={'large'}
+                    filled={false}
+                    onClick={dismountConfirmDeleteModal}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    size={'large'}
+                    onClick={handleContinue}
+                >
+                    Continue
+                </Button>
+            </div>
+        </Modal>
+    );
+}
+
 const SortIcon = ({sortOrder}) => {
     switch (sortOrder) {
         case 0:
@@ -351,6 +399,7 @@ const TaskView = ({index, length, task}) => {
     const [selectedGraph, setSelectedGraph] = useState('Average');
     const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
+    const [isVisibleConfirmDeleteModal, setIsVisibleConfirmDeleteModal] = useState(false);
     const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
     const [sortOrderValue, setSortOrderValue] = useState(0);
 
@@ -366,8 +415,12 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleDelete = () => {
-        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        deleteTask(task._id);
+        if (true) { // check with user settings for prompt to delete task
+            setIsVisibleConfirmDeleteModal(true);
+        } else {
+            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+            deleteTask(task._id);
+        }
     }
 
     const handleSetCurrentValueCheckbox = () => {
@@ -389,6 +442,10 @@ const TaskView = ({index, length, task}) => {
         if (editedEntry) {
             setEditedEntry(null);
         }
+    }
+
+    const dismountConfirmDeleteModal = () => {
+        setIsVisibleConfirmDeleteModal(false);
     }
 
     const handleChangeSortOrderValue = () => {
@@ -557,6 +614,15 @@ const TaskView = ({index, length, task}) => {
                     editedEntry={editedEntry}
                     entryDates={!entriesLoading ? [...entries, entry].map(tempEntry => new Date(tempEntry.date)) : [new Date(entry.date)]}
                 />}
+            {isVisibleConfirmDeleteModal &&
+                <ConfirmDeleteModal
+                    dismountConfirmDeleteModal={dismountConfirmDeleteModal}
+                    deleteFunction={() => {
+                        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+                        deleteTask(task._id)
+                    }}
+                />
+            }
         </div>
     );
 };
