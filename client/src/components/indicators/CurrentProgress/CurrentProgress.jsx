@@ -1,4 +1,4 @@
-import {motion} from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import {useEffect, useMemo, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
@@ -8,31 +8,6 @@ import {useChangeEntryValue} from "../../../hooks/change-hooks/useChangeEntryVal
 import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
 
 const CurrentProgress = ({task}) => {
-    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
-    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
-
-    useEffect(() => {
-        if (!isNaN(entry?.value)){
-            setPrevPercentage(entry.value)
-        }
-    }, [entry?.value])
-
-    const handleCheckboxClick = () => {
-        if (!isLoading) {
-            setPrevPercentage(getPercentage());
-
-            const number = entry.value === 0 ? 1 : 0
-            setTaskCurrentEntry({taskId: task._id, entryId: entry?._id, value: number});
-        }
-    }
-
-    const handleNumberClick = () => {
-        if (isLoading) return;
-
-        setPrevPercentage(getPercentage());
-        setTaskCurrentEntry({taskId: task._id, entryId: entry._id, value: entry?.value + task.step});
-    }
-
     const getPercentage = () => {
         if (isLoading) return 0;
         let percentage;
@@ -46,17 +21,46 @@ const CurrentProgress = ({task}) => {
         return percentage;
     }
 
+    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
+    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
     const [prevPercentage, setPrevPercentage] = useState(getPercentage());
 
+    console.log('test')
+
+    useEffect(() => {
+        if (!isNaN(entry?.value)){
+            setPrevPercentage(entry.value)
+        }
+    }, [entry?.value])
+
+
+
+    const handleCheckboxClick = () => {
+        console.log(isLoading);
+        if (!isLoading) {
+            setPrevPercentage(getPercentage());
+
+            const number = parseInt(entry.value) === 0 ? 1 : 0
+            setTaskCurrentEntry({taskId: task._id, entryId: entry?._id, value: number});
+        }
+    }
+
+    const handleNumberClick = () => {
+        if (isLoading) return;
+
+        setPrevPercentage(getPercentage());
+        setTaskCurrentEntry({taskId: task._id, entryId: entry._id, value: entry?.value + task.step});
+    }
+
     const circleVariants = {
-        hidden: {pathLength: prevPercentage, opacity: getPercentage() > 0 ? 1 : 0},
+        hidden: {pathLength: prevPercentage, opacity: getPercentage() > 0 ? 0 : 1},
         visible: () => {
             let percentage = getPercentage();
             const duration = Math.min(0.4, Math.abs(percentage - prevPercentage) * 2);
 
             return {
                 pathLength: percentage, opacity: percentage > 0 ? 1 : 0, transition: {
-                    pathLength: {type: "spring", duration: duration, bounce: 0}, opacity: {duration: 0.01}
+                    pathLength: {type: "spring", duration: duration, bounce: 0}, opacity: {duration: 0.01, delay: percentage > 0 ? 0 : 0.75 * duration}
                 }
             };
         }
@@ -94,22 +98,24 @@ const CurrentProgress = ({task}) => {
 
     return (<div className={styles.container}>
             <div className={`${styles.outlineContainer}`}>
-                <motion.svg
-                    width="100%"
-                    height="100%"
-                    viewBox="0 0 100 100"
-                    initial="hidden"
-                    animate="visible"
-                >
-                    <motion.circle
-                        key={entry?.value}
-                        cx="50%"
-                        cy="50%"
-                        r="calc(50% - 5px)"
-                        stroke="var(--green-color)"
-                        variants={circleVariants}
-                    />
-                </motion.svg>
+                <AnimatePresence initial={true}>
+                    <motion.svg
+                        width="100%"
+                        height="100%"
+                        viewBox="0 0 100 100"
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <motion.circle
+                            key={entry?.value}
+                            cx="50%"
+                            cy="50%"
+                            r="calc(50% - 5px)"
+                            stroke="var(--green-color)"
+                            variants={circleVariants}
+                        />
+                    </motion.svg>
+                </AnimatePresence>
             </div>
             <div className={`${styles.textContainer}`}>
                 {task.type === 'Number' && <button
