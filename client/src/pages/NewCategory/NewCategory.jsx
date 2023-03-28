@@ -271,7 +271,9 @@ const NewCategory = ({index, length, id}) => {
                     <TextBoxInput type="number" placeholder="Number" value={timeGroupNumber} setValue={setTimeGroupNumber}/>
                 </InputWrapper>
                 <InputWrapper label={'Time period'}>
-                    <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
+                    <DropDownInput placeholder={'Weeks'} selected={timePeriod} setSelected={setTimePeriod}>
+                        {timePeriods.map(tempTimePeriod => (tempTimePeriod))}
+                    </DropDownInput>
                 </InputWrapper>
                 {timePeriod !== 'Days' && <InputWrapper label={'On'}>
                     <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />

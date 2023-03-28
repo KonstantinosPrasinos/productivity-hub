@@ -1,16 +1,14 @@
-import {useContext, useRef, useState} from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
-import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {TbChevronDown} from "react-icons/tb";
 
-const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected }) => {
+const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
   const [extended, setExtended] = useState(false);
   const containerRef = useRef();
   const iconRef = useRef();
   const hasEventListener = useRef(false);
-  const miniPagesContext = useContext(MiniPagesContext);
 
   const handleExtension = () => {
       const collapse = (event) => {
@@ -67,13 +65,9 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
                         exit={{height: 0, padding: "0 12px"}}
                         transition={{duration: 0.15}}
                     >
-                        {options.map((option, index) => {
+                        {children.map((option, index) => {
                             return (
-                                <div className={`${styles.option}`} key={index} onClick={() => {
-                                    typeof option !== 'string' && miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}})
-                                    setSelected(typeof option === 'string' ? option : '');
-                                    handleExtension();
-                                }}>
+                                <div className={`${styles.option}`} key={index} onClick={handleExtension}>
                                     {option}
                                 </div>
                             );

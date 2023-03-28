@@ -3,3 +3,13 @@
 .titleMedium {
   opacity: $opacity-very-low;
 }
+
+.dropDownOption {
+  font-size: inherit;
+  width: 100%;
+  height: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+}

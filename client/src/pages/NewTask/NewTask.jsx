@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import {useContext, useEffect, useMemo, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -25,21 +25,6 @@ import styles from "./NewTask.module.scss";
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
 
-    const categoryOptions = useMemo(() => {
-        const titles = ['None'];
-
-        if (categoriesLoading) return titles
-
-        titles.push(...categories?.map(category => category.title));
-
-        titles.push(<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            Add new
-            <TbPlus />
-        </div>)
-
-        return titles;
-    }, [categoriesLoading, categories])
-    
     const {data: settings} = useGetSettings();
 
     const {mutate: addTask} = useAddTask();
@@ -52,14 +37,14 @@ const NewTask = ({index, length, id}) => {
     const [hasGoal, setHasGoal] = useState(false);
     const [goalType, setGoalType] = useState('At least');
     const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
-    const [selectedCategory, setCategory] = useState('None');
+    const [category, setCategory] = useState('None');
     const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
     const [hasLongGoal, setHasLongGoal] = useState(false);
-    const [longGoalType, setLongGoalType] = useState('None');
+    const [longGoalType, setLongGoalType] = useState('At least');
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     // const [expiresAt, setExpiresAt] = useState('Never');
-    const [selectedGroup, setTimeGroup] = useState('');
+    const [timeGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
 
@@ -80,7 +65,7 @@ const NewTask = ({index, length, id}) => {
 
     // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
-    const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
+    const goalTypes = ['At most', 'Exactly', 'At least'];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
 
@@ -95,14 +80,14 @@ const NewTask = ({index, length, id}) => {
 
         if (groupsLoading) return tempGroups;
 
-        const categoryId = categories?.find(localCategory => localCategory.title === selectedCategory)?._id
+        const categoryId = categories?.find(localCategory => localCategory.title === category)?._id
 
         tempGroups.push(...groups.filter(group => group.parent === categoryId));
 
         return tempGroups;
     }
 
-    const categoryGroups = useMemo(findMatchingGroups, [groupsLoading, categories, selectedCategory]);
+    const categoryGroups = useMemo(findMatchingGroups, [groupsLoading, categories, category]);
 
     useEffect(() => {
         if (id && !isLoading) {
@@ -128,7 +113,7 @@ const NewTask = ({index, length, id}) => {
 
                 if (task.group) {
                     setRepeatType('Time Group');
-                    setTimeGroup(groups.find(group => group.id === selectedGroup).title)
+                    setTimeGroup(groups.find(group => group.id === timeGroup).title)
                 } else {
                     setRepeatType(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
@@ -139,11 +124,11 @@ const NewTask = ({index, length, id}) => {
     }, [isLoading]);
 
     useEffect(() => {
-        if (selectedGroup) {
+        if (timeGroup) {
             setRepeatEvery('');
             setRepeatEverySub('');
         }
-    }, [selectedGroup])
+    }, [timeGroup])
 
     useEffect(() => {
         if (repeatEvery || repeatEverySub) {
@@ -181,10 +166,10 @@ const NewTask = ({index, length, id}) => {
                 repeatProperties = undefined;
             } else {
                 if (repeatType === "Time Group") {
-                    if (selectedGroup) {
-                        if (selectedGroup) repeatProperties = {
-                            repeatRate: selectedGroup.repeatRate,
-                            group: selectedGroup
+                    if (timeGroup.title !== "None") {
+                        if (timeGroup) repeatProperties = {
+                            repeatRate: timeGroup.repeatRate,
+                            group: timeGroup
                         };
                     } else {
                         alertsContext.dispatch({
@@ -229,8 +214,8 @@ const NewTask = ({index, length, id}) => {
                 ...repeatProperties
             }
 
-            if (selectedCategory !== "None") {
-                task.category = categories.find(category => category.title === selectedCategory)?._id;
+            if (category !== "None") {
+                task.category = category._id;
             }
 
             if (task.type === "Number") {
@@ -253,7 +238,6 @@ const NewTask = ({index, length, id}) => {
             if (id) {
                 changeTask(task)
             } else {
-                console.log(task);
                 addTask(task);
             }
 
@@ -314,11 +298,33 @@ const NewTask = ({index, length, id}) => {
                 </InputWrapper>
                 <InputWrapper label={"Category"}>
                     <DropDownInput
-                        placeholder={'Category'}
-                        options={categoryOptions}
-                        selected={selectedCategory}
-                        setSelected={setCategory}
-                    />
+                        placeholder={'None'}
+                        selected={category?.title}
+                    >
+                        <button
+                            onClick={() => setCategory("None")}
+                            className={styles.dropDownOption}
+                        >
+                            None
+                        </button>
+                        {categories.map((tempCategory, id) => (
+                            <button
+                                className={styles.dropDownOption}
+                                key={id}
+                                onClick={() => setCategory(tempCategory)}
+                            >
+                                {tempCategory.title}
+                            </button>
+                        ))}
+                        <button
+                            className={styles.dropDownOption}
+                            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}})}
+                            style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}
+                        >
+                            Add new
+                            <TbPlus />
+                        </button>
+                    </DropDownInput>
                 </InputWrapper>
                 <InputWrapper label="Priority">
                     <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
@@ -363,9 +369,18 @@ const NewTask = ({index, length, id}) => {
                         placeholder={'Type'}
                         options={goalTypes}
                         selected={goalType}
-                        setSelected={setGoalType}
                         isDisabled={!hasGoal}
-                    />
+                    >
+                        {goalTypes.map(tempGoalType => (
+                            <button
+                                className={styles.dropDownOption}
+                                onClick={() => setGoalType(tempGoalType)}
+                                key={tempGoalType}
+                            >
+                                {tempGoalType}
+                            </button>
+                        ))}
+                    </DropDownInput>
                     <TextBoxInput
                         type="number"
                         placeholder="Number"
@@ -409,9 +424,18 @@ const NewTask = ({index, length, id}) => {
                         placeholder={'Type'}
                         options={goalTypes}
                         selected={longGoalType}
-                        setSelected={setLongGoalType}
                         isDisabled={!hasLongGoal}
-                    />
+                    >
+                        {goalTypes.map(tempGoalType => (
+                            <button
+                                className={styles.dropDownOption}
+                                onClick={() => setLongGoalType(tempGoalType)}
+                                key={tempGoalType}
+                            >
+                                {tempGoalType}
+                            </button>
+                        ))}
+                    </DropDownInput>
                     <TextBoxInput
                         type="number"
                         placeholder="Number"
@@ -433,16 +457,20 @@ const NewTask = ({index, length, id}) => {
                     ))}
                 </InputWrapper>
                 <InputWrapper label={"Select a category time group"}>
-                    {categoryGroups.map((group, index) => (
-                        <Chip
-                            key={index}
-                            value={group}
-                            selected={selectedGroup}
-                            setSelected={setTimeGroup}
-                        >
-                            {group.title}
-                        </Chip>
-                    ))}
+                    <DropDownInput
+                        placeholder={"None"}
+                        isDisabled={repeatType !== "Time Group"} setSelected={setTimeGroup} selected={timeGroup?.title}
+                    >
+                        {categoryGroups.map((tempTimeGroup, index) => (
+                            <button
+                                className={styles.dropDownOption}
+                                key={index}
+                                onClick={() => setTimeGroup(tempTimeGroup)}
+                            >
+                                {tempTimeGroup.title}
+                            </button>
+                        ))}
+                    </DropDownInput>
                 </InputWrapper>
             </HeaderExtendContainer>
             <HeaderExtendContainer
