@@ -14,7 +14,7 @@
     box-shadow: none;
     justify-content: space-between;
 
-    &:hover {
+    &:hover:not(.disabled) {
         transform: scale(1.01);
     }
 
@@ -22,6 +22,9 @@
 
     &.disabled {
         cursor: not-allowed;
+        > * {
+            opacity: $opacity-very-low;
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useRef, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
@@ -26,10 +26,12 @@ const DropDownInput = ({ placeholder, options, isDisabled, selected, setSelected
           }
       }
 
-      setExtended(current => !current);
-      if (!extended && !hasEventListener.current) {
-          hasEventListener.current = true;
-          document.body.addEventListener('click', collapse);
+      if (!isDisabled) {
+          setExtended(current => !current);
+          if (!extended && !hasEventListener.current) {
+              hasEventListener.current = true;
+              document.body.addEventListener('click', collapse);
+          }
       }
   }
 
