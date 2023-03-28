@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "react-query";
 
-const postChangeSettings = async (data) => {
+const postChangeEntry = async (data) => {
     const response = await fetch('http://localhost:5000/api/entry/set', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -19,7 +19,7 @@ export function useChangeEntry() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: postChangeSettings,
+        mutationFn: postChangeEntry,
         onSuccess: (newEntry) => {
             const currentDate = new Date();
             const date = new Date(newEntry.date);

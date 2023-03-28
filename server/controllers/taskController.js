@@ -31,7 +31,8 @@ const taskSchema = Joi.object({
         //     starting: Joi.number().integer().min(0),
         //     ending: Joi.number().integer().max(2400)
         // })
-    })
+    }),
+    _id: Joi.string()
 })
 
 const getDateAddDetails = (bigTimePeriod, number) => {
@@ -218,6 +219,8 @@ const createTask = async (req, res) => {
             return res.status(400).json({message: validatedTask.error});
         }
 
+        validatedTask.value._id = undefined;
+
         try {
             const newTask = await Task.create({...validatedTask.value, userId: req.user._id});
             const entry = await Entry.create({userId: req.user._id, taskId: newTask._id});
@@ -252,4 +255,28 @@ const deleteTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask};
+const setTask = async (req, res) => {
+    if (req.user) {
+        const {task} = req.body;
+
+        const validatedTask = taskSchema.validate(task);
+
+        if (validatedTask.error) {
+            return res.status(400).json({message: validatedTask.error});
+        }
+
+        validatedTask.value._id = undefined
+
+        try {
+            const newTask = await Task.findOneAndUpdate({_id: task._id, userId: req.user._id}, validatedTask.value, {returnDocument: 'after'});
+
+            return res.status(200).json(newTask);
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+module.exports = {getTasks, createTask, deleteTask, setTask};

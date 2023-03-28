@@ -45,8 +45,6 @@ const NewTask = ({index, length, id}) => {
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     // const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
-    const [repeatEverySub, setRepeatEverySub] = useState('');
-    const [repeatEvery, setRepeatEvery] = useState('');
 
     const [repeatNumber, setRepeatNumber] = useState(settings.defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
@@ -98,24 +96,31 @@ const NewTask = ({index, length, id}) => {
 
             if (task.type === 'Number') {
                 setStep(task.step);
-                setGoalType(task.goal.type);
-                setGoalNumber(task.goal.number);
+                if (task?.goal.type) {
+                    setHasGoal(true);
+                    setGoalType(task.goal.type);
+                    setGoalNumber(task.goal.number);
+                }
             }
 
-            setCategory(task.category);
+            if (task.category) {
+                setCategory(categories.find(tempCategory => tempCategory._id === task.category));
+            }
+
             setPriority(task.priority);
             setRepeats(task.repeats);
 
             if (task.repeats) {
-                setLongGoalType(task.longGoal.type);
-                setLongGoalNumber(task.longGoal.number);
-                // setExpiresAt(task.expiresAt);
+                if (task.longGoal?.type) {
+                    setLongGoalType(task.longGoal.type);
+                    setLongGoalNumber(task.longGoal.number);
+                }
 
                 if (task.group) {
                     setRepeatType('Time Group');
-                    setTimeGroup(groups.find(group => group.id === timeGroup).title)
+                    setTimeGroup(groups.find(group => group._id === task.group._id));
                 } else {
-                    setRepeatType(task.repeatRate.number);
+                    setRepeatNumber(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
                     setTimePeriod2(task.repeatRate.smallTimePeriod);
                 }
@@ -123,22 +128,9 @@ const NewTask = ({index, length, id}) => {
         }
     }, [isLoading]);
 
-    useEffect(() => {
-        if (timeGroup) {
-            setRepeatEvery('');
-            setRepeatEverySub('');
-        }
-    }, [timeGroup])
-
-    useEffect(() => {
-        if (repeatEvery || repeatEverySub) {
-            setTimeGroup('');
-        }
-    }, [repeatEvery, repeatEverySub])
-
-    useEffect(() => {
-        setTimePeriod2([]);
-    }, [timePeriod])
+    const handleSetTimePeriod = (e) => {
+        setTimePeriod2(e);
+    }
 
     const handleSave = async () => {
         const checkAllInputs = () => {
@@ -169,7 +161,7 @@ const NewTask = ({index, length, id}) => {
                     if (timeGroup.title !== "None") {
                         if (timeGroup) repeatProperties = {
                             repeatRate: timeGroup.repeatRate,
-                            group: timeGroup
+                            group: timeGroup._id
                         };
                     } else {
                         alertsContext.dispatch({
@@ -236,7 +228,7 @@ const NewTask = ({index, length, id}) => {
             }
 
             if (id) {
-                changeTask(task)
+                changeTask({...task, _id: id});
             } else {
                 addTask(task);
             }
@@ -422,7 +414,6 @@ const NewTask = ({index, length, id}) => {
                 <InputWrapper label={"Long term goal"}>
                     <DropDownInput
                         placeholder={'Type'}
-                        options={goalTypes}
                         selected={longGoalType}
                         isDisabled={!hasLongGoal}
                     >
@@ -499,9 +490,20 @@ const NewTask = ({index, length, id}) => {
             >
                 <InputWrapper label={'Repeat every'}>
                     <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
-                </InputWrapper>
-                <InputWrapper label={'Time period'}>
-                    <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
+                    <DropDownInput
+                        placeholder={'Weeks'}
+                        selected={timePeriod}
+                    >
+                        {timePeriods.map(tempTimePeriod => (
+                            <button
+                                className={styles.dropDownOption}
+                                onClick={() => handleSetTimePeriod(tempTimePeriod)}
+                                key={tempTimePeriod}
+                            >
+                                {tempTimePeriod}
+                            </button>
+                        ))}
+                    </DropDownInput>
                 </InputWrapper>
                 {timePeriod !== 'Days' &&
                     <InputWrapper label={'On'}>
