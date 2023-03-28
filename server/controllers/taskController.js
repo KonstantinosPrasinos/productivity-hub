@@ -4,30 +4,33 @@ const Entry = require("../models/entrySchema");
 
 const taskSchema = Joi.object({
     title: Joi.string().required(),
-    type: Joi.string().valid('Checkbox', 'Number'),
+    type: Joi.string().valid('Checkbox', 'Number').required(),
     step: Joi.number().min(0),
     goal: Joi.object().keys({
-        type: Joi.string().valid('None', 'At most', 'Exactly', 'At least'),
+        type: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(0)
     }),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
-    longGoal: Joi.object(),
-    expiresAt: Joi.object().keys({
-        type: Joi.string().valid('Never', 'Date', 'End of goal'),
-        timePeriod: Joi.string()
+    longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
+        type: Joi.string().valid('At most', 'Exactly', 'At least'),
+        number: Joi.number().min(0)
     }),
-    group: Joi.string(),
-    repeatRate: Joi.object().keys({
+    // expiresAt: Joi.object().keys({
+    //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
+    //     timePeriod: Joi.string()
+    // }),
+    group: Joi.string().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}),
+    repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
         startingDate: Joi.array().items(Joi.number()),
-        time: Joi.object().keys({
-            starting: Joi.number().integer().min(0),
-            ending: Joi.number().integer().max(2400)
-        })
+        // time: Joi.object().keys({
+        //     starting: Joi.number().integer().min(0),
+        //     ending: Joi.number().integer().max(2400)
+        // })
     })
 })
 
@@ -217,7 +220,7 @@ const createTask = async (req, res) => {
 
         try {
             const newTask = await Task.create({...validatedTask.value, userId: req.user._id});
-            const entry = await Entry.create({userId: req.user._id, taskId: newTask._id})
+            const entry = await Entry.create({userId: req.user._id, taskId: newTask._id});
 
             res.status(200).json({
                 ...newTask._doc,

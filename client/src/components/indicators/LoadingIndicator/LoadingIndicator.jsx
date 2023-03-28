@@ -5,7 +5,7 @@ import styles from './LoadingIndicator.module.scss'
 const LoadingIndicator = ({size}) => {
     return (
         <motion.div
-            className={`Rounded-Container ${styles.container} ${styles[size]}`}
+            className={`Rounded-Container Has-Shadow ${styles.container} ${styles[size]}`}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}

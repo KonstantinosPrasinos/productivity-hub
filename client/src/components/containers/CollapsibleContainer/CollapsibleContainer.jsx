@@ -1,36 +1,15 @@
 import React, {useState} from 'react';
 import {AnimatePresence, motion} from "framer-motion";
 import styles from './CollapsibleContainer.module.scss';
-import {TbChevronDown} from "react-icons/tb";
 
 const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) => {
     const [extended, setExtended] = useState(false);
 
     return (
-        <div className={styles.container}>
-            {label &&
-                <div className={`${label ? `Rounded-Container ${styles.subContainer}` : ''} Horizontal-Flex-Container Space-Between Clickable`}
-                     onClick={() => {setExtended(state => !state)}}
-                >
-                    <span>{label}</span>
-                    <motion.div
-                        animate={extended ? 'extended' : 'collapsed'}
-                        variants={{
-                        extended: {
-                            rotate: 180
-                        },
-                        collapsed: {
-                            rotate: 0
-                        }}}
-                        transition={{type: 'tween'}}
-                    >
-                        <TbChevronDown />
-                    </motion.div>
-                </div>
-            }
-            <AnimatePresence>
-                {(isVisible || (label && extended)) && <motion.div
-                    className={`Stack-Container No-Gap ${styles.childrenContainer} ${label || !hasBorder ? styles.noBorder : ''}`}
+        <AnimatePresence initial={false}>
+            {isVisible &&
+                <motion.div
+                    className={styles.container}
                     initial={"collapsed"}
                     animate={"extended"}
                     exit={"collapsed"}
@@ -38,15 +17,15 @@ const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) =>
                         collapsed: {
                             height: 0,
                             padding: 0,
-                            marginTop: 0,
-                            marginBottom: 0,
+                            // marginTop: 0,
+                            // marginBottom: 0,
                             overflowY: 'hidden'
                         },
                         extended: {
                             height: 'auto',
                             padding: label || !hasBorder ? 0 : '10px 0',
-                            marginTop: label || !hasBorder ? 0 : '10px',
-                            marginBottom: label || !hasBorder ? 0 : '10px',
+                            // marginTop: label || !hasBorder ? 0 : '10px',
+                            // marginBottom: label || !hasBorder ? 0 : '10px',
                             transitionEnd: {
                                 overflowY: 'visible'
                             }
@@ -54,10 +33,15 @@ const CollapsibleContainer = ({children, isVisible, label, hasBorder = true}) =>
                     }}
                     transition={{type: 'tween'}}
                 >
-                    {children}
-                </motion.div>}
-            </AnimatePresence>
-        </div>
+                    {(isVisible || (label && extended)) && <motion.div
+                        className={`Stack-Container No-Gap ${styles.childrenContainer} ${label || !hasBorder ? styles.noBorder : ''}`}
+
+                    >
+                        {children}
+                    </motion.div>}
+                </motion.div>
+            }
+        </AnimatePresence>
     );
 };
 

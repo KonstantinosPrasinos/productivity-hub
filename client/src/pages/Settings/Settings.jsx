@@ -157,7 +157,7 @@ const Settings = () => {
 
     return (
         <motion.div
-            className={`Rounded-Container ${styles.container}`}
+            className={`Rounded-Container ${styles.container} Has-Shadow`}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}

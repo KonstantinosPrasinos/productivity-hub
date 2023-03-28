@@ -6,7 +6,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: none !important;
 
 
   &.fullSize {
@@ -33,13 +32,13 @@
   height: 2em;
   width: 2em;
   border-radius: 2em;
-  background-color: var(--border-color);
+  background-color: var(--background-color);
   overflow: hidden;
 
   &::after {
     content: '';
     position: absolute;
-    background-color: var(--on-primary-color);
+    background-color: var(--surface-color);
     top: 0.25em;
     left: 0.25em;
     height: 1.5em;

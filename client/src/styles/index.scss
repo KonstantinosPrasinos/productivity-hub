@@ -163,12 +163,13 @@ a {
     display: inline-flex;
 
     &.Has-Shadow {
+        border: none;
         box-shadow: $elevation-1;
     }
 }
 
 .Empty-Indicator-Container {
-    @extend .Stack-Container, .Rounded-Container;
+    @extend .Stack-Container, .Rounded-Container, .Has-Shadow;
     height: 2.5em;
     width: 22.15em;
     padding: 6px 12px;

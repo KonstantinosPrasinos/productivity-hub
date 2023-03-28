@@ -9,10 +9,7 @@ import MiniPageContainer from "../../components/containers/MiniPagesContainer/Mi
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import {TbChevronDown, TbPlus} from "react-icons/tb";
-import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
-import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
-import Divider from "../../components/utilities/Divider/Divider";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
@@ -27,18 +24,21 @@ import styles from "./NewTask.module.scss";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
-    
-    const getCategoryTitles = () => {
-        const titles = ['None'];
-        
-        if (categoriesLoading) return titles
-        
-        titles.push(...categories?.map(category => category.title));
-        
-        return titles;
-    }
 
-    const categoryTitles = useMemo(getCategoryTitles, [categoriesLoading, categories])
+    const categoryOptions = useMemo(() => {
+        const titles = ['None'];
+
+        if (categoriesLoading) return titles
+
+        titles.push(...categories?.map(category => category.title));
+
+        titles.push(<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            Add new
+            <TbPlus />
+        </div>)
+
+        return titles;
+    }, [categoriesLoading, categories])
     
     const {data: settings} = useGetSettings();
 
@@ -49,14 +49,16 @@ const NewTask = ({index, length, id}) => {
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
     const [step, setStep] = useState(settings.defaults.step);
+    const [hasGoal, setHasGoal] = useState(false);
     const [goalType, setGoalType] = useState('At least');
     const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
     const [selectedCategory, setCategory] = useState('None');
     const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
+    const [hasLongGoal, setHasLongGoal] = useState(false);
     const [longGoalType, setLongGoalType] = useState('None');
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
-    const [expiresAt, setExpiresAt] = useState('Never');
+    // const [expiresAt, setExpiresAt] = useState('Never');
     const [selectedGroup, setTimeGroup] = useState('');
     const [repeatEverySub, setRepeatEverySub] = useState('');
     const [repeatEvery, setRepeatEvery] = useState('');
@@ -76,20 +78,11 @@ const NewTask = ({index, length, id}) => {
 
     const [extendedSection, setExtendedSection] = useState(0);
 
-    const causesOfExpiration = ['End of goal', 'Date', 'Never'];
+    // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
     const goalTypes = ['None', 'At most', 'Exactly', 'At least'];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
-
-    const headerVariants = {
-        extended: {
-            rotate: 180
-        },
-        collapsed: {
-            rotate: 0
-        }
-    }
 
     const handleKeyDown = (e) => {
         if (e.code === 'Enter') {
@@ -131,7 +124,7 @@ const NewTask = ({index, length, id}) => {
             if (task.repeats) {
                 setLongGoalType(task.longGoal.type);
                 setLongGoalNumber(task.longGoal.number);
-                setExpiresAt(task.expiresAt);
+                // setExpiresAt(task.expiresAt);
 
                 if (task.group) {
                     setRepeatType('Time Group');
@@ -171,49 +164,96 @@ const NewTask = ({index, length, id}) => {
             return false;
         }
 
+        // The rules for if the task can be created are:
+        // a) title always required
+        // b) priority, type, category and repeats are also technically required, but they are pre-filled
+        // c) if the task type is set to Number then goal type, goal number and step are also required
+        // d) if repeat is set to true then long term goal type and number are required
+        // e) if repeat is set to true then the user can input a time group of the category selected (if selected) or custom rules.
+        //    In both cases repeat rate is required. In the case of the group it is copied from the group.
+        //    This is done so that if the user decides to delete the group, they can keep their repeat data.
+
+        // First check that all the categories and groups have loaded. Also do the first check.
         if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
-            const startingDates = findStartingDates(timePeriod, timePeriod2);
+            let repeatProperties = {};
 
-            const repeatProperties = {};
+            if (!repeats) {
+                repeatProperties = undefined;
+            } else {
+                if (repeatType === "Time Group") {
+                    if (selectedGroup) {
+                        if (selectedGroup) repeatProperties = {
+                            repeatRate: selectedGroup.repeatRate,
+                            group: selectedGroup
+                        };
+                    } else {
+                        alertsContext.dispatch({
+                            type: "ADD_ALERT",
+                            payload: {
+                                type: "warning",
+                                message: "You need to select a time group, select the custom rules options or toggle the repeats option to false."
+                            }
+                        })
+                        return;
+                    }
+                } else {
+                    // Repeat type is set to custom rules
+                    const repeatRate = {
+                        number: repeatNumber,
+                        bigTimePeriod: timePeriod
+                    };
 
-            if (repeats && selectedGroup) {
-                repeatProperties.repeatRate = selectedGroup.repeatRate ?? undefined;
-            } else if (repeats && !selectedGroup) {
-                repeatProperties.repeatRate = undefined;
-                repeatProperties.repeats = false;
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You didn't set any repeat properties, so the repeat property was set to false"}})
+                    if (timePeriod2) {
+                        repeatRate.smallTimePeriod = timePeriod2;
+                        repeatRate.startingDate = findStartingDates(timePeriod, timePeriod2);
+                    } else {
+                        alertsContext.dispatch({
+                            type: "ADD_ALERT",
+                            payload: {
+                                type: "warning",
+                                message: "You need to enter at least one value into the \"On\" field."
+                            }
+                        })
+                        return;
+                    }
+
+                    repeatProperties.repeatRate = repeatRate;
+                }
             }
-
-            const categoryId = categories.find(category => category.title === selectedCategory)?._id;
 
             const task = {
                 title,
                 type,
-                step: type === 'Number' ? (step ? step : settings.defaults.step) : undefined,
-                goal: type === 'Number' ? {
-                    type: goalType,
-                    number: goalType === 'None' ? undefined : (goalNumber ? goalNumber : settings.defaults.goal)
-                } : undefined,
-                category: categoryId,
-                priority: priority ? priority : settings.defaults.priority,
+                priority,
                 repeats,
-                longGoal: repeats ? {
+                ...repeatProperties
+            }
+
+            if (selectedCategory !== "None") {
+                task.category = categories.find(category => category.title === selectedCategory)?._id;
+            }
+
+            if (task.type === "Number") {
+                task.step = step;
+                if (hasGoal) {
+                    task.goal = {
+                        type: goalType,
+                        number: goalNumber,
+                    }
+                }
+            }
+
+            if (hasLongGoal) {
+                task.longGoal = {
                     type: longGoalType,
-                    number: longGoalType === 'None' ? undefined : (longGoalNumber ? longGoalNumber : settings.defaults.goal)
-                } : undefined,
-                group: repeats ? selectedGroup._id : undefined,
-                currentEntryValue: 0,
-                streak: repeats ? "0000000" : undefined,
-                ...repeatProperties,
-                // expiresAt: {
-                //     type: "Never",
-                //     timePeriod: undefined
-                // },
+                    number: longGoalNumber,
+                }
             }
 
             if (id) {
                 changeTask(task)
             } else {
+                console.log(task);
                 addTask(task);
             }
 
@@ -275,11 +315,7 @@ const NewTask = ({index, length, id}) => {
                 <InputWrapper label={"Category"}>
                     <DropDownInput
                         placeholder={'Category'}
-                        options={[...categoryTitles,
-                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                                Add new
-                                <TbPlus />
-                            </div>]}
+                        options={categoryOptions}
                         selected={selectedCategory}
                         setSelected={setCategory}
                     />
@@ -288,13 +324,19 @@ const NewTask = ({index, length, id}) => {
                     <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
                     <PriorityIndicator/>
                 </InputWrapper>
+                <InputWrapper label="Repeats">
+                    <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
+                </InputWrapper>
             </HeaderExtendContainer>
             <HeaderExtendContainer
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={"Stack-Container"}>
                             <div className={"Title-Medium"}>Number type options</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>Goal: at least 10, Step 1</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>
+                                {type === 'Number' && `Goal: at least 10, Step 1`}
+                                {type !== 'Number' && 'In order to enable set the task type to Number'}
+                            </div>
                         </div>
                         <motion.div
                             className={"Title-Large"}
@@ -310,17 +352,27 @@ const NewTask = ({index, length, id}) => {
                 extendedInherited={extendedSection === 1}
                 isDisabled={type !== 'Number'}
             >
+                <InputWrapper label="Step">
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} />
+                </InputWrapper>
+                <InputWrapper label={"Has goal"}>
+                    <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
+                </InputWrapper>
                 <InputWrapper label={"Goal"}>
                     <DropDownInput
                         placeholder={'Type'}
                         options={goalTypes}
                         selected={goalType}
                         setSelected={setGoalType}
+                        isDisabled={!hasGoal}
                     />
-                    <TextBoxInput type="number" placeholder="Number" value={goalNumber} setValue={setGoalNumber}/>
-                </InputWrapper>
-                <InputWrapper label="Step">
-                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep}/>
+                    <TextBoxInput
+                        type="number"
+                        placeholder="Number"
+                        value={goalNumber}
+                        setValue={setGoalNumber}
+                        isDisabled={!hasGoal}
+                    />
                 </InputWrapper>
             </HeaderExtendContainer>
             <HeaderExtendContainer
@@ -328,7 +380,10 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={"Stack-Container"}>
                             <div className={"Title-Medium"}>Repeat options</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>Repeats: true, Long term goal: At least 1</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>
+                                {!repeats && "In order to enable, toggle repeats"}
+                                {repeats && `Long term goal: At least 1`}
+                            </div>
                         </div>
                         <IconButton>
                             <motion.div
@@ -344,9 +399,10 @@ const NewTask = ({index, length, id}) => {
                 )}
                 setExtendedInherited={() => {setExtendedSection(extendedSection === 2 ? null : 2)}}
                 extendedInherited={extendedSection === 2}
+                isDisabled={!repeats}
             >
-                <InputWrapper label="Repeats">
-                    <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
+                <InputWrapper label={"Has long term goal"}>
+                    <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />
                 </InputWrapper>
                 <InputWrapper label={"Long term goal"}>
                     <DropDownInput
@@ -354,13 +410,26 @@ const NewTask = ({index, length, id}) => {
                         options={goalTypes}
                         selected={longGoalType}
                         setSelected={setLongGoalType}
+                        isDisabled={!hasLongGoal}
                     />
-                    <TextBoxInput type="number" placeholder="Number" value={longGoalNumber}
-                                  setValue={setLongGoalNumber}/>
+                    <TextBoxInput
+                        type="number"
+                        placeholder="Number"
+                        value={longGoalNumber}
+                        setValue={setLongGoalNumber}
+                        isDisabled={!hasLongGoal}
+                    />
                 </InputWrapper>
                 <InputWrapper label={"Repeat using"}>
                     {repeatTypes.map(item => (
-                        <Chip>{item}</Chip>
+                        <Chip
+                            key={item}
+                            value={item}
+                            selected={repeatType}
+                            setSelected={setRepeatType}
+                        >
+                            {item}
+                        </Chip>
                     ))}
                 </InputWrapper>
                 <InputWrapper label={"Select a category time group"}>
@@ -375,15 +444,42 @@ const NewTask = ({index, length, id}) => {
                         </Chip>
                     ))}
                 </InputWrapper>
+            </HeaderExtendContainer>
+            <HeaderExtendContainer
+                header={(
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Stack-Container"}>
+                            <div className={"Title-Medium"}>Custom rules for repeat</div>
+                            <div className={`Label-Small ${styles.titleMedium}`}>
+                                {(!repeats || repeatType !== "Custom Rules") && "In order to enable, toggle repeats and custom rules"}
+                                {(repeats && repeatType === "Custom Rules") && `Repeat every: 1 Week on Mondays`}
+                            </div>
+                        </div>
+                        <motion.div
+                            className={"Title-Large"}
+                            key={extendedSection === 3}
+                            initial={{rotate: extendedSection === 3 ? 0 : 180}}
+                            animate={{rotate: !(extendedSection === 3) ? 0 : 180}}
+                        >
+                            <TbChevronDown />
+                        </motion.div>
+                    </div>
+                )}
+                setExtendedInherited={() => {setExtendedSection(extendedSection === 3 ? null : 3)}}
+                extendedInherited={extendedSection === 3}
+                isDisabled={!repeats || repeatType !== "Custom Rules"}
+            >
                 <InputWrapper label={'Repeat every'}>
                     <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
                 </InputWrapper>
                 <InputWrapper label={'Time period'}>
                     <DropDownInput placeholder={'Weeks'} options={timePeriods} selected={timePeriod} setSelected={setTimePeriod}></DropDownInput>
                 </InputWrapper>
-                {timePeriod !== 'Days' && <InputWrapper label={'On'}>
-                    <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
-                </InputWrapper>}
+                {timePeriod !== 'Days' &&
+                    <InputWrapper label={'On'}>
+                        <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
+                    </InputWrapper>
+                }
             </HeaderExtendContainer>
         </MiniPageContainer>
     );

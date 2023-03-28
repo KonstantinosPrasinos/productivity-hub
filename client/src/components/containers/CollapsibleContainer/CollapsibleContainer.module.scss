@@ -9,7 +9,7 @@
   border-top: $base-border;
   border-bottom: $base-border;
   gap: 0;
-  overflow-x: hidden;
+  overflow-y: visible;
   & > * {
     margin-top: 10px;
     margin-bottom: 10px;
