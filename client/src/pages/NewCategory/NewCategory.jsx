@@ -21,6 +21,7 @@ import {findStartingDates} from "../../functions/findStartingDates";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useAddCategory} from "../../hooks/add-hooks/useAddCategory";
 import {useAddGroup} from "../../hooks/add-hooks/useAddGroup";
+import {AnimatePresence, motion} from "framer-motion";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -72,31 +73,30 @@ const NewCategory = ({index, length, id}) => {
                 color,
             }
 
-            if (id) {
-
-                for (const group of groups) {
-                    // Do set group things
-                }
-
-            } else {
-                await addCategoryToServer(category, {onSuccess: (data) => {
-                        // if (error) return;
-                        for (index in timeGroups) {
-                            delete timeGroups[index].initial
-                            timeGroups[index].parent = data._id;
-
-                            addGroupToServer(timeGroups[index]);
-                        }
-                    }});
-                for (index in timeGroups) {
-                    // delete timeGroups[index].initial
-
-                    // console.log(arguments);
-                    // await addGroupToServer(timeGroups[index]);
-                }
-
-
-            }
+            // if (id) {
+            //
+            //     for (const group of groups) {
+            //         // Do set group things
+            //     }
+            //
+            // } else {
+            //     await addCategoryToServer(category, {onSuccess: (data) => {
+            //             // if (error) return;
+            //             for (index in timeGroups) {
+            //                 delete timeGroups[index].initial
+            //                 timeGroups[index].parent = data._id;
+            //
+            //                 addGroupToServer(timeGroups[index]);
+            //             }
+            //         }});
+            //     for (index in timeGroups) {
+            //         // delete timeGroups[index].initial
+            //
+            //         // await addGroupToServer(timeGroups[index]);
+            //     }
+            //
+            //
+            // }
 
             // for (const group of timeGroups) {
             //     if (group.priority < settings.priorityBounds.low) {
@@ -125,6 +125,18 @@ const NewCategory = ({index, length, id}) => {
         setPriority(settings.defaults.priority);
     }
 
+    const getGroupId = () => {
+        if (timeGroups.length === 0) {
+            return 0;
+        }
+
+        for (let i = 0; i <= timeGroups.length; i++) {
+            if (!timeGroups.find(group => group.id === i)) {
+                return i;
+            }
+        }
+    }
+
     const handleTimeGroupSave = () => {
         if (!timeGroupTitle || !timeGroupNumber || !timePeriod) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "All time group fields must be filled"}})
@@ -141,11 +153,12 @@ const NewCategory = ({index, length, id}) => {
             return;
         }
 
-        const id = currentEditedGroup.current?.id;
+        const id = currentEditedGroup.current?.id ?? getGroupId();
 
         const startingDates = findStartingDates(timePeriod, timePeriod2);
 
         const timeGroup = {
+            id,
             title: timeGroupTitle,
             priority,
             repeatRate: {
@@ -240,7 +253,7 @@ const NewCategory = ({index, length, id}) => {
         >
             <input
                 type="text"
-                className="Title Title-Input"
+                className="Title-Large"
                 placeholder="Add category title" value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -250,13 +263,27 @@ const NewCategory = ({index, length, id}) => {
             </InputWrapper>
             <InputWrapper label="Time Groups">
                 <div className={customStyles.groupsContainer}>
-                    <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
-                        <TbPlus/>
-                    </IconButton>
-                    {timeGroups.map((group, index) => (<Chip key={index} type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
-                        {group.title}
-                        <IconButton onClick={() => handleDelete(group)}><TbX /></IconButton>
-                    </Chip>))}
+                    <div className={customStyles.addGroupButton}>
+                        <IconButton border={true} onClick={() => setCreatingTimeGroup(state => !state)}>
+                            <TbPlus/>
+                        </IconButton>
+                    </div>
+                    <AnimatePresence mode={"popLayout"}>
+                        {timeGroups.map((group) => (
+                            <motion.div
+                                layout
+                                key={group.id}
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                            >
+                                <Chip type={'icon'} style={'round'} onClick={(e) => {handleGroupClick(e, group)}}>
+                                    {group.title}
+                                    <IconButton onClick={() => handleDelete(group)}><TbX /></IconButton>
+                                </Chip>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
             </InputWrapper>
 

@@ -77,6 +77,7 @@ a {
     cursor: pointer;
     padding: $base-padding;
     width: max-content;
+    white-space: nowrap;
     
     &.disabled {
         cursor: not-allowed;
@@ -241,7 +242,7 @@ input {
         outline: none;
     }
 
-    &.Title {
+    &.Title-Large {
         opacity: 1;
         box-shadow: 0 2px 0 0 var(--surface-color);
         transition: box-shadow 0.2s;

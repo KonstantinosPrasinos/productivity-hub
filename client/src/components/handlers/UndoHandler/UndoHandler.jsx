@@ -5,9 +5,16 @@ import IconButton from "../../buttons/IconButton/IconButton";
 import {TbX} from "react-icons/tb";
 import styles from "./UndoHandler.module.scss"
 import {useUndoDeleteTask} from "../../../hooks/delete-hooks/useUndoDeleteTask";
+import {motion} from "framer-motion";
 
 const UndoPrompt = ({type, deleteFunction, undoFunction}) => (
-    <div className={styles.container}>
+    <motion.div
+        initial={{opacity: 0}}
+        animate={{opacity: 1}}
+        exit={{opacity: 0}}
+        transition={{duration: 0.2}}
+        className={styles.container}
+    >
         <button
             onClick={undoFunction}
         >
@@ -16,7 +23,7 @@ const UndoPrompt = ({type, deleteFunction, undoFunction}) => (
         <IconButton onClick={deleteFunction}>
             <TbX />
         </IconButton>
-    </div>
+    </motion.div>
 )
 
 const UndoHandler = () => {
