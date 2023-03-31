@@ -3,6 +3,7 @@ const Joi = require('joi');
 
 const settingsSchema = Joi.object({
     theme: Joi.string().valid('Light', 'Dark', 'Device'),
+    confirmDelete: Joi.boolean(),
     defaults: Joi.object().keys({
         step: Joi.number().min(0),
         priority: Joi.number(),

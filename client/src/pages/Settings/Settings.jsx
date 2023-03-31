@@ -14,6 +14,7 @@ import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
 import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin} from "react-icons/tb";
+import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -22,11 +23,13 @@ const Settings = () => {
     const {mutateAsync: resetAccount, isLoading: resetAccountLoading, isError: resetAccountError} = useResetAccount();
     const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
 
-    const [currentPassword, setCurrentPassword] = useState('');
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
+    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
+
+    const [currentPassword, setCurrentPassword] = useState('');
     const [settingsChanges, setSettingsChanges] = useState({});
 
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -39,7 +42,7 @@ const Settings = () => {
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
-            await setSettings({theme: selectedTheme, defaults: {step, goal, priority}});
+            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority}});
             setSettingsChanges({});
         }
     }
@@ -61,6 +64,20 @@ const Settings = () => {
                 return rest;
             });
         }
+    }
+
+    const handleSetConfirmDelete = () => {
+        if (settings.confirmDelete !== !confirmDelete) {
+            setSettingsChanges({...settingsChanges, confirmDelete: !confirmDelete});
+        } else {
+            setSettingsChanges((current) => {
+                const {confirmDelete, ...rest} = current;
+
+                return rest;
+            });
+        }
+
+        setConfirmDelete(!confirmDelete);
     }
 
     const handleSetPriority = (e) => {
@@ -235,6 +252,19 @@ const Settings = () => {
                                 <Chip key={theme} value={theme} selected={selectedTheme} setSelected={handleSetTheme}>{theme}</Chip>)}
                             </div>
                         </div>
+
+                        <div className={'Horizontal-Flex-Container'}>Show confirm prompt on delete</div>
+                        <div className={`Horizontal-Flex-Container Space-Between`}>
+                            <div className={'Label'}>
+                                Show a prompt to confirm your action when deleting a task or category.
+                                <br />
+                                Note: regardless of this option, an undo button appears for 10 seconds after deletion.
+                            </div>
+                            <div className={'Horizontal-Flex-Container'}>
+                                <ToggleButton isToggled={confirmDelete} setIsToggled={handleSetConfirmDelete} />
+                            </div>
+                        </div>
+
                         <div className={styles.subSectionTitle}>Input Fields Default</div>
                         <section className={`Stack-Container ${styles.subSection}`}>
                             <div className={'Stack-Container'}>
