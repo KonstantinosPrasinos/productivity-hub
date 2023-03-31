@@ -18,9 +18,14 @@ const Entry = new mongoose.Schema({
         type: Date,
         default: new Date(),
         required: true
+    },
+    forDeletion: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 
 Entry.index({createdAt: 1}, {expireAfterSeconds: 24 * 60 * 60, partialFilterExpression: {value: 0}});
+Entry.index({updatedAt: 1}, {expireAfterSeconds: 60, partialFilterExpression: {forDeletion: true}});
 
 module.exports = mongoose.model('Entry', Entry);

@@ -162,7 +162,7 @@ const getTasksWithHistory = async (tasks, userId) => {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})
         }
 
-        tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id})
+        tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id, forDeletion: undefined, hidden: false}) // Remove the for deletion property, add the hidden property
     }
 
     // Add streak to tasks
@@ -243,13 +243,33 @@ const deleteTask = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
-        Task.findByIdAndDelete(taskId, (err, doc) => {
-            if (err) {
-                return res.status(500).json({message: err});
-            }
+        try {
+            await Task.updateMany({userId: req.user._id, _id: taskId}, {$set: {forDeletion: true}});
 
-            return res.status(200).json({taskId: doc._id});
-        })
+            await Entry.updateMany({userId: req.user._id, taskId: taskId}, {$set: {forDeletion: true}});
+
+            res.status(200).json({message: "Task and it's entries set for deletion."});
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+const undoDeleteTask = async (req, res) => {
+    if (req.user) {
+        const {taskId} = req.body;
+
+        try {
+            await Task.updateMany({userId: req.user._id, _id: taskId}, {$set: {forDeletion: false}});
+
+            await Entry.updateMany({userId: req.user._id, taskId: taskId}, {$set: {forDeletion: false}});
+
+            res.status(200).json({message: "Task and it's entries set for deletion."});
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
     } else {
         res.status(401).send({message: "Not authorized."});
     }
@@ -279,4 +299,4 @@ const setTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask, setTask};
+module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask};

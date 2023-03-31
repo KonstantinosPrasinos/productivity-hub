@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from "react";
+import {useMemo} from "react";
 import {useGetTasks} from "./get-hooks/useGetTasks";
 import {useGetGroups} from "./get-hooks/useGetGroups";
 
@@ -75,7 +75,7 @@ const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
             }
         }
 
-        const groupTasks = tasks.filter(task => task.group === group._id);
+        const groupTasks = tasks.filter(task => task.group === group._id && task.hidden !== false);
 
         if (!groupTasks.length) {
             return;
@@ -94,33 +94,35 @@ const addTasksToArray = (groupedTasks, usesTime, tasks) => {
         // First checks if the component it will be rendered in even cares about time
         // Then it checks if the task repeats
         // And then it check if the task is in a time group
-        if (task.repeats) {
-            if (!task.group) {
-                if (usesTime) {
-                    if (checkTime(task)) {
+        if (!task.hidden) {
+            if (task.repeats) {
+                if (!task.group) {
+                    if (usesTime) {
+                        if (checkTime(task)) {
+                            groupedTasks.push(task);
+                        }
+                    } else {
                         groupedTasks.push(task);
                     }
-                } else {
-                    groupedTasks.push(task);
                 }
+            } else {
+                groupedTasks.push(task);
             }
-        } else {
-            groupedTasks.push(task);
         }
     })
 }
 
-const findLeastUpdateTime = () => {
-    let min = null;
-
-    Object.values(tasksNextUpdate).forEach(key => {
-        if (min === null || min > key) {
-            min = key;
-        }
-    })
-
-    return min;
-}
+// const findLeastUpdateTime = () => {
+//     let min = null;
+//
+//     Object.values(tasksNextUpdate).forEach(key => {
+//         if (min === null || min > key) {
+//             min = key;
+//         }
+//     })
+//
+//     return min;
+// }
 
 const getCurrentTasks = (usesTime, tasks, groups) => {
     const groupedTasks = [];

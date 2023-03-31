@@ -31,6 +31,7 @@ import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
+import {UndoContext} from "../../context/UndoContext";
 
 const StatSection = ({entries}) => {
     return (
@@ -211,7 +212,7 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         }
     }
 
-    const handleDelete = async () => {
+    const handleDeleteClick = async () => {
         if (editedEntry) {
             if (isToday) {
                 await changeEntry({taskId, entryId: editedEntry._id, value: 0});
@@ -232,14 +233,14 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     const renderDisplayIcon = () => {
         if (isToday) return (
             <IconButton
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
             >
                 <TbRefresh />
             </IconButton>
         );
         return (
             <IconButton
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
             >
                 <TbTrash />
             </IconButton>
@@ -351,7 +352,7 @@ const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction}) => {
                     Are you sure you want to delete this task?
                 </div>
                 <div className={"Label"}>
-                    If you continue you will be able to undo this action for <b>15 seconds</b> (or until you dismiss the undo prompt),
+                    If you continue you will be able to undo this action for <b>10 seconds</b> (or until you dismiss the undo prompt),
                     after which the task will be deleted permanently.
                 </div>
                 <div className={"Label Horizontal-Flex-Container "}>
@@ -391,35 +392,42 @@ const SortIcon = ({sortOrder}) => {
 
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
+    const undoContext = useContext(UndoContext);
+    
     const {mutate: deleteTask} = useDeleteTask();
     const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
     const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id, task.currentEntryId);
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
-    const [selectedGraph, setSelectedGraph] = useState('Average');
+    // const [selectedGraph, setSelectedGraph] = useState('Average');
     const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
     const [isVisibleConfirmDeleteModal, setIsVisibleConfirmDeleteModal] = useState(false);
     const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
     const [sortOrderValue, setSortOrderValue] = useState(0);
 
-    const graphOptions = ['Average', 'Total'];
+    // const graphOptions = ['Average', 'Total'];
 
     const [date, setDate] = useState(new Date());
 
-    const addToMonth = (adder) => {
-        const newDate = new Date(date.getTime());
-        newDate.setMonth(newDate.getMonth() + adder);
-
-        setDate(newDate);
-    }
+    // const addToMonth = (adder) => {
+    //     const newDate = new Date(date.getTime());
+    //     newDate.setMonth(newDate.getMonth() + adder);
+    //
+    //     setDate(newDate);
+    // }
 
     const handleDelete = () => {
+        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+        undoContext.dispatch({type: 'ADD_UNDO', payload: {type: 'task', id: task._id}});
+        deleteTask(task._id);
+    }
+
+    const handleDeleteClick = () => {
         if (true) { // check with user settings for prompt to delete task
             setIsVisibleConfirmDeleteModal(true);
         } else {
-            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-            deleteTask(task._id);
+            handleDelete()
         }
     }
 
@@ -496,7 +504,7 @@ const TaskView = ({index, length, task}) => {
                         >
                             <TbEdit />
                         </IconButton>
-                        <IconButton onClick={handleDelete}><TbTrash /></IconButton>
+                        <IconButton onClick={handleDeleteClick}><TbTrash /></IconButton>
                     </div>
                 </section>
                 <section className={'Horizontal-Flex-Container'}>
@@ -617,10 +625,7 @@ const TaskView = ({index, length, task}) => {
             {isVisibleConfirmDeleteModal &&
                 <ConfirmDeleteModal
                     dismountConfirmDeleteModal={dismountConfirmDeleteModal}
-                    deleteFunction={() => {
-                        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-                        deleteTask(task._id)
-                    }}
+                    deleteFunction={handleDelete}
                 />
             }
         </div>

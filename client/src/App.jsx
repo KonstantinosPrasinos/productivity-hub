@@ -6,9 +6,7 @@ import {useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
-import NewCategory from './pages/NewCategory/NewCategory';
 import NotFound from "./pages/NotFound/NotFound";
-import NewTask from "./pages/NewTask/NewTask";
 import Home from "./pages/Home/Home";
 import AlertHandler from "./components/handlers/AlertHandler/AlertHandler";
 import MiniPagesHandler from "./components/handlers/MiniPagesHandler/MiniPageHandler";
@@ -21,15 +19,18 @@ import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
 import {ReactQueryDevtools} from "react-query/devtools";
 import {updateUserValidDate} from "./functions/updateUserValidDate";
 import 'react-day-picker/dist/style.css';
+import UndoContextProvider from "./context/UndoContext";
+import UndoHandler from "./components/handlers/UndoHandler/UndoHandler";
 
 const NavLayout = () => (
-    <>
+    <UndoContextProvider>
         <NavBar/>
         <MiniPagesHandler />
+        <UndoHandler />
         <div className="Content-Container">
             <Outlet />
         </div>
-    </>
+    </UndoContextProvider>
 )
 const ProtectedLayout = () => {
     const userExists = useContext(UserContext).state?.id;
@@ -43,7 +44,7 @@ const ProtectedLayout = () => {
 }
 
 function App() {
-    const location = useLocation();
+    // const location = useLocation();
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);

@@ -1,6 +1,6 @@
 import styles from './IconButton.module.scss';
 
-const IconButton = ({children, label, selected = null, onClick, border, color = 'inverse', disabled}) => {
+const IconButton = ({children, label, selected = null, onClick, border, color = 'inherit', disabled}) => {
     return (
         <button
             onClick={onClick}

@@ -11,7 +11,11 @@ const fetchTasks = async () => {
         throw new Error('Failed to get tasks from server');
     }
 
-    return response.json();
+    const data = response.json();
+
+    console.log(data);
+
+    return data;
 }
 
 

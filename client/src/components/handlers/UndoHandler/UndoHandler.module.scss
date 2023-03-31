@@ -1,0 +1,14 @@
+@import 'src/styles/index.scss';
+
+.container {
+  @extend .Horizontal-Flex-Container;
+  border-radius: $button-border-radius;
+  position: fixed;
+  bottom: 2em;
+  right: 2em;
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+  font-size: $font-l;
+  padding: $base-padding;
+  z-index: 2;
+}

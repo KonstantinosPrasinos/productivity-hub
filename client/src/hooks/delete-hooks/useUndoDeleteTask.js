@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 
-const postDeleteTask = async (taskId) => {
-    const response = await fetch('http://localhost:5000/api/task/delete', {
+const postUndoDeleteTask = async (taskId) => {
+    const response = await fetch('http://localhost:5000/api/task/undo-delete', {
         method: 'POST',
         body: JSON.stringify({taskId}),
         headers: {'Content-Type': 'application/json'},
@@ -15,17 +15,17 @@ const postDeleteTask = async (taskId) => {
     return response.json();
 }
 
-export function useDeleteTask() {
+export function useUndoDeleteTask() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: postDeleteTask,
+        mutationFn: postUndoDeleteTask,
         onSuccess: (_, recoveredTaskId) => {
             queryClient.setQueryData(["tasks"], (oldData) => {
                 return oldData ? {
                     tasks: [...oldData.tasks.map(task => {
                         if (task._id === recoveredTaskId) {
-                            return {...task, hidden: true};
+                            return {...task, hidden: false};
                         }
                         return task;
                     })]

@@ -42,7 +42,7 @@ export function useAddTask() {
             queryClient.setQueryData(["tasks"], (oldData) => {
                 updateSettingsLowAndHigh(data);
                 return oldData ? {
-                    tasks: [...oldData.tasks, data]
+                    tasks: [...oldData.tasks, {...data, hidden: false}]
                 } : oldData
             });
         }

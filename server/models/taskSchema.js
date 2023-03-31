@@ -51,7 +51,13 @@ const Task = new mongoose.Schema({
     mostRecentProperDate: {
         type: Date,
         default: Date.now
+    },
+    forDeletion: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
+
+Task.index({updatedAt: 1}, {expireAfterSeconds: 60, partialFilterExpression: {forDeletion: true}});
 
 module.exports = mongoose.model('Task', Task)

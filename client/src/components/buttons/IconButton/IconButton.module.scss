@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   font-size: inherit;
-  color: var(--primary-color);
+  color: inherit;
   height: 1.5em;
   width: 1.5em;
   overflow: hidden;
@@ -19,10 +19,6 @@
 
   &.notSelected {
     opacity: $opacity-very-low;
-  }
-
-  &.inverse {
-    color: var(--primary-color);
   }
 
   &.normal {
