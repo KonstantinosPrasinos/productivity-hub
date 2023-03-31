@@ -32,6 +32,8 @@ import TextButton from "../../components/buttons/TextButton/TextButton";
 import {useChangeEntry} from "../../hooks/change-hooks/useChangeEntry";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import {UndoContext} from "../../context/UndoContext";
+import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
+import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 
 const StatSection = ({entries}) => {
     return (
@@ -332,12 +334,12 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     );
 }
 
-const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction}) => {
+const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction, changeSettingsFunction}) => {
     const [neverShowAgain, setNeverShowAgain] = useState(false);
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (neverShowAgain) {
-            // Set equivalent setting
+            changeSettingsFunction();
         }
         dismountConfirmDeleteModal();
         deleteFunction();
@@ -396,8 +398,11 @@ const TaskView = ({index, length, task}) => {
     
     const {mutate: deleteTask} = useDeleteTask();
     const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
+    const {mutate: setSettings} = useChangeSettings();
+
     const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id, task.currentEntryId);
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+    const {data: settings} = useGetSettings();
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
     const [editedEntry, setEditedEntry] = useState(null);
@@ -408,7 +413,7 @@ const TaskView = ({index, length, task}) => {
 
     // const graphOptions = ['Average', 'Total'];
 
-    const [date, setDate] = useState(new Date());
+    // const [date, setDate] = useState(new Date());
 
     // const addToMonth = (adder) => {
     //     const newDate = new Date(date.getTime());
@@ -417,6 +422,10 @@ const TaskView = ({index, length, task}) => {
     //     setDate(newDate);
     // }
 
+    const updateSettings = async () => {
+        await setSettings({...settings, confirmDelete: false, priorityBounds: undefined});
+    }
+
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
         undoContext.dispatch({type: 'ADD_UNDO', payload: {type: 'task', id: task._id}});
@@ -424,7 +433,7 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleDeleteClick = () => {
-        if (true) { // check with user settings for prompt to delete task
+        if (settings.confirmDelete) { // check with user settings for prompt to delete task
             setIsVisibleConfirmDeleteModal(true);
         } else {
             handleDelete()
@@ -626,6 +635,7 @@ const TaskView = ({index, length, task}) => {
                 <ConfirmDeleteModal
                     dismountConfirmDeleteModal={dismountConfirmDeleteModal}
                     deleteFunction={handleDelete}
+                    changeSettingsFunction={updateSettings}
                 />
             }
         </div>

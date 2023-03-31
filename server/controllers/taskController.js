@@ -195,7 +195,7 @@ const getTasksWithHistory = async (tasks, userId) => {
 
 const getTasks = async (req, res) => {
     if (req.user) {
-        Task.find({userId: req.user._id}, async (err, tasks) => {
+        Task.find({userId: req.user._id, forDeletion: false}, async (err, tasks) => {
             if (err) return res.status(404).json({message: 'Tasks not found.'});
 
             const tasksWithHistory = await getTasksWithHistory(tasks, req.user._id)
