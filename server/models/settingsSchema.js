@@ -10,6 +10,10 @@ const Settings = new mongoose.Schema({
         type: String,
         default: 'Light'
     },
+    confirmDelete: {
+        type: Boolean,
+        default: true
+    },
     defaults: {
         step: {type: Number, default: 1},
         goal: {type: Number, default: 1},
