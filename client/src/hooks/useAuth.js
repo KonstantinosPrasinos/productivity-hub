@@ -89,7 +89,7 @@ export function useAuth() {
             localStorage.removeItem('user');
             localStorage.removeItem('settings');
             dispatch({type: "REMOVE_USER"});
-            queryClient.removeQueries(["settings"]);
+            queryClient.removeQueries();
         }
     }
 
