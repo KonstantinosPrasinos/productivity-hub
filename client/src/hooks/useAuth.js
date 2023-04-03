@@ -33,6 +33,29 @@ export function useAuth() {
         setIsLoading(false);
     }
 
+    const loginGoogle = async (data) => {
+        setIsLoading(true);
+
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/google`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+
+        } else {
+            const data = await response.json();
+            const date = new Date();
+            date.setMonth(date.getMonth() + 1);
+            date.setHours(date.getHours() - 1);
+            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date}));
+        }
+        setIsLoading(false);
+    }
+
     const register = async (email, password) => {
         setIsLoading(true);
 
@@ -90,5 +113,5 @@ export function useAuth() {
         await queryClient.invalidateQueries({queryKey: ["categories"]});
     }
 
-    return {login, logout, register, isLoading, resetAccount}
+    return {login, logout, register, isLoading, resetAccount, loginGoogle}
 }

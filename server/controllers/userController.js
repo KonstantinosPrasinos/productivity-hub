@@ -1,4 +1,5 @@
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleOneTapStrategy = require("passport-google-one-tap").GoogleOneTapStrategy;
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 
@@ -11,6 +12,12 @@ const Category = require('../models/categorySchema');
 const Group = require('../models/groupSchema');
 const Entry = require('../models/entrySchema');
 
+const createUser = async (parameters) => {
+    const user = await User.create(parameters);
+    await Settings.create({userId: user._id});
+
+    return user;
+}
 const signupUser = (req, res) => {
     const {email, password} = req.body;
 
@@ -26,8 +33,7 @@ const signupUser = (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, 10);
 
         if (!userExists) {
-            const user = await User.create({local: {email: email, password: hashedPassword}});
-            await Settings.create({userId: user._id});
+            await createUser({local: {email: email, password: hashedPassword}});
         }
 
         await sendEmail(email, 'setEmail');
@@ -37,7 +43,7 @@ const signupUser = (req, res) => {
 }
 
 const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
-    User.findOne({'local.email': email}, (err, user) =>{
+    User.findOne({'local.email': email, 'googleId': undefined}, (err, user) =>{
         if (err) {return done(err)}
         if (!user) {return done(null, false, {message: 'Incorrect email or password.'})}
         if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect email or password.' })}
@@ -45,6 +51,44 @@ const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, 
         return done(null, user);
     })
 });
+
+const googleLogin = new GoogleOneTapStrategy(
+    {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        verifyCsrfToken: false, // whether to validate the csrf token or not
+    },
+    async (profile, done)=> {
+        let user;
+
+        try {
+            user = await User.findOne({'googleId': profile.id});
+        } catch (err) {
+            return done(err);
+        }
+
+        if (!user) {
+            let emailUser, newUser;
+            try {
+                emailUser = await User.findOne({'local.email': profile.emails[0].value});
+            } catch (err) {
+                return done(err);
+            }
+
+            if (emailUser) return done(null, false, {message: 'Account already exists for this email.'});
+
+            try {
+                newUser = createUser({googleId: profile.id, local: {email: profile.emails[0].value}, active: true});
+            } catch (err) {
+                return done(err);
+            }
+
+            return done(null, newUser);
+        }
+
+        return done(null, user);
+    }
+)
 
 const logoutUser = (req, res) => {
     if (req.user) {
@@ -115,4 +159,4 @@ const resetUser = async (req, res) => {
     }
 }
 
-module.exports = {loginUser, signupUser, logoutUser, deleteUser, resetUser};
+module.exports = {loginUser, signupUser, logoutUser, deleteUser, resetUser, googleLogin};

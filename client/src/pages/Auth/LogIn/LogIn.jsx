@@ -12,6 +12,7 @@ import TextButton from "../../../components/buttons/TextButton/TextButton";
 import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
+import GoogleSignInButton from "../../../components/utilities/GoogleSignInButton/GoogleSignInButton";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -141,11 +142,13 @@ const LogIn = () => {
                             onKeydown={handleKeyDown}
                         />
                     </CollapsibleContainer>
-                    <div className={'Horizontal-Flex-Container Space-Between'}>
+                    <div className={`Horizontal-Flex-Container Space-Between ${styles.buttonContainer}`}>
                         <Button filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
                         <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
+                    <div>or</div>
+                    <GoogleSignInButton />
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>

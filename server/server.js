@@ -7,7 +7,7 @@ const session = require('express-session');
 const cors = require('cors')
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-const {loginUser} = require('./controllers/userController');
+const {loginUser, googleLogin} = require('./controllers/userController');
 const User = require('./models/userSchema');
 
 const userRoutes = require('./routes/userRoutes');
@@ -17,6 +17,7 @@ const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const securityRoutes = require('./routes/securityRoutes');
 const taskHistoryRoutes = require('./routes/entryRoutes');
+// const {Strategy: GoogleStrategy} = require("passport-google-oauth20");
 
 // Express app
 const app = express();
@@ -63,6 +64,7 @@ passport.deserializeUser(function(user, done) {
 });
 
 passport.use(loginUser);
+passport.use(googleLogin);
 
 // Routes
 app.use('/api/user', userRoutes);
