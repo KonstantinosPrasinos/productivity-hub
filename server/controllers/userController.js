@@ -78,7 +78,7 @@ const googleLogin = new GoogleOneTapStrategy(
             if (emailUser) return done(null, false, {message: 'Account already exists for this email.'});
 
             try {
-                newUser = createUser({googleId: profile.id, local: {email: profile.emails[0].value}, active: true});
+                newUser = await createUser({googleId: profile.id, local: {email: profile.emails[0].value}, active: true});
             } catch (err) {
                 return done(err);
             }
@@ -94,9 +94,9 @@ const logoutUser = (req, res) => {
     if (req.user) {
         req.session.destroy();
         res.clearCookie('connect.sid');
-        return res.json({msg: 'Logging user out.'});
+        return res.status(200).json({message: 'Logging user out.'});
     } else {
-        return res.status(400).json({msg: 'No user to log out.'})
+        return res.status(400).json({message: 'No user to log out.'})
     }
 }
 
@@ -156,6 +156,8 @@ const resetUser = async (req, res) => {
         }
 
         return res.status(200).json({message: 'User reset successfully.'});
+    } else {
+        res.status(401).send({message: "Not authorized"});
     }
 }
 

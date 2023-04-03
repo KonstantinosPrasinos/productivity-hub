@@ -75,6 +75,13 @@ app.use('/api/category', categoryRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/entry', taskHistoryRoutes);
 
+app.use((err, req, res, next) => {
+    if (err.message) {
+        return res.status(400).json({message: err.message})
+    }
+    next();
+})
+
 // Connect to database
 mongoose.connect(process.env.MONG_URI)
     .then(() => {

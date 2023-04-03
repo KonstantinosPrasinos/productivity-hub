@@ -12,8 +12,7 @@ const queryClient = new QueryClient();
 const container = document.getElementById("root");
 const root = createRoot(container)
 
-root.render(
-    // <React.StrictMode>
+root.render(// <React.StrictMode>
     <AlertsContextProvider>
         <MiniPagesContextProvider>
             <UserContextProvider>

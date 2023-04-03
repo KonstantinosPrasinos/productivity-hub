@@ -13,12 +13,12 @@ import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
 import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
-import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin} from "react-icons/tb";
+import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin, TbBrandGoogle} from "react-icons/tb";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
-    const email = useContext(UserContext).state.email;
+    const {email, googleLinked} = useContext(UserContext).state;
     const {mutateAsync: setSettings, isError: isErrorSetSettings} = useChangeSettings();
     const {mutateAsync: resetAccount, isLoading: resetAccountLoading, isError: resetAccountError} = useResetAccount();
     const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
@@ -168,6 +168,7 @@ const Settings = () => {
             await handleLogOut();
         }
     }
+
     const checkIfContinueActive = () => {
         return currentPassword.length <= 0;
     }
@@ -193,15 +194,18 @@ const Settings = () => {
                         </div>
                         <div className={styles.subSectionTitle}>Account Details</div>
                         <section className={`Stack-Container ${styles.subSection}`}>
-                            {/*<div className={'Stack-Container'}>*/}
-                            {/*    <div className={'Horizontal-Flex-Container'}><GoogleIcon />Google Account</div>*/}
-                            {/*    <div className={`Horizontal-Flex-Container Space-Between`}>*/}
-                            {/*        <div className={'Label'}>{email}</div>*/}
-                            {/*        <Button filled={false} size={'small'} onClick={handleChangeEmail}>Unlink</Button>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><TbMail />Email</div>
+                            {googleLinked && <div className={'Stack-Container'}>
+                                <div className={'Horizontal-Flex-Container'}><TbBrandGoogle/>Google Account</div>
+                                <div className={`Horizontal-Flex-Container Space-Between`}>
+                                    <div className={'Label'}>
+                                        You are connected using a Google Account with the following email address:
+                                        <br />
+                                        {email}
+                                    </div>
+                                </div>
+                            </div>}
+                            {!googleLinked && <div className={'Stack-Container'}>
+                                <div className={'Horizontal-Flex-Container'}><TbMail/>Email</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>
                                         {email}
@@ -210,8 +214,8 @@ const Settings = () => {
                                     </div>
                                     <Button filled={false} size={'small'} onClick={handleChangeEmail}>Change</Button>
                                 </div>
-                            </div>
-                            <div className={'Stack-Container'}>
+                            </div>}
+                            {!googleLinked && <div className={'Stack-Container'}>
                                 <div className={'Horizontal-Flex-Container'}>Change Password</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
                                     <div className={'Label'}>
@@ -221,7 +225,7 @@ const Settings = () => {
                                     </div>
                                     <Button filled={false} size={'small'} onClick={handleChangePasswordClick}>Change</Button>
                                 </div>
-                            </div>
+                            </div>}
                         </section>
                         <div className={styles.subSectionTitle}>Danger Zone</div>
                         <section className={`Stack-Container ${styles.subSection}`}>
@@ -317,7 +321,7 @@ const Settings = () => {
                     </div>
                 </section>
 
-                {/*// Modal for password confirmation in order to delete account*/}
+                {/* Modal for password confirmation in order to delete account*/}
                 {deleteModalVisible && <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
                     <div className={'Stack-Container Big-Gap'} >
                         <div className={'Display'}>Confirm your password</div>
@@ -350,7 +354,7 @@ const Settings = () => {
                     </div>
                 </Modal>}
 
-                {/*// Modal for password confirmation in order to reset account*/}
+                {/* Modal for password confirmation in order to reset account*/}
                 {resetModalVisible && <Modal isOverlay={true} dismountFunction={handleResetCancel}>
                     <div className={'Stack-Container'} >
                         <div className={'Display'}>Confirm your password</div>
@@ -383,6 +387,8 @@ const Settings = () => {
                     </div>
                 </Modal>}
             </div>
+
+            {/* If any changes have been made render save changes button */}
             {Object.keys(settingsChanges).length > 0 &&
                 <div className={styles.saveSettingsContainer}>
                     <Button onClick={handleSaveChanges}>Save changes</Button>

@@ -21,14 +21,14 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
         } else {
             const data = await response.json();
             const date = new Date();
             date.setMonth(date.getMonth() + 1);
             date.setHours(date.getHours() - 1);
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date}));
+            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
         }
         setIsLoading(false);
     }
@@ -44,14 +44,15 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
         } else {
             const data = await response.json();
             const date = new Date();
+            console.log(data);
             date.setMonth(date.getMonth() + 1);
             date.setHours(date.getHours() - 1);
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date}));
+            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
         }
         setIsLoading(false);
     }
