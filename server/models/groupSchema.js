@@ -19,8 +19,8 @@ const Group = new mongoose.Schema({
         smallTimePeriod: [String],
         startingDate: [Number],
         time: {
-            startingTime: Number,
-            endingTime: Number
+            start: String,
+            end: String
         }
     },
     parent: {

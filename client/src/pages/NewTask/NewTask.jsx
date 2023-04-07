@@ -21,6 +21,7 @@ import HeaderExtendContainer from "../../components/containers/HeaderExtendConta
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import {motion} from "framer-motion";
 import styles from "./NewTask.module.scss";
+import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -45,6 +46,11 @@ const NewTask = ({index, length, id}) => {
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     // const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState('');
+    const [hasTime, setHasTime] = useState(false);
+    const [startHour, setStartHour] = useState('00');
+    const [startMinute, setStartMinute] = useState('00');
+    const [endHour, setEndHour] = useState('23');
+    const [endMinute, setEndMinute] = useState('59');
 
     const [repeatNumber, setRepeatNumber] = useState(settings.defaults.priority);
     const [timePeriod, setTimePeriod] = useState('Weeks');
@@ -128,10 +134,6 @@ const NewTask = ({index, length, id}) => {
         }
     }, [isLoading]);
 
-    const handleSetTimePeriod = (e) => {
-        setTimePeriod2(e);
-    }
-
     const handleSave = async () => {
         const checkAllInputs = () => {
             if (title) {
@@ -192,6 +194,13 @@ const NewTask = ({index, length, id}) => {
                             }
                         })
                         return;
+                    }
+
+                    if (hasTime) {
+                        repeatRate.time = {
+                            start: startHour.concat(startMinute),
+                            end: endHour.concat(endMinute)
+                        }
                     }
 
                     repeatProperties.repeatRate = repeatRate;
@@ -488,6 +497,26 @@ const NewTask = ({index, length, id}) => {
                 extendedInherited={extendedSection === 3}
                 isDisabled={!repeats || repeatType !== "Custom Rules"}
             >
+                <InputWrapper label={"Repeat between certain times"}>
+                    <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
+                </InputWrapper>
+                <InputWrapper label={"From - To"}>
+                    <TimeInput
+                        hour={startHour}
+                        setHour={setStartHour}
+                        minute={startMinute}
+                        setMinute={setStartMinute}
+                        isDisabled={!hasTime}
+                    />
+                    -
+                    <TimeInput
+                        hour={endHour}
+                        setHour={setEndHour}
+                        minute={endMinute}
+                        setMinute={setEndMinute}
+                        isDisabled={!hasTime}
+                    />
+                </InputWrapper>
                 <InputWrapper label={'Repeat every'}>
                     <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
                     <DropDownInput
@@ -497,7 +526,7 @@ const NewTask = ({index, length, id}) => {
                         {timePeriods.map(tempTimePeriod => (
                             <button
                                 className={styles.dropDownOption}
-                                onClick={() => handleSetTimePeriod(tempTimePeriod)}
+                                onClick={() => setTimePeriod(tempTimePeriod)}
                                 key={tempTimePeriod}
                             >
                                 {tempTimePeriod}

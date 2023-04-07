@@ -1,0 +1,32 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  font-size: $font-xl;
+  line-height: 28px;
+  width: min-content;
+  position: relative;
+  padding: 6px 4px;
+  justify-content: center;
+  box-sizing: border-box;
+
+  .disabled {
+    opacity: $opacity-low;
+  }
+}
+
+.currentContainer {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 2em 1em 2em;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas: ". . .";
+  align-items: center;
+}
+
+.currentNumber {
+  width: 100%;
+  font-size: inherit;
+  text-align: center;
+  overscroll-behavior-y: contain;
+}

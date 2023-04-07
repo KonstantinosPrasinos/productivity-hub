@@ -44,8 +44,8 @@ const Task = new mongoose.Schema({
         smallTimePeriod: [String],
         startingDate: [Number],
         time: {
-            starting: Number,
-            ending: Number
+            start: String,
+            end: String
         }
     },
     mostRecentProperDate: {

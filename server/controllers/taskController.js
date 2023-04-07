@@ -27,10 +27,10 @@ const taskSchema = Joi.object({
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
         startingDate: Joi.array().items(Joi.number()),
-        // time: Joi.object().keys({
-        //     starting: Joi.number().integer().min(0),
-        //     ending: Joi.number().integer().max(2400)
-        // })
+        time: Joi.object().keys({
+            start: Joi.string(),
+            end: Joi.string()
+        })
     }),
     _id: Joi.string()
 })

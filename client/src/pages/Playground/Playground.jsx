@@ -20,6 +20,7 @@ import IconButton from "../../components/buttons/IconButton/IconButton";
 import {TbHome} from "react-icons/tb";
 import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import {AnimatePresence, motion} from "framer-motion";
+import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -31,9 +32,8 @@ const Playground = () => {
   const [textValue, setTextValue] = useState("");
   const [numberValue, setNumberValue] = useState(0);
   const [calendarValue, setCalendarValue] = useState("");
-
-
-
+  const [hourValue, setHourValue] = useState("20");
+  const [minuteValue, setMinuteValue] = useState('20')
 
   const testingTask = {
       type: 'Number',
@@ -129,59 +129,54 @@ const Playground = () => {
         {/*    </div>*/}
         {/*</InputWrapper>*/}
 
-        {/*<InputWrapper label={"Normal Button Styles"}>*/}
-        {/*    <div className={styles.alignTopContainer}>*/}
-        {/*        <InputWrapper label={"Default (size: medium, filled: true, type: round)"}>*/}
-        {/*            <Button>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"Size Small"}>*/}
-        {/*            <Button size={"small"}>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"Size Large"}>*/}
-        {/*            <Button size={"large"}>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"Type Square"}>*/}
-        {/*            <Button type={"square"}>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"Filled False"}>*/}
-        {/*            <Button filled={false}>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"Width Max (Fills the containers width)"}>*/}
-        {/*            <Button width={"max"}>Button</Button>*/}
-        {/*        </InputWrapper>*/}
-        {/*    </div>*/}
-        {/*</InputWrapper>*/}
+        <InputWrapper label={"Normal Button Styles"}>
+            <div className={styles.alignTopContainer}>
+                <InputWrapper label={"Default (size: medium, filled: true, type: round)"}>
+                    <Button>Button</Button>
+                </InputWrapper>
+                <InputWrapper label={"Size Small"}>
+                    <Button size={"small"}>Button</Button>
+                </InputWrapper>
+                <InputWrapper label={"Size Large"}>
+                    <Button size={"large"}>Button</Button>
+                </InputWrapper>
+                <InputWrapper label={"Type Square"}>
+                    <Button type={"square"}>Button</Button>
+                </InputWrapper>
+                <InputWrapper label={"Filled False"}>
+                    <Button filled={false}>Button</Button>
+                </InputWrapper>
+                <InputWrapper label={"Width Max (Fills the containers width)"}>
+                    <Button width={"max"}>Button</Button>
+                </InputWrapper>
+            </div>
+        </InputWrapper>
 
-        {/*<InputWrapper label={"Etc Buttons"}>*/}
-        {/*    <InputWrapper label={"Text Button"}>*/}
-        {/*        <TextButton>Click me!</TextButton>*/}
-        {/*    </InputWrapper>*/}
-        {/*    <InputWrapper label={"Toggle Button"}>*/}
-        {/*        <ToggleButton isToggled={isToggled} setIsToggled={setIsToggled}>Click me</ToggleButton>*/}
-        {/*    </InputWrapper>*/}
-        {/*    <InputWrapper label={"Icon Button"}>*/}
-        {/*        <IconButton>*/}
-        {/*            <TbHome />*/}
-        {/*        </IconButton>*/}
-        {/*    </InputWrapper>*/}
-        {/*</InputWrapper>*/}
-        {/*<InputWrapper label={"Chips"}>*/}
-        {/*    {chipGroup.map((value, index) => (*/}
-        {/*        <Chip key={index} selected={selected} value={value} setSelected={setSelected}>{value}</Chip>*/}
-        {/*    ))}*/}
-        {/*</InputWrapper>*/}
+        <InputWrapper label={"Etc Buttons"}>
+            <InputWrapper label={"Text Button"}>
+                <TextButton>Click me!</TextButton>
+            </InputWrapper>
+            <InputWrapper label={"Toggle Button"}>
+                <ToggleButton isToggled={isToggled} setIsToggled={setIsToggled}>Click me</ToggleButton>
+            </InputWrapper>
+            <InputWrapper label={"Icon Button"}>
+                <IconButton>
+                    <TbHome />
+                </IconButton>
+            </InputWrapper>
+        </InputWrapper>
+        <InputWrapper label={"Chips"}>
+            {chipGroup.map((value, index) => (
+                <Chip key={index} selected={selected} value={value} setSelected={setSelected}>{value}</Chip>
+            ))}
+        </InputWrapper>
 
         <InputWrapper label={"Header Extension Container"}>
             <HeaderExtendContainer header={<div>header</div>}>
                 <div>Hello</div>
             </HeaderExtendContainer>
         </InputWrapper>
-
-        <div style={{position: "relative"}}>
-            <div style={{position: "absolute"}}>
-                <div style={{position: "fixed"}}>test</div>
-            </div>
-        </div>
+        <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} />
 
       {/*<Button onClick={() => console.log("Clicked!")}>*/}
       {/*  Click me*/}

@@ -17,23 +17,23 @@ const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2}) => {
         day: customStyles.calendarDay
     }
 
-    const renderPicker = () => {
-        switch (timePeriod) {
-            case 'Days':
-                return;
-            case 'Weeks':
-                return (<WeekDayInput selected={timePeriod2} setSelected={setTimePeriod2}></WeekDayInput>)
-            case 'Months':
-                return (<DayPicker
+    return (
+        <div>
+            {timePeriod === 'Weeks' &&
+                <WeekDayInput selected={timePeriod2} setSelected={setTimePeriod2}></WeekDayInput>
+            }
+            {timePeriod === 'Months' &&
+                <DayPicker
                     mode="multiple"
                     styles={{caption: {display: 'none'}}}
                     selected={timePeriod2}
                     onSelect={setTimePeriod2}
                     defaultMonth={new Date(2022, 4)}
                     classNames={classNames}
-                />)
-            case 'Years':
-                return (<DayPicker
+                />
+            }
+            {timePeriod === 'Years' &&
+                <DayPicker
                     mode="multiple"
                     styles={{caption_label: {zIndex: 'auto'}}}
                     selected={timePeriod2}
@@ -43,14 +43,9 @@ const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2}) => {
                     formatters={{ formatCaption }}
                     defaultMonth={new Date(2022, 0)}
                     classNames={classNames}
-                />)
-        }
-    }
-
-    return (
-        <>
-            {renderPicker()}
-        </>
+                />
+            }
+        </div>
     );
 };
 
