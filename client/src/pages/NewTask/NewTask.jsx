@@ -129,7 +129,16 @@ const NewTask = ({index, length, id}) => {
                     setRepeatNumber(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
                     setTimePeriod2(task.repeatRate.smallTimePeriod);
+                    if (task.repeatRate.time) {
+                        setHasTime(true);
+                        setStartHour(task.repeatRate.time.start.substring(0, 2));
+                        setStartMinute(task.repeatRate.time.start.substring(2));
+                        setEndHour(task.repeatRate.time.end.substring(0, 2));
+                        setEndMinute(task.repeatRate.time.end.substring(2));
+                    }
                 }
+
+
             }
         }
     }, [isLoading]);
@@ -198,10 +207,13 @@ const NewTask = ({index, length, id}) => {
 
                     if (hasTime) {
                         if (
-                            (parseInt(startHour) < parseInt(endHour)) ||
+                            endHour !== "00" &&
                             (
-                                parseInt(startHour) === parseInt(endHour) &&
-                                parseInt(startMinute) < parseInt(endMinute)
+                                (parseInt(startHour) < parseInt(endHour)) ||
+                                (
+                                    parseInt(startHour) === parseInt(endHour) &&
+                                    parseInt(startMinute) < parseInt(endMinute)
+                                )
                             )
                         ) {
                             repeatRate.time = {

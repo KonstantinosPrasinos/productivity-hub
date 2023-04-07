@@ -8,7 +8,7 @@ import {UserContext} from "../../context/UserContext";
 import {useAuth} from "../../hooks/useAuth";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
-import {motion} from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
 import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
 import {useNavigate} from "react-router-dom";
@@ -389,11 +389,14 @@ const Settings = () => {
             </div>
 
             {/* If any changes have been made render save changes button */}
-            {Object.keys(settingsChanges).length > 0 &&
-                <div className={styles.saveSettingsContainer}>
-                    <Button onClick={handleSaveChanges}>Save changes</Button>
-                </div>
-            }
+            <AnimatePresence>
+                {Object.keys(settingsChanges).length > 0 &&
+                    <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className={styles.saveSettingsContainer}>
+                        <Button onClick={handleSaveChanges}>Save changes</Button>
+                    </motion.div>
+
+                }
+            </AnimatePresence>
         </motion.div>
     );
 };

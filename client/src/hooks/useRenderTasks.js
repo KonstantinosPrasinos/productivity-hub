@@ -62,8 +62,6 @@ const checkTime = (task) => {
 
     // Check if the current time is in the task render time range
     if (task.repeatRate.time) {
-        console.log('hello')
-        console.log(task.repeatRate.time);
         const fromHours = parseInt(task.repeatRate.time.start.substring(0, 2));
         const toHours = parseInt(task.repeatRate.time.end.substring(0, 2));
         const fromMinutes = parseInt(task.repeatRate.time.start.substring(2));
@@ -71,11 +69,17 @@ const checkTime = (task) => {
 
         if (
             isCorrectTime &&
-            !(
-                fromHours <= currentHours &&
-                toHours >= currentHours &&
-                fromMinutes <= currentMinutes &&
-                toMinutes >= currentMinutes
+            (
+                fromHours > currentHours ||
+                currentHours > toHours ||
+                (
+                    fromHours === currentHours &&
+                    currentMinutes <= fromMinutes
+                ) ||
+                (
+                    toHours === currentMinutes &&
+                    currentMinutes >= toMinutes
+                )
             )
         ) {
             isCorrectTime = false;
