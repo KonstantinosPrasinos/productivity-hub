@@ -6,7 +6,7 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
     const handleHourChange = (e) => {
         const input = e.target.value;
 
-        if (input.match(/^([01][0-9]?|2[0-3]?)?$/)) {
+        if (input.match(/^([0-9]|[01][0-9]?|2[0-3]?)?$/)) {
             setHour(input);
         }
     }
@@ -14,7 +14,7 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
     const handleMinuteChange = (e) => {
         const input = e.target.value;
 
-        if (input.match(/^([0-5][0-9]?)?$/)) {
+        if (input.match(/^([0-9]|[0-5][0-9]?)?$/)) {
             setMinute(input);
         }
     }

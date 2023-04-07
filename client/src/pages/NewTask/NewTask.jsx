@@ -189,7 +189,7 @@ const NewTask = ({index, length, id}) => {
                         alertsContext.dispatch({
                             type: "ADD_ALERT",
                             payload: {
-                                type: "warning",
+                                type: "error",
                                 message: "You need to enter at least one value into the \"On\" field."
                             }
                         })
@@ -197,9 +197,26 @@ const NewTask = ({index, length, id}) => {
                     }
 
                     if (hasTime) {
-                        repeatRate.time = {
-                            start: startHour.concat(startMinute),
-                            end: endHour.concat(endMinute)
+                        if (
+                            (parseInt(startHour) < parseInt(endHour)) ||
+                            (
+                                parseInt(startHour) === parseInt(endHour) &&
+                                parseInt(startMinute) < parseInt(endMinute)
+                            )
+                        ) {
+                            repeatRate.time = {
+                                start: startHour.concat(startMinute),
+                                end: endHour.concat(endMinute)
+                            }
+                        } else {
+                            alertsContext.dispatch({
+                                type: "ADD_ALERT",
+                                payload: {
+                                    type: "error",
+                                    message: "The \"from\" time must be before the \"after\" time."
+                                }
+                            })
+                            return;
                         }
                     }
 

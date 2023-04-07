@@ -42,11 +42,14 @@ const checkTime = (task) => {
     let isCorrectTime = false;
     let taskNextUpdate = null;
     const currentDate = new Date();
+    const currentHours = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
     currentDate.setUTCHours(0, 0, 0, 0);
 
 
-    for (const startingTime of task.repeatRate.startingDate) {
-        const nextUpdate = findNextUpdate(startingTime, task.repeatRate.number, task.repeatRate.bigTimePeriod);
+
+    for (const startingDate of task.repeatRate.startingDate) {
+        const nextUpdate = findNextUpdate(startingDate, task.repeatRate.number, task.repeatRate.bigTimePeriod);
         if (!taskNextUpdate || nextUpdate < taskNextUpdate) {
             taskNextUpdate = nextUpdate;
         }
@@ -55,6 +58,30 @@ const checkTime = (task) => {
 
         isCorrectTime = nextUpdate.getTime() === currentDate.getTime();
         if (isCorrectTime) break;
+    }
+
+    // Check if the current time is in the task render time range
+    if (task.repeatRate.time) {
+        console.log('hello')
+        console.log(task.repeatRate.time);
+        const fromHours = parseInt(task.repeatRate.time.start.substring(0, 2));
+        const toHours = parseInt(task.repeatRate.time.end.substring(0, 2));
+        const fromMinutes = parseInt(task.repeatRate.time.start.substring(2));
+        const toMinutes = parseInt(task.repeatRate.time.end.substring(2));
+
+        if (
+            isCorrectTime &&
+            !(
+                fromHours <= currentHours &&
+                toHours >= currentHours &&
+                fromMinutes <= currentMinutes &&
+                toMinutes >= currentMinutes
+            )
+        ) {
+            isCorrectTime = false;
+        }
+
+        taskNextUpdate?.setHours(fromHours, fromMinutes);
     }
 
     if (taskNextUpdate) {
@@ -67,7 +94,6 @@ const checkTime = (task) => {
 const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
 
     groups.forEach(group => {
-
         // Check if the group should be rendered at the current time
         if (usesTime) {
             if (!checkTime(group)) {
