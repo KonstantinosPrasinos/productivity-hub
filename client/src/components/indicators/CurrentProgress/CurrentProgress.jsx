@@ -13,9 +13,9 @@ const CurrentProgress = ({task}) => {
         let percentage;
 
         if (task.type === 'Checkbox') {
-            percentage = entry.value;
+            percentage = entry?.value;
         } else {
-            percentage = entry.value / task.goal.number;
+            percentage = entry?.value / task.goal.number;
         }
 
         return percentage;
@@ -26,8 +26,8 @@ const CurrentProgress = ({task}) => {
     const [prevPercentage, setPrevPercentage] = useState(getPercentage());
 
     useEffect(() => {
-        if (!isNaN(entry?.value)){
-            setPrevPercentage(entry.value)
+        if (!isLoading && !isNaN(entry?.value)){
+            setPrevPercentage(entry?.value)
         }
     }, [entry?.value])
 

@@ -41,9 +41,12 @@
     
     z-index: 1;
     margin-top: 5px;
-    overflow-y: hidden;
     padding: $base-padding;
     box-shadow: $elevation-1;
+
+    max-height: 10em;
+    flex-flow: wrap;
+    overflow-y: auto;
 }
 
 .option {
@@ -55,6 +58,8 @@
     text-overflow: ellipsis;
     overflow: hidden;
     box-sizing: border-box;
+    height: 2em;
+    width: 100%;
 
     & > * {
         padding: $base-padding;

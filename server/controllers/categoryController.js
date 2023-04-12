@@ -3,6 +3,7 @@ const Task = require('../models/taskSchema');
 const Joi = require('joi');
 const Group = require('../models/groupSchema');
 const {deleteGroupTasks} = require("../functions/deleteGroupTasks");
+const {groupSchema} = require('./groupController');
 
 const categorySchema = Joi.object({
     title: Joi.string().required(),
@@ -23,7 +24,9 @@ const getCategories = (req, res) => {
 
 const createCategory = async (req, res) => {
     if (req.user) {
-        const {category}  = req.body;
+        const {category, groups}  = req.body;
+
+        if (!category) return res.status(400).json({message: "No category provided."})
 
         const validatedCategory = categorySchema.validate(category);
 
@@ -31,12 +34,35 @@ const createCategory = async (req, res) => {
             return res.status(400).json({message: validatedCategory.error});
         }
 
+        let validatedGroups = [];
+
+        if (groups.length) {
+            for (const group of groups) {
+                const validatedGroup = groupSchema.validate(group);
+
+                if (validatedGroup.error) return res.status(400).json({message: validatedGroup.error});
+
+                validatedGroup.value.userId = req.user._id;
+
+                validatedGroups.push(validatedGroup.value);
+            }
+        }
+
         try {
             const newCategory = await Category.create({
                 ...validatedCategory.value,
                 userId: req.user._id
             });
-            res.status(200).json(newCategory);
+
+            let newGroups = undefined;
+
+            if (validatedGroups.length) {
+                newGroups = await Group.create(validatedGroups.map(group => {
+                    return {...group, parent: newCategory._id}
+                }));
+            }
+
+            res.status(200).json({newCategory, newGroups});
         } catch (error) {
             res.status(500).json({message: error.message})
         }

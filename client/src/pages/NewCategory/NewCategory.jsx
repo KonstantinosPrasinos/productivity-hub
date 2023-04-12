@@ -20,7 +20,6 @@ import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {findStartingDates} from "../../functions/findStartingDates";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useAddCategory} from "../../hooks/add-hooks/useAddCategory";
-import {useAddGroup} from "../../hooks/add-hooks/useAddGroup";
 import {AnimatePresence, motion} from "framer-motion";
 
 const NewCategory = ({index, length, id}) => {
@@ -29,7 +28,6 @@ const NewCategory = ({index, length, id}) => {
     const {data: settings} = useGetSettings();
     const alertsContext = useContext(AlertsContext);
     const {mutate: addCategoryToServer} = useAddCategory();
-    const {mutate: addGroupToServer} = useAddGroup();
     const miniPagesContext = useContext(MiniPagesContext);
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years']
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
@@ -70,33 +68,18 @@ const NewCategory = ({index, length, id}) => {
         if (checkAllInputs()) {
             const category = {
                 title,
-                color,
+                color
             }
 
-            // if (id) {
-            //
-            //     for (const group of groups) {
-            //         // Do set group things
-            //     }
-            //
-            // } else {
-            //     await addCategoryToServer(category, {onSuccess: (data) => {
-            //             // if (error) return;
-            //             for (index in timeGroups) {
-            //                 delete timeGroups[index].initial
-            //                 timeGroups[index].parent = data._id;
-            //
-            //                 addGroupToServer(timeGroups[index]);
-            //             }
-            //         }});
-            //     for (index in timeGroups) {
-            //         // delete timeGroups[index].initial
-            //
-            //         // await addGroupToServer(timeGroups[index]);
-            //     }
-            //
-            //
-            // }
+            if (id) {
+            } else {
+                await addCategoryToServer(
+                    {
+                        category,
+                        groups: timeGroups.map(timeGroup => {
+                            return {...timeGroup, id: undefined}
+                        })});
+            }
 
             // for (const group of timeGroups) {
             //     if (group.priority < settings.priorityBounds.low) {
@@ -105,12 +88,12 @@ const NewCategory = ({index, length, id}) => {
             //     if (group.priority > settings.priorityBounds.high) {
             //         dispatch(setHighestPriority(group.priority));
             //     }
-            //
-            //     if (id && group.initial) {
-            //         dispatch(setGroup(tempGroup));
-            //     } else {
-            //         await addCategoryToServer()
-            //     }
+            //     //
+            //     // if (id && group.initial) {
+            //     //     dispatch(setGroup(tempGroup));
+            //     // } else {
+            //     //     await addCategoryToServer()
+            //     // }
             // }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})

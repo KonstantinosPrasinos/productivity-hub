@@ -48,7 +48,7 @@ export function useAuth() {
         } else {
             const data = await response.json();
             const date = new Date();
-            console.log(data);
+
             date.setMonth(date.getMonth() + 1);
             date.setHours(date.getHours() - 1);
             dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});

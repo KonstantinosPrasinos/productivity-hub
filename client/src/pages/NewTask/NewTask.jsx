@@ -337,7 +337,7 @@ const NewTask = ({index, length, id}) => {
                         >
                             None
                         </button>
-                        {categories.map((tempCategory, id) => (
+                        {...categories.map((tempCategory, id) => (
                             <button
                                 className={styles.dropDownOption}
                                 key={id}

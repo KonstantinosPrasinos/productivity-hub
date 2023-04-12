@@ -9,13 +9,12 @@ const groupSchema = Joi.object({
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
         startingDate: Joi.array().items(Joi.number()),
-        time: Joi.object().keys({
-            starting: Joi.number().integer().min(0),
-            ending: Joi.number().integer().max(2400)
-        })
-    }),
-    parent: Joi.string().required()
-})
+        // time: Joi.object().keys({
+        //     starting: Joi.number().integer().min(0),
+        //     ending: Joi.number().integer().max(2400)
+        // })
+    })
+});
 
 const getGroups = async (req, res) => {
     if (req.user) {
@@ -69,4 +68,4 @@ const deleteGroup = async (req, res) => {
     }
 }
 
-module.exports = {getGroups, createGroup, deleteGroup};
+module.exports = {getGroups, createGroup, deleteGroup, groupSchema};
