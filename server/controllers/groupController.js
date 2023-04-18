@@ -1,4 +1,5 @@
 const Group = require('../models/groupSchema');
+const Task = require('../models/taskSchema');
 const Joi = require('joi');
 
 const groupSchema = Joi.object({
@@ -54,18 +55,72 @@ const createGroup = async (req, res) => {
 
 const deleteGroup = async (req, res) => {
     if (req.user) {
-        const {groupId} = req.body;
+        const {groupIds, action} = req.body;
 
-        Group.findByIdAndDelete(groupId, (err) => {
-            if (err) {
-                return res.status(500).json({message: err});
+        try {
+            let editedTasks;
+
+            // Get the ids of the tasks that are about to be deleted or edited
+            editedTasks = await Task.find({userId: req.user._id, group: {$in: groupIds}});
+            editedTasks = editedTasks.map(task => task._id);
+
+            switch (action) {
+                case "Keep their repeat details":
+                    await Task.updateMany({userId: req.user._id, group: {$in: groupIds}}, {group: ""});
+                    break;
+                case "Remove their repeat details":
+                    await Task.updateMany(
+                        {userId: req.user._id, group: {$in: groupIds}},
+                        [
+                            {$unset: {group: ""}},
+                            {$set:
+                                    {
+                                        repeatRate: {
+                                            time: {},
+                                            smallTimePeriod: [],
+                                            startingDate: []
+                                        },
+                                        repeats: false
+                                    }
+                            }
+                        ],
+                        {returnDocument: 'after'}
+                    );
+                    break;
+                case "Delete them":
+                    await Task.deleteMany({userId: req.user._id, group: {$in: groupIds}});
+                    break;
             }
 
-            return res.status(200).json({message: 'Group deleted successfully.'})
-        })
+            await Group.deleteMany({userId: req.user._id, _id: {$in: groupIds}});
+
+            return res.status(200).json({message: 'Groups deleted successfully.', affectedTasks: editedTasks});
+        } catch (error) {
+            res.status(500).json({message: error.message})
+        }
     } else {
         res.status(401).send({message: "Not authorized."});
     }
 }
 
-module.exports = {getGroups, createGroup, deleteGroup, groupSchema};
+const setGroups = async (req, res) => {
+    if (req.user) {
+        const {groups} = req.body;
+
+        try {
+            const newGroups = [];
+
+            for (const group of groups) {
+                newGroups.push(await Group.findByIdAndUpdate(group._id, group, {returnDocument: 'after'}));
+            }
+
+            return res.status(200).json({newGroups});
+        } catch (error) {
+            res.status(500).json({message: error.message})
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+module.exports = {getGroups, createGroup, deleteGroup, groupSchema, setGroups};

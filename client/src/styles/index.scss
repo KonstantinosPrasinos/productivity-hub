@@ -263,7 +263,7 @@ table {
     }
 
     tr>td {
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-primary-color);
         border-top: none;
 
         &:first-child:not(:last-child) {
@@ -340,7 +340,7 @@ button {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--border-color);
+    background: var(--border-primary-color);
     border-radius: 10px;
 }
 

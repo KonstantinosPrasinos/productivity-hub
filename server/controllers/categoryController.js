@@ -103,4 +103,20 @@ const deleteCategory = async (req, res) => {
     }
 }
 
-module.exports = {getCategories, createCategory, deleteCategory};
+const setCategory = async (req, res) => {
+    if (req.user) {
+        const {category} = req.body;
+
+        try {
+            const newCategory = await Category.findByIdAndUpdate(category._id, category, {returnDocument: 'after'});
+
+            return res.status(200).json({newCategory});
+        } catch (error) {
+            return res.status(400).json({message: error})
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+module.exports = {getCategories, createCategory, deleteCategory, setCategory};

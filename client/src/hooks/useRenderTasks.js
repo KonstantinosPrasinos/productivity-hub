@@ -46,8 +46,6 @@ const checkTime = (task) => {
     const currentMinutes = currentDate.getMinutes();
     currentDate.setUTCHours(0, 0, 0, 0);
 
-
-
     for (const startingDate of task.repeatRate.startingDate) {
         const nextUpdate = findNextUpdate(startingDate, task.repeatRate.number, task.repeatRate.bigTimePeriod);
         if (!taskNextUpdate || nextUpdate < taskNextUpdate) {
@@ -61,7 +59,7 @@ const checkTime = (task) => {
     }
 
     // Check if the current time is in the task render time range
-    if (task.repeatRate.time) {
+    if (task.repeatRate.time?.start) {
         const fromHours = parseInt(task.repeatRate.time.start.substring(0, 2));
         const toHours = parseInt(task.repeatRate.time.end.substring(0, 2));
         const fromMinutes = parseInt(task.repeatRate.time.start.substring(2));
@@ -105,7 +103,7 @@ const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
             }
         }
 
-        const groupTasks = tasks.filter(task => task.group === group._id && task.hidden !== false);
+        const groupTasks = tasks.filter(task => task.group === group._id && !task.hidden);
 
         if (!groupTasks.length) {
             return;

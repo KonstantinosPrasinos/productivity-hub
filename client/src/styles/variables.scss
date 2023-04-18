@@ -19,7 +19,8 @@ $theme: 'light';
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
-        --border-color: #79747E;
+        --border-primary-color: #E2E6EB;
+        --border-secondary-color: #79747E;
     } @else if $theme == 'dark' {
         $theme: 'dark';
 
@@ -37,7 +38,7 @@ $theme: 'light';
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
-        --border-color: #938F99;
+        --border-primary-color: #938F99;
     }
 }
 
@@ -59,7 +60,7 @@ $base-border-thickness: 1px;
 $base-border-radius: 8px;
 $button-border-radius: 100px;
 
-$base-border: $base-border-thickness solid var(--border-color);
+$base-border: $base-border-thickness solid var(--border-primary-color);
 
 // typography
 $font-m: 16px;

@@ -84,9 +84,7 @@ const NewTask = ({index, length, id}) => {
 
         if (groupsLoading) return tempGroups;
 
-        const categoryId = categories?.find(localCategory => localCategory.title === category)?._id
-
-        tempGroups.push(...groups.filter(group => group.parent === categoryId));
+        tempGroups.push(...groups.filter(group => group.parent === category._id));
 
         return tempGroups;
     }
@@ -266,9 +264,9 @@ const NewTask = ({index, length, id}) => {
             }
 
             if (id) {
-                changeTask({...task, _id: id});
+                await changeTask({...task, _id: id});
             } else {
-                addTask(task);
+                await addTask(task);
             }
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});

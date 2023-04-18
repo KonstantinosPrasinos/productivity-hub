@@ -28,7 +28,7 @@ export function useAddCategory() {
                     }
                 }
                 return {
-                    categories: [data]
+                    categories: [data.newCategory]
                 }
             });
 

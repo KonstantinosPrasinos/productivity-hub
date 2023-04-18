@@ -24,7 +24,7 @@ const Settings = () => {
     const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
 
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
-    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
+    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDeleteTask);
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
@@ -42,7 +42,7 @@ const Settings = () => {
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
-            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority}});
+            await setSettings({theme: selectedTheme, confirmDeleteTask, defaults: {step, goal, priority}});
             setSettingsChanges({});
         }
     }
@@ -67,8 +67,8 @@ const Settings = () => {
     }
 
     const handleSetConfirmDelete = () => {
-        if (settings.confirmDelete !== !confirmDelete) {
-            setSettingsChanges({...settingsChanges, confirmDelete: !confirmDelete});
+        if (settings.confirmDeleteTask !== !confirmDelete) {
+            setSettingsChanges({...settingsChanges, confirmDeleteTask: !confirmDelete});
         } else {
             setSettingsChanges((current) => {
                 const {confirmDelete, ...rest} = current;

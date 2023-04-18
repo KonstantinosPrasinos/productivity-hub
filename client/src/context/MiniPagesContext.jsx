@@ -11,6 +11,8 @@ export const miniPagesReducer = (state, action) => {
             return state;
         case 'REMOVE_PAGE':
             return state.filter((_, i) => i !== state.length - 1)
+        case 'REMOVE_SPECIFIC_PAGE':
+            return state.filter(page => action.payload.type !== page.type && action.payload.id !== page.id);
         default:
             return state;
     }

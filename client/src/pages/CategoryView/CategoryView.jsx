@@ -69,7 +69,7 @@ const CategoryView = ({index, length, category}) => {
                     <div className={'Title'}>{category.title}</div>
                 </div>
                 <div>
-                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category.id}})}><TbEdit /></IconButton>
+                    <IconButton onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category', id: category._id}})}><TbEdit /></IconButton>
                     <IconButton onClick={handleDeleteButton}><TbTrash /></IconButton>
                 </div>
             </section>

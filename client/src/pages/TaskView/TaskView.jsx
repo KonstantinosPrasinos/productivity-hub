@@ -397,11 +397,11 @@ const TaskView = ({index, length, task}) => {
     const undoContext = useContext(UndoContext);
     
     const {mutate: deleteTask} = useDeleteTask();
-    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
+    const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task?.title);
     const {mutate: setSettings} = useChangeSettings();
 
-    const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task._id, task.currentEntryId);
-    const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+    const {data: entries, isLoading: entriesLoading} = useGetTaskEntries(task?._id, task?.currentEntryId);
+    const {data: entry} = useGetTaskCurrentEntry(task?._id, task?.currentEntryId);
     const {data: settings} = useGetSettings();
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
@@ -423,17 +423,17 @@ const TaskView = ({index, length, task}) => {
     // }
 
     const updateSettings = async () => {
-        await setSettings({...settings, confirmDelete: false, priorityBounds: undefined});
+        await setSettings({...settings, confirmDeleteTask: false, priorityBounds: undefined});
     }
 
     const handleDelete = () => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
-        undoContext.dispatch({type: 'ADD_UNDO', payload: {type: 'task', id: task._id}});
-        deleteTask(task._id);
+        undoContext.dispatch({type: 'ADD_UNDO', payload: {type: 'task', id: task?._id}});
+        deleteTask(task?._id);
     }
 
     const handleDeleteClick = () => {
-        if (settings.confirmDelete) { // check with user settings for prompt to delete task
+        if (settings.confirmDeleteTask) { // check with user settings for prompt to delete task
             setIsVisibleConfirmDeleteModal(true);
         } else {
             handleDelete()
@@ -441,16 +441,16 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleSetCurrentValueCheckbox = () => {
-        setTaskCurrentEntry(task._id, entry?._id, entry?.value === 0 ? 1 : 0);
+        setTaskCurrentEntry(task?._id, entry?._id, entry?.value === 0 ? 1 : 0);
     }
 
     const handleSetCurrentValueNumber = (e) => {
         const eventNumber = parseInt(e);
 
         if (isNaN(eventNumber) || eventNumber < 0) {
-            setTaskCurrentEntry(task._id, entry._id, 0);
+            setTaskCurrentEntry(task?._id, entry._id, 0);
         } else {
-            setTaskCurrentEntry(task._id, entry._id, eventNumber);
+            setTaskCurrentEntry(task?._id, entry._id, eventNumber);
         }
     }
 
@@ -506,10 +506,10 @@ const TaskView = ({index, length, task}) => {
                 length={length}
             >
                 <section className={`Horizontal-Flex-Container Space-Between`}>
-                    <div className={'Title'}>{task.title}</div>
+                    <div className={'Title'}>{task?.title}</div>
                     <div className={`Horizontal-Flex-Container ${styles.editIcons}`}>
                         <IconButton
-                            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task._id}})}
+                            onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task', id: task?._id}})}
                         >
                             <TbEdit />
                         </IconButton>
@@ -518,17 +518,17 @@ const TaskView = ({index, length, task}) => {
                 </section>
                 <section className={'Horizontal-Flex-Container'}>
                     <div className={'Label'}>Category:</div>
-                    {task.category ?
+                    {task?.category ?
                         <CategoryIndicator
-                            categoryId={task.category}
-                            groupId={task.group}
+                            categoryId={task?.category}
+                            groupId={task?.group}
                         /> :
                         <div>None</div>
                     }
                 </section>
                 <section className={'Horizontal-Flex-Container'}>
                     <div className={'Label'}>Today's Entry:</div>
-                    {task.type === 'Checkbox' ?
+                    {task?.type === 'Checkbox' ?
                         <div className={`${styles.checkbox} ${entry?.value === 1 ? styles.checked : ''}`} onClick={handleSetCurrentValueCheckbox}>
                             <TbCheck />
                         </div> :
@@ -620,14 +620,14 @@ const TaskView = ({index, length, task}) => {
                     </Button>
                     <div className={'Label Stack-Container'}>
                         <div>Created at:</div>
-                        <div>{" " + new Date(task.createdAt).toLocaleString()}</div>
+                        <div>{" " + new Date(task?.createdAt).toLocaleString()}</div>
                     </div>
                 </section>
             </MiniPageContainer>
             {isVisibleNewEntryModal &&
                 <EntryModal
                     dismountNewEntryModal={dismountNewEntryModal}
-                    taskId={task._id}
+                    taskId={task?._id}
                     editedEntry={editedEntry}
                     entryDates={!entriesLoading ? [...entries, entry].map(tempEntry => new Date(tempEntry.date)) : [new Date(entry.date)]}
                 />}
