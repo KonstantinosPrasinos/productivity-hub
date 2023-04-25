@@ -111,7 +111,7 @@ const setGroups = async (req, res) => {
             const newGroups = [];
 
             for (const group of groups) {
-                newGroups.push(await Group.findByIdAndUpdate(group._id, group, {returnDocument: 'after'}));
+                newGroups.push(await Group.findOneAndUpdate({userId: req.user._id, _id: group._id}, group, {returnDocument: 'after'}));
             }
 
             return res.status(200).json({newGroups});

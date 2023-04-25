@@ -177,7 +177,7 @@ const getTasksWithHistory = async (tasks, userId) => {
             if (entriesHistory.length) {
                 const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
-                const editedTask = await Task.findByIdAndUpdate(tasksWithCurrentEntry[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
+                const editedTask = await Task.findOneAndUpdate({userId: req.user._id, _id: tasksWithCurrentEntry[i]._id}, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
                 const streak = assembleEntryHistory(entriesHistory, editedTask);
 
                 tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});

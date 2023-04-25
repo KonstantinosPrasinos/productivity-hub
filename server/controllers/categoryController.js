@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
     if (req.user) {
         const {category, groups}  = req.body;
 
-        if (!category) return res.status(400).json({message: "No category provided."})
+        if (!category) return res.status(400).json({message: "No category provided."});
 
         const validatedCategory = categorySchema.validate(category);
 
@@ -83,7 +83,7 @@ const deleteCategory = async (req, res) => {
 
         // Delete category
         try{
-            await Category.deleteOne({usrId: req.user._id, _id: categoryId});
+            await Category.deleteOne({userId: req.user._id, _id: categoryId});
             const deleteResponse = await Group.deleteMany({userId: req.user._id, parent: categoryId});
 
             if (deleteResponse?.deletedCount > 0) {
@@ -107,8 +107,17 @@ const setCategory = async (req, res) => {
     if (req.user) {
         const {category} = req.body;
 
+        if (!category) return res.status(400).json({message: 'No category provided.'});
+        if (!category._id) return res.status(400).json({message: 'Category doesn\'t have _id.'});
+
+        const validatedCategory = categorySchema.validate(category);
+
+        if (validatedCategory.error) {
+            return res.status(400).json({message: validatedCategory.error});
+        }
+
         try {
-            const newCategory = await Category.findByIdAndUpdate(category._id, category, {returnDocument: 'after'});
+            const newCategory = await Category.findOneAndUpdate({userId: req.user._id, _id: category._id}, category, {returnDocument: 'after'});
 
             return res.status(200).json({newCategory});
         } catch (error) {

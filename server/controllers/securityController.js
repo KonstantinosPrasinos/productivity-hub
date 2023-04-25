@@ -174,7 +174,7 @@ const changeEmailVerifyCode = async (req, res) => {
         }
 
         try {
-            await User.findOneAndUpdate({'local.email': currentEmail}, {$set: {'local.email': newEmail}});
+            await User.findOneAndUpdate({_id: req.user._id}, {$set: {'local.email': newEmail}});
             await sendEmail(currentEmail, "emailChanged");
         } catch (error) {
             return res.status(400).json({message: error.message});
