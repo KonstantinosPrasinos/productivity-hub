@@ -170,12 +170,14 @@ a {
 }
 
 .Empty-Indicator-Container {
-    @extend .Stack-Container, .Rounded-Container, .Has-Shadow;
+    @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow;
+    font-size: $font-l;
     height: 2.5em;
     width: 22.15em;
     padding: 6px 12px;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .Clickable {
