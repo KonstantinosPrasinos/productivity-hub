@@ -71,7 +71,7 @@ const ListView = () => {
                             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                             layout
 
-                            className={`Rounded-Container Stack-Container ${styles.categoryContainer}`}
+                            className={`Rounded-Container Has-Shadow Stack-Container ${styles.categoryContainer}`}
                             key={category._id}
                             onClick={() => handleCategoryClick(category._id)}
                         >
@@ -89,7 +89,7 @@ const ListView = () => {
                     initial={{ opacity: 0, y: 50, scale: 0.3 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                    className={`Empty-Indicator-Container`}
+                    className={`Empty-Indicator-Container Clickable`}
                     layout
                     onClick={handleNewCategoryClick}
                 >

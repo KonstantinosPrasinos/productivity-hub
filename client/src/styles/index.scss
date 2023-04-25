@@ -171,13 +171,17 @@ a {
 
 .Empty-Indicator-Container {
     @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow;
-    font-size: $font-l;
+    font-size: $font-m;
     height: 2.5em;
     width: 22.15em;
-    padding: 6px 12px;
+    padding: 10px;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
+    box-sizing: unset;
+    
+    &.Clickable {
+        cursor: pointer;
+    }
 }
 
 .Clickable {
