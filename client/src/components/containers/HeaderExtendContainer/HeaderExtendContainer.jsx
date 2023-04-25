@@ -19,7 +19,7 @@ const HeaderExtendContainer = ({header, children, extendedInherited = null, setE
             >
                 {header}
             </div>
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 {(isExtended || extendedInherited) &&
                     <motion.section
                         className={styles.contentContainer}

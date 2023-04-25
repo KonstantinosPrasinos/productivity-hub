@@ -9,7 +9,7 @@ import {TbX} from "react-icons/tb";
 
 const MiniPageContainer = ({children, onClickSave, length, index}) => {
     const containerRef = useRef();
-    const animation = useAnimation();
+    const animationControls = useAnimation();
 
     const {screenSize} = useScreenSize();
     const miniPagesContext = useContext(MiniPagesContext);
@@ -29,13 +29,13 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
     }
 
     const makeFullHeight = () => {
-        animation.set({height: containerRef.current.offsetHeight});
-        animation.start({height: `calc(100% - 4em - 32px)`});
+        animationControls.set({height: containerRef.current.offsetHeight});
+        animationControls.start({height: `calc(100% - 4em - 32px)`});
     }
 
     const makeHalfHeight = () => {
-        animation.set({height: containerRef.current.offsetHeight});
-        animation.start({height: `calc(50% - 4em - 32px)`});
+        animationControls.set({height: containerRef.current.offsetHeight});
+        animationControls.start({height: `calc(50% - 4em - 32px)`});
     }
 
     const handleEnd = (e) => {
@@ -56,27 +56,35 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
     }
 
     useEffect(() => {
-        animation.start({
-            y: 0
-        });
-    }, [])
-
-    useEffect(() => {
         if (index !== length - 1) {
-            animation.start({y: "100%"});
+            animationControls.start(screenSize === "small" ? "mobileCollapsed" : "desktopCollapsed");
         } else {
-            animation.start({y: 0});
+            animationControls.start(screenSize === "small" ? "mobileExtended" : "desktopExtended");
         }
     }, [length, index])
+
+    const animationVariants = {
+        mobileExtended: {y: 0},
+        mobileCollapsed: {y: '100%'},
+        desktopCollapsed: {x: '100%'},
+        desktopExtended: {x: 0}
+    }
+
+    useEffect(() => {
+        animationControls.start(screenSize === "small" ? "mobileExtended" : "desktopExtended")
+    }, [])
 
     return (
         <motion.div
             className={`${styles.container} Stack-Container Symmetrical Big-Padding`}
             ref={containerRef}
-            initial={{y: '100%'}}
-            animate={animation}
+
+            initial={screenSize === "small" ? "mobileCollapsed" : "desktopCollapsed"}
+            animate={animationControls}
+            exit={screenSize === "small" ? "mobileCollapsed" : "desktopCollapsed"}
+
+            variants={animationVariants}
             transition={{type: "tween"}}
-            exit={{y: "100%"}}
         >
             <div className={styles.staticElements} onTouchMove={handleMove} onTouchEnd={handleEnd}>
                 {screenSize === 'small' &&
