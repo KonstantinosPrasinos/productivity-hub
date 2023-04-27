@@ -21,6 +21,7 @@ import {TbHome} from "react-icons/tb";
 import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import {AnimatePresence, motion} from "framer-motion";
 import TimeInput from "../../components/inputs/TimeInput/TimeInput";
+import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -28,6 +29,7 @@ const Playground = () => {
   const [isToggled, setIsToggled] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const chipGroup = ["Option 1", "Option 2", "Option 3"];
+  const [textSwitch, setTextSwitch] = useState(9);
 
   const [textValue, setTextValue] = useState("");
   const [numberValue, setNumberValue] = useState(0);
@@ -45,6 +47,10 @@ const Playground = () => {
       },
       _id: "22",
       step: 10
+  }
+
+  const handleChangeText = () => {
+      setTextSwitch(current => current + 1)
   }
 
 
@@ -177,6 +183,12 @@ const Playground = () => {
             </HeaderExtendContainer>
         </InputWrapper>
         <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} />
+        <InputWrapper label={"Text switch container"}>
+            <TextSwitchContainer>
+                {textSwitch}
+            </TextSwitchContainer>
+            <button onClick={handleChangeText}>Click me to change text</button>
+        </InputWrapper>
 
       {/*<Button onClick={() => console.log("Clicked!")}>*/}
       {/*  Click me*/}

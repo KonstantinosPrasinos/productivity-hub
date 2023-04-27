@@ -1,0 +1,12 @@
+.container {
+  display: inline-block;
+  width: auto;
+  overflow: hidden;
+
+  > div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+  }
+}

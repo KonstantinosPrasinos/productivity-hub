@@ -22,6 +22,8 @@ import IconButton from "../../components/buttons/IconButton/IconButton";
 import {motion} from "framer-motion";
 import styles from "./NewTask.module.scss";
 import TimeInput from "../../components/inputs/TimeInput/TimeInput";
+import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
+import {capitalizeFirstCharacter} from "../../functions/capitalizeFirstCharacter";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -45,7 +47,7 @@ const NewTask = ({index, length, id}) => {
     const [longGoalType, setLongGoalType] = useState('At least');
     const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
     // const [expiresAt, setExpiresAt] = useState('Never');
-    const [timeGroup, setTimeGroup] = useState('');
+    const [timeGroup, setTimeGroup] = useState({title: "None", _id: undefined});
     const [hasTime, setHasTime] = useState(false);
     const [startHour, setStartHour] = useState('00');
     const [startMinute, setStartMinute] = useState('00');
@@ -290,9 +292,22 @@ const NewTask = ({index, length, id}) => {
             <HeaderExtendContainer
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={"Stack-Container"}>
+                        <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>General options</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>Type: {type}, Category: None, Priority: 10</div>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                                <div>
+                                    Type: <TextSwitchContainer>{type}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Category: <TextSwitchContainer>{category?.title ?? category}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Priority: <TextSwitchContainer>{priority}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Repeats: <TextSwitchContainer>{capitalizeFirstCharacter(repeats.toString())}</TextSwitchContainer>
+                                </div>
+                            </motion.div>
                         </div>
                         <IconButton>
                             <motion.div
@@ -365,12 +380,19 @@ const NewTask = ({index, length, id}) => {
             <HeaderExtendContainer
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={"Stack-Container"}>
+                        <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Number type options</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>
-                                {type === 'Number' && `Goal: at least 10, Step 1`}
-                                {type !== 'Number' && 'In order to enable set the task type to Number'}
-                            </div>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                                <div>
+                                    Goal type: <TextSwitchContainer>{hasGoal ? goalType : "None"}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Step: <TextSwitchContainer>{step}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Goal number: <TextSwitchContainer>{hasGoal ? goalNumber : "None"}</TextSwitchContainer>
+                                </div>
+                            </motion.div>
                         </div>
                         <motion.div
                             className={"Title-Large"}
@@ -421,12 +443,21 @@ const NewTask = ({index, length, id}) => {
             <HeaderExtendContainer
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={"Stack-Container"}>
+                        <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Repeat options</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>
-                                {!repeats && "In order to enable, toggle repeats"}
-                                {repeats && `Long term goal: At least 1`}
-                            </div>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                                <div>
+                                    Goal type: <TextSwitchContainer>{hasLongGoal ? longGoalType : "None"}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Method: <TextSwitchContainer>{repeatType === "Custom Rules" ? "Custom" : timeGroup.title}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Goal number: <TextSwitchContainer>{hasLongGoal ? longGoalNumber : "None"}</TextSwitchContainer>
+                                </div>
+
+
+                            </motion.div>
                         </div>
                         <IconButton>
                             <motion.div
@@ -503,12 +534,34 @@ const NewTask = ({index, length, id}) => {
             <HeaderExtendContainer
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={"Stack-Container"}>
+                        <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Custom rules for repeat</div>
-                            <div className={`Label-Small ${styles.titleMedium}`}>
-                                {(!repeats || repeatType !== "Custom Rules") && "In order to enable, toggle repeats and custom rules"}
-                                {(repeats && repeatType === "Custom Rules") && `Repeat every: 1 Week on Mondays`}
-                            </div>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                                <div>
+                                    Number: <TextSwitchContainer>{repeatNumber}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Time:
+                                    <TextSwitchContainer>
+                                        {!hasTime && "None"}
+                                        {hasTime && <>
+                                            {startHour}:{startMinute} - {endHour}:{endMinute}
+                                        </>}
+                                    </TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Time period: <TextSwitchContainer>{timePeriod}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    On:
+                                    <TextSwitchContainer>
+                                        {timePeriod === "Days" ? "Option doesn't apply" : timePeriod2.length}
+                                    </TextSwitchContainer>
+                                    <TextSwitchContainer>
+                                        {timePeriod !== "Days" && "days"}
+                                    </TextSwitchContainer>
+                                </div>
+                            </motion.div>
                         </div>
                         <motion.div
                             className={"Title-Large"}
