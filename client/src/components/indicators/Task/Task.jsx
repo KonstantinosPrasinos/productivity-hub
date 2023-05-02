@@ -1,11 +1,33 @@
-import Streak from "../Streak/Streak";
-
 import styles from './Task.module.scss';
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
 import {useContext, useMemo} from "react";
 import {motion} from "framer-motion";
-import {MiniPagesContext} from "../../../context/MiniPagesContext";
+import {MiniPagesContext} from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
+import {TbEqual, TbTargetArrow} from "react-icons/all";
+import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry";
+import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
+
+const RepeatDetails = ({task}) => {
+    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+
+    return (
+        <div className={styles.repeatDetails}>
+            <div>
+                <TbEqual />
+                <TextSwitchContainer>
+                    {isLoading && "..."}
+                    {!isLoading && entry.value}
+                </TextSwitchContainer>
+            </div>
+            {task?.goal?.number &&
+                <div>
+                    <TbTargetArrow />
+                </div>
+            }
+        </div>
+    );
+}
 
 const Task = ({tasks}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -38,7 +60,7 @@ const Task = ({tasks}) => {
 
     return (
         <motion.div
-            className={`Rounded-Container Stack-Container Has-Shadow ${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
+            className={`${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
@@ -46,22 +68,32 @@ const Task = ({tasks}) => {
 
             onClick={(event) => handleTaskClick(event)}
         >
-            {tasks.length > 0 && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
-            {tasks.map((task, index) => (
-                <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
-                    <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
-                        <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
-                            {/*{tasks.length === 0 && task.category &&*/}
-                            {/*    <CategoryIndicator*/}
-                            {/*        categoryId={task.category}*/}
-                            {/*        groupId={task?.group}*/}
-                            {/*    />}*/}
+            {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
+            <div className={styles.taskList}>
+                {tasks.map((task, index) =>
+                    // <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
+                    //     <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
+                    //         <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
+                    //             {/*{tasks.length === 0 && task.category &&*/}
+                    //             {/*    <CategoryIndicator*/}
+                    //             {/*        categoryId={task.category}*/}
+                    //             {/*        groupId={task?.group}*/}
+                    //             {/*    />}*/}
+                    //             <div className={styles.titleContainer}>{task.title}</div>
+                    //         </div>
+                    //         <CurrentProgress task={task}/>
+                    //     </div>
+                    //     {/*{task.repeats && <Streak streak={task.streak} />}*/}
+                    // </div>
+                    <div key={index} className={styles.task} data-value={'Clickable'}>
+                        <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
+                            {task.repeats && <RepeatDetails task={task}/>}
                         </div>
                         <CurrentProgress task={task}/>
                     </div>
-                    {task.repeats && <Streak streak={task.streak} />}
-                </div>))}
+                )}
+            </div>
         </motion.div>
 
     );

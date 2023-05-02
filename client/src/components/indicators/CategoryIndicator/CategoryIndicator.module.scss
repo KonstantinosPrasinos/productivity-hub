@@ -1,9 +1,10 @@
-@import 'src/styles/variables.scss';
+@use '@/styles/variables' as v;
+@use '@/styles/mixins' as m;
 
 .container {
-  border-radius: $button-border-radius;
-  padding: 5px 10px;
-  font-size: $font-s;
+  border-radius: v.$base-border-radius;
+  padding: 4px 7px;
+  font-size: v.$font-s;
   align-items: center;
   max-width: 12.5em;
   width: fit-content;
