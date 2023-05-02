@@ -1,7 +1,7 @@
 import {useQuery} from "react-query";
 
 const fetchCategories = async () => {
-    const response = await fetch('http://localhost:5000/api/category', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
@@ -15,7 +15,7 @@ const fetchCategories = async () => {
 }
 
 export function useGetCategories() {
-    const queryObject = useQuery(["get-categories"], fetchCategories, {
+    const queryObject = useQuery(["categories"], fetchCategories, {
         staleTime: 30 * 60 * 60 * 1000
     })
 

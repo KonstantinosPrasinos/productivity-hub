@@ -1,7 +1,9 @@
 import {useQuery} from "react-query";
+import {useContext} from "react";
+import {UserContext} from "../../context/UserContext";
 
 const fetchSettings = async () => {
-    const response = await fetch('http://localhost:5000/api/settings', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/settings`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
@@ -15,7 +17,10 @@ const fetchSettings = async () => {
 }
 
 export function useGetSettings() {
-    return useQuery(["get-settings"], fetchSettings, {
-        staleTime: 30 * 60 * 60 * 1000
+    const user = useContext(UserContext);
+
+    return useQuery(["settings"], fetchSettings, {
+        staleTime: 30 * 60 * 60 * 1000,
+        enabled: user.state?.id !== undefined
     });
 }

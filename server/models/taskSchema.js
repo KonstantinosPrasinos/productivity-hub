@@ -15,7 +15,9 @@ const Task = new mongoose.Schema({
     },
     step: Number,
     goal: {
-        type: String,
+        type: {
+            type: String
+        },
         number: Number
     },
     category: String,
@@ -28,6 +30,7 @@ const Task = new mongoose.Schema({
         required: true
     },
     longGoal: {
+        limit: {type: String},
         type: {type: String},
         number: Number
     },
@@ -42,14 +45,20 @@ const Task = new mongoose.Schema({
         smallTimePeriod: [String],
         startingDate: [Number],
         time: {
-            starting: Number,
-            ending: Number
+            start: String,
+            end: String
         }
     },
     mostRecentProperDate: {
         type: Date,
         default: Date.now
+    },
+    forDeletion: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
+
+Task.index({updatedAt: 1}, {expireAfterSeconds: 60, partialFilterExpression: {forDeletion: true}});
 
 module.exports = mongoose.model('Task', Task)

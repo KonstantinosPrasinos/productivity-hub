@@ -12,7 +12,7 @@
     }
 
     &.outlined {
-        border: 1px solid var(--primary-color);
+        border: 2px solid var(--primary-color);
         background-color: var(--surface-color);
         color: var(--on-surface-color);
     }
@@ -21,7 +21,7 @@
         font-size: $font-s;
     }
 
-    &.big {
+    &.large {
         font-size: $font-xxl;
     }
 

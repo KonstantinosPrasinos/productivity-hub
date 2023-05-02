@@ -1,4 +1,4 @@
-@import "./variables.scss";
+@import "variables";
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 :root {
@@ -54,6 +54,21 @@ body {
     transition: background-color 0.2s;
 }
 
+a {
+    &:link {
+        color: var(--on-surface-color);
+    }
+    &:visited {
+        color: var(--on-surface-color);
+    }
+    &:hover {
+        text-decoration: none;
+    }
+    &:active {
+        color: var(--on-surface-color);
+    }
+}
+
 .Button {
     display: inline-flex;
     justify-content: center;
@@ -62,6 +77,7 @@ body {
     cursor: pointer;
     padding: $base-padding;
     width: max-content;
+    white-space: nowrap;
     
     &.disabled {
         cursor: not-allowed;
@@ -96,7 +112,7 @@ body {
     flex-wrap: nowrap;
     flex-direction: column;
 
-    &.BigGap {
+    &.Big-Gap {
         gap: $big-gap;
     }
 
@@ -125,6 +141,7 @@ body {
 
 .Title {
     font-size: $font-xxl;
+    font-weight: 500;
     //opacity: $opacity-low;
     //max-width: fit-content;
 }
@@ -134,6 +151,7 @@ body {
 }
 
 .Display {
+    text-align: center;
     font-size: $font-xxxl;
     font-weight: bold;
 }
@@ -146,17 +164,24 @@ body {
     display: inline-flex;
 
     &.Has-Shadow {
+        border: none;
         box-shadow: $elevation-1;
     }
 }
 
 .Empty-Indicator-Container {
-    @extend .Stack-Container, .Rounded-Container;
+    @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow;
+    font-size: $font-m;
     height: 2.5em;
     width: 22.15em;
-    padding: 6px 12px;
+    padding: 10px;
     justify-content: center;
     align-items: center;
+    box-sizing: unset;
+    
+    &.Clickable {
+        cursor: pointer;
+    }
 }
 
 .Clickable {
@@ -191,6 +216,29 @@ body {
     background-color: var(--purple-color);
 }
 
+// Typography
+
+.Title-Large {
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 28px;
+}
+
+.Title-Medium {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.1px;
+}
+
+.Label-Small {
+    opacity: 0.38;
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+}
+
 input {
     border: none;
     background: none;
@@ -200,7 +248,7 @@ input {
         outline: none;
     }
 
-    &.Title {
+    &.Title-Large {
         opacity: 1;
         box-shadow: 0 2px 0 0 var(--surface-color);
         transition: box-shadow 0.2s;
@@ -212,6 +260,64 @@ input {
     } 
 }
 
+table {
+    border-spacing: 0;
+    width: 100%;
+
+    tr>* {
+        padding: $symmetrical-padding;
+    }
+
+    tr>td {
+        border: 1px solid var(--border-primary-color);
+        border-top: none;
+
+        &:first-child:not(:last-child) {
+            border-right: none !important;
+        }
+        &:last-child:not(:first-child) {
+            border-left: none !important;
+        }
+    }
+
+
+    tr:first-child {
+        th:first-child {
+            border-top-left-radius: $base-border-radius;
+        }
+        th:last-child {
+            border-top-right-radius: $base-border-radius;
+        }
+    }
+
+    &> *:last-child > tr:last-of-type {
+        td:first-child {
+            border-bottom-left-radius: $base-border-radius;
+        }
+        td:last-child {
+            border-bottom-right-radius: $base-border-radius;
+        }
+    }
+}
+
+*:disabled {
+    opacity: $opacity-very-low;
+    cursor: not-allowed;
+}
+
+thead {
+    vertical-align: center;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    font-weight: normal;
+    text-align: left;
+}
+
+td {
+    padding: $base-padding;
+}
+
 ::placeholder {
     opacity: 0.5;
 }
@@ -221,9 +327,34 @@ button {
     background-color: transparent;
     border: none;
     cursor: pointer;
+    color: inherit;
 }
 
-// App.js
+
+// Scrollbar
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    padding-right: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    //box-shadow: inset 0 0 2px grey;
+    border-radius: 10px
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--border-primary-color);
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+}
+
+// App.jsx
 @media (max-width: $tablet-breakpoint) {
     .Content-Container {
         justify-content: center;
@@ -247,6 +378,10 @@ button {
             border-radius: 0;
         }
     }
+
+    ::-webkit-scrollbar {
+        width: 2px;
+    }
 }
 
 @media (min-width: $tablet-breakpoint) {
@@ -267,27 +402,4 @@ button {
 .icon {
     position: absolute;
     top: -0.5em;
-}
-
-// Scrollbar
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    padding-right: 10px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    //box-shadow: inset 0 0 2px grey;
-    border-radius: 10px
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
 }

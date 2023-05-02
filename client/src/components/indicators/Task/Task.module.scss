@@ -1,10 +1,15 @@
-@import 'src/styles/variables.scss';
+@use '@/styles/variables' as v;
+@use '@/styles/index' as i;
+@use '@/styles/mixins' as m;
 
 .container {
+  @extend .Rounded-Container, .Stack-Container, .Has-Shadow;
+
   display: inline-flex;
   position: relative;
   width: 22.15em;
-  padding: $symmetrical-padding;
+  padding: v.$symmetrical-padding;
+  gap: 6px;
 }
 
 .topLine {
@@ -14,17 +19,18 @@
 }
 
 .titleContainer {
-  font-size: $font-l;
+  font-size: v.$font-m;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-weight: 550;
 }
 
 .infoContainer {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  gap: $base-gap;
+  gap: v.$base-gap;
 
   &.repeats {
     width: 100%;
@@ -40,4 +46,42 @@
 
 .completed {
   order: 1;
+}
+
+.task {
+  @extend .Horizontal-Flex-Container;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.detailsList {
+  @extend .Stack-Container;
+  @include m.Label-Large;
+  gap: 6px;
+  width: 100%;
+}
+
+.repeatDetails {
+  @extend .Horizontal-Flex-Container;
+  @include m.Label-Medium;
+  & > div {
+    @extend.Horizontal-Flex-Container;
+    gap: 6px;
+  }
+
+  width: 100%;
+  display: grid;
+  grid-template-columns: 15% 15%;
+  grid-template-rows: repeat(auto-fill, auto);
+  grid-row-gap: 0;
+  grid-column-gap: 0.5em;
+
+  & > div {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
 }

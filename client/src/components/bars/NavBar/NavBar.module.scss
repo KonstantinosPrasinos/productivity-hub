@@ -6,7 +6,7 @@
   }
 
   .navBar {
-    height: 4em;
+    height: 3em;
     background-color: var(--surface-color);
     display: flex;
     align-items: center;
@@ -16,7 +16,18 @@
     z-index: 3;
     flex-direction: row;
   }
+  .item {
+    height: 100%;
+  }
+  .selectedBar {
+    width: 1.5em;
+    height: 6px;
+    bottom: 0;
+    left: 0;
+    border-radius: 6px 6px 0 0;
+  }
 }
+
 @media (min-width: $tablet-breakpoint) {
   .container {
     height: 100%;
@@ -25,7 +36,7 @@
 
   .navBar {
     position: fixed;
-    width: 4em;
+    width: 3em;
     height: 100%;
     background: var(--surface-color);
     padding: 40px 0 40px 0;
@@ -33,13 +44,38 @@
     border-right: $base-border;
     flex-direction: column;
   }
+
+  .item {
+    width: 100%;
+  }
+
+  .selectedBar {
+    width: 6px;
+    height: 1.5em;
+    top: 0;
+    left: 0;
+    border-radius: 0 6px 6px 0;
+  }
 }
 
 .navBar {
   display: flex;
   align-items: center;
+  font-size: $font-xxl;
 }
 
 .container {
   z-index: 4;
+}
+
+.selectedBar {
+  position: absolute;
+  background-color: var(--primary-color);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -5,11 +5,13 @@
     height: calc(100% - 4em);
     overflow: hidden;
     padding: $big-gap !important;
+    padding-right: 12px !important;
     position: relative;
 }
 
 .subContainer {
     overflow-y: auto;
+    padding-right: 20px;
 }
 
 .middleContainer {
@@ -89,5 +91,12 @@
         width: 100%;
         height: auto;
         border: none !important;
+        padding-right: 0 !important;
     }
+}
+
+.subSection {
+    border: 1px solid var(--border-primary-color);
+    border-radius: $base-border-radius;
+    padding: 20px;
 }

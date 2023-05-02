@@ -21,7 +21,7 @@ export function useAddTask() {
     const queryClient = useQueryClient();
 
     const updateSettingsLowAndHigh = (task) => {
-        queryClient.setQueryData(["get-settings"], (oldData) => {
+        queryClient.setQueryData(["settings"], (oldData) => {
             const newData = {...oldData};
 
             if (task.priority < oldData.priorityBounds.low) {
@@ -39,10 +39,10 @@ export function useAddTask() {
     return useMutation({
         mutationFn: postTask,
         onSuccess: data => {
-            queryClient.setQueryData(["get-tasks"], (oldData) => {
+            queryClient.setQueryData(["tasks"], (oldData) => {
                 updateSettingsLowAndHigh(data);
                 return oldData ? {
-                    tasks: [...oldData.tasks, data]
+                    tasks: [...oldData.tasks, {...data, hidden: false}]
                 } : oldData
             });
         }

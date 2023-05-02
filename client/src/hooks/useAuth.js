@@ -1,20 +1,19 @@
 import {useContext, useState} from "react";
 import {UserContext} from "../context/UserContext";
-import {useDispatch} from "react-redux";
-import {removeSettings} from "../state/settingsSlice";
 import {AlertsContext} from "../context/AlertsContext";
+import {useQueryClient} from "react-query";
 
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
-    const reduxDispatch = useDispatch();
+    const queryClient = useQueryClient();
 
     const [isLoading, setIsLoading] = useState(false);
 
     const login = async (email, password) => {
         setIsLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/user/login', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password}),
@@ -22,12 +21,38 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Incorrect email or password."}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
         } else {
             const data = await response.json();
+            const date = new Date();
+            date.setMonth(date.getMonth() + 1);
+            date.setHours(date.getHours() - 1);
+            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+        }
+        setIsLoading(false);
+    }
 
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email}));
+    const loginGoogle = async (data) => {
+        setIsLoading(true);
+
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/google`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
+        } else {
+            const data = await response.json();
+            const date = new Date();
+
+            date.setMonth(date.getMonth() + 1);
+            date.setHours(date.getHours() - 1);
+            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
         }
         setIsLoading(false);
     }
@@ -65,47 +90,29 @@ export function useAuth() {
             localStorage.removeItem('user');
             localStorage.removeItem('settings');
             dispatch({type: "REMOVE_USER"});
-            reduxDispatch(removeSettings());
+            queryClient.removeQueries();
         }
     }
 
-    const resetPasswordEmail = async (email) => {
-        setIsLoading(true);
-
-        const response = await fetch('http://localhost:5000/api/user/forgot-password/send-email', {
+    const resetAccount = async (password) => {
+        const response = await fetch('http://localhost:5000/api/user/reset', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email}),
-            credentials: 'include'
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
-            setIsLoading(false);
-            return false;
-        }
-
-        setIsLoading(false);
-        return true;
-    }
-
-    const setForgotPassword = async (newPassword) => {
-        setIsLoading(true);
-
-        const response = await fetch('http://localhost:5000/api/user/forgot-password/set-password', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({newPassword}),
+            body: JSON.stringify({password}),
             credentials: 'include'
         });
 
         const data = await response.json();
-        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: response.ok ? "success" : "error", message: data.message}});
-        setIsLoading(false);
 
-        return response.ok;
+        if (!response.ok) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            return;
+        }
+
+        await queryClient.invalidateQueries({queryKey: ["tasks"]});
+        await queryClient.invalidateQueries({queryKey: ["groups"]});
+        await queryClient.invalidateQueries({queryKey: ["categories"]});
     }
 
-    return {login, logout, register, isLoading, resetPasswordEmail, setForgotPassword}
+    return {login, logout, register, isLoading, resetAccount, loginGoogle}
 }

@@ -1,0 +1,60 @@
+@import '@/styles/variables';
+
+@media (min-width: $tablet-breakpoint) {
+
+  .surface {
+    width: 600px;
+    height: 500px;
+    border-radius: $base-border-radius;
+  }
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: var(--background-color);
+  z-index: 3;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.surface {
+  justify-content: space-between;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $huge-gap;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+}
+
+.infoContainer {
+  flex-direction: column;
+  display: flex;
+  gap: $base-gap;
+}
+
+.topHalf {
+  flex-direction: column;
+  display: flex;
+  gap: $huge-gap;
+}
+
+.even {
+  width: 500px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.odd {
+  width: 500px;
+  display: flex;
+  align-items: flex-end;
+}

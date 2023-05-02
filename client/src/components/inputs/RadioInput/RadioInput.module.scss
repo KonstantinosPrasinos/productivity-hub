@@ -1,0 +1,40 @@
+@import 'src/styles/variables.scss';
+
+.container {
+  font-size: $font-l;
+  padding-left: 1.7em;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  line-height: 1em;
+
+  cursor: pointer;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  left: 0;
+  height: 1.5em;
+  width: 1.5em;
+}
+
+.radio {
+  height: 0.5em;
+  width: 0.5em;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+
+  border-radius: 50%;
+  border: 0.25em solid var(--surface-color);
+  outline: solid 0.1em var(--border-primary-color);
+  transition: outline-color 0.1s linear, background-color 0.1s linear;
+}
+
+.input:checked ~ .radio {
+  background-color: var(--primary-color);
+  outline-color: var(--primary-color);
+}

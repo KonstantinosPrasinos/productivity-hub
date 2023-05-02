@@ -17,7 +17,7 @@ describe('Task History Tests', () => {
         const cookie = response.headers['set-cookie'];
 
         await request(server)
-            .post('/api/entries/')
+            .post('/api/entry/')
             .set('Cookie', cookie)
             .send({entry: {taskId: '636d24552c9b7b529b0a6d8c', value: '1'}})
             .expect(200)
@@ -31,7 +31,7 @@ describe('Task History Tests', () => {
         const cookie = response.headers['set-cookie'];
 
         await request(server)
-            .get('/api/entries/recent')
+            .get('/api/entry/recent')
             .set('Cookie', cookie)
             .send({taskId: '636d24552c9b7b529b0a6d8c'})
             .expect(200)

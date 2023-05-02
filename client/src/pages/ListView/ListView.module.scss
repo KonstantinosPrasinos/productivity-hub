@@ -40,6 +40,7 @@
 .categoryContainer {
   width: calc(22.15em - 20px);
   padding: 20px;
+  cursor: pointer;
 }
 
 .categoryCircle {
@@ -63,4 +64,6 @@
 .mobileView {
   height: 100%;
   overflow-y: auto;
+  align-items: center;
+  width: 100%;
 }

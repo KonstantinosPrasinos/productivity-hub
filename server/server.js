@@ -7,7 +7,7 @@ const session = require('express-session');
 const cors = require('cors')
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-const {loginUser} = require('./controllers/userController');
+const {loginUser, googleLogin} = require('./controllers/userController');
 const User = require('./models/userSchema');
 
 const userRoutes = require('./routes/userRoutes');
@@ -15,8 +15,9 @@ const taskRoutes = require('./routes/taskRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
-const verificationRoutes = require('./routes/verificationRoutes');
-const taskHistoryRoutes = require('./routes/taskHistoryRoutes');
+const securityRoutes = require('./routes/securityRoutes');
+const taskHistoryRoutes = require('./routes/entryRoutes');
+// const {Strategy: GoogleStrategy} = require("passport-google-oauth20");
 
 // Express app
 const app = express();
@@ -42,7 +43,7 @@ app.use(
 );
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: true,
     credentials: true,
 };
 
@@ -63,6 +64,7 @@ passport.deserializeUser(function(user, done) {
 });
 
 passport.use(loginUser);
+passport.use(googleLogin);
 
 // Routes
 app.use('/api/user', userRoutes);
@@ -70,8 +72,15 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/task', taskRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/category', categoryRoutes);
-app.use('/api/verify', verificationRoutes);
-app.use('/api/entries', taskHistoryRoutes);
+app.use('/api/security', securityRoutes);
+app.use('/api/entry', taskHistoryRoutes);
+
+app.use((err, req, res, next) => {
+    if (err.message) {
+        return res.status(400).json({message: err.message})
+    }
+    next();
+})
 
 // Connect to database
 mongoose.connect(process.env.MONG_URI)

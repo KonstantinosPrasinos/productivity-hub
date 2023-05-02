@@ -2,6 +2,9 @@
 
 .container {
   padding: $symmetrical-padding;
+  &:first-child {
+    white-space: pre-wrap;
+  }
 }
 
 .inputContainer {

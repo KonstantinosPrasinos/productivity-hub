@@ -1,9 +1,9 @@
 import {useMutation, useQueryClient} from "react-query";
 
-const postCategory = async (category) => {
-    const response = await fetch('http://localhost:5000/api/category/create', {
+const postCategory = async (data) => {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/create`, {
         method: 'POST',
-        body: JSON.stringify({category}),
+        body: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
     });
@@ -21,11 +21,24 @@ export function useAddCategory() {
     return useMutation({
         mutationFn: postCategory,
         onSuccess: data => {
-            queryClient.setQueryData(["get-categories"], (oldData) => {
-                return oldData ? {
-                    tasks: [...oldData.tasks, data]
-                } : oldData
+            queryClient.setQueryData(["categories"], (oldData) => {
+                if (oldData?.categories?.length) {
+                    return {
+                        categories: [...oldData.categories, data.newCategory],
+                    }
+                }
+                return {
+                    categories: [data.newCategory]
+                }
             });
+
+            if (data.newGroups) {
+                queryClient.setQueryData(["groups"], (oldData) => {
+                    return oldData ? {
+                        groups: [...oldData.groups, ...data.newGroups]
+                    } : oldData
+                });
+            }
         }
     })
 }

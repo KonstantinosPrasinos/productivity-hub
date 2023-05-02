@@ -1,33 +1,29 @@
 @import 'src/styles/variables.scss';
 
 .container {
-  transition: transform 0.2s, opacity 0.1s, color 0.2s;
+  transition: opacity 0.1s ease-in-out, color 0.2s ease-in-out;
+
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: $font-l;
-  color: var(--primary-color);
+  font-size: inherit;
+  color: inherit;
   height: 1.5em;
   width: 1.5em;
+  overflow: hidden;
+  box-sizing: content-box;
 
-  &:hover {
-    transform: scale(1.01);
-  }
-  &:active {
-    transform: scale(0.99);
-  }
+  min-width: 1.5em;
+  min-height: 1.5em;
+  padding: 0;
 
   &.selected {
     opacity: 1;
   }
 
   &.notSelected {
-    opacity: $opacity-low;
-  }
-
-  &.inverse {
-    color: var(--primary-color);
+    opacity: $opacity-very-low;
   }
 
   &.normal {
@@ -37,6 +33,28 @@
   &.green {
     color: var(--green-color);
   }
+
+  &:hover:enabled {
+    .icon {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  &:active:enabled {
+    .icon {
+      transform: scale(0.9);
+      opacity: 1;
+    }
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease-in-out;
+  transform-origin: center center;
 }
 
 .border {

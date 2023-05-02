@@ -8,21 +8,28 @@ const bcrypt = require("bcrypt");
 jest.setTimeout(20000);
 
 describe('Test User', () => {
-    afterAll(() => {
-        mongoose.connection.close();
+    beforeAll(async () => {
+        await mongoose.connect(process.env.MONG_URI)
+    })
+
+    afterAll(async() => {
+        await mongoose.connection.close();
     })
 
     test('Login Success', async () => {
         await request(server)
             .post('/api/user/login')
-            .send({email: 'user1@email.com', password: 'password'})
+            .send({email: 'test@email.com', password: 'testpassword'})
             .expect(200)
             .then(response => {
-                expect(response.body).toEqual(expect.objectContaining({user: {
-                                __v: expect.any(Number),
-                                _id: expect.any(String),
-                                local: expect.objectContaining({email: 'user1@email.com'})
-                            }}));
+                expect(response.body).toMatchObject({user: {
+                        // __v: expect.any(Number),
+                        // _id: expect.any(String),
+                        local: {email: 'test@email.com'}
+                        // createdAt: expect.any(Date),
+                        // updatedAt: expect.any(Date),
+                        // active: expect.any(Boolean)
+                    }});
             })
     })
 

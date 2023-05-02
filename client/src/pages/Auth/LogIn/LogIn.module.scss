@@ -1,0 +1,17 @@
+@import '@/styles/variables';
+
+.container {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & > * {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+.buttonContainer {
+  width: 100%;
+}

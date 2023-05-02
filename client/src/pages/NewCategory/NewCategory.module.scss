@@ -12,4 +12,10 @@
   gap: $base-gap;
   align-items: center;
   overflow-x: auto;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.addGroupButton {
+  font-size: $font-xxl;
 }

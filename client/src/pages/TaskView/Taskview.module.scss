@@ -1,3 +1,4 @@
+@import 'src/styles/variables.scss';
 $base-size: 1.2em;
 
 .checkbox {
@@ -15,4 +16,37 @@ $base-size: 1.2em;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
   }
+}
+
+.loadingIndicatorContainer {
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.tableButton {
+  display: flex;
+  font-weight: bold;
+  align-items: center;
+  font-size: $font-m;
+  gap: 6px;
+}
+
+.editIcons {
+  font-size: $font-xl;
+}
+
+.table {
+  height: auto;
+  tr {
+    td {
+      width: 45%;
+    }
+    &:last-of-type(td) {
+      width: 10%;
+    }
+  }
+}
+
+.tBody {
+  height: auto;
 }

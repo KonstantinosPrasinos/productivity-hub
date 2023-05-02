@@ -1,0 +1,80 @@
+@import '@/styles/variables';
+
+@media (min-width: $tablet-breakpoint) {
+  .container {
+    background-color: var(--background-color);
+    &.transparent {
+      background-color: rgba(#000000, 0.35);
+    }
+  }
+
+  .surface {
+    padding: 40px 80px;
+    border-radius: $base-border-radius;
+    border: $base-border;
+    width: 600px;
+    height: auto;
+  }
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .container {
+    background-color: var(--surface-color);
+  }
+
+  .surface {
+    height: 100%;
+    width: 100%;
+    padding: 40px;
+    justify-content: space-between;
+    & > :not(:last-child) {
+      margin: auto;
+    }
+  }
+}
+
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 4;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.surface {
+  position: relative;
+  background-color: var(--surface-color);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: $big-gap;
+
+  & > * {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+.loadingContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--surface-color);
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes rotating {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}

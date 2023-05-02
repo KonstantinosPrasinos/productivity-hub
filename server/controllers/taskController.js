@@ -1,34 +1,39 @@
 const Task = require('../models/taskSchema');
 const Joi = require('joi');
-const TaskHistory = require("../models/taskHistorySchema");
+const Entry = require("../models/entrySchema");
 
 const taskSchema = Joi.object({
     title: Joi.string().required(),
-    type: Joi.string().valid('Checkbox', 'Number'),
+    type: Joi.string().valid('Checkbox', 'Number').required(),
     step: Joi.number().min(0),
     goal: Joi.object().keys({
-        type: Joi.string().valid('None', 'At most', 'Exactly', 'At least'),
+        type: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(0)
     }),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
-    longGoal: Joi.object(),
-    expiresAt: Joi.object().keys({
-        type: Joi.string().valid('Never', 'Date', 'End of goal'),
-        timePeriod: Joi.string()
+    longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
+        type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
+        number: Joi.number().min(0)
     }),
-    timeGroup: Joi.string(),
-    repeatRate: Joi.object().keys({
+    // expiresAt: Joi.object().keys({
+    //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
+    //     timePeriod: Joi.string()
+    // }),
+    group: Joi.string().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}),
+    repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
         startingDate: Joi.array().items(Joi.number()),
         time: Joi.object().keys({
-            starting: Joi.number().integer().min(0),
-            ending: Joi.number().integer().max(2400)
+            start: Joi.string(),
+            end: Joi.string()
         })
-    })
+    }),
+    _id: Joi.string()
 })
 
 const getDateAddDetails = (bigTimePeriod, number) => {
@@ -152,25 +157,19 @@ const getTasksWithHistory = async (tasks, userId) => {
     let tasksWithCurrentEntry = [];
 
     for (const task of tasks) {
-        const currentEntry = await TaskHistory
-            .findOne({userId: userId, taskId: task._id, createdAt: {$gt: currentDate}})
-            .exec();
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gte: currentDate}});
 
-        let currentEntryValue;
-
-        if (currentEntry) {
-            currentEntryValue = currentEntry.value;
-        } else {
-            currentEntryValue = 0;
+        if (!currentEntry) {
+            currentEntry = await Entry.create({userId: userId, taskId: task._id})
         }
 
-        tasksWithCurrentEntry.push({...task._doc, currentEntryValue: currentEntryValue})
+        tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id, forDeletion: undefined, hidden: false}) // Remove the for deletion property, add the hidden property
     }
 
     // Add streak to tasks
     for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
         if (tasksWithCurrentEntry[i].repeats) {
-            const entriesHistory = await TaskHistory
+            const entriesHistory = await Entry
                 .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, createdAt: {$lt: currentDate}})
                 .sort({ $natural: -1 })
                 .limit(7)
@@ -179,16 +178,16 @@ const getTasksWithHistory = async (tasks, userId) => {
             if (entriesHistory.length) {
                 const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
-                const editedTask = await Task.findByIdAndUpdate(tasksWithCurrentEntry[i]._id, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
+                const editedTask = await Task.findOneAndUpdate({userId: req.user._id, _id: tasksWithCurrentEntry[i]._id}, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
                 const streak = assembleEntryHistory(entriesHistory, editedTask);
 
-                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryValue: tasksWithCurrentEntry[i].currentEntryValue, mostRecentProperDate: undefined});
+                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
             } else {
 
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, streak: "0000000", mostRecentProperDate: undefined});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000", mostRecentProperDate: undefined});
             }
         } else {
-            tasksWithHistory.push({...tasksWithCurrentEntry[i], currentEntryValue: 0, mostRecentProperDate: undefined});
+            tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
         }
     }
 
@@ -197,10 +196,12 @@ const getTasksWithHistory = async (tasks, userId) => {
 
 const getTasks = async (req, res) => {
     if (req.user) {
-        Task.find({userId: req.user._id}, async (err, tasks) => {
+        Task.find({userId: req.user._id, forDeletion: false}, async (err, tasks) => {
             if (err) return res.status(404).json({message: 'Tasks not found.'});
 
-            if (tasks) {return res.status(200).json({tasks: await getTasksWithHistory(tasks, req.user._id)})}
+            const tasksWithHistory = await getTasksWithHistory(tasks, req.user._id)
+
+            if (tasks) {return res.status(200).json({tasks: tasksWithHistory})}
 
             return res.status(404).json({message: 'Tasks not found.'});
         });
@@ -219,24 +220,20 @@ const createTask = async (req, res) => {
             return res.status(400).json({message: validatedTask.error});
         }
 
+        validatedTask.value._id = undefined;
+
         try {
-            const newTask = await Task.create({
-                ...validatedTask.value,
-                userId: req.user._id,
-                previousEntries: {
-                    value: '000000',
-                    latest: (new Date()).getTime(),
-                    mostRecent: 0
-                }
-            });
+            const newTask = await Task.create({...validatedTask.value, userId: req.user._id});
+            const entry = await Entry.create({userId: req.user._id, taskId: newTask._id});
 
             res.status(200).json({
                 ...newTask._doc,
-                currentEntryValue: 0,
                 streak: newTask.repeats ? "0000000" : undefined,
-                mostRecentProperDate: undefined});
+                mostRecentProperDate: undefined,
+                currentEntryId: entry._id
+            });
         } catch (error) {
-            res.status(500).json({message: error.message})
+            res.status(400).json({message: error.message})
         }
     } else {
         res.status(401).send({message: "Not authorized."});
@@ -247,16 +244,60 @@ const deleteTask = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
-        Task.findByIdAndDelete(taskId, (err, doc) => {
-            if (err) {
-                return res.status(500).json({message: err});
-            }
+        try {
+            await Task.updateMany({userId: req.user._id, _id: taskId}, {$set: {forDeletion: true}});
 
-            return res.status(200).json({taskId: doc._id});
-        })
+            await Entry.updateMany({userId: req.user._id, taskId: taskId}, {$set: {forDeletion: true}});
+
+            res.status(200).json({message: "Task and it's entries set for deletion."});
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
     } else {
         res.status(401).send({message: "Not authorized."});
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask};
+const undoDeleteTask = async (req, res) => {
+    if (req.user) {
+        const {taskId} = req.body;
+
+        try {
+            await Task.updateMany({userId: req.user._id, _id: taskId}, {$set: {forDeletion: false}});
+
+            await Entry.updateMany({userId: req.user._id, taskId: taskId}, {$set: {forDeletion: false}});
+
+            res.status(200).json({message: "Task and it's entries set for deletion."});
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+const setTask = async (req, res) => {
+    if (req.user) {
+        const {task} = req.body;
+
+        const validatedTask = taskSchema.validate(task);
+
+        if (validatedTask.error) {
+            return res.status(400).json({message: validatedTask.error});
+        }
+
+        validatedTask.value._id = undefined
+
+        try {
+            const newTask = await Task.findOneAndUpdate({_id: task._id, userId: req.user._id}, validatedTask.value, {returnDocument: 'after'});
+
+            return res.status(200).json(newTask);
+        } catch (error) {
+            res.status(500).json({message: error.message});
+        }
+    } else {
+        res.status(401).send({message: "Not authorized."});
+    }
+}
+
+module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask};
