@@ -4,27 +4,32 @@ import {useContext, useMemo} from "react";
 import {motion} from "framer-motion";
 import {MiniPagesContext} from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
-import {TbEqual, TbTargetArrow} from "react-icons/all";
-import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry";
-import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
+import {TbFlame, TbHash, TbTargetArrow} from "react-icons/all";
 
-const RepeatDetails = ({task}) => {
-    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
-
+const RepeatDetails = ({longGoal}) => {
     return (
         <div className={styles.repeatDetails}>
             <div>
-                <TbEqual />
-                <TextSwitchContainer>
-                    {isLoading && "..."}
-                    {!isLoading && entry.value}
-                </TextSwitchContainer>
+                {longGoal.type === "Streak" &&
+                    <>
+                        <TbFlame />
+                    </>
+                }
+                {longGoal.type === "Total completed" &&
+                    <>
+
+                    </>
+                }
+                {longGoal.type === "Total number" &&
+                    <>
+                        <TbHash />
+                    </>
+                }
             </div>
-            {task?.goal?.number &&
-                <div>
-                    <TbTargetArrow />
-                </div>
-            }
+            <div>
+                <TbTargetArrow />
+                {longGoal?.number}
+            </div>
         </div>
     );
 }
@@ -88,7 +93,7 @@ const Task = ({tasks}) => {
                     <div key={index} className={styles.task} data-value={'Clickable'}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
-                            {task.repeats && <RepeatDetails task={task}/>}
+                            {task.longGoal?.type && <RepeatDetails longGoal={task?.longGoal}/>}
                         </div>
                         <CurrentProgress task={task}/>
                     </div>

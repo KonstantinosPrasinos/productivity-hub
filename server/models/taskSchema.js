@@ -30,6 +30,7 @@ const Task = new mongoose.Schema({
         required: true
     },
     longGoal: {
+        limit: {type: String},
         type: {type: String},
         number: Number
     },

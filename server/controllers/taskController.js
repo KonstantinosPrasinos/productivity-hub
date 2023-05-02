@@ -14,7 +14,8 @@ const taskSchema = Joi.object({
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
     longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
-        type: Joi.string().valid('At most', 'Exactly', 'At least'),
+        type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(0)
     }),
     // expiresAt: Joi.object().keys({
