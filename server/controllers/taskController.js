@@ -7,16 +7,17 @@ const taskSchema = Joi.object({
     type: Joi.string().valid('Checkbox', 'Number').required(),
     step: Joi.number().min(0),
     goal: Joi.object().keys({
-        type: Joi.string().valid('At most', 'Exactly', 'At least'),
+        type: Joi.string().valid("Streak", "Total entries", "Total number", "Entry number"),
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(0)
     }),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
-    longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
-        type: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
-    }),
+    // longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
+    //     type: Joi.string().valid('At most', 'Exactly', 'At least'),
+    //     number: Joi.number().min(0)
+    // }),
     // expiresAt: Joi.object().keys({
     //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
     //     timePeriod: Joi.string()
