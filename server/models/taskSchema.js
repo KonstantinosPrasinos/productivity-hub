@@ -18,9 +18,6 @@ const Task = new mongoose.Schema({
         type: {
             type: String
         },
-        limit: {
-            type: String
-        },
         number: Number
     },
     category: String,
@@ -32,10 +29,11 @@ const Task = new mongoose.Schema({
         type: Boolean,
         required: true
     },
-    // longGoal: {
-    //     type: {type: String},
-    //     number: Number
-    // },
+    longGoal: {
+        limit: {type: String},
+        type: {type: String},
+        number: Number
+    },
     expiresAt: {
         type: String,
         timePeriod: String

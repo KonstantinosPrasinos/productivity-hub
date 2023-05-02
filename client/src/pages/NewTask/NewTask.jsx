@@ -23,7 +23,7 @@ import {motion} from "framer-motion";
 import styles from "./NewTask.module.scss";
 import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
-import {capitalizeFirstCharacter} from "@/functions/capitalizeFirstCharacter";
+import {capitalizeFirstCharacter} from "../../functions/capitalizeFirstCharacter";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -37,15 +37,19 @@ const NewTask = ({index, length, id}) => {
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Checkbox');
     const [step, setStep] = useState(settings.defaults.step);
-
     const [hasGoal, setHasGoal] = useState(false);
-    const [goalType, setGoalType] = useState("Streak");
-    const [goalLimit, setGoalLimits] = useState('At least');
+    const [goalLimit, setGoalLimit] = useState('At least');
     const [goalNumber, setGoalNumber] = useState(settings.defaults.goal);
-
     const [category, setCategory] = useState('None');
     const [priority, setPriority] = useState(settings.defaults.priority);
     const [repeats, setRepeats] = useState(false);
+
+    const [hasLongGoal, setHasLongGoal] = useState(false);
+    const [longGoalLimit, setLongGoalLimit] = useState('At least');
+    const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
+    const [longGoalType, setLongGoalType] = useState("Streak");
+
+    // const [expiresAt, setExpiresAt] = useState('Never');
     const [timeGroup, setTimeGroup] = useState({title: "None", _id: undefined});
     const [hasTime, setHasTime] = useState(false);
     const [startHour, setStartHour] = useState('00');
@@ -71,9 +75,9 @@ const NewTask = ({index, length, id}) => {
     // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
     const goalLimits = ['At most', 'Exactly', 'At least'];
-    const goalTypes = ["Streak", "Total entries", "Total number", "Entry number"];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
     const repeatTypes = ['Custom Rules', 'Time Group'];
+    const goalTypes = ['Streak', 'Total completed', 'Total number'];
 
     const handleKeyDown = (e) => {
         if (e.code === 'Enter') {
@@ -82,8 +86,8 @@ const NewTask = ({index, length, id}) => {
     }
 
     const handleSetType = (e) => {
-        if (e === "Checkbox" && goalTypes.indexOf(goalType) > 1) {
-            setGoalType("Streak");
+        if (e.type === "Checkbox" && goalTypes.indexOf(longGoalType) > 1) {
+            setLongGoalType("Streak");
         }
         setType(e);
     }
@@ -111,7 +115,7 @@ const NewTask = ({index, length, id}) => {
                 setStep(task.step);
                 if (task?.goal.type) {
                     setHasGoal(true);
-                    setGoalLimits(task.goal.type);
+                    setGoalLimit(task.goal.type);
                     setGoalNumber(task.goal.number);
                 }
             }
@@ -124,6 +128,11 @@ const NewTask = ({index, length, id}) => {
             setRepeats(task.repeats);
 
             if (task.repeats) {
+                if (task.longGoal?.type) {
+                    setLongGoalLimit(task.longGoal.type);
+                    setLongGoalNumber(task.longGoal.number);
+                }
+
                 if (task.group) {
                     setRepeatType('Time Group');
                     setTimeGroup(groups.find(group => group._id === task.group._id));
@@ -252,22 +261,21 @@ const NewTask = ({index, length, id}) => {
 
             if (task.type === "Number") {
                 task.step = step;
-            }
-
-            if (hasGoal) {
-                task.goal = {
-                    limit: goalLimit,
-                    type: goalType,
-                    number: goalNumber,
+                if (hasGoal) {
+                    task.goal = {
+                        type: goalLimit,
+                        number: goalNumber,
+                    }
                 }
             }
 
-            // if (hasLongGoal) {
-            //     task.longGoal = {
-            //         type: longGoalType,
-            //         number: longGoalNumber,
-            //     }
-            // }
+            if (hasLongGoal) {
+                task.longGoal = {
+                    type: longGoalType,
+                    limit: longGoalLimit,
+                    number: longGoalNumber,
+                }
+            }
 
             if (id) {
                 await changeTask({...task, _id: id});
@@ -308,9 +316,6 @@ const NewTask = ({index, length, id}) => {
                                 <div>
                                     Priority: <TextSwitchContainer>{priority}</TextSwitchContainer>
                                 </div>
-                                <div>
-                                    Step: <TextSwitchContainer>{type === "Number" ? step : "None"}</TextSwitchContainer>
-                                </div>
                             </motion.div>
                         </div>
                         <IconButton>
@@ -342,9 +347,6 @@ const NewTask = ({index, length, id}) => {
                         ))
                         }
                     </div>
-                </InputWrapper>
-                <InputWrapper label="Step">
-                    <TextBoxInput isDisabled={type !== "Number"} type="number" placeholder="Step" value={step} setValue={setStep} />
                 </InputWrapper>
                 <InputWrapper label={"Category"}>
                     <DropDownInput
@@ -385,19 +387,16 @@ const NewTask = ({index, length, id}) => {
                 header={(
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>Goal options</div>
+                            <div className={"Title-Medium"}>Number type options</div>
                             <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
                                 <div>
-                                    Has a goal: <TextSwitchContainer>{capitalizeFirstCharacter(hasGoal.toString())}</TextSwitchContainer>
+                                    Goal type: <TextSwitchContainer>{hasGoal ? goalLimit : "None"}</TextSwitchContainer>
                                 </div>
                                 <div>
-                                    Type: <TextSwitchContainer>{hasGoal ? goalType : "None"}</TextSwitchContainer>
+                                    Step: <TextSwitchContainer>{step}</TextSwitchContainer>
                                 </div>
                                 <div>
-                                    Limit: <TextSwitchContainer>{hasGoal ? goalLimit : "None"}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Number: <TextSwitchContainer>{hasGoal ? goalNumber : "None"}</TextSwitchContainer>
+                                    Goal number: <TextSwitchContainer>{hasGoal ? goalNumber : "None"}</TextSwitchContainer>
                                 </div>
                             </motion.div>
                         </div>
@@ -413,45 +412,31 @@ const NewTask = ({index, length, id}) => {
                 )}
                 setExtendedInherited={() => {setExtendedSection(extendedSection === 1 ? null : 1)}}
                 extendedInherited={extendedSection === 1}
+                isDisabled={type !== 'Number'}
             >
+                <InputWrapper label="Step">
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} />
+                </InputWrapper>
                 <InputWrapper label={"Has goal"}>
                     <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
                 </InputWrapper>
-                <InputWrapper label={"Type"}>
+                <InputWrapper label={"Goal"}>
                     <DropDownInput
-                        placeholder={"Type"}
-                        selected={goalType}
-                        isDisabled={!hasGoal}
-                    >
-                        {goalTypes.slice(0, type === "Number" ? 4 : 2).map(tempGoalType => (
-                            <button
-                                className={styles.dropDownOption}
-                                onClick={() => setGoalType(tempGoalType)}
-                                key={tempGoalType}
-                            >
-                                {tempGoalType}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                </InputWrapper>
-                <InputWrapper label={"Limit"}>
-                    <DropDownInput
-                        placeholder={'Limit'}
+                        placeholder={'Type'}
+                        options={goalLimits}
                         selected={goalLimit}
                         isDisabled={!hasGoal}
                     >
                         {goalLimits.map(tempGoalLimit => (
                             <button
                                 className={styles.dropDownOption}
-                                onClick={() => setGoalLimits(tempGoalLimit)}
+                                onClick={() => setGoalLimit(tempGoalLimit)}
                                 key={tempGoalLimit}
                             >
                                 {tempGoalLimit}
                             </button>
                         ))}
                     </DropDownInput>
-                </InputWrapper>
-                <InputWrapper label={"Number"}>
                     <TextBoxInput
                         type="number"
                         placeholder="Number"
@@ -473,6 +458,9 @@ const NewTask = ({index, length, id}) => {
                                 <div>
                                     Method: <TextSwitchContainer>{repeatType === "Custom Rules" ? "Custom" : timeGroup.title}</TextSwitchContainer>
                                 </div>
+                                <div>
+                                    Goal number: <TextSwitchContainer>{hasLongGoal ? longGoalNumber : "None"}</TextSwitchContainer>
+                                </div>
                             </motion.div>
                         </div>
                         <IconButton>
@@ -493,14 +481,13 @@ const NewTask = ({index, length, id}) => {
                 <InputWrapper label="Repeats">
                     <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
                 </InputWrapper>
-                <InputWrapper label={"Repeat according to"}>
+                <InputWrapper label={"Repeat using"}>
                     {repeatTypes.map(item => (
                         <Chip
                             key={item}
                             value={item}
                             selected={repeatType}
                             setSelected={setRepeatType}
-
                         >
                             {item}
                         </Chip>
@@ -509,7 +496,7 @@ const NewTask = ({index, length, id}) => {
                 <InputWrapper label={"Select a category time group"}>
                     <DropDownInput
                         placeholder={"None"}
-                        isDisabled={!repeats || repeatType !== "Time Group"} setSelected={setTimeGroup} selected={timeGroup?.title}
+                        isDisabled={repeatType !== "Time Group"} setSelected={setTimeGroup} selected={timeGroup?.title}
                     >
                         {categoryGroups.map((tempTimeGroup, index) => (
                             <button
@@ -522,33 +509,6 @@ const NewTask = ({index, length, id}) => {
                         ))}
                     </DropDownInput>
                 </InputWrapper>
-                {/*<InputWrapper label={"Has long term goal"}>*/}
-                {/*    <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />*/}
-                {/*</InputWrapper>*/}
-                {/*<InputWrapper label={"Long term goal"}>*/}
-                {/*    <DropDownInput*/}
-                {/*        placeholder={'Type'}*/}
-                {/*        selected={longGoalType}*/}
-                {/*        isDisabled={!hasLongGoal}*/}
-                {/*    >*/}
-                {/*        {goalLimits.map(tempGoalType => (*/}
-                {/*            <button*/}
-                {/*                className={styles.dropDownOption}*/}
-                {/*                onClick={() => setLongGoalType(tempGoalType)}*/}
-                {/*                key={tempGoalType}*/}
-                {/*            >*/}
-                {/*                {tempGoalType}*/}
-                {/*            </button>*/}
-                {/*        ))}*/}
-                {/*    </DropDownInput>*/}
-                {/*    <TextBoxInput*/}
-                {/*        type="number"*/}
-                {/*        placeholder="Number"*/}
-                {/*        value={longGoalNumber}*/}
-                {/*        setValue={setLongGoalNumber}*/}
-                {/*        isDisabled={!hasLongGoal}*/}
-                {/*    />*/}
-                {/*</InputWrapper>*/}
             </HeaderExtendContainer>
             <HeaderExtendContainer
                 header={(
@@ -639,95 +599,87 @@ const NewTask = ({index, length, id}) => {
                     </InputWrapper>
                 }
             </HeaderExtendContainer>
-            {/*<HeaderExtendContainer*/}
-            {/*    header={(*/}
-            {/*        <div className={"Horizontal-Flex-Container Space-Between"}>*/}
-            {/*            <div className={styles.headerLeftSide}>*/}
-            {/*                <div className={"Title-Medium"}>Long term goal options</div>*/}
-            {/*                <motion.div className={`Label-Small ${styles.titleMedium}`} layout>*/}
-            {/*                    <div>*/}
-            {/*                        Number: <TextSwitchContainer>{repeatNumber}</TextSwitchContainer>*/}
-            {/*                    </div>*/}
-            {/*                    <div>*/}
-            {/*                        Time:*/}
-            {/*                        <TextSwitchContainer>*/}
-            {/*                            {!hasTime && "None"}*/}
-            {/*                            {hasTime && <>*/}
-            {/*                                {startHour}:{startMinute} - {endHour}:{endMinute}*/}
-            {/*                            </>}*/}
-            {/*                        </TextSwitchContainer>*/}
-            {/*                    </div>*/}
-            {/*                    <div>*/}
-            {/*                        Time period: <TextSwitchContainer>{timePeriod}</TextSwitchContainer>*/}
-            {/*                    </div>*/}
-            {/*                    <div>*/}
-            {/*                        On:*/}
-            {/*                        <TextSwitchContainer>*/}
-            {/*                            {timePeriod === "Days" ? "Option doesn't apply" : timePeriod2.length}*/}
-            {/*                        </TextSwitchContainer>*/}
-            {/*                        <TextSwitchContainer>*/}
-            {/*                            {timePeriod !== "Days" && "days"}*/}
-            {/*                        </TextSwitchContainer>*/}
-            {/*                    </div>*/}
-            {/*                </motion.div>*/}
-            {/*            </div>*/}
-            {/*            <motion.div*/}
-            {/*                className={"Title-Large"}*/}
-            {/*                key={extendedSection === 3}*/}
-            {/*                initial={{rotate: extendedSection === 3 ? 0 : 180}}*/}
-            {/*                animate={{rotate: !(extendedSection === 3) ? 0 : 180}}*/}
-            {/*            >*/}
-            {/*                <TbChevronDown />*/}
-            {/*            </motion.div>*/}
-            {/*        </div>*/}
-            {/*    )}*/}
-            {/*    setExtendedInherited={() => {setExtendedSection(extendedSection === 3 ? null : 3)}}*/}
-            {/*    extendedInherited={extendedSection === 3}*/}
-            {/*    isDisabled={!repeats || repeatType !== "Custom Rules"}*/}
-            {/*>*/}
-            {/*    /!*<InputWrapper label={"Repeat between certain times"}>*!/*/}
-            {/*    /!*    <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />*!/*/}
-            {/*    /!*</InputWrapper>*!/*/}
-            {/*    /!*<InputWrapper label={"From - To"}>*!/*/}
-            {/*    /!*    <TimeInput*!/*/}
-            {/*    /!*        hour={startHour}*!/*/}
-            {/*    /!*        setHour={setStartHour}*!/*/}
-            {/*    /!*        minute={startMinute}*!/*/}
-            {/*    /!*        setMinute={setStartMinute}*!/*/}
-            {/*    /!*        isDisabled={!hasTime}*!/*/}
-            {/*    /!*    />*!/*/}
-            {/*    /!*    -*!/*/}
-            {/*    /!*    <TimeInput*!/*/}
-            {/*    /!*        hour={endHour}*!/*/}
-            {/*    /!*        setHour={setEndHour}*!/*/}
-            {/*    /!*        minute={endMinute}*!/*/}
-            {/*    /!*        setMinute={setEndMinute}*!/*/}
-            {/*    /!*        isDisabled={!hasTime}*!/*/}
-            {/*    /!*    />*!/*/}
-            {/*    /!*</InputWrapper>*!/*/}
-            {/*    /!*<InputWrapper label={'Repeat every'}>*!/*/}
-            {/*    /!*    <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>*!/*/}
-            {/*    /!*    <DropDownInput*!/*/}
-            {/*    /!*        placeholder={'Weeks'}*!/*/}
-            {/*    /!*        selected={timePeriod}*!/*/}
-            {/*    /!*    >*!/*/}
-            {/*    /!*        {timePeriods.map(tempTimePeriod => (*!/*/}
-            {/*    /!*            <button*!/*/}
-            {/*    /!*                className={styles.dropDownOption}*!/*/}
-            {/*    /!*                onClick={() => setTimePeriod(tempTimePeriod)}*!/*/}
-            {/*    /!*                key={tempTimePeriod}*!/*/}
-            {/*    /!*            >*!/*/}
-            {/*    /!*                {tempTimePeriod}*!/*/}
-            {/*    /!*            </button>*!/*/}
-            {/*    /!*        ))}*!/*/}
-            {/*    /!*    </DropDownInput>*!/*/}
-            {/*    /!*</InputWrapper>*!/*/}
-            {/*    /!*{timePeriod !== 'Days' &&*!/*/}
-            {/*    /!*    <InputWrapper label={'On'}>*!/*/}
-            {/*    /!*        <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />*!/*/}
-            {/*    /!*    </InputWrapper>*!/*/}
-            {/*    /!*}*!/*/}
-            {/*</HeaderExtendContainer>*/}
+            <HeaderExtendContainer
+                header={(
+                    <div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={styles.headerLeftSide}>
+                            <div className={"Title-Medium"}>Long term goal options</div>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                                <div>
+                                    Has goal: <TextSwitchContainer>{capitalizeFirstCharacter(hasLongGoal.toString())}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Goal type: <TextSwitchContainer>{hasLongGoal ? longGoalType : "None"}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Goal limit: <TextSwitchContainer>{hasLongGoal ? longGoalLimit : "None"}</TextSwitchContainer>
+                                </div>
+                                <div>
+                                    Goal number: <TextSwitchContainer>{hasLongGoal ? longGoalNumber : "None"}</TextSwitchContainer>
+                                </div>
+                            </motion.div>
+                        </div>
+                        <motion.div
+                            className={"Title-Large"}
+                            key={extendedSection === 4}
+                            initial={{rotate: extendedSection === 4 ? 0 : 180}}
+                            animate={{rotate: !(extendedSection === 4) ? 0 : 180}}
+                        >
+                            <TbChevronDown />
+                        </motion.div>
+                    </div>
+                )}
+                setExtendedInherited={() => {setExtendedSection(extendedSection === 4 ? null : 4)}}
+                extendedInherited={extendedSection === 4}
+                isDisabled={!repeats}
+            >
+                <InputWrapper label={"Has long term goal"}>
+                    <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />
+                </InputWrapper>
+                <InputWrapper label={"Type"}>
+                    <DropDownInput
+                        placeholder={'Type'}
+                        selected={longGoalType}
+                        isDisabled={!hasLongGoal}
+                    >
+                        {goalTypes.slice(0, type === "Number" ? 3 : 2).map(tempGoalLimit => (
+                            <button
+                                className={styles.dropDownOption}
+                                onClick={() => setLongGoalLimit(tempGoalLimit)}
+                                key={tempGoalLimit}
+                            >
+                                {tempGoalLimit}
+                            </button>
+                        ))}
+                    </DropDownInput>
+                </InputWrapper>
+                <InputWrapper label={"Limit"}>
+                    <DropDownInput
+                        placeholder={'Limit'}
+                        selected={longGoalLimit}
+                        isDisabled={!hasLongGoal}
+                    >
+                        {goalLimits.map(tempGoalLimit => (
+                            <button
+                                className={styles.dropDownOption}
+                                onClick={() => setLongGoalLimit(tempGoalLimit)}
+                                key={tempGoalLimit}
+                            >
+                                {tempGoalLimit}
+                            </button>
+                        ))}
+                    </DropDownInput>
+                </InputWrapper>
+                <InputWrapper label={"Number"}>
+                    <TextBoxInput
+                        type="number"
+                        placeholder="Number"
+                        value={longGoalNumber}
+                        setValue={setLongGoalNumber}
+                        isDisabled={!hasLongGoal}
+                    />
+                </InputWrapper>
+            </HeaderExtendContainer>
         </MiniPageContainer>
     );
 };
