@@ -43,15 +43,21 @@ const Task = new mongoose.Schema({
         number: Number,
         bigTimePeriod: String,
         smallTimePeriod: [String],
-        startingDate: [Number],
+        startingDate: [Date],
         time: {
             start: String,
             end: String
         }
     },
+    repeatStats: {
+        longestStreak: {
+            number: Number,
+            lastDate: Date
+        }
+    },
     mostRecentProperDate: {
         type: Date,
-        default: Date.now
+        default: null
     },
     forDeletion: {
         type: Boolean,

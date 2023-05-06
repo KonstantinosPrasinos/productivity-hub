@@ -27,7 +27,7 @@ const taskSchema = Joi.object({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
-        startingDate: Joi.array().items(Joi.number()),
+        startingDate: Joi.array().items(Joi.date()),
         time: Joi.object().keys({
             start: Joi.string(),
             end: Joi.string()
@@ -67,85 +67,86 @@ const findMostRecentDate = (task) => {
     if (task.mostRecentProperDate) {
         date.setTime(task.mostRecentProperDate.getTime());
     } else {
-        date.setTime(task.repeatRate.startingDate.getTime());
+        date.setTime(task.repeatRate.startingDate[0].getTime());
     }
 
-    date.setUTCHours(0, 0, 0, 0);
-
     const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
-    
+
     while(currentDate.getTime() > date.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
     }
 
-    return date.getTime();
+    return date;
 }
 
 const assembleEntryHistory = (entries, task) => {
+    let streak = 0;
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
+
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     const date = new Date(task.mostRecentProperDate);
     date.setUTCHours(0, 0, 0, 0);
 
-    let properEntries = "0".repeat(7);
-
-    for (let i = 0; i < entries.length; i++) {
+    if (date.getTime() === currentDate.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
-
-        const entryFound = entries.find(entry => {
-            entry.createdAt.setUTCHours(0, 0, 0, 0);
-
-            return entry.createdAt.getTime() === date.getTime();
-        })
-
-        if (entryFound) {
-
-            let addedValue = '0';
-
-            if (task.type === 'Checkbox') {
-                if (entryFound?.value === 1) {
-                    addedValue = '3';
-                }
-            } else {
-                switch(task.goal.type) {
-                    case 'None':
-                        if (entryFound?.value > 0) {
-                            addedValue = '3';
-                        }
-                        break;
-                    case 'At most':
-                        if (entryFound?.value > 0) {
-                            if (entryFound?.value < task.goal.number) {
-                                addedValue = '3';
-                            } else if (entryFound?.value === task.goal.number) {
-                                addedValue = '1';
-                            }
-                        }
-                        break;
-                    case 'Exactly':
-                        if (entryFound?.value === task.goal.number) {
-                            addedValue = '3';
-                        }
-                        break;
-                    case 'At least':
-                        if (entryFound?.value >= task.goal.number) {
-                            addedValue = '3';
-                        } else if (entryFound?.value >= Math.ceil(task.goal.number / 2)) {
-                            addedValue = '2';
-                        } else if (entryFound?.value > 0) {
-                            addedValue = '1';
-                        }
-                        break;
-                }
-            }
-
-            properEntries = properEntries.substring(0, properEntries.length - 1 - i) + addedValue + properEntries.substring(properEntries.length, properEntries.length - i);
-        }
     }
 
-    return properEntries;
+    let entryFound = true;
+
+    while(entryFound) {
+        for (let i = task.repeatRate.startingDate.length - 1; i >= 0; i--) {
+            let timeDifference = task.repeatRate.startingDate[i] - task.repeatRate.startingDate[0];
+            timeDifference = timeDifference / (24 * 3600 * 1000); // Turn into days
+
+            date.setDate(date.getDate() + timeDifference);
+
+            entryFound = entries.find(entry => {
+                if (entry.date.getTime() === date.getTime()) {
+                    if (task.type === "Checkbox") {
+                        return entry.value === 1;
+                    } else {
+                        switch (task.goal.type) {
+                            case "At least":
+                                if (entry.value >= task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            case "Exactly":
+                                if (entry.value === task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            case "At most":
+                                if (entry.value <= task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            default: break;
+                        }
+                    }
+                }
+
+                return false;
+            });
+
+            if (entryFound) {
+                streak++;
+            } else {
+                break;
+            }
+
+            date.setDate(date.getDate() - timeDifference);
+        }
+
+        date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
+    }
+
+    return streak;
 }
 
 const getTasksWithHistory = async (tasks, userId) => {
@@ -157,7 +158,7 @@ const getTasksWithHistory = async (tasks, userId) => {
     let tasksWithCurrentEntry = [];
 
     for (const task of tasks) {
-        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gte: currentDate}});
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: currentDate});
 
         if (!currentEntry) {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})
@@ -170,21 +171,24 @@ const getTasksWithHistory = async (tasks, userId) => {
     for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
         if (tasksWithCurrentEntry[i].repeats) {
             const entriesHistory = await Entry
-                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, createdAt: {$lt: currentDate}})
-                .sort({ $natural: -1 })
-                .limit(7)
+                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, date: {$lte: currentDate}})
+                .sort({date: -1})
                 .exec();
 
             if (entriesHistory.length) {
                 const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
-                const editedTask = await Task.findOneAndUpdate({userId: req.user._id, _id: tasksWithCurrentEntry[i]._id}, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
+                const editedTask = await Task.findOneAndUpdate(
+                    {userId: userId, _id: tasksWithCurrentEntry[i]._id},
+                    {"$set": {"mostRecentProperDate": mostRecentDate}},
+                    {new: true}
+                );
+
                 const streak = assembleEntryHistory(entriesHistory, editedTask);
 
                 tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
             } else {
-
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000", mostRecentProperDate: undefined});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: 0, mostRecentProperDate: undefined});
             }
         } else {
             tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
@@ -300,4 +304,4 @@ const setTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask};
+module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask, assembleEntryHistory, getDateAddDetails};

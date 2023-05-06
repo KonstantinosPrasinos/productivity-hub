@@ -16,7 +16,7 @@ const Entry = new mongoose.Schema({
     },
     date: {
         type: Date,
-        default: new Date(),
+        default: (new Date()).setUTCHours(0, 0, 0, 0),
         required: true
     },
     forDeletion: {
