@@ -316,9 +316,11 @@ const createTask = async (req, res) => {
 
             res.status(200).json({
                 ...newTask._doc,
-                streak: newTask.repeats ? "0000000" : undefined,
                 mostRecentProperDate: undefined,
-                currentEntryId: entry._id
+                currentEntryId: entry._id,
+                streak: {number: 0, date: null},
+                totalCompletedEntries: 0,
+                totalNumber: newTask._doc.type === "Number" ? 0 : undefined
             });
         } catch (error) {
             res.status(400).json({message: error.message})
