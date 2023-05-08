@@ -51,8 +51,14 @@ const Task = new mongoose.Schema({
     },
     repeatStats: {
         longestStreak: {
-            number: Number,
-            lastDate: Date
+            number: {
+                type: Number,
+                default: null
+            },
+            lastDate: {
+                type: Date,
+                default: null
+            }
         }
     },
     mostRecentProperDate: {

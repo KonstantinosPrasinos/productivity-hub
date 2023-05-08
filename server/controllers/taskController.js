@@ -61,7 +61,7 @@ const getDateAddDetails = (bigTimePeriod, number) => {
     return {functionName, timeToAdd};
 }
 
-const findMostRecentDate = (task) => {
+const findMostRecentDate = (task, currentDate = null) => { // current date for tests
     const date = new Date();
 
     if (task.mostRecentProperDate) {
@@ -70,7 +70,10 @@ const findMostRecentDate = (task) => {
         date.setTime(task.repeatRate.startingDate[0].getTime());
     }
 
-    const currentDate = new Date();
+    if (!currentDate) {
+        currentDate = new Date();
+    }
+
     currentDate.setUTCHours(0, 0, 0, 0);
 
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
@@ -82,11 +85,14 @@ const findMostRecentDate = (task) => {
     return date;
 }
 
-const assembleEntryHistory = (entries, task) => {
+const assembleEntryHistory = (entries, task, currentDate = null) => { // current date for tests
     let streak = 0;
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
 
-    const currentDate = new Date();
+    if (!currentDate) {
+        currentDate = new Date();
+    }
+
     currentDate.setUTCHours(0, 0, 0, 0);
 
     const date = new Date(task.mostRecentProperDate);
@@ -178,13 +184,22 @@ const getTasksWithHistory = async (tasks, userId) => {
             if (entriesHistory.length) {
                 const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
-                const editedTask = await Task.findOneAndUpdate(
+                let editedTask = await Task.findOneAndUpdate(
                     {userId: userId, _id: tasksWithCurrentEntry[i]._id},
                     {"$set": {"mostRecentProperDate": mostRecentDate}},
                     {new: true}
                 );
 
                 const streak = assembleEntryHistory(entriesHistory, editedTask);
+
+                if (!editedTask.repeatStats?.longestStreak?.number || editedTask.repeatStats.longestStreak.number < streak) {
+                    // If current streak is longer than longest, replace longest with current
+                    editedTask = await Task.findOneAndUpdate(
+                        {userId: userId, _id: tasksWithCurrentEntry[i]._id},
+                        {"$set": {"mostRecentProperDate": mostRecentDate, "repeatStats.longestStreak.number": streak}},
+                        {new: true}
+                    )
+                }
 
                 tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
             } else {
@@ -304,4 +319,4 @@ const setTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask, assembleEntryHistory, getDateAddDetails};
+module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask, assembleEntryHistory, getDateAddDetails, findMostRecentDate};
