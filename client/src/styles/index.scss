@@ -1,3 +1,4 @@
+@use '@/styles/mixins' as m;
 @import "variables";
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
@@ -75,7 +76,7 @@ a {
     align-items: center;
     gap: $base-gap;
     cursor: pointer;
-    padding: $base-padding;
+    padding: 10px 24px;
     width: max-content;
     white-space: nowrap;
     
@@ -133,6 +134,10 @@ a {
     grid-template-areas:
     ". ."
     ". .";
+
+    & > * {
+        height: 72.8px;
+    }
 }
 
 .Label {
@@ -146,6 +151,31 @@ a {
     //opacity: $opacity-low;
     //max-width: fit-content;
 }
+
+.Headline-Large {
+    @include m.Headline-Large;
+}
+
+.Headline-Medium {
+    @include m.Headline-Medium;
+}
+
+.Title-Large {
+    @include m.Title-Large;
+}
+
+.Title-Small {
+    @include m.Title-Small;
+}
+
+.Label-Medium {
+    @include m.Label-Medium;
+}
+
+.Body-Small {
+    @include m.Body-Small;
+}
+
 
 .Headline {
     font-size: $font-xl;
@@ -217,28 +247,33 @@ a {
     background-color: var(--purple-color);
 }
 
+.Opacity-Very-Low {
+    opacity: $opacity-very-low;
+}
+
+
 // Typography
 
-.Title-Large {
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 28px;
-}
-
-.Title-Medium {
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: 0.1px;
-}
-
-.Label-Small {
-    opacity: 0.38;
-    font-weight: 500;
-    font-size: 11px;
-    line-height: 16px;
-    letter-spacing: 0.5px;
-}
+//.Title-Large {
+//    font-weight: 400;
+//    font-size: 22px;
+//    line-height: 28px;
+//}
+//
+//.Title-Medium {
+//    font-weight: 500;
+//    font-size: 16px;
+//    line-height: 24px;
+//    letter-spacing: 0.1px;
+//}
+//
+//.Label-Small {
+//    opacity: 0.38;
+//    font-weight: 500;
+//    font-size: 11px;
+//    line-height: 16px;
+//    letter-spacing: 0.5px;
+//}
 
 input {
     border: none;

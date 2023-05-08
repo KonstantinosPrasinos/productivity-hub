@@ -1,10 +1,11 @@
-@import 'src/styles/variables.scss';
+@use '@/styles/variables' as v;
+@use '@/styles/mixins' as m;
 
 .container {
     width: 600px;
     height: calc(100% - 4em);
     overflow: hidden;
-    padding: $big-gap !important;
+    padding: v.$big-gap !important;
     padding-right: 12px !important;
     position: relative;
 }
@@ -22,8 +23,8 @@
 
 .header {
     width: 100%;
-    padding-bottom: $symmetrical-padding;
-    border-bottom: $base-border;
+    padding-bottom: v.$symmetrical-padding;
+    border-bottom: v.$base-border;
     font-weight: 500;
     background-color: var(--surface-color);
     //z-index: 1;
@@ -34,7 +35,7 @@
     display: flex;
     gap: 10px;
     flex-direction: column;
-    border-right: $base-border;
+    border-right: v.$base-border;
     border-width: 2px;
     padding: 1em;
 }
@@ -47,7 +48,7 @@
 }
 
 .email {
-    font-size: $font-s;
+    font-size: v.$font-s;
 }
 
 .accountContainer {
@@ -86,7 +87,7 @@
     right: 2em;
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
     .container {
         width: 100%;
         height: auto;
@@ -97,6 +98,6 @@
 
 .subSection {
     border: 1px solid var(--border-primary-color);
-    border-radius: $base-border-radius;
+    border-radius: v.$base-border-radius;
     padding: 20px;
 }

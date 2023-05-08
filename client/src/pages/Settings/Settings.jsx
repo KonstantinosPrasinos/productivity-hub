@@ -15,6 +15,7 @@ import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
 import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin, TbBrandGoogle} from "react-icons/tb";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
+import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -39,6 +40,7 @@ const Settings = () => {
     const navigate = useNavigate();
 
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
+    const deleteTimeGroupActions = ["Keep repeat", "Remove repeat", "Delete them"]
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
@@ -183,21 +185,21 @@ const Settings = () => {
         >
             <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
                 <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>Profile</div>
+                    <div className={`Headline-Large`}>Profile</div>
                     <div className={'Stack-Container Big-Gap'}>
                         <div className={'Stack-Container'}>
-                            <div className={'Horizontal-Flex-Container'}>Logout</div>
+                            <div className={'Title-Small'}>Logout</div>
                             <div className={`Horizontal-Flex-Container Space-Between`}>
-                                <div className={'Label'}>Disconnect your account from this device.</div>
+                                <div className={'Body-Small Opacity-Very-Low'}>Disconnect your account from this device.</div>
                                 <Button filled={false} size={'small'} onClick={handleLogOut}>Logout</Button>
                             </div>
                         </div>
-                        <div className={styles.subSectionTitle}>Account Details</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Large'}>Account Details</div>
+                        <section className={`Stack-Container`}>
                             {googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><TbBrandGoogle/>Google Account</div>
+                                <div className={'Horizontal-Flex-Container Title-Small'}><TbBrandGoogle/>Google Account</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                    <div className={'Body-Small Opacity-Very-Low'}>
                                         You are connected using a Google Account with the following email address:
                                         <br />
                                         {email}
@@ -205,9 +207,9 @@ const Settings = () => {
                                 </div>
                             </div>}
                             {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><TbMail/>Email</div>
+                                <div className={'Horizontal-Flex-Container Title-Small'}><TbMail/>Email</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                    <div className={'Body-Small Opacity-Very-Low'}>
                                         {email}
                                         <br/>
                                         Note: if you change your email, you will be logged out.
@@ -216,9 +218,9 @@ const Settings = () => {
                                 </div>
                             </div>}
                             {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Change Password</div>
+                                <div className={'Title-Small'}>Change Password</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                    <div className={'Body-Small Opacity-Very-Low'}>
                                         Change the password you use when logging in using your email.
                                         <br/>
                                         Note: this action will log you out.
@@ -227,19 +229,19 @@ const Settings = () => {
                                 </div>
                             </div>}
                         </section>
-                        <div className={styles.subSectionTitle}>Danger Zone</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Large'}>Danger Zone</div>
+                        <section className={`Stack-Container`}>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Delete Account</div>
+                                <div className={'Title-Small'}>Delete Account</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>Delete all the data of your account.</div>
+                                    <div className={'Body-Small Opacity-Very-Low'}>Delete all the data of your account.</div>
                                     <Button filled={false} size={'small'} onClick={toggleDeleteAccountModal} isWarning={true}>Delete</Button>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Reset Account</div>
+                                <div className={'Title-Small'}>Reset Account</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>Keep your account but delete all the task data and reset settings.</div>
+                                    <div className={'Body-Small Opacity-Very-Low'}>Keep your account but delete all the task data and reset settings.</div>
                                     <Button filled={false} size={'small'} onClick={toggleResetAccountModal} isWarning={true}>Reset</Button>
                                 </div>
                             </div>
@@ -247,19 +249,19 @@ const Settings = () => {
                     </div>
                 </section>
                 <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>General</div>
+                    <div className={`Headline-Large`}>General</div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>App Theme</div>
+                        <div className={'Title-Small'}>App Theme</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>The color theme the app uses.</div>
+                            <div className={'Body-Small Opacity-Very-Low'}>The color theme the app uses.</div>
                             <div className={'Horizontal-Flex-Container'}>{themeChips.map(theme =>
                                 <Chip key={theme} value={theme} selected={selectedTheme} setSelected={handleSetTheme}>{theme}</Chip>)}
                             </div>
                         </div>
 
-                        <div className={'Horizontal-Flex-Container'}>Show confirm prompt on delete</div>
+                        <div className={'Title-Small'}>Show confirm prompt on delete</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>
+                            <div className={'Body-Small Opacity-Very-Low'}>
                                 Show a prompt to confirm your action when deleting a task or category.
                                 <br />
                                 Note: regardless of this option, an undo button appears for 10 seconds after deletion.
@@ -268,27 +270,38 @@ const Settings = () => {
                                 <ToggleButton isToggled={confirmDelete} setIsToggled={handleSetConfirmDelete} />
                             </div>
                         </div>
+                        <div className={'Title-Small'}>Delete time-group action</div>
+                        <div className={`Horizontal-Flex-Container Space-Between`}>
+                            <div className={'Body-Small Opacity-Very-Low'}>
+                                What happens to tasks whose time group parent is deleted
+                            </div>
+                            <div className={'Horizontal-Flex-Container'}>
+                                <DropDownInput placeholder={"Keep repeat"}>
+                                    {deleteTimeGroupActions.map(action => (action))}
+                                </DropDownInput>
+                            </div>
+                        </div>
 
-                        <div className={styles.subSectionTitle}>Input Fields Default</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Large'}>Input Fields Default Values</div>
+                        <section className={`Stack-Container`}>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Priority</div>
+                                <div className={'Title-Small'}>Priority</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value all fields labeled priority are filled by default.</div>
+                                    <div className={'Body-Small Opacity-Very-Low'}>The value all fields labeled priority are filled by default.</div>
                                     <TextBoxInput type={'number'} value={priority} setValue={handleSetPriority}></TextBoxInput>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Number Task Step</div>
+                                <div className={'Title-Small'}>Number Task Step</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value the step field in a “number” task is filled by default.</div>
+                                    <div className={'Body-Small Opacity-Very-Low'}>The value the step field in a “number” task is filled by default.</div>
                                     <TextBoxInput type={'number'} value={step} setValue={handleSetStep}></TextBoxInput>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Goal Number</div>
+                                <div className={'Title-Small'}>Goal Number</div>
                                 <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value the goal fields are filled by default. </div>
+                                    <div className={'Body-Small Opacity-Very-Low'}>The value the goal fields are filled by default. </div>
                                     <TextBoxInput type={'number'} value={goal} setValue={handleSetGoal}></TextBoxInput>
                                 </div>
                             </div>
@@ -296,12 +309,12 @@ const Settings = () => {
                     </div>
                 </section>
                 <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>About</div>
-                    <div className={'Horizontal-Flex-Container'}>App Version<div className={'Label'}>1.0</div></div>
+                    <div className={`Headline-Large`}>About</div>
+                    <div className={'Title-Small'}>App Version<div className={'Body-Small Opacity-Very-Low'}>1.0</div></div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>App Details</div>
+                        <div className={'Title-Small'}>App Details</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>
+                            <div className={'Body-Small Opacity-Very-Low'}>
                                 Available as a Web App, on Android and on Windows.
                                 You can view the source code for this
                                 app <a href={"https://github.com/KonstantinosPrasinos/productivity-hub"} target="_blank">on github</a>.
@@ -309,9 +322,9 @@ const Settings = () => {
                         </div>
                     </div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>About the App Creator</div>
+                        <div className={'Title-Small'}>About the App Creator</div>
                         <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
+                            <div className={'Body-Small Opacity-Very-Low'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
                         </div>
                         <div className={'Horizontal-Flex-Container'}>
                             <IconButton onClick={handleGithubClick}><TbBrandGithub/></IconButton>
