@@ -85,6 +85,52 @@ const findMostRecentDate = (task, currentDate = null) => { // current date for t
     return date;
 }
 
+const getTotalCompletedEntries = (entries, task) => {
+    let total = 0;
+
+    for (const entry of entries) {
+        switch (task.type) {
+            case "Checkbox":
+                if (entry.value === 1) {
+                    total++;
+                }
+                break;
+            case "Number":
+                switch (task.goal.type) {
+                    case "At least":
+                        if (entry.value >= task.goal.number) {
+                            total++;
+                        }
+                        break;
+                    case "Exactly":
+                        if (entry.value === task.goal.number) {
+                            total++;
+                        }
+                        break;
+                    case "At most":
+                        if (entry.value <= task.goal.number) {
+                            total++;
+                        }
+                        break;
+                }
+                break;
+            default: break;
+        }
+    }
+
+    return total;
+}
+
+const getTotalNumber = (entries) => {
+    let total = 0;
+
+    for (const entry of entries) {
+        total += entry.value;
+    }
+
+    return total;
+}
+
 const assembleEntryHistory = (entries, task, currentDate = null) => { // current date for tests
     let streak = 0;
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
@@ -177,7 +223,7 @@ const getTasksWithHistory = async (tasks, userId) => {
     for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
         if (tasksWithCurrentEntry[i].repeats) {
             const entriesHistory = await Entry
-                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, date: {$lte: currentDate}})
+                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, date: {$lt: currentDate}, value: {$gt: 0}})
                 .sort({date: -1})
                 .exec();
 
@@ -201,9 +247,33 @@ const getTasksWithHistory = async (tasks, userId) => {
                     )
                 }
 
-                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
+                const totalCompletedEntries = getTotalCompletedEntries(entriesHistory, task);
+
+                console.log(totalCompletedEntries);
+
+                if (editedTask.type === "Number") {
+                    const totalNumber = getTotalNumber(entriesHistory);
+                    console.log(totalNumber);
+
+                    tasksWithHistory.push({
+                        ...editedTask._doc,
+                        streak: streak,
+                        currentEntryId: tasksWithCurrentEntry[i].currentEntryId,
+                        mostRecentProperDate: undefined,
+                        totalCompletedEntries,
+                        totalNumber
+                    });
+                } else {
+                    tasksWithHistory.push({
+                        ...editedTask._doc,
+                        streak: streak,
+                        currentEntryId: tasksWithCurrentEntry[i].currentEntryId,
+                        mostRecentProperDate: undefined,
+                        totalCompletedEntries
+                    });
+                }
             } else {
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: 0, mostRecentProperDate: undefined});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: 0, mostRecentProperDate: undefined, totalCompletedEntries: 0, totalNumber: 0});
             }
         } else {
             tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
