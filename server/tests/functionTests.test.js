@@ -42,7 +42,7 @@ describe("Test assembleEntryHistory", () => {
         ]
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(2);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 2, date: new Date(1680912000000)});
     })
 
     test("Fail single day selected, checkbox", () => {
@@ -63,7 +63,7 @@ describe("Test assembleEntryHistory", () => {
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
 
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(0);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 0, date: null});
     })
 
     test("Success multiple days selected, checkbox", () => {
@@ -86,7 +86,7 @@ describe("Test assembleEntryHistory", () => {
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
 
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(3);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 3, date: new Date(1680998400000)});
     })
 
     test("Fail multiple days selected, checkbox", () => {
@@ -108,7 +108,7 @@ describe("Test assembleEntryHistory", () => {
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
 
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(0);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 0, date: null});
     })
 
     test("Success single day selected, number", () => {
@@ -134,7 +134,7 @@ describe("Test assembleEntryHistory", () => {
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
 
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(2);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 2, date: new Date(1680912000000)});
     })
 
     test("Fail single day selected, number", () => {
@@ -160,6 +160,6 @@ describe("Test assembleEntryHistory", () => {
 
         const mockCurrentDate = new Date(1683331200000) // Sat 6/5/23
 
-        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toBe(1);
+        expect(assembleEntryHistory(mockEntries, mockTask, mockCurrentDate)).toMatchObject({streak: 1, date: new Date(1682121600000)});
     })
 })

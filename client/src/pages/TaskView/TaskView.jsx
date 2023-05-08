@@ -1,7 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import Divider from "../../components/utilities/Divider/Divider";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -35,29 +34,29 @@ import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 
-const StatSection = ({entries}) => {
+const StatSection = ({task}) => {
     return (
-        <section className={'Grid-Container Two-By-Two'}>
+        <section className={'Grid-Container'}>
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Current Streak</div>
-                <div>2 days</div>
-                <div className={'Label'}>Since: 05/10/2022</div>
+                <div>{task.streak.number} days</div>
+                <div className={'Label'}>Since: {task.streak.number > 0 ? task.streak.date : "Never"}</div>
             </div>
             <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Best Streak</div>
-                <div>2 days</div>
-                <div className={'Label'}>Ended at: 05/10/2022</div>
+                <div className={'Label'}>Longest Streak</div>
+                <div>{task.repeatStats.longestStreak.number ?? 0} days</div>
+                <div className={'Label'}>Since: {task.repeatStats.longestStreak.number > 0 ? task.repeatStats.longestStreak.date : "Never"}</div>
             </div>
-            <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Total</div>
-                <div>3 days</div>
-                <div></div>
-            </div>
-            <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Unfilled Days</div>
-                <div>2 days</div>
-                <div className={'Label'}>Ended at: 05/10/2022</div>
-            </div>
+            {task.type === "Number" && <>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>Total Sum</div>
+                    <div>{task.totalNumber}</div>
+                </div>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>Total Completed</div>
+                    <div>{task.totalCompletedEntries}</div>
+                </div>
+            </>}
         </section>
     );
 }
@@ -249,14 +248,19 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         );
     }
 
-    const disabledDates = () => {
+    const disabledDates = useMemo(() => {
+        const datesToDisable = [{after: new Date()}];
+
         if (editedEntry) {
             const editedEntryDate = new Date(editedEntry.date);
 
-            return entryDates.filter(date => editedEntryDate.getTime() !== date.getTime());
+            datesToDisable.push(...entryDates.filter(date => editedEntryDate.getTime() !== date.getTime()));
+        } else {
+            datesToDisable.push(...entryDates);
         }
-        return entryDates;
-    }
+
+        return datesToDisable;
+    }, [editedEntry, entryDates]);
 
     return (
         <Modal
@@ -310,7 +314,7 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
                         mode={"single"}
                         selected={date}
                         onDayClick={handleDateClick}
-                        disabled={disabledDates()}
+                        disabled={disabledDates}
                     />
                 </div>
             </CollapsibleContainer>
@@ -536,9 +540,7 @@ const TaskView = ({index, length, task}) => {
                             <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber} type={"number"}></TextBoxInput>
                         </div>}
                 </section>
-                <Divider />
-                <StatSection entries={entries ? [...entries, entry] : [entry]} />
-                <Divider />
+                {task.repeats && <StatSection task={task} />}
                 {/*<section className={'Stack-Container'}>*/}
                 {/*    <div className={'Horizontal-Flex-Container'}>*/}
                 {/*        {graphOptions.map((option, index) => (*/}
