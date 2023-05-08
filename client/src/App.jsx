@@ -119,7 +119,7 @@ function App() {
     const theme = useMemo(getTheme, [settings?.theme, defaultThemeChanged]);
 
     return (
-        <div className={`App ${theme}`}>
+        <div className={`App ${theme}`} id={"app"}>
             <AlertHandler />
             {/*<AnimatePresence mode="wait">*/}
                 <Routes>
