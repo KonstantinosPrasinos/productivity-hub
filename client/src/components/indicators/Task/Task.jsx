@@ -66,27 +66,15 @@ const Task = ({tasks}) => {
             className={`${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, scale: 0.5}}
+            transition={{duration: 0.2}}
 
             onClick={(event) => handleTaskClick(event)}
+            layout
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
             <div className={styles.taskList}>
                 {tasks.map((task, index) =>
-                    // <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
-                    //     <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
-                    //         <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
-                    //             {/*{tasks.length === 0 && task.category &&*/}
-                    //             {/*    <CategoryIndicator*/}
-                    //             {/*        categoryId={task.category}*/}
-                    //             {/*        groupId={task?.group}*/}
-                    //             {/*    />}*/}
-                    //             <div className={styles.titleContainer}>{task.title}</div>
-                    //         </div>
-                    //         <CurrentProgress task={task}/>
-                    //     </div>
-                    //     {/*{task.repeats && <Streak streak={task.streak} />}*/}
-                    // </div>
                     <div key={index} className={styles.task}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
