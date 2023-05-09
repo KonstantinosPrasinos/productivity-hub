@@ -1,6 +1,6 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
   .container {
     background-color: var(--background-color);
     &.transparent {
@@ -10,14 +10,14 @@
 
   .surface {
     padding: 40px 80px;
-    border-radius: $base-border-radius;
-    border: $base-border;
+    border-radius: v.$base-border-radius;
+    border: v.$base-border;
     width: 600px;
     height: auto;
   }
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .container {
     background-color: var(--surface-color);
   }
@@ -53,7 +53,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  gap: $big-gap;
+  gap: v.$big-gap;
 
   & > * {
     margin-top: 10px;

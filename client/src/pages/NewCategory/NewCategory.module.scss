@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .bottomButtonsContainer {
   display: flex;
@@ -9,7 +9,7 @@
 .groupsContainer {
   display: inline-flex;
   flex-direction: row;
-  gap: $base-gap;
+  gap: v.$base-gap;
   align-items: center;
   overflow-x: auto;
   padding-bottom: 10px;
@@ -17,5 +17,5 @@
 }
 
 .addGroupButton {
-  font-size: $font-xxl;
+  font-size: v.$font-xxl;
 }

@@ -1,7 +1,7 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-    border-radius: $button-border-radius;
+    border-radius: v.$button-border-radius;
     height: 1.5em;
     width: 2.25em;
     background-color: var(--primary-color);
@@ -13,7 +13,7 @@
         background-color: var(--on-primary-color);
         content: '';
         display: inline-block;
-        border-radius: $button-border-radius;
+        border-radius: v.$button-border-radius;
         transform: translate(0.25em, 0.25em);
         vertical-align: top;
         transition: transform 0.2s, width 0.2s, height 0.2s;

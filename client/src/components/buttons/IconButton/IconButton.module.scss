@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
   transition: opacity 0.1s ease-in-out, color 0.2s ease-in-out;
@@ -23,7 +23,7 @@
   }
 
   &.notSelected {
-    opacity: $opacity-very-low;
+    opacity: v.$opacity-very-low;
   }
 
   &.normal {

@@ -1,6 +1,6 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .container {
     order: 3;
   }
@@ -10,9 +10,9 @@
     background-color: var(--surface-color);
     display: flex;
     align-items: center;
-    padding: $base-padding;
+    padding: v.$base-padding;
     justify-content: space-around;
-    border-top: $base-border;
+    border-top: v.$base-border;
     z-index: 3;
     flex-direction: row;
   }
@@ -28,7 +28,7 @@
   }
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
   .container {
     height: 100%;
     width: 4em;
@@ -41,7 +41,7 @@
     background: var(--surface-color);
     padding: 40px 0 40px 0;
     gap: 2em !important;
-    border-right: $base-border;
+    border-right: v.$base-border;
     flex-direction: column;
   }
 
@@ -61,7 +61,7 @@
 .navBar {
   display: flex;
   align-items: center;
-  font-size: $font-xxl;
+  font-size: v.$font-xxl;
 }
 
 .container {

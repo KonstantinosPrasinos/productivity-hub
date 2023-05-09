@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
 .container {
     width: 100%;
@@ -8,15 +8,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: $base-padding;
+    padding: v.$base-padding;
     transform-origin: top;
-    border-radius: $base-border-radius;
+    border-radius: v.$base-border-radius;
 }
 
 .textContainer {
     display: inline-flex;
     align-items: center;
-    gap: $base-gap;
+    gap: v.$base-gap;
 }
 
 .iconContainer {

@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
 .container {
   position: relative;
@@ -8,7 +8,7 @@
 }
 
 .leftSide {
-  padding: $symmetrical-padding;
+  padding: v.$symmetrical-padding;
 }
 
 .rightSide {
@@ -45,7 +45,7 @@
   top: 20px;
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .container {
     height: 100%;
   }

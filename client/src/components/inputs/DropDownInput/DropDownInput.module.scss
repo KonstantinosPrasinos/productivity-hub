@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
     width: 10em;
@@ -23,7 +23,7 @@
     &.disabled {
         cursor: not-allowed;
         > * {
-            opacity: $opacity-very-low;
+            opacity: v.$opacity-very-low;
         }
     }
 }
@@ -41,8 +41,8 @@
     
     z-index: 1;
     margin-top: 5px;
-    padding: $base-padding;
-    box-shadow: $elevation-1;
+    padding: v.$base-padding;
+    box-shadow: v.$elevation-1;
 
     max-height: 10em;
     flex-flow: wrap;
@@ -51,7 +51,7 @@
 
 .option {
     position: relative;
-    font-size: $font-l;
+    font-size: v.$font-l;
     line-height: 1.5em;
     cursor: pointer;
     white-space: nowrap;
@@ -62,7 +62,7 @@
     width: 100%;
 
     & > * {
-        padding: $base-padding;
+        padding: v.$base-padding;
         &:hover {
             &::after {
                 content: '';

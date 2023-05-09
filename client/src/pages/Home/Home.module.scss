@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
   display: flex;
@@ -18,7 +18,7 @@
   flex: 2;
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .leftSide {
     width: 100%;
     padding-top: 1em;

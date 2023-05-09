@@ -1,7 +1,8 @@
-@import 'src/styles/index.scss';
+@use "@/styles/index";
+@use "@/styles/variables" as v;
 
 .titleMedium {
-  opacity: $opacity-very-low;
+  opacity: v.$opacity-very-low;
   width: 100%;
   display: grid;
   grid-template-columns: calc(45% - 0.5em) 55%;

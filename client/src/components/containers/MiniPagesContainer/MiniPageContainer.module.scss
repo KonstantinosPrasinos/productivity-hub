@@ -1,8 +1,8 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .container {
-    border-top: $base-border;
+    border-top: v.$base-border;
     width: calc(100% - 40px);
     height: calc(100% - 4em - 32px);
     bottom: calc(4em + 12px);
@@ -12,14 +12,14 @@
   }
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
   .container {
     width: 400px;
     height: 100%;
     right: 0;
     top: 0;
     box-sizing: border-box;
-    border-left: $base-border;
+    border-left: v.$base-border;
   }
 }
 
@@ -30,7 +30,7 @@
   z-index: 3;
   flex-wrap: nowrap;
   gap: 0;
-  box-shadow: $elevation-1;
+  box-shadow: v.$elevation-1;
 }
 
 .topLineContainer {
@@ -51,7 +51,7 @@
 .actionButtonsContainer {
   display: flex;
   justify-content: space-between;
-  font-size: $font-xl;
+  font-size: v.$font-xl;
   padding: 0 0 10px 0;
   background-color: var(--surface-color);
 }

@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
   width: 100%;
@@ -16,7 +16,7 @@
   height: 100%;
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
   //.leftSide {
   //  width: 22.15em;
   //}
@@ -25,7 +25,7 @@
   //}
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
   .leftSide, .rightSide {
     width: 100%;
     overflow: hidden;
@@ -52,7 +52,7 @@
 .selectionBar {
   background-color: var(--surface-color);
   padding: 1em;
-  border-bottom: $base-border;
+  border-bottom: v.$base-border;
   position: fixed;
   top: 0;
   left: 0;

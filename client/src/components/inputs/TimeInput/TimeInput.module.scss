@@ -1,7 +1,7 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-  font-size: $font-xl;
+  font-size: v.$font-xl;
   line-height: 28px;
   width: min-content;
   position: relative;
@@ -10,7 +10,7 @@
   box-sizing: border-box;
 
   .disabled {
-    opacity: $opacity-low;
+    opacity: v.$opacity-low;
   }
 }
 

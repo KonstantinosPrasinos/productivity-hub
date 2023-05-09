@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
 .container {
   margin-top: 0 !important;
@@ -7,8 +7,8 @@
 }
 
 .childrenContainer {
-  border-top: $base-border;
-  border-bottom: $base-border;
+  border-top: v.$base-border;
+  border-bottom: v.$base-border;
   gap: 0;
   overflow-y: visible;
   & > * {

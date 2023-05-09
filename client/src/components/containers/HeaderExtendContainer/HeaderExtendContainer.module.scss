@@ -1,8 +1,9 @@
-@import 'src/styles/index.scss';
+@use "@/styles/index";
+@use "@/styles/variables" as v;
 
 .container {
   @extend .Stack-Container, .Rounded-Container;
-  border: $base-border;
+  border: v.$base-border;
   padding: 12px 12px 0 12px;
   width: 100%;
   box-sizing: border-box;

@@ -1,5 +1,5 @@
 @use '@/styles/mixins' as m;
-@import "variables";
+@use "variables" as v;
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 :root {
@@ -25,16 +25,16 @@
     flex-direction: row;
     gap: 0;
     &.Light {
-        @include getTheme('light');
+        @include v.getTheme('light');
     }
     &.Dark {
-        @include getTheme('dark');
+        @include v.getTheme('dark');
     }
 }
 
 ul {
     margin: 0;
-    font-size: $font-l;
+    font-size: v.$font-l;
 }
 
 body {
@@ -74,7 +74,7 @@ a {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: $base-gap;
+    gap: v.$base-gap;
     cursor: pointer;
     padding: 10px 24px;
     width: max-content;
@@ -88,7 +88,7 @@ a {
 .Horizontal-Flex-Container {
     display: flex;
     align-items: center;
-    gap: $base-gap;
+    gap: v.$base-gap;
 
     &.Space-Between {
         justify-content: space-between;
@@ -109,12 +109,12 @@ a {
 
 .Stack-Container {
     display: flex;
-    gap: $base-gap;
+    gap: v.$base-gap;
     flex-wrap: nowrap;
     flex-direction: column;
 
     &.Big-Gap {
-        gap: $big-gap;
+        gap: v.$big-gap;
     }
 
     &.No-Gap {
@@ -141,14 +141,14 @@ a {
 }
 
 .Label {
-    font-size: $font-s;
-    opacity: $opacity-low;
+    font-size: v.$font-s;
+    opacity: v.$opacity-low;
 }
 
 .Title {
-    font-size: $font-xxl;
+    font-size: v.$font-xxl;
     font-weight: 500;
-    //opacity: $opacity-low;
+    //opacity: v.$opacity-low;
     //max-width: fit-content;
 }
 
@@ -182,31 +182,31 @@ a {
 
 
 .Headline {
-    font-size: $font-xl;
+    font-size: v.$font-xl;
 }
 
 .Display {
     text-align: center;
-    font-size: $font-xxxl;
+    font-size: v.$font-xxxl;
     font-weight: bold;
 }
 
 .Rounded-Container {
-    padding: $base-padding;
-    border-radius: $base-border-radius;
+    padding: v.$base-padding;
+    border-radius: v.$base-border-radius;
     background-color: var(--surface-color);
-    border: $base-border;
+    border: v.$base-border;
     display: inline-flex;
 
     &.Has-Shadow {
         border: none;
-        box-shadow: $elevation-1;
+        box-shadow: v.$elevation-1;
     }
 }
 
 .Empty-Indicator-Container {
     @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow;
-    font-size: $font-m;
+    font-size: v.$font-m;
     height: 2.5em;
     width: 22.15em;
     padding: 10px;
@@ -252,7 +252,7 @@ a {
 }
 
 .Opacity-Very-Low {
-    opacity: $opacity-very-low;
+    opacity: v.$opacity-very-low;
 }
 
 
@@ -305,7 +305,7 @@ table {
     width: 100%;
 
     tr>* {
-        padding: $symmetrical-padding;
+        padding: v.$symmetrical-padding;
     }
 
     tr>td {
@@ -323,25 +323,25 @@ table {
 
     tr:first-child {
         th:first-child {
-            border-top-left-radius: $base-border-radius;
+            border-top-left-radius: v.$base-border-radius;
         }
         th:last-child {
-            border-top-right-radius: $base-border-radius;
+            border-top-right-radius: v.$base-border-radius;
         }
     }
 
     &> *:last-child > tr:last-of-type {
         td:first-child {
-            border-bottom-left-radius: $base-border-radius;
+            border-bottom-left-radius: v.$base-border-radius;
         }
         td:last-child {
-            border-bottom-right-radius: $base-border-radius;
+            border-bottom-right-radius: v.$base-border-radius;
         }
     }
 }
 
 *:disabled {
-    opacity: $opacity-very-low;
+    opacity: v.$opacity-very-low;
     cursor: not-allowed;
 }
 
@@ -355,7 +355,7 @@ thead {
 }
 
 td {
-    padding: $base-padding;
+    padding: v.$base-padding;
 }
 
 ::placeholder {
@@ -395,7 +395,7 @@ button {
 }
 
 // App.jsx
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$tablet-breakpoint) {
     .Content-Container {
         justify-content: center;
         width: 100vw;
@@ -424,7 +424,7 @@ button {
     }
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
     .Content-Container {
         box-sizing: border-box;
         width: calc(100% - 300px - 8em);

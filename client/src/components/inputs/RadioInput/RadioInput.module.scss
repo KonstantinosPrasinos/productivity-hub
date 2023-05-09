@@ -1,7 +1,7 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-  font-size: $font-l;
+  font-size: v.$font-l;
   padding-left: 1.7em;
   position: relative;
   display: flex;

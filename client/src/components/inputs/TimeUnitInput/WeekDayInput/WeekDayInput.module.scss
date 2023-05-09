@@ -1,9 +1,9 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .button {
   width: 2em;
   height: 2em;
-  border-radius: $button-border-radius;
+  border-radius: v.$button-border-radius;
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
 
@@ -11,5 +11,4 @@
     color: var(--on-primary-color);
     background-color: var(--primary-color);
   }
-  //background-color: red;
 }

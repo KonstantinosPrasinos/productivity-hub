@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 $base-size: 1.2em;
 
 .checkbox {
@@ -27,12 +27,12 @@ $base-size: 1.2em;
   display: flex;
   font-weight: bold;
   align-items: center;
-  font-size: $font-m;
+  font-size: v.$font-m;
   gap: 6px;
 }
 
 .editIcons {
-  font-size: $font-xl;
+  font-size: v.$font-xl;
 }
 
 .table {

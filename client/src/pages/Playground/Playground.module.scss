@@ -1,5 +1,5 @@
-@import 'src/styles/variables.scss';
-@import 'src/styles/index.scss';
+@use "@/styles/variables" as v;
+@use "@/styles/index";
 
 .container {
     @extend .Stack-Container, .Rounded-Container;
@@ -10,11 +10,11 @@
     overflow-y: auto;
     width: 90%;
     height: 90%;
-    margin: $base-margin;
+    margin: v.$base-margin;
 }
 
 .test {
-    font-size: $font-m;
+    font-size: v.$font-m;
 }
 
 .alignTopContainer {

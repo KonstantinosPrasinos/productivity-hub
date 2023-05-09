@@ -1,11 +1,11 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$tablet-breakpoint) {
 
   .surface {
     width: 600px;
     height: 500px;
-    border-radius: $base-border-radius;
+    border-radius: v.$base-border-radius;
   }
 }
 
@@ -29,7 +29,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: $huge-gap;
+  gap: v.$huge-gap;
   justify-content: space-between;
   height: 100%;
   width: 100%;
@@ -38,13 +38,13 @@
 .infoContainer {
   flex-direction: column;
   display: flex;
-  gap: $base-gap;
+  gap: v.$base-gap;
 }
 
 .topHalf {
   flex-direction: column;
   display: flex;
-  gap: $huge-gap;
+  gap: v.$huge-gap;
 }
 
 .even {
