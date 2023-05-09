@@ -249,7 +249,7 @@ const getTasksWithHistory = async (tasks, userId) => {
                     )
                 }
 
-                const totalCompletedEntries = getTotalCompletedEntries(entriesHistory, task);
+                const totalCompletedEntries = getTotalCompletedEntries(entriesHistory, editedTask);
 
                 if (editedTask.type === "Number") {
                     const totalNumber = getTotalNumber(entriesHistory);

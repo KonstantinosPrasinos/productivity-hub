@@ -26,11 +26,16 @@ const CategoryIndicator = ({categoryId, groupId}) => {
 
     const group = useMemo(findGroup, [groupsLoading]);
 
+    const handleClick = (event) => {
+        event.stopPropagation();
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}})
+    }
+
     return (
         <>
             {category && <button
                 className={`${styles.container} Horizontal-Flex-Container ${category.color}`}
-                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}})}
+                onClick={handleClick}
             >
                 <div className={styles.text}>{category.title}</div>
                 {group && <div>|</div>}

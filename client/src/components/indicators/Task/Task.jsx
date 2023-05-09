@@ -57,10 +57,8 @@ const Task = ({tasks}) => {
 
     const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
 
-    const handleTaskClick = event => {
-        if (event.target.getAttribute("data-value") === 'Clickable') {
-            miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}});
-        }
+    const handleTaskClick = () => {
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}});
     }
 
     return (
@@ -69,7 +67,6 @@ const Task = ({tasks}) => {
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-            // layout
 
             onClick={(event) => handleTaskClick(event)}
         >
@@ -90,7 +87,7 @@ const Task = ({tasks}) => {
                     //     </div>
                     //     {/*{task.repeats && <Streak streak={task.streak} />}*/}
                     // </div>
-                    <div key={index} className={styles.task} data-value={'Clickable'}>
+                    <div key={index} className={styles.task}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
                             {task.longGoal?.type && <RepeatDetails longGoal={task?.longGoal}/>}

@@ -33,7 +33,8 @@ const CurrentProgress = ({task}) => {
 
 
 
-    const handleCheckboxClick = () => {
+    const handleCheckboxClick = (event) => {
+        event.stopPropagation();
         if (!isLoading) {
             setPrevPercentage(getPercentage());
 
@@ -42,7 +43,8 @@ const CurrentProgress = ({task}) => {
         }
     }
 
-    const handleNumberClick = () => {
+    const handleNumberClick = (event) => {
+        event.stopPropagation();
         if (isLoading) return;
 
         setPrevPercentage(getPercentage());
