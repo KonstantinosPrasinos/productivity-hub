@@ -32,6 +32,9 @@ const Button = ({
             exit={exit}
             layout={"size"}
             transition={transition}
+
+            whileHover={!disabled ? {y: -1} : null}
+            whileTap={!disabled ? {y: 1} : null}
         >
             {children}
         </motion.button>;

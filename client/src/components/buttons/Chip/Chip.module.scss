@@ -1,23 +1,23 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
     background-color: var(--surface-color);
     color: var(--on-surface-color);
-    border-radius: $base-border-radius;
-    transition: 0.2s background-color, 0.2s color, 0.2s filter;
-    border: $base-border;
+    border-radius: v.$base-border-radius;
+    transition: 0.2s background-color, 0.2s color, 0.2s box-shadow, 0.2s opacity;
+    border: v.$base-border;
 
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
     }
 
-    &:hover {
-        filter: brightness(95%);
+    &:hover:not(.disabled) {
+        box-shadow: v.$elevation-1;
     }
 
     &.round {
-        border-radius: $button-border-radius;
+        border-radius: v.$button-border-radius;
     }
 
     &.filled {
@@ -27,10 +27,15 @@
     }
 
     &.small {
-        font-size: $font-s;
+        font-size: v.$font-s;
     }
 
     &.big {
-        font-size: $font-xxl;
+        font-size: v.$font-xxl;
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: v.$opacity-low;
     }
 }

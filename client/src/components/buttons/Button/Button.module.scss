@@ -1,13 +1,13 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-    border-radius: $button-border-radius;
+    border-radius: v.$button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
-    font-size: $font-l;
+    font-size: v.$font-l;
 
     &.square {
-        border-radius: $base-border-radius;
+        border-radius: v.$base-border-radius;
         padding: 10px
     }
 
@@ -18,11 +18,11 @@
     }
 
     &.small {
-        font-size: $font-s;
+        font-size: v.$font-s;
     }
 
     &.large {
-        font-size: $font-xxl;
+        font-size: v.$font-xxl;
     }
 
     &.max {
@@ -30,12 +30,16 @@
     }
 
     &:disabled {
-        opacity: $opacity-low;
+        opacity: v.$opacity-low;
         cursor: not-allowed;
     }
 
     &.isWarning {
         color: var(--error-color);
         border-color: var(--error-color);
+    }
+
+    &:hover:not(.disabled) {
+        box-shadow: v.$elevation-1;
     }
 }
