@@ -62,7 +62,7 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
                         } Stack-Container Rounded-Container`}
                         initial={{height: 0, padding: "0 12px"}}
                         animate={{height: 'auto', padding: '6px 12px'}}
-                        exit={{height: 0, padding: "0 12px"}}
+                        exit={{overflowY: "hidden", height: 0, padding: "0 12px"}}
                         transition={{duration: 0.15}}
                     >
                         {children.map((option, index) => {

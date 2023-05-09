@@ -172,6 +172,10 @@ a {
     @include m.Label-Medium;
 }
 
+.Label-Small {
+    @include m.Label-Small;
+}
+
 .Body-Small {
     @include m.Body-Small;
 }
