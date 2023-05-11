@@ -25,7 +25,8 @@ const Settings = () => {
     const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
 
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
-    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDeleteTask);
+    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
+    const [deleteAction, setDeleteAction] = useState(settings.defaults.deleteGroupAction);
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
@@ -40,11 +41,15 @@ const Settings = () => {
     const navigate = useNavigate();
 
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
-    const deleteTimeGroupActions = ["Keep repeat", "Remove repeat", "Delete them"]
+    const deleteTimeGroupActions = [
+        {display: "Keep repeat", actual: 'Keep their repeat details'},
+        {display: "Remove repeat", actual: 'Remove their repeat details'},
+        {display: "Delete them", actual: 'Delete them'}
+    ]
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
-            await setSettings({theme: selectedTheme, confirmDeleteTask, defaults: {step, goal, priority}});
+            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority, deleteGroupAction: deleteAction.actual}});
             setSettingsChanges({});
         }
     }
@@ -69,8 +74,8 @@ const Settings = () => {
     }
 
     const handleSetConfirmDelete = () => {
-        if (settings.confirmDeleteTask !== !confirmDelete) {
-            setSettingsChanges({...settingsChanges, confirmDeleteTask: !confirmDelete});
+        if (settings.confirmDelete !== !confirmDelete) {
+            setSettingsChanges({...settingsChanges, confirmDelete: !confirmDelete});
         } else {
             setSettingsChanges((current) => {
                 const {confirmDelete, ...rest} = current;
@@ -80,6 +85,19 @@ const Settings = () => {
         }
 
         setConfirmDelete(!confirmDelete);
+    }
+
+    const handleSetDeleteAction = (action) => {
+        if (settings.defaults.deleteGroupAction !== action.actual) {
+            setSettingsChanges({...settingsChanges, deleteGroupAction: action.actual})
+        } else {
+            setSettingsChanges((current) => {
+                const {deleteGroupAction, ...rest} = current;
+
+                return rest;
+            });
+        }
+        setDeleteAction(action);
     }
 
     const handleSetPriority = (e) => {
@@ -120,6 +138,7 @@ const Settings = () => {
             });
         }
     }
+
     const handleChangeEmail = () => {
         navigate('/change-email')
     }
@@ -276,12 +295,15 @@ const Settings = () => {
                                 What happens to tasks whose time group parent is deleted
                             </div>
                             <div className={'Horizontal-Flex-Container'}>
-                                <DropDownInput placeholder={"Keep repeat"}>
-                                    {deleteTimeGroupActions.map(action => (action))}
+                                <DropDownInput placeholder={"Keep repeat"} selected={deleteAction.display}>
+                                    {deleteTimeGroupActions.map(action => (
+                                        <button key={action.display} className={"DropDownOption"} onClick={() => handleSetDeleteAction(action)}>
+                                            {action.display}
+                                        </button>
+                                    ))}
                                 </DropDownInput>
                             </div>
                         </div>
-
                         <div className={'Title-Large'}>Input Fields Default Values</div>
                         <section className={`Stack-Container`}>
                             <div className={'Stack-Container'}>
@@ -407,7 +429,6 @@ const Settings = () => {
                     <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className={styles.saveSettingsContainer}>
                         <Button onClick={handleSaveChanges}>Save changes</Button>
                     </motion.div>
-
                 }
             </AnimatePresence>
         </motion.div>

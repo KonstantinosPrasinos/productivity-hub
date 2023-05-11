@@ -585,7 +585,7 @@ const NewTask = ({index, length, id}) => {
                     >
                         {timePeriods.map(tempTimePeriod => (
                             <button
-                                className={styles.dropDownOption}
+                                className={"DropDownOption"}
                                 onClick={() => setTimePeriod(tempTimePeriod)}
                                 key={tempTimePeriod}
                             >

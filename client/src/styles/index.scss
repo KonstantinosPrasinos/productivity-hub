@@ -145,6 +145,16 @@ a {
     opacity: v.$opacity-low;
 }
 
+.DropDownOption {
+    font-size: inherit;
+    width: 100%;
+    height: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+}
+
 .Title {
     font-size: v.$font-xxl;
     font-weight: 500;
