@@ -11,11 +11,11 @@ const ConfirmDeleteGroupModal = ({dismountModal, continueFunction, groupTitles})
     const {mutate: setSettings} = useChangeSettings();
 
     const [action, setAction] = useState(settings.defaults.deleteGroupAction);
-    const [neverShow, setNeverShow] = useState(false);
+    const [neverShow, setNeverShow] = useState(settings.confirmDelete);
 
     const handleConfirm = async () => {
         if (neverShow !== !settings.confirmDeleteGroup || action !== settings.defaults.deleteGroupAction) {
-            await setSettings({...settings, confirmDeleteGroup: !neverShow, defaults: {...settings.defaults, deleteGroupAction: action}, priorityBounds: undefined});
+            await setSettings({...settings, confirmDelete: !neverShow, defaults: {...settings.defaults, deleteGroupAction: action}, priorityBounds: undefined});
         }
         continueFunction(action);
     }
