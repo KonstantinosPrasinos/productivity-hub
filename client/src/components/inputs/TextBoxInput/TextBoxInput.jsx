@@ -60,7 +60,9 @@ const TextBoxInput = ({
                           },
                             alignment = 'left',
                           invalid = null,
-                            toggleCalendar = null
+                            toggleCalendar = null,
+                            minNumber = null,
+                            maxNumber = null
                       }) => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -71,6 +73,8 @@ const TextBoxInput = ({
                 return;
             }
         }
+        if (minNumber !== null && event.target.value < minNumber) return;
+        if (maxNumber !== null && event.target.value > maxNumber) return;
         setValue(event.target.value)
     }
 
@@ -97,12 +101,17 @@ const TextBoxInput = ({
 
     const increment = () => {
         checkIfNull();
-        setValue(parseInt(value) + 1);
+        if (maxNumber === null || value + 1 <= maxNumber) {
+            setValue(parseInt(value) + 1);
+        }
     }
 
     const decrement = () => {
         checkIfNull();
-        setValue(parseInt(value) - 1);
+        console.log(parseInt(value) - 1, minNumber);
+        if (minNumber === null || parseInt(value) - 1 >= minNumber) {
+            setValue(parseInt(value) - 1);
+        }
     }
 
     const handleType = () => {

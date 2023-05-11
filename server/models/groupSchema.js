@@ -17,11 +17,16 @@ const Group = new mongoose.Schema({
         number: Number,
         bigTimePeriod: String,
         smallTimePeriod: [String],
-        startingDate: [Number],
+        startingDate: [Date],
         time: {
             start: String,
             end: String
         }
+    },
+    goal: {
+        limit: {type: String},
+        type: {type: String},
+        number: Number
     },
     parent: {
         type: String,

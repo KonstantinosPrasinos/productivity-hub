@@ -32,7 +32,7 @@ const Modal = ({children, isLoading, isOverlay = false, dismountFunction = () =>
                 {children}
             </motion.div>
         </motion.div>
-    ), document.getElementById("app"));
+    ), document.getElementById("app") ?? document.getElementById("root"));
 };
 
 export default Modal;

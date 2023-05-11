@@ -29,6 +29,10 @@
         width: 100%;
     }
 
+    &.symmetrical {
+        padding: 11px;
+    }
+
     &:disabled {
         opacity: v.$opacity-low;
         cursor: not-allowed;

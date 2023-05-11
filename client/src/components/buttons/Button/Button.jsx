@@ -13,7 +13,8 @@ const Button = ({
                     animate,
                     width = 'medium',
                     disabled = false,
-                    isWarning = false
+                    isWarning = false,
+                    symmetrical = false
                 }) => {
 
     return <motion.button
@@ -25,6 +26,7 @@ const Button = ({
                   ${filled ? '' : styles.outlined}
                   ${styles[width]}
                   ${isWarning ? styles.isWarning : ''}
+                  ${symmetrical ? styles.symmetrical : ""}
             `}
             disabled={disabled}
             initial={initial}

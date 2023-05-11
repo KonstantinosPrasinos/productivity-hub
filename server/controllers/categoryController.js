@@ -105,10 +105,9 @@ const deleteCategory = async (req, res) => {
 
 const setCategory = async (req, res) => {
     if (req.user) {
-        const {category} = req.body;
+        const {category, groups}  = req.body;
 
-        if (!category) return res.status(400).json({message: 'No category provided.'});
-        if (!category._id) return res.status(400).json({message: 'Category doesn\'t have _id.'});
+        if (!category) return res.status(400).json({message: "No category provided."});
 
         const validatedCategory = categorySchema.validate(category);
 
@@ -116,12 +115,37 @@ const setCategory = async (req, res) => {
             return res.status(400).json({message: validatedCategory.error});
         }
 
-        try {
-            const newCategory = await Category.findOneAndUpdate({userId: req.user._id, _id: category._id}, category, {returnDocument: 'after'});
+        let validatedGroups = [];
 
-            return res.status(200).json({newCategory});
+        if (groups.length) {
+            for (const group of groups) {
+                const validatedGroup = groupSchema.validate(group);
+
+                if (validatedGroup.error) return res.status(400).json({message: validatedGroup.error});
+
+                validatedGroup.value.userId = req.user._id;
+
+                validatedGroups.push(validatedGroup.value);
+            }
+        }
+
+        try {
+            const newCategory = await Category.findOneAndReplace({userId: req.user._id, _id: validatedCategory.value._id}, {
+                ...validatedCategory.value,
+                userId: req.user._id
+            }, {new: true});
+
+            let newGroups = [];
+
+            if (validatedGroups.length) {
+                for (const group of validatedGroups) {
+                    newGroups.push(await Group.findOneAndReplace({userId: req.user._id, _id: group._id, parent: group.parent}, {...group, parent: newCategory._id}))
+                }
+            }
+
+            res.status(200).json({newCategory, newGroups});
         } catch (error) {
-            return res.status(400).json({message: error})
+            res.status(500).json({message: error.message})
         }
     } else {
         res.status(401).send({message: "Not authorized."});

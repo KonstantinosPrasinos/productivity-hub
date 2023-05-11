@@ -13,12 +13,15 @@
 .headerContainer {
   text-align: left;
   padding: 0 0 12px;
-  cursor: pointer;
   transition: opacity 0.2s linear;
 
   &.disabled {
     opacity: 0.38;
     cursor: not-allowed;
+  }
+
+  &.hasPointer {
+    cursor: pointer;
   }
 }
 
