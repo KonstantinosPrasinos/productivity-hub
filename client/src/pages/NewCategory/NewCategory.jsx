@@ -21,9 +21,7 @@ import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useAddCategory} from "../../hooks/add-hooks/useAddCategory";
 import {AnimatePresence, motion} from "framer-motion";
 import ConfirmDeleteGroupModal from "../../components/utilities/ConfirmDeleteGroupModal/ConfirmDeleteGroupModal";
-import {useChangeGroup} from "../../hooks/change-hooks/useChangeGroup";
 import {useChangeCategory} from "../../hooks/change-hooks/useChangeCategory";
-import {useDeleteGroup} from "../../hooks/delete-hooks/useDeleteGroup";
 import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import ToggleButton from "@/components/buttons/ToggleButton/ToggleButton";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
@@ -65,9 +63,7 @@ const NewCategory = ({index, length, id}) => {
     const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
 
     const {mutate: addCategoryToServer} = useAddCategory();
-    const {mutateAsync: changeGroups, isLoading: changeGroupLoading} = useChangeGroup();
     const {mutateAsync: changeCategory, isLoading: changeCategoryLoading} = useChangeCategory();
-    const {mutateAsync: deleteGroups, isLoading: deleteGroupsLoading} = useDeleteGroup();
 
     const continueAfterModalFunctionRef = useRef();
     const initialCategoryValues = useRef();
@@ -128,34 +124,49 @@ const NewCategory = ({index, length, id}) => {
             if (id) {
                 const groupsForDeletion = [];
                 const groupsForEdit = [];
+                const newGroups = [];
 
                 // Get edited and deleted groups
                 for (const group of timeGroups) {
                     if (group?.deleted) {
                         groupsForDeletion.push(group._id);
                     } else if (group?.edited) {
+                        delete group.edited;
                         groupsForEdit.push(group);
+                    } else if (group?.isNew) {
+                        delete group._id;
+                        delete group.isNew;
+                        newGroups.push(group);
                     }
                 }
 
-                const continueAfterModalFunction = async (action = "Keep their repeat details") => {
+                const continueAfterModalFunction = async (action = settings.defaults.deleteGroupAction) => {
+                    const requestObject = {action};
+
                     if (groupsForDeletion.length) {
-                        await deleteGroups({groupIds: groupsForDeletion, action});
+                        requestObject.groupsForDeletion = groupsForDeletion
                     }
 
                     if (groupsForEdit.length > 0) {
-                        await changeGroups({groups: groupsForEdit, action});
+                        requestObject.groupsForEdit = groupsForEdit;
+                    }
+
+                    if (newGroups.length > 0) {
+                        requestObject.newGroups = newGroups;
+                        requestObject.parentId = id;
                     }
 
                     if (initialCategoryValues.current?.title !== category.title || initialCategoryValues.current?.color !== category.color) {
-                        await changeCategory({...category, _id: id});
+                        requestObject.category = {...category, _id: id};
                     }
+
+                    await changeCategory(requestObject);
 
                     miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
                 }
 
                 if (groupsForDeletion.length) {
-                    if (settings.confirmDeleteGroup) {
+                    if (settings.confirmDelete) {
                         toggleConfirmModal()
                         continueAfterModalFunctionRef.current = continueAfterModalFunction;
                     } else {
@@ -166,6 +177,7 @@ const NewCategory = ({index, length, id}) => {
                 }
 
             } else {
+                console.log(category, timeGroups);
                 await addCategoryToServer(
                     {
                         category,
@@ -220,7 +232,7 @@ const NewCategory = ({index, length, id}) => {
         }
 
         // Unique title (in category)
-        if (timeGroupTitle !== currentEditedGroup.current?.title && timeGroups.find(group => group.title === timeGroupTitle))  {
+        if (timeGroupTitle !== currentEditedGroup.current?.title && timeGroups.find(group => group.title === timeGroupTitle && !group?.deleted))  {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Time group title must be unique for this category"}})
             return;
         }
@@ -232,12 +244,12 @@ const NewCategory = ({index, length, id}) => {
         }
 
 
-        const id = currentEditedGroup.current?._id ?? getGroupId();
+        const newId = currentEditedGroup.current?._id ?? getGroupId();
 
         const startingDates = findStartingDates(timePeriod, timePeriod2);
 
         const timeGroup = {
-            _id: id,
+            _id: newId,
             title: timeGroupTitle,
             priority,
             repeatRate: {
@@ -294,6 +306,9 @@ const NewCategory = ({index, length, id}) => {
                 }
             }))
         } else {
+            if (id) {
+                timeGroup.isNew = true;
+            }
             setTimeGroups([...timeGroups, timeGroup]);
         }
 

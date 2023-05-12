@@ -3,7 +3,9 @@ const Task = require('../models/taskSchema');
 const Joi = require('joi');
 const Group = require('../models/groupSchema');
 const {deleteGroupTasks} = require("../functions/deleteGroupTasks");
-const {groupSchema} = require('./groupController');
+const {deleteGroups} = require("../functions/deleteGroups");
+const {editGroups} = require("../functions/editGroups");
+const {createGroupFunction, groupSchema} = require("../functions/createGroupFunction");
 
 const categorySchema = Joi.object({
     title: Joi.string().required(),
@@ -105,48 +107,81 @@ const deleteCategory = async (req, res) => {
 
 const setCategory = async (req, res) => {
     if (req.user) {
-        const {category, groups}  = req.body;
+        const {category, groupsForDeletion, groupsForEdit, action, newGroups, parentId}  = req.body;
+        const responseObject = {};
 
-        if (!category) return res.status(400).json({message: "No category provided."});
+        // For category
+        if (category) {
+            // Manual validation of _id
+            if (!category?._id) return res.status(400).json({message: "Category must have _id."});
 
-        const validatedCategory = categorySchema.validate(category);
+            // Store the id of the category individually and delete it
+            const categoryId = category._id;
+            delete category._id;
 
-        if (validatedCategory.error) {
-            return res.status(400).json({message: validatedCategory.error});
-        }
+            const validatedCategory = categorySchema.validate(category);
 
-        let validatedGroups = [];
-
-        if (groups.length) {
-            for (const group of groups) {
-                const validatedGroup = groupSchema.validate(group);
-
-                if (validatedGroup.error) return res.status(400).json({message: validatedGroup.error});
-
-                validatedGroup.value.userId = req.user._id;
-
-                validatedGroups.push(validatedGroup.value);
+            if (validatedCategory.error) {
+                return res.status(400).json({message: validatedCategory.error});
+            }
+            try {
+                responseObject.editedCategory = await Category.findOneAndReplace({
+                    userId: req.user._id,
+                    _id: categoryId
+                }, {
+                    ...validatedCategory.value,
+                    userId: req.user._id
+                }, {new: true});
+            } catch (error) {
+                return res.status(500).json({message: error.message})
             }
         }
 
-        try {
-            const newCategory = await Category.findOneAndReplace({userId: req.user._id, _id: validatedCategory.value._id}, {
-                ...validatedCategory.value,
-                userId: req.user._id
-            }, {new: true});
+        // For group deletion
+        if (groupsForDeletion?.length > 0) {
+            const groupDeleteResponse = await deleteGroups(action, groupsForDeletion, req.user._id)
 
-            let newGroups = [];
+            if (groupDeleteResponse?.isError) {
+                return res.status(500).send({message: groupDeleteResponse.message});
+            } else {
+                responseObject.affectedTasks = groupDeleteResponse.affectedTasks;
+            }
+        }
 
-            if (validatedGroups.length) {
-                for (const group of validatedGroups) {
-                    newGroups.push(await Group.findOneAndReplace({userId: req.user._id, _id: group._id, parent: group.parent}, {...group, parent: newCategory._id}))
+        // For group editing
+        if (groupsForEdit?.length > 0) {
+            const groupEditResponse = await editGroups(groupsForEdit, req.user._id);
+
+            if (groupEditResponse?.message) {
+                return res.status(500).send({message: groupEditResponse.message})
+            } else {
+                responseObject.editedGroups = groupEditResponse.editedGroups;
+            }
+        }
+
+        // For new groups
+        if (newGroups?.length > 0) {
+            if (!parentId) return res.status(400).send({message: "parentId required for adding new groups"})
+
+            const newGroupList = [];
+
+            for (const newGroup of newGroups) {
+                const createGroupResponse = await createGroupFunction(newGroup, req.user._id, parentId);
+
+                if (createGroupResponse?.message) {
+                    return res.status(500).send({message: createGroupResponse.message});
+                } else {
+                    newGroupList.push(createGroupResponse.newGroup);
                 }
             }
 
-            res.status(200).json({newCategory, newGroups});
-        } catch (error) {
-            res.status(500).json({message: error.message})
+            if (newGroupList.length > 0) {
+                responseObject.newGroups = newGroupList;
+            }
         }
+
+        // Return all changes made
+        return res.status(200).send(responseObject);
     } else {
         res.status(401).send({message: "Not authorized."});
     }
