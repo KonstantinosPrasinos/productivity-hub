@@ -5,10 +5,10 @@ const Entry = require("../models/entrySchema");
 const taskSchema = Joi.object({
     title: Joi.string().required(),
     type: Joi.string().valid('Checkbox', 'Number').required(),
-    step: Joi.number().min(0),
+    step: Joi.number().min(1),
     goal: Joi.object().keys({
         type: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
+        number: Joi.number().min(1)
     }),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
@@ -16,7 +16,7 @@ const taskSchema = Joi.object({
     longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
         type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
+        number: Joi.number().min(1)
     }),
     // expiresAt: Joi.object().keys({
     //     type: Joi.string().valid('Never', 'Date', 'End of goal'),

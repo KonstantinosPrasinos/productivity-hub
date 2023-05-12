@@ -529,6 +529,7 @@ const NewCategory = ({index, length, id}) => {
                             value={longGoalNumber}
                             setValue={setLongGoalNumber}
                             isDisabled={!hasLongGoal}
+                            minNumber={1}
                         />
                     </InputWrapper>
                     <div className={"Horizontal-Flex-Container"}>

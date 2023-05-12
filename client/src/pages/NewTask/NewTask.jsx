@@ -415,7 +415,7 @@ const NewTask = ({index, length, id}) => {
                 isDisabled={type !== 'Number'}
             >
                 <InputWrapper label="Step">
-                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} />
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} />
                 </InputWrapper>
                 <InputWrapper label={"Has goal"}>
                     <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
@@ -443,6 +443,7 @@ const NewTask = ({index, length, id}) => {
                         value={goalNumber}
                         setValue={setGoalNumber}
                         isDisabled={!hasGoal}
+                        minNumber={1}
                     />
                 </InputWrapper>
             </HeaderExtendContainer>
@@ -578,7 +579,7 @@ const NewTask = ({index, length, id}) => {
                     />
                 </InputWrapper>
                 <InputWrapper label={'Repeat every'}>
-                    <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
+                    <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber} minNumber={1}/>
                     <DropDownInput
                         placeholder={'Weeks'}
                         selected={timePeriod}
@@ -678,6 +679,7 @@ const NewTask = ({index, length, id}) => {
                         value={longGoalNumber}
                         setValue={setLongGoalNumber}
                         isDisabled={!hasLongGoal}
+                        minNumber={1}
                     />
                 </InputWrapper>
             </HeaderExtendContainer>

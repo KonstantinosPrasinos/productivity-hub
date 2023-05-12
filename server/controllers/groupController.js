@@ -8,7 +8,7 @@ const groupSchema = Joi.object({
     goal: Joi.object().keys({
         type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
+        number: Joi.number().min(1)
     }),
     repeatRate: Joi.object().keys({
         number: Joi.number().integer().min(1),
