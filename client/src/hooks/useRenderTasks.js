@@ -1,100 +1,110 @@
-import {useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useGetTasks} from "./get-hooks/useGetTasks";
 import {useGetGroups} from "./get-hooks/useGetGroups";
+import {getDateAddDetails} from "@/functions/getDateAddDetails";
 
-const tasksNextUpdate = {}; // has _id and nextUpdateTime pairs (used to cut down future calculations)
+let tasksNextUpdate = null
+let timeout = null;
 
-const findNextUpdate = (startingTime, time, unit) => {
-    const date = new Date(startingTime);
-    const currentDate = new Date();
-    let functionName;
-    let timeToAdd = time;
-
-    switch(unit) {
-        case 'Days':
-            functionName = 'Date';
-            break;
-        case 'Weeks':
-            functionName = 'Date';
-            timeToAdd *= 7;
-            break;
-        case 'Months':
-            functionName = 'Month';
-            break;
-        case 'Years':
-            functionName = 'FullYear'
-            break;
-        default:
-            functionName = 'Date';
-            break;
+const findNextUpdateDate = (task) => {
+    // In case something breaks in the back end
+    if (!task.mostRecentProperDate && task?.repeatRate?.startingDate?.length === 0) {
+        return false;
     }
 
+    const date = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
+    date.setHours(0, 0, 0, 0);
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    // Get the time that should be added to each date for a repetition
+    const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
+
+    // Find next local date it should render
     while(currentDate.getTime() > date.getTime()) {
+        let wentOver = false;
+
+        if (task.repeatRate.startingDate.length > 1 && currentDate.getTime() > date.getTime()) {
+            for (let index in task.repeatRate.startingDate) {
+                if (index !== "0") {
+                    const currentStartingDate = new Date(task.repeatRate.startingDate[index]);
+                    const previousStartingDate = new Date(task.repeatRate.startingDate[index - 1]);
+
+                    date.setTime(date.getTime() + (currentStartingDate.getTime() - previousStartingDate.getTime()));
+
+                    if (date.getTime() >= currentDate.getTime()) {
+                        wentOver = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (wentOver) break;
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
     }
-
-    date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
 
     return date;
 }
 
 const checkTime = (task) => {
-    let isCorrectTime = false;
-    let taskNextUpdate = null;
     const currentDate = new Date();
     const currentHours = currentDate.getHours();
     const currentMinutes = currentDate.getMinutes();
-    currentDate.setUTCHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
 
-    for (const startingDate of task.repeatRate.startingDate) {
-        const nextUpdate = findNextUpdate(startingDate, task.repeatRate.number, task.repeatRate.bigTimePeriod);
-        if (!taskNextUpdate || nextUpdate < taskNextUpdate) {
-            taskNextUpdate = nextUpdate;
-        }
+    const nextUpdate = findNextUpdateDate(task);
 
-        nextUpdate.setUTCHours(0, 0, 0, 0);
-
-        isCorrectTime = nextUpdate.getTime() === currentDate.getTime();
-        if (isCorrectTime) break;
+    if (nextUpdate === false) {
+        return false;
     }
 
-    // Check if the current time is in the task render time range
+    const isCorrectDate = nextUpdate.getTime() === currentDate.getTime();
+    let isCorrectTime = true;
+
+    // Check if it uses time
     if (task.repeatRate.time?.start) {
+        // If it has time, check if it should render at the current time
         const fromHours = parseInt(task.repeatRate.time.start.substring(0, 2));
         const toHours = parseInt(task.repeatRate.time.end.substring(0, 2));
         const fromMinutes = parseInt(task.repeatRate.time.start.substring(2));
         const toMinutes = parseInt(task.repeatRate.time.end.substring(2));
 
         if (
-            isCorrectTime &&
+            fromHours > currentHours ||
+            currentHours > toHours ||
             (
-                fromHours > currentHours ||
-                currentHours > toHours ||
-                (
-                    fromHours === currentHours &&
-                    currentMinutes <= fromMinutes
-                ) ||
-                (
-                    toHours === currentMinutes &&
-                    currentMinutes >= toMinutes
-                )
+                fromHours === currentHours &&
+                currentMinutes < fromMinutes
+            ) ||
+            (
+                toHours === currentHours &&
+                currentMinutes >= toMinutes
             )
         ) {
+            // It shouldn't render now so set next update time
+            nextUpdate.setHours(fromHours, fromMinutes);
             isCorrectTime = false;
+        } else {
+            // It should render now so return true and set next update to, to-time
+            nextUpdate.setHours(toHours, toMinutes);
+            isCorrectTime = true;
         }
-
-        taskNextUpdate?.setHours(fromHours, fromMinutes);
+    } else {
+        if (isCorrectDate) {
+            // Set update time to tomorrow at 00:00
+            nextUpdate.setHours(24, 0);
+        }
     }
 
-    if (taskNextUpdate) {
-        tasksNextUpdate[task._id] = taskNextUpdate.getTime();
+    if (!tasksNextUpdate || (nextUpdate.getTime() < tasksNextUpdate.getTime())) {
+        tasksNextUpdate = nextUpdate;
     }
 
-    return isCorrectTime;
+    return isCorrectDate && isCorrectTime;
 }
 
 const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
-
     groups.forEach(group => {
         // Check if the group should be rendered at the current time
         if (usesTime) {
@@ -140,18 +150,6 @@ const addTasksToArray = (groupedTasks, usesTime, tasks) => {
     })
 }
 
-// const findLeastUpdateTime = () => {
-//     let min = null;
-//
-//     Object.values(tasksNextUpdate).forEach(key => {
-//         if (min === null || min > key) {
-//             min = key;
-//         }
-//     })
-//
-//     return min;
-// }
-
 const getCurrentTasks = (usesTime, tasks, groups) => {
     const groupedTasks = [];
 
@@ -164,27 +162,39 @@ const getCurrentTasks = (usesTime, tasks, groups) => {
     return groupedTasks
 }
 
-// useEffect(() => {
-//     timeOut = setTimeout(addTasksToData, findLeastUpdateTime() - (new Date).getTime());
-//
-//     return () => {
-//         clearTimeout(timeOut);
-//     }
-// }, [])
-
-// const data = useMemo(addTasksToData, [tasks, groups])
-
 export function useRenderTasks(usesTime = false) {
-
+    const [shouldReRender, setShouldReRender] = useState(false); // Flip this when we want tasks to re-render
     const {isLoading: tasksLoading, isError: tasksError, data: tasks} = useGetTasks();
     const {isLoading: groupsLoading, isError: groupsError, data: groups} = useGetGroups();
 
     const data = useMemo(() => {
         if (tasksError || groupsError) return false;
         if (!tasksLoading && !groupsLoading) {
-            return [...getCurrentTasks(usesTime, tasks, groups)]
+            const now = new Date();
+            now.setSeconds(0, 0);
+
+            const currentTasks = getCurrentTasks(usesTime, tasks, groups)
+
+            // Clear previous timeout if it exists
+            if (timeout) clearTimeout(timeout);
+
+            // Set when the tasks should re-render
+            if (tasksNextUpdate) {
+                timeout = setTimeout(() => {
+                    setShouldReRender(current => !current);
+                }, tasksNextUpdate - (new Date).getTime())
+            }
+            tasksNextUpdate = null;
+
+            return currentTasks;
         }
-    }, [tasksLoading, groupsLoading, groups, tasks]);
+    }, [tasksLoading, groupsLoading, groups, tasks, shouldReRender]);
+
+    useEffect(() => {
+        return () => {
+            if (timeout) clearTimeout(timeout);
+        }
+    }, [])
 
     return {isLoading: tasksLoading || groupsLoading, isError: groupsError || tasksError, data};
 }

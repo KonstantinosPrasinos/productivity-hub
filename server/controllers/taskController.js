@@ -26,8 +26,8 @@ const taskSchema = Joi.object({
     repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
-        smallTimePeriod: Joi.array().items(Joi.string()),
-        startingDate: Joi.array().items(Joi.date()),
+        smallTimePeriod: Joi.array().items(Joi.string()).min(1),
+        startingDate: Joi.array().items(Joi.date()).min(1),
         time: Joi.object().keys({
             start: Joi.string(),
             end: Joi.string()
@@ -229,8 +229,10 @@ const getTasksWithHistory = async (tasks, userId) => {
                 .sort({date: -1})
                 .exec();
 
+            let mostRecentDate;
+
             if (entriesHistory.length) {
-                const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
+                mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
 
                 let editedTask = await Task.findOneAndUpdate(
                     {userId: userId, _id: tasksWithCurrentEntry[i]._id},
@@ -270,7 +272,8 @@ const getTasksWithHistory = async (tasks, userId) => {
                     });
                 }
             } else {
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: {number: 0, date: null}, totalCompletedEntries: 0, totalNumber: 0});
+                mostRecentDate = tasksWithCurrentEntry[i].repeatRate.startingDate[0];
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: {number: 0, date: null}, totalCompletedEntries: 0, totalNumber: 0, mostRecentProperDate: mostRecentDate});
             }
         } else {
             tasksWithHistory.push({...tasksWithCurrentEntry[i]});

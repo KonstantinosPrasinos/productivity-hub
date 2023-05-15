@@ -202,7 +202,7 @@ const NewTask = ({index, length, id}) => {
                         bigTimePeriod: timePeriod
                     };
 
-                    if (timePeriod2) {
+                    if (timePeriod2.length > 0) {
                         repeatRate.smallTimePeriod = timePeriod2;
                         repeatRate.startingDate = findStartingDates(timePeriod, timePeriod2);
                     } else {
