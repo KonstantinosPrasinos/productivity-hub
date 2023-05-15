@@ -14,6 +14,7 @@ import LoadingIndicator from "../../components/indicators/LoadingIndicator/Loadi
 import {AnimatePresence, motion} from 'framer-motion';
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
+import tempStyles from 'react-day-picker/dist/style.module.css';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
@@ -33,6 +34,7 @@ import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
+import {getDateAddDetails} from "@/functions/getDateAddDetails";
 
 const StatSection = ({task}) => {
     return (
@@ -160,7 +162,7 @@ const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortO
     )
 }
 
-const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates}) => {
+const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates, task}) => {
     const [value, setValue] = useState(editedEntry ? editedEntry.value : '0');
     const [date, setDate] = useState(editedEntry ? new Date(editedEntry.date) : "");
     const [isVisibleCalendar, setIsVisibleCalendar] = useState(false);
@@ -262,6 +264,42 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         return datesToDisable;
     }, [editedEntry, entryDates]);
 
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
+    const today = new Date();
+
+    const bookedDays = (day) => {
+        if (day.getTime() >= today.getTime()) {
+            return false;
+        }
+
+        let startDate = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
+
+        startDate.setHours(0, 0, 0, 0);
+
+        while(startDate.getTime() > day.getTime()) {
+            startDate[`set${functionName}`](startDate[`get${functionName}`]() - timeToAdd);
+        }
+
+        for (let index in task.repeatRate.startingDate) {
+            if (index === "0") {
+                if (startDate.getTime() === day.getTime()) {
+                    return true;
+                }
+            } else {
+                const currentStartingDate = new Date(task.repeatRate.startingDate[index]);
+                const previousStartingDate = new Date(task.repeatRate.startingDate[index - 1]);
+
+                startDate.setTime(startDate.getTime() + (currentStartingDate.getTime() - previousStartingDate.getTime()));
+
+                if (startDate.getTime() === day.getTime()) {
+                    return true;
+                }
+            }
+        }
+    };
+
+    const properDateStyles = { color: "var(--success-color)", fontSize: "120%", fontWeight: "bold" };
+
     return (
         <Modal
             isOverlay={true}
@@ -277,16 +315,22 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
                         }
                     </div>
                 </div>
-                <div className={"Label"}>{editedEntry ?
-                    <div>
-                        The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
-                        <br />
-                        You can edit the entry below. {isToday && (<><br />You cannot delete today's entry, you can only reset it's value.</>)}
-                        <br />
-                        <TextButton onClick={resetToOriginalValues}>Reset to original values.</TextButton>
-                    </div>:
-                    "In order to create a new entry you need to enter a valid date and value."
-                }</div>
+                <div className={"Label"}>
+                    {editedEntry ?
+                        <div>
+                            The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
+                            <br />
+                            You can edit the entry below. {isToday && (<><br />You cannot delete today's entry, you can only reset it's value.</>)}
+                            <br />
+                            <TextButton onClick={resetToOriginalValues}>Reset to original values.</TextButton>
+                        </div>:
+                        "In order to create a new entry you need to enter a valid date and value."
+                    }
+                    <br />
+                    <br />
+                    Note: Only dates that follow the rules stated when creating the entry will be counted towards the streak and other statistics.
+                    Such dates are marked on the calendar picker.
+                </div>
             </div>
             <div className={'Horizontal-Flex-Container Space-Between'}>
                 <InputWrapper label={"Date"}>
@@ -311,10 +355,13 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
             <CollapsibleContainer isVisible={isVisibleCalendar}>
                 <div className={'Horizontal-Flex-Container Align-Center'}>
                     <DayPicker
+                        className={{...tempStyles, proper: styles.properDays}}
                         mode={"single"}
                         selected={date}
                         onDayClick={handleDateClick}
                         disabled={disabledDates}
+                        modifiers={{proper: bookedDays}}
+                        modifiersStyles={{proper: properDateStyles}}
                     />
                 </div>
             </CollapsibleContainer>
@@ -566,7 +613,7 @@ const TaskView = ({index, length, task}) => {
                 {/*        </IconButton>*/}
                 {/*    </div>*/}
                 {/*</section>*/}
-                <section>
+                {task.repeats && <section>
                     <motion.table className={styles.table}>
                         <thead>
                         <tr>
@@ -581,7 +628,7 @@ const TaskView = ({index, length, task}) => {
                                             exit={{scale: 0}}
                                             transition={{duration: 0.1}}
                                         >
-                                            <SortIcon sortOrder={sortOrderDate} />
+                                            <SortIcon sortOrder={sortOrderDate}/>
                                         </motion.div>
                                     </AnimatePresence>
                                 </button>
@@ -597,7 +644,7 @@ const TaskView = ({index, length, task}) => {
                                             exit={{scale: 0}}
                                             transition={{duration: 0.1}}
                                         >
-                                            <SortIcon sortOrder={sortOrderValue} />
+                                            <SortIcon sortOrder={sortOrderValue}/>
                                         </motion.div>
                                     </AnimatePresence>
                                 </button>
@@ -614,12 +661,11 @@ const TaskView = ({index, length, task}) => {
                             setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
                         />
                     </motion.table>
-
-                </section>
+                </section>}
                 <section className={'Horizontal-Flex-Container Space-Between'}>
-                    <Button onClick={() => setIsVisibleNewEntryModal(true)}>
-                        Add new entry <TbPlus />
-                    </Button>
+                    {task.repeats && <Button onClick={() => setIsVisibleNewEntryModal(true)}>
+                        Add new entry <TbPlus/>
+                    </Button>}
                     <div className={'Label Stack-Container'}>
                         <div>Created at:</div>
                         <div>{" " + new Date(task?.createdAt).toLocaleString()}</div>
@@ -632,6 +678,7 @@ const TaskView = ({index, length, task}) => {
                     taskId={task?._id}
                     editedEntry={editedEntry}
                     entryDates={!entriesLoading ? [...entries, entry].map(tempEntry => new Date(tempEntry.date)) : [new Date(entry.date)]}
+                    task={task}
                 />}
             {isVisibleConfirmDeleteModal &&
                 <ConfirmDeleteModal

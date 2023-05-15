@@ -258,7 +258,6 @@ const getTasksWithHistory = async (tasks, userId) => {
                         ...editedTask._doc,
                         streak: {number: streak, date: streakFrom},
                         currentEntryId: tasksWithCurrentEntry[i].currentEntryId,
-                        mostRecentProperDate: undefined,
                         totalCompletedEntries,
                         totalNumber
                     });
@@ -267,15 +266,14 @@ const getTasksWithHistory = async (tasks, userId) => {
                         ...editedTask._doc,
                         streak: streak,
                         currentEntryId: tasksWithCurrentEntry[i].currentEntryId,
-                        mostRecentProperDate: undefined,
                         totalCompletedEntries
                     });
                 }
             } else {
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: {number: 0, date: null}, mostRecentProperDate: undefined, totalCompletedEntries: 0, totalNumber: 0});
+                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: {number: 0, date: null}, totalCompletedEntries: 0, totalNumber: 0});
             }
         } else {
-            tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
+            tasksWithHistory.push({...tasksWithCurrentEntry[i]});
         }
     }
 
