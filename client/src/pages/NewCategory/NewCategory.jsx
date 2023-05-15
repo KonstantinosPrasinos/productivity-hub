@@ -13,7 +13,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import Button from "../../components/buttons/Button/Button";
 import styles from './NewCategory.module.scss';
 import Chip from "../../components/buttons/Chip/Chip";
-import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import TimePeriodInput from "@/components/utilities/TimePeriodInputModal/TimePeriodInput";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {findStartingDates} from "../../functions/findStartingDates";

@@ -1,5 +1,5 @@
 import {AnimatePresence, motion} from "framer-motion";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
 import { TbCheck } from "react-icons/tb";
@@ -24,6 +24,8 @@ const CurrentProgress = ({task}) => {
     const {mutate: setTaskCurrentEntry} = useChangeEntryValue(task.title);
     const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
     const [prevPercentage, setPrevPercentage] = useState(getPercentage());
+    const [overlayIsVisible, setOverlayIsVisible] = useState(false);
+    const [addValue, setAddValue] = useState(task.type === "Number" ? task.step : 1);
 
     useEffect(() => {
         if (!isLoading && !isNaN(entry?.value)){
@@ -33,8 +35,7 @@ const CurrentProgress = ({task}) => {
 
 
 
-    const handleCheckboxClick = (event) => {
-        event.stopPropagation();
+    const handleCheckboxClick = () => {
         if (!isLoading) {
             setPrevPercentage(getPercentage());
 
@@ -43,12 +44,19 @@ const CurrentProgress = ({task}) => {
         }
     }
 
+    const handleNumberRightClick = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setOverlayIsVisible(current => !current);
+        return false;
+    }
+
     const handleNumberClick = (event) => {
         event.stopPropagation();
         if (isLoading) return;
 
         setPrevPercentage(getPercentage());
-        setTaskCurrentEntry({taskId: task._id, entryId: entry._id, value: entry?.value + task.step});
+        setTaskCurrentEntry({taskId: task._id, entryId: entry._id, value: entry?.value + addValue});
     }
 
     const circleVariants = {
@@ -94,8 +102,60 @@ const CurrentProgress = ({task}) => {
     }
 
     const entryColor = useMemo(getEntryColor, [entry?.value]);
+    const contentRef = useRef();
+    const overlayRef = useRef();
 
-    return (<div className={styles.container}>
+    useEffect(() => {
+        if (overlayIsVisible) {
+            const {top, left} = contentRef.current.getBoundingClientRect()
+            overlayRef.current.style.top = `calc(${top}px - 2.025em)`;
+            overlayRef.current.style.left = `calc(${left}px - 0.3125em)`;
+        }
+    }, [overlayIsVisible]);
+
+    const handleOverlayContainerClick = (e) => {
+        e.stopPropagation();
+        setOverlayIsVisible(false);
+    }
+
+    const [animationDirection, setAnimationDirection] = useState(0);
+
+    const handleOverlayWheel = (e) => {
+        if (e.deltaY < 0) {
+            if (addValue > 1) {
+                setAddValue(current => current - 1);
+            }
+            setAnimationDirection(-1);
+        } else {
+            setAddValue(current => current + 1);
+            setAnimationDirection(1);
+        }
+    }
+
+    const handleTopOverlayClick = (e) => {
+        e.stopPropagation();
+        if (addValue - 1 > 0) {
+            setAddValue(current => current - 1);
+            handleNumberClick(e);
+            setOverlayIsVisible(false);
+        }
+    }
+
+    const handleMiddleOverlayClick = (e) => {
+        e.stopPropagation();
+        handleNumberClick(e);
+        setOverlayIsVisible(false);
+    }
+
+    const handleBottomOverlayClick = (e) => {
+        e.stopPropagation();
+        setAddValue(current => current + 1);
+        handleNumberClick(e);
+        setOverlayIsVisible(false);
+    }
+
+    return (
+        <div className={styles.container}>
             <div className={`${styles.outlineContainer}`}>
                 <AnimatePresence initial={true}>
                     <motion.svg
@@ -116,22 +176,70 @@ const CurrentProgress = ({task}) => {
                     </motion.svg>
                 </AnimatePresence>
             </div>
-            <div className={`${styles.textContainer}`}>
+            <div className={`${styles.textContainer}`} ref={contentRef}>
                 {task.type === 'Number' && <button
                     style={{
                         color: entryColor,
-                        fontSize: `${18 - task.step.toString().length * 2}px`
+                        fontSize: `${18 - addValue.toString().length * 2}px`
                     }}
                     onClick={handleNumberClick}
+                    onContextMenu={handleNumberRightClick}
                 >
-                    {isLoading ? "..." : `+${task.step}`}
+                    {isLoading ? "..." : `+${addValue}`}
                 </button>}
-                {task.type === 'Checkbox' && <IconButton color={entry?.value > 0 ? 'green' : 'normal'} selected={true}
-                                                         onClick={handleCheckboxClick}>
+                {task.type === 'Checkbox' &&
+                    <IconButton
+                        color={entry?.value > 0 ? 'green' : 'normal'}
+                        selected={true}
+                        onClick={handleCheckboxClick}
+                    >
                     <TbCheck />
                 </IconButton>}
             </div>
-        </div>);
+            <AnimatePresence>
+                {overlayIsVisible &&
+                    <div
+                        className={styles.overlayContainer}
+                        onClick={handleOverlayContainerClick}
+                        onWheel={handleOverlayWheel}
+                    >
+                        <motion.div
+                            className={styles.overlay}
+                            ref={overlayRef}
+                            initial={{opacity: 0, scaleY: 0.32, scaleX: 0.55}}
+                            animate={{opacity: 1, scaleY: 1, scaleX: 1}}
+                            exit={{opacity: 0, scaleY: 0.32, scaleX: 0.55}}
+                        >
+                            <motion.div
+                                key={addValue - 2}
+                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
+                                animate={{y: 0}}
+                                onClick={handleTopOverlayClick}
+                            >
+                                {addValue - 1 > 0 ? addValue - 1 : ""}
+                            </motion.div>
+                            <motion.div
+                                key={addValue}
+                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
+                                animate={{y: 0}}
+                                onClick={handleMiddleOverlayClick}
+                            >
+                                {addValue}
+                            </motion.div>
+                            <motion.div
+                                key={addValue + 2}
+                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
+                                animate={{y: 0}}
+                                onClick={handleBottomOverlayClick}
+                            >
+                                {addValue + 1}
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                }
+            </AnimatePresence>
+        </div>
+    );
 };
 
 export default CurrentProgress;

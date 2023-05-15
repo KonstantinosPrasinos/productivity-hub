@@ -9,7 +9,7 @@ import MiniPageContainer from "../../components/containers/MiniPagesContainer/Mi
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import {TbChevronDown, TbPlus} from "react-icons/tb";
-import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import TimePeriodInput from "@/components/utilities/TimePeriodInputModal/TimePeriodInput";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
@@ -24,6 +24,7 @@ import styles from "./NewTask.module.scss";
 import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
 import {capitalizeFirstCharacter} from "../../functions/capitalizeFirstCharacter";
+import Button from "@/components/buttons/Button/Button";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -71,6 +72,7 @@ const NewTask = ({index, length, id}) => {
     const miniPagesContext = useContext(MiniPagesContext);
 
     const [extendedSection, setExtendedSection] = useState(0);
+    const [dateModalIsVisible, setDateModalIsVisible] = useState(false);
 
     // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
     const taskType = ['Checkbox', 'Number'];
@@ -285,6 +287,10 @@ const NewTask = ({index, length, id}) => {
 
             miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
         }
+    }
+
+    const toggleModalIsVisible = () => {
+        setDateModalIsVisible(current => !current);
     }
 
     return (
@@ -595,11 +601,10 @@ const NewTask = ({index, length, id}) => {
                         ))}
                     </DropDownInput>
                 </InputWrapper>
-                {timePeriod !== 'Days' &&
-                    <InputWrapper label={'On'}>
-                        <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
-                    </InputWrapper>
-                }
+                <InputWrapper label={'On'}>
+                    <Button>Select dates</Button>
+                    {dateModalIsVisible && <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />}
+                </InputWrapper>
             </HeaderExtendContainer>
             <HeaderExtendContainer
                 header={(

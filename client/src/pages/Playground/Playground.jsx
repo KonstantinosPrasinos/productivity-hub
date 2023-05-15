@@ -13,7 +13,7 @@ import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 import Alert from "../../components/utilities/Alert/Alert";
 import styles from "./Playground.module.scss";
-import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import TimePeriodInput from "@/components/utilities/TimePeriodInputModal/TimePeriodInput";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import IconButton from "../../components/buttons/IconButton/IconButton";
@@ -124,13 +124,13 @@ const Playground = () => {
         {/*<InputWrapper label={"Time Period Input"}>*/}
         {/*    <div className={styles.alignTopContainer}>*/}
         {/*        <InputWrapper label={"In a week"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Weeks"} />*/}
+        {/*            <TimePeriodInputModal timePeriod={"Weeks"} />*/}
         {/*        </InputWrapper>*/}
         {/*        <InputWrapper label={"In a month"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Months"} />*/}
+        {/*            <TimePeriodInputModal timePeriod={"Months"} />*/}
         {/*        </InputWrapper>*/}
         {/*        <InputWrapper label={"In a year"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Years"} />*/}
+        {/*            <TimePeriodInputModal timePeriod={"Years"} />*/}
         {/*        </InputWrapper>*/}
         {/*    </div>*/}
         {/*</InputWrapper>*/}
