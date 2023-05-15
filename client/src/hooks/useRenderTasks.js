@@ -106,17 +106,17 @@ const checkTime = (task) => {
 
 const addGroupsToArray = (groupedTasks, usesTime, tasks, groups) => {
     groups.forEach(group => {
-        // Check if the group should be rendered at the current time
-        if (usesTime) {
-            if (!checkTime(group)) {
-                return;
-            }
-        }
-
         const groupTasks = tasks.filter(task => task.group === group._id && !task.hidden);
 
         if (!groupTasks.length) {
             return;
+        }
+
+        // Check if the group should be rendered at the current time
+        if (usesTime) {
+            if (!checkTime({...group, mostRecentProperDate: tasks[0].mostRecentProperDate})) {
+                return;
+            }
         }
 
         groupedTasks.push({
