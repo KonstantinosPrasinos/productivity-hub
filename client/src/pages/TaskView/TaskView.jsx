@@ -14,7 +14,6 @@ import LoadingIndicator from "../../components/indicators/LoadingIndicator/Loadi
 import {AnimatePresence, motion} from 'framer-motion';
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
-import tempStyles from 'react-day-picker/dist/style.module.css';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
@@ -35,6 +34,41 @@ import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 import {getDateAddDetails} from "@/functions/getDateAddDetails";
+
+const checkIfDateIsProper = (date, task, functionName, timeToAdd) => {
+    const today = new Date();
+
+    if (date.getTime() >= today.getTime()) {
+        return false;
+    }
+
+    let startDate = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
+
+    startDate.setHours(0, 0, 0, 0);
+
+    while(startDate.getTime() > date.getTime()) {
+        startDate[`set${functionName}`](startDate[`get${functionName}`]() - timeToAdd);
+    }
+
+    for (let index in task.repeatRate.startingDate) {
+        if (index === "0") {
+            if (startDate.getTime() === date.getTime()) {
+                return true;
+            }
+        } else {
+            const currentStartingDate = new Date(task.repeatRate.startingDate[index]);
+            const previousStartingDate = new Date(task.repeatRate.startingDate[index - 1]);
+
+            startDate.setTime(startDate.getTime() + (currentStartingDate.getTime() - previousStartingDate.getTime()));
+
+            if (startDate.getTime() === date.getTime()) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
 
 const StatSection = ({task}) => {
     return (
@@ -63,8 +97,9 @@ const StatSection = ({task}) => {
     );
 }
 
-const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal}) => {
+const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal, task}) => {
     const [pageNumber, setPageNumber] = useState(0);
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
@@ -121,11 +156,14 @@ const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortO
             <motion.tbody className={styles.tBody} key={pageNumber}>
                         {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
                             const entryDate = new Date(entry.date);
+                            entryDate.setHours(0, 0);
+
+                            const isProperDate = checkIfDateIsProper(entryDate, task, functionName, timeToAdd)
 
                             return <tr
                                 key={entry._id}
                             >
-                                <td>{entryDate.toLocaleDateString()}</td>
+                                <td className={isProperDate ? styles.isProperDate : ""}>{entryDate.toLocaleDateString()}</td>
                                 <td>{entry.value}</td>
                                 <td>
                                     <IconButton onClick={() => handleEditEntry(entry)}>
@@ -264,41 +302,13 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         return datesToDisable;
     }, [editedEntry, entryDates]);
 
-    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
-    const today = new Date();
-
-    const bookedDays = (day) => {
-        if (day.getTime() >= today.getTime()) {
-            return false;
-        }
-
-        let startDate = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
-
-        startDate.setHours(0, 0, 0, 0);
-
-        while(startDate.getTime() > day.getTime()) {
-            startDate[`set${functionName}`](startDate[`get${functionName}`]() - timeToAdd);
-        }
-
-        for (let index in task.repeatRate.startingDate) {
-            if (index === "0") {
-                if (startDate.getTime() === day.getTime()) {
-                    return true;
-                }
-            } else {
-                const currentStartingDate = new Date(task.repeatRate.startingDate[index]);
-                const previousStartingDate = new Date(task.repeatRate.startingDate[index - 1]);
-
-                startDate.setTime(startDate.getTime() + (currentStartingDate.getTime() - previousStartingDate.getTime()));
-
-                if (startDate.getTime() === day.getTime()) {
-                    return true;
-                }
-            }
-        }
-    };
 
     const properDateStyles = { color: "var(--success-color)", fontSize: "120%", fontWeight: "bold" };
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
+
+    const tempFunction = (date) => {
+        return checkIfDateIsProper(date, task, functionName, timeToAdd);
+    }
 
     return (
         <Modal
@@ -355,12 +365,11 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
             <CollapsibleContainer isVisible={isVisibleCalendar}>
                 <div className={'Horizontal-Flex-Container Align-Center'}>
                     <DayPicker
-                        className={{...tempStyles, proper: styles.properDays}}
                         mode={"single"}
                         selected={date}
                         onDayClick={handleDateClick}
                         disabled={disabledDates}
-                        modifiers={{proper: bookedDays}}
+                        modifiers={{proper: tempFunction}}
                         modifiersStyles={{proper: properDateStyles}}
                     />
                 </div>
@@ -659,6 +668,7 @@ const TaskView = ({index, length, task}) => {
                             sortOrderValue={sortOrderValue}
                             setEditedEntry={setEditedEntry}
                             setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
+                            task={task}
                         />
                     </motion.table>
                 </section>}
