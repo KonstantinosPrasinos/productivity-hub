@@ -289,10 +289,6 @@ const NewTask = ({index, length, id}) => {
         }
     }
 
-    const toggleModalIsVisible = () => {
-        setDateModalIsVisible(current => !current);
-    }
-
     return (
         <MiniPageContainer
             onClickSave={handleSave}
@@ -421,7 +417,7 @@ const NewTask = ({index, length, id}) => {
                 isDisabled={type !== 'Number'}
             >
                 <InputWrapper label="Step">
-                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} />
+                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} maxNumber={999} />
                 </InputWrapper>
                 <InputWrapper label={"Has goal"}>
                     <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />

@@ -108,14 +108,19 @@ const CurrentProgress = ({task}) => {
     useEffect(() => {
         if (overlayIsVisible) {
             const {top, left} = contentRef.current.getBoundingClientRect()
-            overlayRef.current.style.top = `calc(${top}px - 2.025em)`;
-            overlayRef.current.style.left = `calc(${left}px - 0.3125em)`;
+            overlayRef.current.style.top = `${top}px`;
+            overlayRef.current.style.left = `${left}px`;
         }
     }, [overlayIsVisible]);
 
     const handleOverlayContainerClick = (e) => {
         e.stopPropagation();
-        setOverlayIsVisible(false);
+
+        if (animationDirection === 0) {
+            setOverlayIsVisible(false);
+        } else {
+            setAnimationDirection(0);
+        }
     }
 
     const [animationDirection, setAnimationDirection] = useState(0);
@@ -124,11 +129,13 @@ const CurrentProgress = ({task}) => {
         if (e.deltaY < 0) {
             if (addValue > 1) {
                 setAddValue(current => current - 1);
+                setAnimationDirection(1);
             }
-            setAnimationDirection(-1);
         } else {
-            setAddValue(current => current + 1);
-            setAnimationDirection(1);
+            if (addValue < 998) {
+                setAddValue(current => current + 1);
+                setAnimationDirection(-1);
+            }
         }
     }
 
@@ -137,21 +144,72 @@ const CurrentProgress = ({task}) => {
         if (addValue - 1 > 0) {
             setAddValue(current => current - 1);
             handleNumberClick(e);
-            setOverlayIsVisible(false);
+            if (animationDirection === 0) {
+                setOverlayIsVisible(false);
+            } else {
+                setAnimationDirection(0);
+            }
         }
     }
 
     const handleMiddleOverlayClick = (e) => {
         e.stopPropagation();
         handleNumberClick(e);
-        setOverlayIsVisible(false);
+        if (animationDirection === 0) {
+            setOverlayIsVisible(false);
+        } else {
+            setAnimationDirection(0);
+        }
     }
 
     const handleBottomOverlayClick = (e) => {
         e.stopPropagation();
         setAddValue(current => current + 1);
         handleNumberClick(e);
-        setOverlayIsVisible(false);
+        if (animationDirection === 0) {
+            setOverlayIsVisible(false);
+        } else {
+            setAnimationDirection(0);
+        }
+    }
+
+    useEffect(() => {
+        if (animationDirection === 0 && overlayIsVisible) {
+            setOverlayIsVisible(false);
+        }
+    }, [animationDirection])
+
+    const tempVariants = {
+        initial: (positioning) => {
+            switch (animationDirection) {
+                case 0:
+                   if (positioning !== "middle") return {display: "none", opacity: 0};
+                   break;
+                case -1:
+                    return {y: "1em"};
+                case 1:
+                    return {y: "-1em"};
+            }
+        },
+        animate: () => {
+            switch (animationDirection) {
+                case 0:
+                    return {display: "unset", opacity: 1, transition: {delay: 0.1}};
+                case 1:
+                case -1:
+                    return {y: 0};
+            }
+        },
+        exit: () => {
+            if (animationDirection === 0) {
+                return {opacity: 0, transition: {duration: 0.1}, transitionEnd: {display: "none"}};
+            }
+        },
+        middleExit: () => {
+            if (animationDirection === 0) {
+                return {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"}
+            }
+        }
     }
 
     return (
@@ -180,7 +238,7 @@ const CurrentProgress = ({task}) => {
                 {task.type === 'Number' && <button
                     style={{
                         color: entryColor,
-                        fontSize: `${18 - addValue.toString().length * 2}px`
+                        fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"
                     }}
                     onClick={handleNumberClick}
                     onContextMenu={handleNumberRightClick}
@@ -203,38 +261,50 @@ const CurrentProgress = ({task}) => {
                         onClick={handleOverlayContainerClick}
                         onWheel={handleOverlayWheel}
                     >
-                        <motion.div
-                            className={styles.overlay}
-                            ref={overlayRef}
-                            initial={{opacity: 0, scaleY: 0.32, scaleX: 0.55}}
-                            animate={{opacity: 1, scaleY: 1, scaleX: 1}}
-                            exit={{opacity: 0, scaleY: 0.32, scaleX: 0.55}}
-                        >
+                        <div className={styles.overlay} ref={overlayRef}>
                             <motion.div
-                                key={addValue - 2}
-                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
-                                animate={{y: 0}}
-                                onClick={handleTopOverlayClick}
+                                className={styles.overlayContent}
+                                initial={{height: "2.2em", width: "2.2em", fontSize: "16px", paddingTop: 0, paddingBottom: 0}}
+                                animate={{height: "5.5em", width: "2.08em",fontSize: "20px", paddingTop: "10px", paddingBottom: "10px"}}
+                                exit={{height: "2.2em", width: "2.2em",fontSize: "16px", paddingTop: 0, paddingBottom: 0, transition: {delay: 0.1}}}
+                                transition={{type: "tween", duration: 0.2}}
                             >
-                                {addValue - 1 > 0 ? addValue - 1 : ""}
+                                <motion.div
+                                    style={(addValue - 1).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue - 1).toString().length - 1) * 5}px)`} : ''}
+                                    key={addValue - 2}
+                                    initial={"initial"}
+                                    animate={"animate"}
+                                    exit={"exit"}
+                                    variants={tempVariants}
+                                    onClick={handleTopOverlayClick}
+                                >
+                                    {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
+                                </motion.div>
+                                <motion.div
+                                    style={(addValue).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue).toString().length - 1) * 5}px)`} : ''}
+                                    key={addValue}
+                                    custom={"middle"}
+                                    initial={"initial"}
+                                    animate={"animate"}
+                                    exit={"middleExit"}
+                                    variants={tempVariants}
+                                    onClick={handleMiddleOverlayClick}
+                                >
+                                    +{addValue}
+                                </motion.div>
+                                <motion.div
+                                    style={(addValue + 1).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue + 1).toString().length - 1) * 5}px)`} : ''}
+                                    key={addValue + 2}
+                                    initial={"initial"}
+                                    animate={"animate"}
+                                    exit={"exit"}
+                                    variants={tempVariants}
+                                    onClick={handleBottomOverlayClick}
+                                >
+                                    {addValue + 1 < 999 ? `+${addValue + 1}` : ""}
+                                </motion.div>
                             </motion.div>
-                            <motion.div
-                                key={addValue}
-                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
-                                animate={{y: 0}}
-                                onClick={handleMiddleOverlayClick}
-                            >
-                                {addValue}
-                            </motion.div>
-                            <motion.div
-                                key={addValue + 2}
-                                initial={animationDirection > 0 ? {y: "1em"} : {y: "-1em"}}
-                                animate={{y: 0}}
-                                onClick={handleBottomOverlayClick}
-                            >
-                                {addValue + 1}
-                            </motion.div>
-                        </motion.div>
+                        </div>
                     </div>
                 }
             </AnimatePresence>
