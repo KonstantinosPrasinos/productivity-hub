@@ -75,16 +75,14 @@ circle {
     box-shadow: v.$elevation-1;
 
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     overflow-y: hidden;
-    gap: 10px;
-    font-size: v.$font-xl;
-    max-font-size: v.$font-xl;
+    gap: 0.5em;
 
     & > * {
         overflow-y: hidden;
         text-align: center;
-        height: 1.5em;
-        line-height: 1.5em;
+        height: 24px;
+        line-height: 24px;
     }
 }

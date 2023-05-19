@@ -15,7 +15,9 @@ const CurrentProgress = ({task}) => {
         if (task.type === 'Checkbox') {
             percentage = entry?.value;
         } else {
-            percentage = entry?.value / task.goal.number;
+            if (task.goal?.number) {
+                percentage = entry?.value / task.goal.number;
+            }
         }
 
         return percentage;
@@ -63,6 +65,7 @@ const CurrentProgress = ({task}) => {
         hidden: {pathLength: prevPercentage, opacity: getPercentage() > 0 ? 0 : 1},
         visible: () => {
             let percentage = getPercentage();
+
             const duration = Math.min(0.4, Math.abs(percentage - prevPercentage) * 2);
 
             return {
@@ -113,28 +116,25 @@ const CurrentProgress = ({task}) => {
         }
     }, [overlayIsVisible]);
 
+    const animationDirection = useRef(0);
+
     const handleOverlayContainerClick = (e) => {
         e.stopPropagation();
 
-        if (animationDirection === 0) {
-            setOverlayIsVisible(false);
-        } else {
-            setAnimationDirection(0);
-        }
+        animationDirection.current = 0;
+        setOverlayIsVisible(false);
     }
-
-    const [animationDirection, setAnimationDirection] = useState(0);
 
     const handleOverlayWheel = (e) => {
         if (e.deltaY < 0) {
             if (addValue > 1) {
                 setAddValue(current => current - 1);
-                setAnimationDirection(1);
+                animationDirection.current = 1;
             }
         } else {
             if (addValue < 998) {
                 setAddValue(current => current + 1);
-                setAnimationDirection(-1);
+                animationDirection.current = -1;
             }
         }
     }
@@ -144,44 +144,29 @@ const CurrentProgress = ({task}) => {
         if (addValue - 1 > 0) {
             setAddValue(current => current - 1);
             handleNumberClick(e);
-            if (animationDirection === 0) {
-                setOverlayIsVisible(false);
-            } else {
-                setAnimationDirection(0);
-            }
+            animationDirection.current = 0;
+            setOverlayIsVisible(false);
         }
     }
 
     const handleMiddleOverlayClick = (e) => {
         e.stopPropagation();
         handleNumberClick(e);
-        if (animationDirection === 0) {
-            setOverlayIsVisible(false);
-        } else {
-            setAnimationDirection(0);
-        }
+        animationDirection.current = 0;
+        setOverlayIsVisible(false);
     }
 
     const handleBottomOverlayClick = (e) => {
         e.stopPropagation();
         setAddValue(current => current + 1);
         handleNumberClick(e);
-        if (animationDirection === 0) {
-            setOverlayIsVisible(false);
-        } else {
-            setAnimationDirection(0);
-        }
+        animationDirection.current = 0;
+        setOverlayIsVisible(false);
     }
-
-    useEffect(() => {
-        if (animationDirection === 0 && overlayIsVisible) {
-            setOverlayIsVisible(false);
-        }
-    }, [animationDirection])
 
     const tempVariants = {
         initial: (positioning) => {
-            switch (animationDirection) {
+            switch (animationDirection.current) {
                 case 0:
                    if (positioning !== "middle") return {display: "none", opacity: 0};
                    break;
@@ -192,21 +177,21 @@ const CurrentProgress = ({task}) => {
             }
         },
         animate: () => {
-            switch (animationDirection) {
+            switch (animationDirection.current) {
                 case 0:
-                    return {display: "unset", opacity: 1, transition: {delay: 0.1}};
+                    return {display: "unset", opacity: 1, transition: {delay: 0.2}};
                 case 1:
                 case -1:
                     return {y: 0};
             }
         },
         exit: () => {
-            if (animationDirection === 0) {
-                return {opacity: 0, transition: {duration: 0.1}, transitionEnd: {display: "none"}};
+            if (animationDirection.current === 0) {
+                return {opacity: 0, transition: {duration: 0.09}, transitionEnd: {display: "none"}};
             }
         },
         middleExit: () => {
-            if (animationDirection === 0) {
+            if (animationDirection.current === 0) {
                 return {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"}
             }
         }
@@ -214,7 +199,7 @@ const CurrentProgress = ({task}) => {
 
     return (
         <div className={styles.container}>
-            <div className={`${styles.outlineContainer}`}>
+            {(task.type === "Checkbox" || (task.type === "Number" && task.goal?.number)) && <div className={`${styles.outlineContainer}`}>
                 <AnimatePresence initial={true}>
                     <motion.svg
                         width="100%"
@@ -233,7 +218,7 @@ const CurrentProgress = ({task}) => {
                         />
                     </motion.svg>
                 </AnimatePresence>
-            </div>
+            </div>}
             <div className={`${styles.textContainer}`} ref={contentRef}>
                 {task.type === 'Number' && <button
                     style={{
@@ -264,13 +249,13 @@ const CurrentProgress = ({task}) => {
                         <div className={styles.overlay} ref={overlayRef}>
                             <motion.div
                                 className={styles.overlayContent}
-                                initial={{height: "2.2em", width: "2.2em", fontSize: "16px", paddingTop: 0, paddingBottom: 0}}
-                                animate={{height: "5.5em", width: "2.08em",fontSize: "20px", paddingTop: "10px", paddingBottom: "10px"}}
+                                initial={{height: "2.2em", width: "2.2em", paddingTop: 0, paddingBottom: 0}}
+                                animate={{height: "5.5em", width: "2.6em", paddingTop: "10px", paddingBottom: "10px"}}
                                 exit={{height: "2.2em", width: "2.2em",fontSize: "16px", paddingTop: 0, paddingBottom: 0, transition: {delay: 0.1}}}
                                 transition={{type: "tween", duration: 0.2}}
                             >
                                 <motion.div
-                                    style={(addValue - 1).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue - 1).toString().length - 1) * 5}px)`} : ''}
+                                    style={(addValue - 1).toString().length > 1 ? {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"} : ''}
                                     key={addValue - 2}
                                     initial={"initial"}
                                     animate={"animate"}
@@ -281,7 +266,7 @@ const CurrentProgress = ({task}) => {
                                     {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
                                 </motion.div>
                                 <motion.div
-                                    style={(addValue).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue).toString().length - 1) * 5}px)`} : ''}
+                                    style={(addValue).toString().length > 1 ? {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"} : ''}
                                     key={addValue}
                                     custom={"middle"}
                                     initial={"initial"}
@@ -293,7 +278,7 @@ const CurrentProgress = ({task}) => {
                                     +{addValue}
                                 </motion.div>
                                 <motion.div
-                                    style={(addValue + 1).toString().length > 1 ? {fontSize: `calc(100% - ${((addValue + 1).toString().length - 1) * 5}px)`} : ''}
+                                    style={(addValue + 1).toString().length > 1 ? {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"} : ''}
                                     key={addValue + 2}
                                     initial={"initial"}
                                     animate={"animate"}
