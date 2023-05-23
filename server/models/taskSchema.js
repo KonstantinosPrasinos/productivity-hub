@@ -53,7 +53,7 @@ const Task = new mongoose.Schema({
         longestStreak: {
             number: {
                 type: Number,
-                default: null
+                default: 0
             },
             lastDate: {
                 type: Date,

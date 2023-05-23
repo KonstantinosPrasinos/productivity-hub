@@ -71,11 +71,7 @@
   }
 
   width: 100%;
-  display: grid;
-  grid-template-columns: 15% 15%;
-  grid-template-rows: repeat(auto-fill, auto);
-  grid-row-gap: 0;
-  grid-column-gap: 0.5em;
+  gap: 0.5em;
 
   & > div {
     text-overflow: ellipsis;
@@ -84,5 +80,12 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
+    width: 14%;
+
+    &.repeatSeparator {
+      text-align: center;
+      width: auto;
+    }
   }
 }
+

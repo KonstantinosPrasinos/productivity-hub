@@ -5,31 +5,65 @@ import {motion} from "framer-motion";
 import {MiniPagesContext} from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import {TbFlame, TbHash, TbTargetArrow} from "react-icons/all";
+import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry";
+import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
+import {TbCheck} from "react-icons/tb";
 
-const RepeatDetails = ({longGoal}) => {
+const RepeatDetails = ({task}) => {
+    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+
     return (
         <div className={styles.repeatDetails}>
-            <div>
-                {longGoal.type === "Streak" &&
-                    <>
-                        <TbFlame />
-                    </>
-                }
-                {longGoal.type === "Total completed" &&
-                    <>
-
-                    </>
-                }
-                {longGoal.type === "Total number" &&
-                    <>
-                        <TbHash />
-                    </>
-                }
-            </div>
-            <div>
-                <TbTargetArrow />
-                {longGoal?.number}
-            </div>
+            {task.type === "Number" &&
+                <div>
+                    <TbHash />
+                    <TextSwitchContainer>
+                        {isLoading && "..."}
+                        {!isLoading && entry.value}
+                    </TextSwitchContainer>
+                </div>
+            }
+            {task.type === "Number" && task.goal?.number &&
+                <div>
+                    <TbTargetArrow />
+                    <TextSwitchContainer>
+                        {task.goal?.number}
+                    </TextSwitchContainer>
+                </div>
+            }
+            {task.type === "Number" && task.longGoal?.type &&
+                <div className={styles.repeatSeparator}>
+                    |
+                </div>
+            }
+            {task.longGoal?.type &&
+                <>
+                    <div>
+                        {task.longGoal?.type === "Streak" &&
+                            <>
+                                <TbFlame />
+                                <TextSwitchContainer>
+                                    {task.streak?.number}
+                                </TextSwitchContainer>
+                            </>
+                        }
+                        {task.longGoal?.type === "Total Completed" &&
+                            <>
+                                <TbCheck />
+                                <TextSwitchContainer>
+                                    {task.totalCompletedEntries}
+                                </TextSwitchContainer>
+                            </>
+                        }
+                    </div>
+                    <div>
+                        <TbTargetArrow />
+                        <TextSwitchContainer>
+                            {task.longGoal?.number}
+                        </TextSwitchContainer>
+                    </div>
+                </>
+            }
         </div>
     );
 }
@@ -78,7 +112,7 @@ const Task = ({tasks}) => {
                     <div key={index} className={styles.task}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
-                            {task.longGoal?.type && <RepeatDetails longGoal={task?.longGoal}/>}
+                            <RepeatDetails task={task} />
                         </div>
                         <CurrentProgress task={task}/>
                     </div>

@@ -204,9 +204,12 @@ const NewTask = ({index, length, id}) => {
                         bigTimePeriod: timePeriod
                     };
 
-                    if (timePeriod2.length > 0) {
-                        repeatRate.smallTimePeriod = timePeriod2;
-                        repeatRate.startingDate = findStartingDates(timePeriod, timePeriod2);
+                    if (timePeriod === "Days" ) {
+                        repeatRate.smallTimePeriod = [];
+                        repeatRate.startingDate = [(new Date()).setUTCHours(0, 0, 0, 0)];
+                    }  else if (timePeriod2.length > 0) {
+                      repeatRate.smallTimePeriod = timePeriod2;
+                      repeatRate.startingDate = findStartingDates(timePeriod, timePeriod2);
                     } else {
                         alertsContext.dispatch({
                             type: "ADD_ALERT",
