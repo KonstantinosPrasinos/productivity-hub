@@ -105,6 +105,15 @@ a {
     &.Align-Center {
         justify-content: center;
     }
+
+    &.Flex-Wrap {
+        flex-wrap: wrap;
+    }
+
+    &.Big-Gap {
+        column-gap: v.$big-gap;
+        row-gap: v.$base-gap;
+    }
 }
 
 .Stack-Container {

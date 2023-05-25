@@ -8,15 +8,12 @@
 
 .inputContainer {
     width: 100%;
-    transition: transform 0.2s;
     box-sizing: border-box;
     height: 2.5em;
     box-shadow: none;
     justify-content: space-between;
 
-    &:hover:not(.disabled) {
-        transform: scale(1.01);
-    }
+    transition: 0.2s box-shadow, 0.2s transform;
 
     cursor: pointer;
 
@@ -25,6 +22,15 @@
         > * {
             opacity: v.$opacity-very-low;
         }
+    }
+
+    &:hover:not(.disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+
+    &:active:not(.disabled) {
+        transform: translateY(1px);
     }
 }
 

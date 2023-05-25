@@ -4,16 +4,12 @@
     background-color: var(--surface-color);
     color: var(--on-surface-color);
     border-radius: v.$base-border-radius;
-    transition: 0.2s background-color, 0.2s color, 0.2s box-shadow, 0.2s opacity;
+    transition: 0.2s background-color, 0.2s color, 0.2s box-shadow, 0.2s opacity, 0.2s transform;
     border: v.$base-border;
 
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
-    }
-
-    &:hover:not(.disabled) {
-        box-shadow: v.$elevation-1;
     }
 
     &.round {
@@ -38,5 +34,14 @@
     &.disabled {
         cursor: not-allowed;
         opacity: v.$opacity-low;
+    }
+
+    &:hover:not(.disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+
+    &:active:not(.disabled) {
+        transform: translateY(1px);
     }
 }

@@ -1,9 +1,8 @@
 import styles from "./Chip.module.scss";
-import {motion} from "framer-motion"
 
 const Chip = ({ children, value, selected, setSelected, type='select', onClick, style = 'squared', size, disabled}) => {
   return (
-    <motion.div
+    <div
       className={`Button ${styles[style]} ${styles.container} ${type === 'select' && value === selected ? styles.filled : ""} ${type === 'icon'} ${styles[size]} ${disabled ? styles.disabled : ''}`}
       onClick={(e) => {
           if (!disabled) {
@@ -17,10 +16,9 @@ const Chip = ({ children, value, selected, setSelected, type='select', onClick, 
               }
           }
       }}
-      whileHover={!disabled ? {y: -1} : null}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 

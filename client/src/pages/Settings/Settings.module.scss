@@ -1,18 +1,35 @@
 @use '@/styles/variables' as v;
 @use '@/styles/mixins' as m;
+@use '@/styles/index';
+
+@media (max-width: v.$tablet-breakpoint) {
+    .container {
+        width: 100%;
+        height: auto;
+        border: none !important;
+        padding-right: 0 !important;
+    }
+}
+
+@media (min-width: v.$tablet-breakpoint) {
+    .container {
+        width: 600px;
+        height: calc(100% - 4em);
+        padding-left: 20px !important;
+        padding-right: 22px !important;
+    }
+}
 
 .container {
-    width: 600px;
-    height: calc(100% - 4em);
-    overflow: hidden;
-    padding: v.$big-gap !important;
-    padding-right: 12px !important;
     position: relative;
+    overflow-y: auto;
+    scroll-padding-right: 10px;
 }
 
 .subContainer {
     overflow-y: auto;
     padding-right: 20px;
+    padding-left: 10px;
 }
 
 .middleContainer {
@@ -38,13 +55,6 @@
     border-right: v.$base-border;
     border-width: 2px;
     padding: 1em;
-}
-
-.contentContainer {
-    width: 100%;
-    padding: 20px;
-    overflow-y: auto;
-    flex-wrap: nowrap !important;
 }
 
 .email {
@@ -87,17 +97,13 @@
     right: 2em;
 }
 
-@media (max-width: v.$tablet-breakpoint) {
-    .container {
-        width: 100%;
-        height: auto;
-        border: none !important;
-        padding-right: 0 !important;
-    }
-}
-
 .subSection {
     border: 1px solid var(--border-primary-color);
     border-radius: v.$base-border-radius;
     padding: 20px;
+}
+
+.description {
+    flex-grow: 1;
+    width: calc(100% - 120px);
 }

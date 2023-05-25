@@ -4,6 +4,7 @@
     border-radius: v.$button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
+    transition: 0.2s box-shadow, 0.2s transform;
     font-size: v.$font-l;
 
     &.square {
@@ -44,6 +45,11 @@
     }
 
     &:hover:not(.disabled) {
+        transform: translateY(-1px);
         box-shadow: v.$elevation-1;
+    }
+
+    &:active:not(.disabled) {
+        transform: translateY(1px);
     }
 }

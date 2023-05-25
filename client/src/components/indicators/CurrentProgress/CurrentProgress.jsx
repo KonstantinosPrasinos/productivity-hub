@@ -266,7 +266,10 @@ const CurrentProgress = ({task}) => {
                                     {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
                                 </motion.div>
                                 <motion.div
-                                    style={(addValue).toString().length > 1 ? {fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"} : ''}
+                                    style={(addValue).toString().length > 1 ?
+                                        {color: entryColor, fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"}
+                                        : {color: entryColor}
+                                    }
                                     key={addValue}
                                     custom={"middle"}
                                     initial={"initial"}
