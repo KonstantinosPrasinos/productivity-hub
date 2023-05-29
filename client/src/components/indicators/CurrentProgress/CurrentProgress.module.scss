@@ -52,6 +52,7 @@ circle {
     z-index: 3;
     background-color: transparent;
     transform-origin: center center;
+    pointer-events: none;
 }
 
 .overlay {
@@ -68,21 +69,44 @@ circle {
     @extend .Stack-Container;
 
     border-radius: 2.2em;
-    flex-shrink: 0;
 
     background-color: var(--primary-color);
     color: var(--on-primary-color);
     box-shadow: v.$elevation-1;
 
-    align-items: center;
+    height: 3em;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    overflow-y: hidden;
-    gap: 0.5em;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
 
-    & > * {
-        overflow-y: hidden;
-        text-align: center;
-        height: 24px;
-        line-height: 24px;
-    }
+    //& > * {
+    //    overflow-y: hidden;
+    //    text-align: center;
+    //    height: 24px;
+    //    line-height: 24px;
+    //}
+}
+
+.overlayContentNotMiddle {
+    display: none;
+    opacity: 0;
+}
+
+.overlayContentChild {
+    flex-shrink: 0;
+    text-align: center;
+    height: 24px;
+    line-height: 24px;
+}
+
+.overlayTopEdge {
+    opacity: 0;
+}
+.overlayBottomEdge {
+    opacity: 0;
 }
