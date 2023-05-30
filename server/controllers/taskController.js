@@ -242,11 +242,11 @@ const getTasksWithHistory = async (tasks, userId) => {
 
                 const {streak, date: streakFrom} = assembleEntryHistory(entriesHistory, editedTask);
 
-                if (!editedTask.repeatStats?.longestStreak?.number || editedTask.repeatStats.longestStreak.number < streak) {
+                if (!editedTask?.longestStreak?.number || editedTask.longestStreak.number < streak) {
                     // If current streak is longer than longest, replace longest with current
                     editedTask = await Task.findOneAndUpdate(
                         {userId: userId, _id: tasksWithCurrentEntry[i]._id},
-                        {"$set": {"mostRecentProperDate": mostRecentDate, "repeatStats.longestStreak.number": streak, "repeatStats.longestStreak.date": streakFrom}},
+                        {"$set": {"mostRecentProperDate": mostRecentDate, "longestStreak.number": streak, "longestStreak.date": streakFrom}},
                         {new: true}
                     )
                 }

@@ -26,12 +26,12 @@ export function useChangeTask() {
 
                 return {
                     tasks: [
-                        ...oldData.tasks.filter(task => task._id !== newTask._id),
-                        {
-                            ...newTask,
-                            currentEntryId: taskBeforeEdit.currentEntryId,
-                            streak: taskBeforeEdit.streak
-                        }
+                            ...oldData.tasks.filter(task => task._id !== newTask._id),
+                            {
+                                ...newTask,
+                                currentEntryId: taskBeforeEdit.currentEntryId,
+                                streak: taskBeforeEdit.streak
+                            }
                         ]
                 }
             })

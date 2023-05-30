@@ -142,7 +142,7 @@ const NewTask = ({index, length, id}) => {
                     setRepeatNumber(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
                     setTimePeriod2(task.repeatRate.smallTimePeriod);
-                    if (task.repeatRate.time) {
+                    if (task.repeatRate.time?.start) {
                         setHasTime(true);
                         setStartHour(task.repeatRate.time.start.substring(0, 2));
                         setStartMinute(task.repeatRate.time.start.substring(2));

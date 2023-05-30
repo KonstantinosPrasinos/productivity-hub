@@ -80,8 +80,8 @@ const StatSection = ({task}) => {
             </div>
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Longest Streak</div>
-                <div>{task.repeatStats.longestStreak.number ?? 0} days</div>
-                <div className={'Label'}>Since: {task.repeatStats.longestStreak.number > 0 ? task.repeatStats.longestStreak.date : "Never"}</div>
+                <div>{task.longestStreak.number ?? 0} days</div>
+                <div className={'Label'}>Since: {task.longestStreak.number > 0 ? task.repeatStats.longestStreak.date : "Never"}</div>
             </div>
             {task.type === "Number" && <>
                 <div className={'Rounded-Container Stack-Container'}>

@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import styles from "./DropDownInput.module.scss";
 import {TbChevronDown} from "react-icons/tb";
+import {createPortal} from "react-dom";
 
 const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
   const [extended, setExtended] = useState(false);
@@ -33,6 +34,23 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
       }
   }
 
+  const [overlayContentTop, setOverlayContentTop] = useState(0);
+  const [overlayContentLeft, setOverlayContentLeft] = useState(0);
+
+  const handleOverlayClick = (e) => {
+      e.stopPropagation();
+      setExtended(false);
+  }
+
+  useEffect(() => {
+      if (extended) {
+          const {top, left} = containerRef.current.getBoundingClientRect();
+
+          setOverlayContentTop(`calc(${top}px + 2.5em)`);
+          setOverlayContentLeft(left)
+      }
+  }, [extended]);
+
   return (
     <div className={`${isDisabled ? styles.disabled : ''} ${styles.container}`} ref={containerRef}>
       <div
@@ -53,30 +71,35 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
             </motion.div>
         </AnimatePresence>
       </div>
-        <div>
+        {createPortal((
             <AnimatePresence>
                 {extended && !isDisabled && (
-                    <motion.div
-                        className={`${
-                            styles.optionsContainer
-                        } Stack-Container Rounded-Container`}
-                        initial={{height: 0, padding: "0 12px"}}
-                        animate={{height: 'auto', padding: '6px 12px'}}
-                        exit={{overflowY: "hidden", height: 0, padding: "0 12px"}}
-                        transition={{duration: 0.15}}
+                    <div
+                        className={styles.optionsOverlay}
+                        onClick={handleOverlayClick}
                     >
-                        {children.map((option, index) => {
-                            return (
-                                <div className={`${styles.option}`} key={index} onClick={handleExtension}>
-                                    {option}
-                                </div>
-                            );
-                        })}
-                    </motion.div>
+                        <motion.div
+                            className={`${
+                                styles.optionsContainer
+                            } Stack-Container Rounded-Container`}
+                            initial={{height: 0, padding: "0 12px"}}
+                            animate={{height: 'auto', padding: '6px 12px'}}
+                            exit={{overflowY: "hidden", height: 0, padding: "0 12px"}}
+                            transition={{duration: 0.15}}
+                            style={{top: overlayContentTop, left: overlayContentLeft}}
+                        >
+                            {children.map((option, index) => {
+                                return (
+                                    <div className={`${styles.option}`} key={index} onClick={handleExtension}>
+                                        {option}
+                                    </div>
+                                );
+                            })}
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
-        </div>
-
+        ), document.getElementById("app") ?? document.getElementById("root"))}
     </div>
   );
 };
