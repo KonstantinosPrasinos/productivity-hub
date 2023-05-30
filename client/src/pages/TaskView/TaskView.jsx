@@ -501,16 +501,16 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleSetCurrentValueCheckbox = () => {
-        setTaskCurrentEntry(task?._id, entry?._id, entry?.value === 0 ? 1 : 0);
+        setTaskCurrentEntry({taskId: task?._id, entryId: entry?._id, value: entry?.value === 0 ? 1 : 0});
     }
 
     const handleSetCurrentValueNumber = (e) => {
         const eventNumber = parseInt(e);
 
         if (isNaN(eventNumber) || eventNumber < 0) {
-            setTaskCurrentEntry(task?._id, entry._id, 0);
+            setTaskCurrentEntry({taskId: task?._id, entryId: entry._id, value: 0});
         } else {
-            setTaskCurrentEntry(task?._id, entry._id, eventNumber);
+            setTaskCurrentEntry({taskId: task?._id, entryId: entry._id, value: eventNumber});
         }
     }
 
