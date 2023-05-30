@@ -12,6 +12,16 @@
     align-items: center;
     background-color: var(--surface-color);
     flex-shrink: 0;
+    transition: transform 0.2s;
+    transform-origin: center center;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
 }
 
 .outlineContainer {
@@ -52,7 +62,6 @@ circle {
     z-index: 3;
     background-color: transparent;
     transform-origin: center center;
-    pointer-events: none;
 }
 
 .overlay {
@@ -83,13 +92,6 @@ circle {
     align-items: center;
     gap: 8px;
     padding: 0;
-
-    //& > * {
-    //    overflow-y: hidden;
-    //    text-align: center;
-    //    height: 24px;
-    //    line-height: 24px;
-    //}
 }
 
 .overlayContentNotMiddle {
@@ -102,11 +104,9 @@ circle {
     text-align: center;
     height: 24px;
     line-height: 24px;
+    cursor: pointer;
 }
 
-.overlayTopEdge {
-    opacity: 0;
-}
-.overlayBottomEdge {
+.overlayTopEdge, .overlayBottomEdge {
     opacity: 0;
 }

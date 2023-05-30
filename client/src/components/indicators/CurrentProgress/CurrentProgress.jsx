@@ -6,6 +6,7 @@ import { TbCheck } from "react-icons/tb";
 import IconButton from "../../buttons/IconButton/IconButton";
 import {useChangeEntryValue} from "../../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
+import {createPortal} from "react-dom";
 
 const CurrentProgress = ({task}) => {
     const getPercentage = () => {
@@ -68,12 +69,18 @@ const CurrentProgress = ({task}) => {
     const contextMenuTimeout = useRef(null);
     const [scope, animate] = useAnimate();
 
-    const handleCheckboxClick = () => {
-        if (!isLoading) {
+    const handleContainerClick = (event) => {
+        event.stopPropagation();
+
+        if (isLoading) return
+
+        if (task.type === "Checkbox") {
             setPrevPercentage(getPercentage());
 
             const number = parseInt(entry.value) === 0 ? 1 : 0
             setTaskCurrentEntry({taskId: task._id, entryId: entry?._id, value: number});
+        } else {
+            handleNumberClick(event);
         }
     }
 
@@ -132,14 +139,14 @@ const CurrentProgress = ({task}) => {
     const overlayContentVariants = {
         initial: {
             height: "35.2px",
-            width: "35.2px",
+            width: "35.2px", // 2.2em
             paddingTop: 0,
             paddingBottom: 0,
             color: entryColor
         },
         animate: {
             height: "88px",
-            width: "41.6px",
+            width: "45.76px", // 2.6em + 10% (for hover transform). I have used px instead, in order to change the fond size when needed
             paddingTop: "10px",
             paddingBottom: "10px",
             color: "var(--on-primary-color)"
@@ -324,9 +331,15 @@ const CurrentProgress = ({task}) => {
 
     useEffect(() => {
         if (overlayIsVisible) {
-            const {top, left} = contentRef.current.getBoundingClientRect()
-            overlayRef.current.style.top = `${top}px`;
-            overlayRef.current.style.left = `${left}px`;
+            const {top, left, width} = contentRef.current.getBoundingClientRect();
+
+            const actualWidth = 2.6 * 16 - 6.4; // for some reason, the width from getBoundingClientRect() is smaller than expected by 6.4 ¯\_(ツ)_/¯
+
+            const leftCoord = left + width / 2 - actualWidth / 2;
+            const topCoord = top + width / 2 - actualWidth / 2;
+
+            overlayRef.current.style.top = `${topCoord}px`; // + 2.08 because its half of the 10% scale from hovering
+            overlayRef.current.style.left = `${leftCoord}px`;
         }
     }, [overlayIsVisible]);
 
@@ -337,7 +350,10 @@ const CurrentProgress = ({task}) => {
     }, [entry?.value])
 
     return (
-        <div className={styles.container}>
+        <div
+            className={styles.container}
+            onClick={handleContainerClick}
+        >
             {(task.type === "Checkbox" || (task.type === "Number" && task.goal?.number)) && <div className={`${styles.outlineContainer}`}>
                 <AnimatePresence initial={true}>
                     <motion.svg
@@ -358,13 +374,15 @@ const CurrentProgress = ({task}) => {
                     </motion.svg>
                 </AnimatePresence>
             </div>}
-            <div className={`${styles.textContainer}`} ref={contentRef}>
+            <div
+                className={`${styles.textContainer}`}
+                ref={contentRef}
+            >
                 {task.type === 'Number' && <button
                     style={{
                         color: entryColor,
                         fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"
                     }}
-                    onClick={handleNumberClick}
                     onContextMenu={handleNumberRightClick}
                     onTouchStart={handleNumberTouchStart}
                     onTouchEnd={handleNumberTouchEnd}
@@ -375,66 +393,65 @@ const CurrentProgress = ({task}) => {
                     <IconButton
                         color={entry?.value > 0 ? 'green' : 'normal'}
                         selected={true}
-                        onClick={handleCheckboxClick}
                     >
                     <TbCheck />
                 </IconButton>}
             </div>
-            <AnimatePresence>
-                {overlayIsVisible &&
-                    <motion.div
-                        className={styles.overlayContainer}
-                        animate={{pointerEvents: "unset"}}
-                        transition={{delay: 0.22}}
-                        onClick={handleOverlayContainerClick}
-                        onWheel={handleOverlayWheel}
-                        onTouchStart={handleOverlayTouchStart}
-                        onTouchEnd={handleOverlayTouchEnd}
-                    >
-                        <div className={styles.overlay} ref={overlayRef} onTouchMove={handleOverlayTouchMove} key={"test"}>
-                            <motion.div
-                                className={styles.overlayContent}
-                                initial={"initial"}
-                                animate={"animate"}
-                                exit={"exit"}
-                                variants={overlayContentVariants}
-                                style={{fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"}}
-                                transition={{type: "tween", duration: 0.2}}
-                                ref={scope}
-                            >
+            {createPortal((
+                <AnimatePresence>
+                    {overlayIsVisible &&
+                        <motion.div
+                            className={styles.overlayContainer}
+                            onClick={handleOverlayContainerClick}
+                            onWheel={handleOverlayWheel}
+                            onTouchStart={handleOverlayTouchStart}
+                            onTouchEnd={handleOverlayTouchEnd}
+                        >
+                            <div className={styles.overlay} ref={overlayRef} onTouchMove={handleOverlayTouchMove} key={"test"}>
                                 <motion.div
-                                    className={`${styles.overlayContentChild} ${styles.overlayTopEdge}`}
+                                    className={styles.overlayContent}
+                                    initial={"initial"}
+                                    animate={"animate"}
+                                    exit={"exit"}
+                                    variants={overlayContentVariants}
+                                    style={{fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"}}
+                                    transition={{type: "tween", duration: 0.2}}
+                                    ref={scope}
                                 >
-                                    {addValue - 2 > 0 ? `+${addValue - 2}` : ""}
+                                    <motion.div
+                                        className={`${styles.overlayContentChild} ${styles.overlayTopEdge}`}
+                                    >
+                                        {addValue - 2 > 0 ? `+${addValue - 2}` : ""}
+                                    </motion.div>
+                                    <motion.div
+                                        className={`${styles.overlayContentChild} overlayContentTop`}
+                                        onClick={handleTopOverlayClick}
+                                    >
+                                        {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
+                                    </motion.div>
+                                    <motion.div
+                                        className={styles.overlayContentChild}
+                                        onClick={handleMiddleOverlayClick}
+                                    >
+                                        +{addValue}
+                                    </motion.div>
+                                    <motion.div
+                                        className={`${styles.overlayContentChild} overlayContentBottom`}
+                                        onClick={handleBottomOverlayClick}
+                                    >
+                                        {addValue + 1 < 999 ? `+${addValue + 1}` : ""}
+                                    </motion.div>
+                                    <motion.div
+                                        className={`${styles.overlayContentChild} ${styles.overlayBottomEdge}`}
+                                    >
+                                        {addValue + 2 < 998 ? `+${addValue + 2}` : ""}
+                                    </motion.div>
                                 </motion.div>
-                                <motion.div
-                                    className={`${styles.overlayContentChild} overlayContentTop`}
-                                    onClick={handleTopOverlayClick}
-                                >
-                                    {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
-                                </motion.div>
-                                <motion.div
-                                    className={styles.overlayContentChild}
-                                    onClick={handleMiddleOverlayClick}
-                                >
-                                    +{addValue}
-                                </motion.div>
-                                <motion.div
-                                    className={`${styles.overlayContentChild} overlayContentBottom`}
-                                    onClick={handleBottomOverlayClick}
-                                >
-                                    {addValue + 1 < 999 ? `+${addValue + 1}` : ""}
-                                </motion.div>
-                                <motion.div
-                                    className={`${styles.overlayContentChild} ${styles.overlayBottomEdge}`}
-                                >
-                                    {addValue + 2 < 998 ? `+${addValue + 2}` : ""}
-                                </motion.div>
-                            </motion.div>
-                        </div>
-                    </motion.div>
-                }
-            </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    }
+                </AnimatePresence>
+            ), document.getElementById("app") ?? document.getElementById("root"))}
         </div>
     );
 };
