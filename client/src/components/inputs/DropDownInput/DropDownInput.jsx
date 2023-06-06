@@ -7,6 +7,8 @@ import {createPortal} from "react-dom";
 
 const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
   const [extended, setExtended] = useState(false);
+  const [overlayContentTop, setOverlayContentTop] = useState(0);
+  const [overlayContentLeft, setOverlayContentLeft] = useState(0);
   const containerRef = useRef();
   const iconRef = useRef();
   const hasEventListener = useRef(false);
@@ -33,9 +35,6 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
           }
       }
   }
-
-  const [overlayContentTop, setOverlayContentTop] = useState(0);
-  const [overlayContentLeft, setOverlayContentLeft] = useState(0);
 
   const handleOverlayClick = (e) => {
       e.stopPropagation();

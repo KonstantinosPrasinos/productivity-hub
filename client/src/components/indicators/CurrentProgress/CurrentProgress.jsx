@@ -1,4 +1,4 @@
-import {AnimatePresence, motion, useAnimate} from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import {useEffect, useMemo, useRef, useState} from "react";
 
 import styles from "./CurrentProgress.module.scss";
@@ -7,6 +7,7 @@ import IconButton from "../../buttons/IconButton/IconButton";
 import {useChangeEntryValue} from "../../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
 import {createPortal} from "react-dom";
+import {useStepAnimations} from "@/hooks/useStepAnimations";
 
 const CurrentProgress = ({task}) => {
     const getPercentage = () => {
@@ -62,12 +63,10 @@ const CurrentProgress = ({task}) => {
     const overlayRef = useRef();
     const animationDirection = useRef(0);
     const overlayMouseDown = useRef(false);
-    const valueUpdates = useRef(0);
-    const shouldUpdate = useRef(false);
-    const theoreticalAddValue = useRef(addValue); // useState set state was too slow for animation orchestrations. It made it possible to go to addValue 0. Added this for state value checks
     const previousTouchY = useRef(null);
     const contextMenuTimeout = useRef(null);
-    const [scope, animate] = useAnimate();
+
+    const {scope, addUpdate, subtractUpdate} = useStepAnimations(24, addValue, setAddValue, styles.overlayContentTop, styles.overlayTopEdge, styles.overlayContentBottom, styles.overlayBottomEdge, styles.overlayContentChild, 1, 999);
 
     const handleContainerClick = (event) => {
         event.stopPropagation();
@@ -167,86 +166,14 @@ const CurrentProgress = ({task}) => {
         overlayMouseDown.current = false;
         setOverlayIsVisible(false);
     }
-    
-    const doOverlayAnimations = () => { // direction is -1 for down and 1 for up
-        let direction = valueUpdates.current > 0 ? -1 : 1;
-        const handleTransitionEnd = () => {
-            if (shouldUpdate.current) {
-                shouldUpdate.current = false;
-                setAddValue(current => current - direction);
-                animate(`.${styles.overlayContentChild}`, {y: `0em`}, {duration: 0});
-                theoreticalAddValue.current -= direction
-                valueUpdates.current += direction;
-
-                if (direction < 0) {
-                    animate(`.${styles.overlayBottomEdge}`, {opacity: 0, scale: 0}, {duration: 0.01});
-                    animate(".overlayContentTop", {opacity: 1, scale: 1}, {duration: 0.01})
-                } else {
-                    animate(`.${styles.overlayTopEdge}`, {opacity: 0, scale: 0}, {duration: 0.01});
-                    animate(".overlayContentBottom", {opacity: 1, scale: 1}, {duration: 0.01})
-                }
-
-                if (valueUpdates.current !== 0) {
-                    if (theoreticalAddValue.current + valueUpdates.current > 0 && theoreticalAddValue.current + valueUpdates.current < 999) {
-                        doOverlayAnimations(direction);
-                    } else {
-                        valueUpdates.current = 0;
-                    }
-                }
-            }
-        }
-
-        if (theoreticalAddValue.current + valueUpdates.current > 0 && theoreticalAddValue.current + valueUpdates.current < 999) {
-            if (direction < 0) {
-                animate(`.${styles.overlayBottomEdge}`, {opacity: 1, scale: 1}, {duration: 0.1});
-                animate(".overlayContentTop", {opacity: 0, scale: 0}, {duration: 0.1})
-            } else {
-                animate(`.${styles.overlayTopEdge}`, {opacity: 1, scale: 1}, {duration: 0.1});
-                animate(".overlayContentBottom", {opacity: 0, scale: 0}, {duration: 0.1})
-            }
-            shouldUpdate.current = true;
-            animate(`.${styles.overlayContentChild}`, {y: `${direction * 24}px`}, {
-                duration: 0.1,
-                onComplete: handleTransitionEnd,
-                from: 0,
-                type: "tween"
-            });
-        } else {
-            valueUpdates.current = 0;
-        }
-    }
 
     const handleOverlayWheel = (e) => {
         if (e.deltaY < 0) {
             // Go down
-            if (theoreticalAddValue.current + valueUpdates.current > 1) {
-                if (valueUpdates.current <= 0) {
-                    valueUpdates.current -= 1;
-
-                    if (valueUpdates.current >= -1) {
-                        doOverlayAnimations(1);
-                    }
-                }
-                // else {
-                //     valueUpdates.current = -1;
-                //     doOverlayAnimations(1);
-                // }
-            }
+            subtractUpdate();
         } else if (e.deltaY > 0) {
             // Go up
-            if (theoreticalAddValue.current + valueUpdates.current < 998) {
-                if (valueUpdates.current >= 0) {
-                    valueUpdates.current += 1;
-
-                    if (valueUpdates.current <= 1) {
-                        doOverlayAnimations(-1);
-                    }
-                }
-                // else {
-                //     valueUpdates.current = 1;
-                //     doOverlayAnimations(-1);
-                // }
-            }
+            addUpdate();
         }
     }
 
@@ -285,34 +212,10 @@ const CurrentProgress = ({task}) => {
         if (previousTouchY.current !== null) {
             if (previousTouchY.current + 34 < e.touches[0].pageY) {
                 // Go down
-                if (theoreticalAddValue.current + valueUpdates.current > 1) {
-                    if (valueUpdates.current <= 0) {
-                        valueUpdates.current -= 1;
-
-                        if (valueUpdates.current >= -1) {
-                            doOverlayAnimations(1);
-                        }
-                    }
-                    // else {
-                    //     valueUpdates.current = -1;
-                    //     doOverlayAnimations(1);
-                    // }
-                }
+                subtractUpdate();
             } else if (previousTouchY.current - 34 > e.touches[0].pageY) {
                 // Go up
-                if (theoreticalAddValue.current + valueUpdates.current < 998) {
-                    if (valueUpdates.current >= 0) {
-                        valueUpdates.current += 1;
-
-                        if (valueUpdates.current <= 1) {
-                            doOverlayAnimations(-1);
-                        }
-                    }
-                    // else {
-                    //     valueUpdates.current = 1;
-                    //     doOverlayAnimations(-1);
-                    // }
-                }
+                addUpdate();
             }
         }
 
@@ -407,7 +310,7 @@ const CurrentProgress = ({task}) => {
                             onTouchStart={handleOverlayTouchStart}
                             onTouchEnd={handleOverlayTouchEnd}
                         >
-                            <div className={styles.overlay} ref={overlayRef} onTouchMove={handleOverlayTouchMove} key={"test"}>
+                            <div className={styles.overlay} ref={overlayRef} onTouchMove={handleOverlayTouchMove}>
                                 <motion.div
                                     className={styles.overlayContent}
                                     initial={"initial"}
@@ -424,7 +327,7 @@ const CurrentProgress = ({task}) => {
                                         {addValue - 2 > 0 ? `+${addValue - 2}` : ""}
                                     </motion.div>
                                     <motion.div
-                                        className={`${styles.overlayContentChild} overlayContentTop`}
+                                        className={`${styles.overlayContentChild} ${styles.overlayContentTop}`}
                                         onClick={handleTopOverlayClick}
                                     >
                                         {addValue - 1 > 0 ? `+${addValue - 1}` : ""}
@@ -436,7 +339,7 @@ const CurrentProgress = ({task}) => {
                                         +{addValue}
                                     </motion.div>
                                     <motion.div
-                                        className={`${styles.overlayContentChild} overlayContentBottom`}
+                                        className={`${styles.overlayContentChild} ${styles.overlayContentBottom}`}
                                         onClick={handleBottomOverlayClick}
                                     >
                                         {addValue + 1 < 999 ? `+${addValue + 1}` : ""}

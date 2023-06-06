@@ -2,26 +2,48 @@
 
 .container {
   font-size: v.$font-xl;
-  line-height: 28px;
+  //line-height: 28px;
   width: min-content;
   position: relative;
-  padding: 6px 4px;
+  padding: 6px 12px;
   justify-content: center;
-  box-sizing: border-box;
+  height: 2em;
+  flex-shrink: 0;
+
+  text-align: center;
+  display: grid;
+  grid-template-columns: 2em 1em 2em auto;
+  gap: 0 0;
+  grid-template-areas: ". . .";
+  align-items: center;
+  box-sizing: content-box;
 
   .disabled {
     opacity: v.$opacity-low;
   }
 }
 
-.currentContainer {
-  text-align: center;
-  display: grid;
-  grid-template-columns: 2em 1em 2em;
-  grid-template-rows: 1fr;
-  gap: 0px 0px;
-  grid-template-areas: ". . .";
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  background-color: transparent;
+  transform-origin: center center;
+}
+
+.overlayContentContainer {
+  position: absolute;
+  font-size: v.$font-xl;
+  height: 2em;
+  display: flex;
+  justify-content: center;
   align-items: center;
+  overflow: visible;
+  padding-top: 6px;
+  border-top: 1px solid transparent;
 }
 
 .currentNumber {
@@ -29,4 +51,45 @@
   font-size: inherit;
   text-align: center;
   overscroll-behavior-y: contain;
+  padding: 0;
+}
+
+.overlayCurrentContainer {
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid;
+  text-align: center;
+  grid-template-columns: 2em 1em 2em auto;
+  gap: 0 0;
+  height: 1.5em;
+  line-height: 1.5em;
+  grid-template-areas: ". . .";
+  align-items: center;
+
+  box-shadow: v.$elevation-1;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.4em;
+    height: 1.5em;
+
+    & > div:not(.separator), input {
+      flex-shrink: 0;
+      height: 1.5em;
+    }
+  }
+}
+
+.separator {
+  border-top: v.$base-border;
+}
+
+.overlayHour, .overlayHourTop, .overlayHourBottom, .overlayMinute, .overlayMinuteTop, .overlayMinuteBottom {
+  opacity: 1;
+}
+
+.overlayHourTopEdge, .overlayHourBottomEdge, .overlayMinuteTopEdge, .overlayMinuteBottomEdge {
+  opacity: 0;
 }

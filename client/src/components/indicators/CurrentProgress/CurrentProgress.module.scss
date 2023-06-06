@@ -78,6 +78,7 @@ circle {
     @extend .Stack-Container;
 
     border-radius: 2.2em;
+    transition: box-shadow 0.2s;
 
     background-color: var(--primary-color);
     color: var(--on-primary-color);
@@ -109,4 +110,9 @@ circle {
 
 .overlayTopEdge, .overlayBottomEdge {
     opacity: 0;
+}
+
+.overlayContentTop, .overlayContentBottom {
+    // We added this in order for the scss class to not be undefined, because it's used for animations
+    opacity: 1;
 }

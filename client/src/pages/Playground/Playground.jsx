@@ -34,8 +34,8 @@ const Playground = () => {
   const [textValue, setTextValue] = useState("");
   const [numberValue, setNumberValue] = useState(0);
   const [calendarValue, setCalendarValue] = useState("");
-  const [hourValue, setHourValue] = useState("20");
-  const [minuteValue, setMinuteValue] = useState('20')
+  const [hourValue, setHourValue] = useState(20);
+  const [minuteValue, setMinuteValue] = useState(20)
 
   const testingTask = {
       type: 'Number',
