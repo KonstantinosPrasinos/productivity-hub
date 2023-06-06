@@ -107,6 +107,49 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
         }
     }
 
+    const previousTouchYHour = useRef(null);
+    const previousTouchYMinute = useRef(null);
+
+    const handleOverlayHourTouchEnd = () => {
+        previousTouchYHour.current = null;
+    }
+
+    const handleOverlayHourTouchMove = (e) => {
+        if (previousTouchYHour.current !== null) {
+            if (previousTouchYHour.current + 34 < e.touches[0].pageY) {
+                // Go down
+                subtractUpdateHour()
+            } else if (previousTouchYHour.current - 34 > e.touches[0].pageY) {
+                // Go up
+                addUpdateHour()
+            }
+        }
+
+        if (previousTouchYHour.current + 34 < e.touches[0].pageY || previousTouchYHour.current - 34 > e.touches[0].pageY) {
+            previousTouchYHour.current = e.touches[0].pageY;
+        }
+    }
+
+    const handleOverlayMinuteTouchEnd = () => {
+        previousTouchYMinute.current = null;
+    }
+
+    const handleOverlayMinuteTouchMove = (e) => {
+        if (previousTouchYMinute.current !== null) {
+            if (previousTouchYMinute.current + 34 < e.touches[0].pageY) {
+                // Go down
+                subtractUpdateMinute()
+            } else if (previousTouchYMinute.current - 34 > e.touches[0].pageY) {
+                // Go up
+                addUpdateMinute()
+            }
+        }
+
+        if (previousTouchYMinute.current + 34 < e.touches[0].pageY || previousTouchYMinute.current - 34 > e.touches[0].pageY) {
+            previousTouchYMinute.current = e.touches[0].pageY;
+        }
+    }
+
     const handleOverlayContainerClick = (e) => {
         e.stopPropagation();
     }
@@ -164,7 +207,12 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
                                 animate={{height: "6em"}}
                                 exit={{height: "2em"}}
                             >
-                                <div onWheel={handleOverlayHourWheel} ref={scopeHour}>
+                                <div
+                                    onWheel={handleOverlayHourWheel}
+                                    onTouchEnd={handleOverlayHourTouchEnd}
+                                    onTouchMove={handleOverlayHourTouchMove}
+                                    ref={scopeHour}
+                                >
                                     <div className={`${styles.overlayHour} ${styles.overlayHourTopEdge}`}>{parseInt(hour) - 2 > -1 ? makeTwoDigits(hour - 2) : ""}</div>
                                     <div className={styles.separator} />
                                     <div className={`${styles.overlayHour} ${styles.overlayHourTop}`}>{parseInt(hour) - 1 > -1 ? makeTwoDigits(hour - 1) : ""}</div>
@@ -194,7 +242,12 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
                                     <div className={`${styles.overlayHour} ${styles.overlayHourBottomEdge}`}>{parseInt(hour) + 2 < 23 ? makeTwoDigits(hour + 2) : ""}</div>
                                 </div>
                                 :
-                                <div onWheel={handleOverlayMinuteWheel} ref={scopeMinute}>
+                                <div
+                                    onWheel={handleOverlayMinuteWheel}
+                                    onTouchEnd={handleOverlayMinuteTouchEnd}
+                                    onTouchMove={handleOverlayMinuteTouchMove}
+                                    ref={scopeMinute}
+                                >
                                     <div className={`${styles.overlayMinute} ${styles.overlayMinuteTopEdge}`}>{parseInt(minute) - 2 > -1 ? makeTwoDigits(minute - 2) : ""}</div>
                                     <div className={styles.separator} />
                                     <div className={`${styles.overlayMinute} ${styles.overlayMinuteTop}`}>{parseInt(minute) - 1 > -1 ? makeTwoDigits(minute - 1) : ""}</div>

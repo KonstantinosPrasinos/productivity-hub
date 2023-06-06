@@ -108,7 +108,6 @@ const TextBoxInput = ({
 
     const decrement = () => {
         checkIfNull();
-        console.log(parseInt(value) - 1, minNumber);
         if (minNumber === null || parseInt(value) - 1 >= minNumber) {
             setValue(parseInt(value) - 1);
         }
