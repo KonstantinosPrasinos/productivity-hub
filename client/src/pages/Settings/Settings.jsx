@@ -19,6 +19,20 @@ import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
 import Divider from "@/components/utilities/Divider/Divider";
 
 const Settings = () => {
+    const deleteTimeGroupActions = [
+        {display: "Keep repeat", actual: 'Keep their repeat details'},
+        {display: "Remove repeat", actual: 'Remove their repeat details'},
+        {display: "Delete them", actual: 'Delete them'}
+    ]
+
+    const getDeleteActionDefault = () => {
+        for (const action of deleteTimeGroupActions) {
+            if (action.actual === settings.defaults.deleteGroupAction) return action;
+        }
+
+        return deleteTimeGroupActions[0];
+    }
+
     const {data: settings} = useGetSettings();
     const {email, googleLinked} = useContext(UserContext).state;
     const {mutateAsync: setSettings, isError: isErrorSetSettings} = useChangeSettings();
@@ -27,7 +41,7 @@ const Settings = () => {
 
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
     const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
-    const [deleteAction, setDeleteAction] = useState(settings.defaults.deleteGroupAction);
+    const [deleteAction, setDeleteAction] = useState(getDeleteActionDefault());
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
@@ -42,15 +56,18 @@ const Settings = () => {
     const navigate = useNavigate();
 
     const themeChips = ['Device', 'Light', 'Dark']; // Add black
-    const deleteTimeGroupActions = [
-        {display: "Keep repeat", actual: 'Keep their repeat details'},
-        {display: "Remove repeat", actual: 'Remove their repeat details'},
-        {display: "Delete them", actual: 'Delete them'}
-    ]
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
-            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority, deleteGroupAction: deleteAction.actual}});
+            let tempDeleteAction;
+
+            if (typeof deleteAction === "string") {
+                tempDeleteAction = deleteAction
+            } else {
+                tempDeleteAction = deleteAction.actual
+            }
+
+            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority, deleteGroupAction: tempDeleteAction}});
             setSettingsChanges({});
         }
     }
