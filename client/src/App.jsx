@@ -21,17 +21,35 @@ import {updateUserValidDate} from "./functions/updateUserValidDate";
 import 'react-day-picker/dist/style.css';
 import UndoContextProvider from "./context/UndoContext";
 import UndoHandler from "./components/handlers/UndoHandler/UndoHandler";
+import {useGetTasks} from "@/hooks/get-hooks/useGetTasks";
+import {useGetGroups} from "@/hooks/get-hooks/useGetGroups";
+import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
+import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
 
-const NavLayout = () => (
-    <UndoContextProvider>
-        <NavBar/>
-        <MiniPagesHandler />
-        <UndoHandler />
-        <div className="Content-Container">
-            <Outlet />
-        </div>
-    </UndoContextProvider>
-)
+const NavLayout = () => {
+    const {isLoading: settingsLoading} = useGetSettings();
+    const {isLoading: tasksLoading} = useGetTasks();
+    const {isLoading: categoriesLoading} = useGetCategories();
+    const {isLoading: groupsLoading} = useGetGroups()
+
+    if (settingsLoading || tasksLoading || categoriesLoading || groupsLoading){
+        return (
+            <LoadingScreen />
+        )
+    }
+
+
+    return (
+        <UndoContextProvider>
+            <NavBar/>
+            <MiniPagesHandler/>
+            <UndoHandler/>
+            <div className="Content-Container">
+                <Outlet/>
+            </div>
+        </UndoContextProvider>
+    )
+}
 const ProtectedLayout = () => {
     const userExists = useContext(UserContext).state?.id;
     const location = useLocation();

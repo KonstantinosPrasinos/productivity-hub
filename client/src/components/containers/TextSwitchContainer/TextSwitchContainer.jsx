@@ -5,13 +5,13 @@ import styles from "./TextSwitchContainer.module.scss";
 const TextSwitchContainer = ({children}) => {
     return (
         <div className={styles.container}>
-            <AnimatePresence mode={"wait"}>
+            <AnimatePresence mode={"wait"} initial={false}>
                 <motion.div
                     key={children}
 
-                    initial={{y: "-1em"}}
+                    initial={{y: "-1.5em"}}
                     animate={{y: 0}}
-                    exit={{y: "1em"}}
+                    exit={{y: "1.5em"}}
                 >
                     {children}
                 </motion.div>

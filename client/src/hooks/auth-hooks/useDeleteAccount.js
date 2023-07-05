@@ -4,7 +4,7 @@ import {AlertsContext} from "../../context/AlertsContext";
 import {UserContext} from "../../context/UserContext";
 
 const postDeleteAccount = async (password) => {
-    const response = await fetch('http://localhost:5000/api/user/delete', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/delete`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({password}),

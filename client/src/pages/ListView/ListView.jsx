@@ -4,11 +4,9 @@ import {AnimatePresence, motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import SwitchContainer from "../../components/containers/SwitchContainer/SwitchContainer";
 import Chip from "../../components/buttons/Chip/Chip";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
-import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
 import {useScreenSize} from "../../hooks/useScreenSize";
 import {TbPlus} from "react-icons/tb";
 
@@ -37,10 +35,6 @@ const ListView = () => {
     return (
         <motion.div
             className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
-            initial={{opacity: 0}}
-            animate={{opacity: 1}}
-            exit={{opacity: 0}}
-            transition={{duration: 0.1}}
         >
             {screenSize === 'small' &&
                 <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
@@ -48,33 +42,30 @@ const ListView = () => {
                 </div>
             }
             <div className={`Stack-Container ${styles.leftSide}`}>
+                {!tasksLoading && tasks.length === 0 &&
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.3 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+                        className={`Empty-Indicator-Container`}
+                    >
+                        No tasks for now
+                    </motion.div>
+                }
                 <AnimatePresence>
-                    {tasksLoading && <LoadingIndicator />}
-                    {!tasksLoading && tasks.length > 0 && tasks.map((task) => !task.hasOwnProperty('tasks') ? (
-                        <Task key={task._id} tasks={[task]}></Task>) : (
-                        <Task key={task.tasks[0]._id} tasks={task.tasks}></Task>
-                    ))}
-                    {tasks.length === 0 &&
-                        <motion.div
-                            initial={{ opacity: 0, y: 50, scale: 0.3 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
-                            transition={{duration: 0.4, type: "spring"}}
-                            layout
-                            className={`Empty-Indicator-Container`}
-                        >
-                            No tasks
-                        </motion.div>
-                    }
+                    {!tasksLoading && tasks.length > 0 && tasks.map((task) => !task.hasOwnProperty('tasks') ?
+                        (<Task key={task._id} tasks={[task]}></Task>) :
+                        (<Task key={task.tasks[0]._id} tasks={task.tasks}></Task>)
+                    )}
                 </AnimatePresence>
             </div>
             {screenSize !== 'small' && <div className={`Stack-Container ${styles.rightSide}`}>
                 <motion.button
                     className={`Empty-Indicator-Container Clickable`}
                     onClick={handleNewCategoryClick}
-                    initial={{opacity: 0, y: 50, scale: 0.3}}
-                    animate={{opacity: 1, y: 0, scale: 1}}
-                    exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
+                    initial={{ opacity: 0, scale: 0.3}}
+                    animate={{ opacity: 1, scale: 1}}
+                    exit={{ opacity: 0, scale: 0.3}}
                     transition={{duration: 0.4, type: "spring"}}
                     layout
                 >
@@ -91,9 +82,9 @@ const ListView = () => {
                                 className={`Rounded-Container Has-Shadow Stack-Container ${styles.categoryContainer}`}
                                 key={category._id}
                                 onClick={() => handleCategoryClick(category._id)}
-                                initial={{opacity: 0, y: 50, scale: 0.3}}
-                                animate={{opacity: 1, y: 0, scale: 1}}
-                                exit={{opacity: 0, scale: 0.5, transition: {duration: 0.2}}}
+                                initial={{ opacity: 0, scale: 0.3}}
+                                animate={{ opacity: 1, scale: 1}}
+                                exit={{ opacity: 0, scale: 0.3}}
                                 transition={{duration: 0.4, type: "spring"}}
                                 layout
                             >

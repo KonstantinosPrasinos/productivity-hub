@@ -311,7 +311,7 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>General options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`}>
                                 <div>
                                     Type: <TextSwitchContainer>{type}</TextSwitchContainer>
                                 </div>
@@ -393,7 +393,7 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Number type options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`}>
                                 <div>
                                     Goal type: <TextSwitchContainer>{hasGoal ? goalLimit : "None"}</TextSwitchContainer>
                                 </div>
@@ -457,7 +457,7 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Repeat options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`}>
                                 <div>
                                     Repeats: <TextSwitchContainer>{capitalizeFirstCharacter(repeats.toString())}</TextSwitchContainer>
                                 </div>
@@ -522,7 +522,7 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Custom rules for repeat</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`}>
                                 <div>
                                     Number: <TextSwitchContainer>{repeatNumber}</TextSwitchContainer>
                                 </div>
@@ -610,7 +610,7 @@ const NewTask = ({index, length, id}) => {
                     <div className={"Horizontal-Flex-Container Space-Between"}>
                         <div className={styles.headerLeftSide}>
                             <div className={"Title-Medium"}>Long term goal options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
+                            <motion.div className={`Label-Small ${styles.titleMedium}`}>
                                 <div>
                                     Has goal: <TextSwitchContainer>{capitalizeFirstCharacter(hasLongGoal.toString())}</TextSwitchContainer>
                                 </div>

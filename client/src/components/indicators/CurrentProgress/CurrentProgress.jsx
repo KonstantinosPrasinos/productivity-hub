@@ -104,11 +104,13 @@ const CurrentProgress = ({task}) => {
     }
 
     const handleNumberTouchEnd = (e) => {
-        e.preventDefault();
         e.stopPropagation();
+
         if (contextMenuTimeout.current !== null) {
             clearTimeout(contextMenuTimeout.current);
             contextMenuTimeout.current = null;
+        } else {
+            e.preventDefault();
         }
     }
 

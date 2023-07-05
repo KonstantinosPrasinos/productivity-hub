@@ -6,7 +6,7 @@ export function useUnlinkGoogle() {
     const {makeFetch} = useMakeFetch(setIsLoading);
 
     const unlinkGoogle = async (password) => {
-        return await makeFetch('http://localhost:5000/api/user/google/unlink', {password})
+        return await makeFetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/google/unlink`, {password})
     }
 
     return {unlinkGoogle, isLoading};

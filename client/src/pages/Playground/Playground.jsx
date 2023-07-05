@@ -138,7 +138,7 @@ const Playground = () => {
         <InputWrapper label={"Normal Button Styles"}>
             <div className={styles.alignTopContainer}>
                 <InputWrapper label={"Default (size: medium, filled: true, type: round)"}>
-                    <Button>Button</Button>
+                    <Button onClick={() => console.log("clicked")}>Button</Button>
                 </InputWrapper>
                 <InputWrapper label={"Size Small"}>
                     <Button size={"small"}>Button</Button>

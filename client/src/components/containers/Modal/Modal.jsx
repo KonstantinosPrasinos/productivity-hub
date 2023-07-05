@@ -1,13 +1,17 @@
 import React from 'react';
 import styles from './Modal.module.scss';
-import {AnimatePresence, motion} from "framer-motion";
-import LoadingIndicator from "../../indicators/LoadingIndicator/LoadingIndicator";
+import {motion} from "framer-motion";
 import {createPortal} from "react-dom";
+import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
 
 const Modal = ({children, isLoading, isOverlay = false, dismountFunction = () => {}}) => {
     const handleContainerClick = (e) => {
         if (isOverlay && e.currentTarget === e.target) dismountFunction();
     }
+
+    if (isLoading) return (
+        <LoadingScreen />
+    )
 
     return createPortal((
         <motion.div
@@ -18,17 +22,6 @@ const Modal = ({children, isLoading, isOverlay = false, dismountFunction = () =>
             transition={{duration: 0.1}}
         >
             <motion.div className={styles.surface} layout>
-                <AnimatePresence>
-                    {isLoading && <motion.div
-                        className={styles.loadingContainer}
-                        initial={{opacity: 0}}
-                        animate={{opacity: 1}}
-                        exit={{opacity: 0}}
-                        transition={{duration: 0.2}}
-                    >
-                        <LoadingIndicator size={'full'} />
-                    </motion.div>}
-                </AnimatePresence>
                 {children}
             </motion.div>
         </motion.div>

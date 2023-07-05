@@ -7,11 +7,15 @@
   gap: 3em;
   justify-content: center;
   width: 100%;
+  overflow-x: visible;
 }
 
 .leftSide {
-  width: min-content;
   align-items: center;
+  width: 22.15em;
+  max-width: 100%;
+  overflow-x: visible;
+  padding: 0 10px;
 }
 
 .rightSide {
@@ -20,7 +24,6 @@
 
 @media (max-width: v.$tablet-breakpoint) {
   .leftSide {
-    width: 100%;
     padding-top: 1em;
   }
 }

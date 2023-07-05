@@ -4,7 +4,7 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import {useHandleDeleteGroups} from "@/hooks/delete-hooks/useHandleDeleteGroups";
 
 const postDeleteGroup = async (data) => {
-    const response = await fetch('http://localhost:5000/api/group/delete', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/group/delete`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'},

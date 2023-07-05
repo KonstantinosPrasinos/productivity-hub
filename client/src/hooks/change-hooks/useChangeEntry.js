@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 
 const postChangeEntry = async (data) => {
-    const response = await fetch('http://localhost:5000/api/entry/set', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/set`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data),

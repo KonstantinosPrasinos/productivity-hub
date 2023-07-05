@@ -30,12 +30,12 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
     const makeFullHeight = () => {
         animationControls.set({height: containerRef.current.offsetHeight});
-        animationControls.start({height: `calc(100% - 4em - 32px)`});
+        animationControls.start({height: `calc(100% - 4em - 12px)`});
     }
 
     const makeHalfHeight = () => {
         animationControls.set({height: containerRef.current.offsetHeight});
-        animationControls.start({height: `calc(50% - 4em - 32px)`});
+        animationControls.start({height: `calc(50% - 4em - 12px)`});
     }
 
     const handleEnd = (e) => {

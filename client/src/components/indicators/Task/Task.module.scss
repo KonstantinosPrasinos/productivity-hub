@@ -7,10 +7,12 @@
 
   display: inline-flex;
   position: relative;
-  width: 22.15em;
+  width: 100%;
   padding: v.$symmetrical-padding;
   gap: 6px;
   cursor: pointer;
+  box-sizing: border-box;
+  opacity: 0;
 }
 
 .topLine {

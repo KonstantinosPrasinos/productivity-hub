@@ -4,7 +4,7 @@ import {debounce} from "lodash";
 import {AlertsContext} from "../../context/AlertsContext";
 
 const postChangeEntryValue = async (data) => {
-    const response = await fetch('http://localhost:5000/api/entry/set-value', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/set-value`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'},

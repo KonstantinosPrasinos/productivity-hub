@@ -2,7 +2,7 @@ import {useMutation, useQueryClient} from "react-query";
 import {useHandleDeleteGroups} from "@/hooks/delete-hooks/useHandleDeleteGroups";
 
 const postChangeCategory = async (data) => {
-    const response = await fetch('http://localhost:5000/api/category/set', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/set`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data),

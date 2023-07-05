@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 
 const postDeleteCategory = async (data) => {
-    const response = await fetch('http://localhost:5000/api/category/delete', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/delete`, {
         method: 'POST',
         body: JSON.stringify({categoryId: data.categoryId, deleteTasks: data.deleteTasks}),
         headers: {'Content-Type': 'application/json'},

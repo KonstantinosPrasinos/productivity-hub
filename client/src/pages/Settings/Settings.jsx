@@ -16,6 +16,7 @@ import Modal from "../../components/containers/Modal/Modal";
 import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin, TbBrandGoogle} from "react-icons/tb";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
+import Divider from "@/components/utilities/Divider/Divider";
 
 const Settings = () => {
     const {data: settings} = useGetSettings();
@@ -202,8 +203,8 @@ const Settings = () => {
             exit={{opacity: 0}}
             transition={{duration: 0.2}}
         >
-            <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
-                <section className={'Stack-Container Big-Gap'}>
+            <div className={`Stack-Container To-Edge ${styles.subContainer} Huge-Gap`}>
+                <section className={`Stack-Container Big-Gap ${styles.firstSection}`}>
                     <div className={`Headline-Large`}>Profile</div>
                     <div className={'Stack-Container Big-Gap'}>
                         <div className={'Stack-Container'}>
@@ -267,6 +268,7 @@ const Settings = () => {
                         </section>
                     </div>
                 </section>
+                <Divider />
                 <section className={'Stack-Container Big-Gap'}>
                     <div className={`Headline-Large`}>General</div>
                     <div className={'Stack-Container Big-Gap'}>
@@ -330,6 +332,7 @@ const Settings = () => {
                         </section>
                     </div>
                 </section>
+                <Divider />
                 <section className={'Stack-Container Big-Gap'}>
                     <div className={`Headline-Large`}>About</div>
                     <div className={'Title-Small'}>App Version<div className={'Body-Small Opacity-Very-Low'}>1.0</div></div>
@@ -355,7 +358,6 @@ const Settings = () => {
                         </div>
                     </div>
                 </section>
-
                 {/* Modal for password confirmation in order to delete account*/}
                 {deleteModalVisible && <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
                     <div className={'Stack-Container Big-Gap'} >

@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 
 const postChangeGroup = async (data) => {
-    const response = await fetch('http://localhost:5000/api/group/set', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}api/group/set`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({groups: data}),

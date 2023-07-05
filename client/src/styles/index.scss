@@ -130,6 +130,10 @@ a {
         gap: 0;
     }
 
+    &.Huge-Gap {
+        gap: v.$huge-gap;
+    }
+
     &.Centered {
         align-items: center;
     }
@@ -443,10 +447,6 @@ button {
         &.To-Edge {
             border-radius: 0;
         }
-    }
-
-    ::-webkit-scrollbar {
-        width: 2px;
     }
 }
 

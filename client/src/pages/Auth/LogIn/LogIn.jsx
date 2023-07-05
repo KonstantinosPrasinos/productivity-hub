@@ -143,8 +143,8 @@ const LogIn = () => {
                         />
                     </CollapsibleContainer>
                     <div className={`Horizontal-Flex-Container Space-Between ${styles.buttonContainer}`}>
-                        <Button filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
-                        <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
+                        <Button size={"small"} filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
+                        <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
                     <div>or</div>

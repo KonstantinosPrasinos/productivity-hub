@@ -3,11 +3,11 @@
 @media (max-width: v.$tablet-breakpoint) {
   .container {
     border-top: v.$base-border;
-    width: calc(100% - 40px);
-    height: calc(100% - 4em - 32px);
+    width: 100%;
+    height: calc(100% - 4em - 12px);
     bottom: calc(4em + 12px);
     min-height: 25%;
-    max-height: calc(100% - 4em - 32px);
+    max-height: calc(100% - 4em - 12px);
     border-radius: 10px 10px 0 0;
   }
 }
@@ -25,7 +25,6 @@
 
 .container {
   position: fixed;
-  padding: 20px 20px;
   background-color: var(--surface-color);
   z-index: 3;
   flex-wrap: nowrap;
@@ -52,12 +51,12 @@
   display: flex;
   justify-content: space-between;
   font-size: v.$font-xl;
-  padding: 0 0 10px 0;
+  padding: 20px 20px 10px 20px;
   background-color: var(--surface-color);
 }
 
 .childrenContainer {
-  padding-right: 12px;
+  padding: 0 12px;
   overflow-y: auto;
   flex: 1;
   gap: 0;

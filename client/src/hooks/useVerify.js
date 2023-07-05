@@ -8,7 +8,7 @@ export function useVerify() {
     const verifyCodeResetPassword = async (email, code) => {
         setIsLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/verify/forgot-password', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/verify/forgot-password`, {
             method: 'POST',
             body: JSON.stringify({email, code}),
             headers: {'Content-Type': 'application/json'},
@@ -27,7 +27,7 @@ export function useVerify() {
     }
 
     const resendCodeResetPassword = async (email) => {
-        const response = await fetch('http://localhost:5000/api/verify/forgot-password/resend', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/verify/forgot-password/resend`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email}),
@@ -47,7 +47,7 @@ export function useVerify() {
     const verifyEmail = async (email, code) => {
         setIsLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/verify/email', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/verify/email`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, code}),
@@ -67,7 +67,7 @@ export function useVerify() {
     }
 
     const resendEmailCode = async (email) => {
-        const response = await fetch('http://localhost:5000/api/verify/email/resend', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/verify/email/resend`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email}),

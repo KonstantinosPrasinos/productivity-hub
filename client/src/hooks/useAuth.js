@@ -60,7 +60,7 @@ export function useAuth() {
     const register = async (email, password) => {
         setIsLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/user/signup', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password}),
@@ -78,7 +78,7 @@ export function useAuth() {
     }
 
     const logout = async () => {
-        const response = await fetch('http://localhost:5000/api/user/logout', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/logout`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include'
@@ -95,7 +95,7 @@ export function useAuth() {
     }
 
     const resetAccount = async (password) => {
-        const response = await fetch('http://localhost:5000/api/user/reset', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/reset`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({password}),

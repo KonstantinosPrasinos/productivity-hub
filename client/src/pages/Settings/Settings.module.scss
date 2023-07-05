@@ -7,6 +7,7 @@
         width: 100%;
         height: auto;
         border: none !important;
+        border-radius: 0 !important;
         padding-right: 0 !important;
     }
 }
@@ -106,4 +107,8 @@
 .description {
     flex-grow: 1;
     width: calc(100% - 120px);
+}
+
+.firstSection {
+    padding-top: 20px;
 }
