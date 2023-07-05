@@ -16,8 +16,9 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
     const {scope: scopeMinute, subtractUpdate: subtractUpdateMinute, addUpdate: addUpdateMinute} = useStepAnimations((0.8 + 1.5) * 20 + 1 /* 0.4em */, minute, setMinute, styles.overlayMinuteTop, styles.overlayMinuteTopEdge, styles.overlayMinuteBottom, styles.overlayMinuteBottomEdge, styles.overlayMinute, 0, 59);
 
     const makeTwoDigits = (number) => {
-        if (number < 10) return `0${number}`;
-        return number;
+        const intNumber = parseInt(number)
+        if (intNumber < 10) return `0${intNumber}`;
+        return intNumber
     }
 
     const handleHourChange = (e) => {
@@ -156,10 +157,14 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
 
     useEffect(() => {
         if (overlayIsVisible) {
-            const {top, left} = containerRef.current.getBoundingClientRect();
+            const setOverlayPosition = () => {
+                const {top, left} = containerRef.current.getBoundingClientRect();
 
-            setOverlayContentTop(top);
-            setOverlayContentLeft(left)
+                setOverlayContentTop(top);
+                setOverlayContentLeft(left)
+            }
+            window.addEventListener("resize", setOverlayPosition);
+            setOverlayPosition();
         }
     }, [overlayIsVisible]);
 
@@ -187,7 +192,7 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
                     disabled={isDisabled}
                     placeholder={"00"}
                 />
-                <IconButton onClick={handleClockClick}><TbClock /></IconButton>
+                <IconButton onClick={handleClockClick} disabled={isDisabled}><TbClock /></IconButton>
             </div>
             {createPortal((
                 <AnimatePresence>
@@ -276,7 +281,7 @@ const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
                                     <div className={styles.separator} />
                                     <div className={`${styles.overlayMinute} ${styles.overlayMinuteBottomEdge}`}>{parseInt(minute) + 2 < 59 ? makeTwoDigits(minute + 2) : ""}</div>
                                 </div>
-                                <IconButton onClick={handleClockClick}><TbClock /></IconButton>
+                                <IconButton onClick={handleClockClick} disabled={isDisabled}><TbClock /></IconButton>
                             </motion.div>
                         </div>
                     </div>}

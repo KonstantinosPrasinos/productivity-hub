@@ -43,10 +43,14 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
 
   useEffect(() => {
       if (extended) {
-          const {top, left} = containerRef.current.getBoundingClientRect();
+          const setOverlayPosition = () => {
+              const {top, left} = containerRef.current.getBoundingClientRect();
 
-          setOverlayContentTop(`calc(${top}px + 2.5em)`);
-          setOverlayContentLeft(left)
+              setOverlayContentTop(`calc(${top}px + 2.5em)`);
+              setOverlayContentLeft(left)
+          }
+          window.addEventListener("resize", setOverlayPosition);
+          setOverlayPosition();
       }
   }, [extended]);
 

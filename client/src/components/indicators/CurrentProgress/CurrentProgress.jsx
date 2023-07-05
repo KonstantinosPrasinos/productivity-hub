@@ -236,15 +236,20 @@ const CurrentProgress = ({task}) => {
 
     useEffect(() => {
         if (overlayIsVisible) {
-            const {top, left, width} = contentRef.current.getBoundingClientRect();
+            const setOverlayPosition = () => {
+                const {top, left, width} = contentRef.current.getBoundingClientRect();
 
-            const actualWidth = 2.6 * 16 - 6.4; // for some reason, the width from getBoundingClientRect() is smaller than expected by 6.4 ¯\_(ツ)_/¯
+                const actualWidth = 2.6 * 16 - 6.4; // for some reason, the width from getBoundingClientRect() is smaller than expected by 6.4 ¯\_(ツ)_/¯
 
-            const leftCoord = left + width / 2 - actualWidth / 2;
-            const topCoord = top + width / 2 - actualWidth / 2;
+                const leftCoord = left + width / 2 - actualWidth / 2;
+                const topCoord = top + width / 2 - actualWidth / 2;
 
-            overlayRef.current.style.top = `${topCoord}px`; // + 2.08 because its half of the 10% scale from hovering
-            overlayRef.current.style.left = `${leftCoord}px`;
+                overlayRef.current.style.top = `${topCoord}px`; // + 2.08 because its half of the 10% scale from hovering
+                overlayRef.current.style.left = `${leftCoord}px`;
+            }
+
+            window.addEventListener("resize", setOverlayPosition);
+            setOverlayPosition();
         }
     }, [overlayIsVisible]);
 
