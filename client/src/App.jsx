@@ -27,6 +27,7 @@ import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
 import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
 
 const NavLayout = () => {
+    // Server state
     const {isLoading: settingsLoading} = useGetSettings();
     const {isLoading: tasksLoading} = useGetTasks();
     const {isLoading: categoriesLoading} = useGetCategories();

@@ -50,7 +50,7 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-        &:hover:not(.disabled) {
+        &:not(.disabled) {
             transform: translateY(-1px);
             box-shadow: v.$elevation-1;
         }
