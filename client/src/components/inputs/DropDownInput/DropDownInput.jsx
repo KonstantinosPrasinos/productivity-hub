@@ -5,7 +5,7 @@ import styles from "./DropDownInput.module.scss";
 import {TbChevronDown} from "react-icons/tb";
 import {createPortal} from "react-dom";
 
-const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
+const DropDownInput = ({placeholder, isDisabled, selected, children}) => {
   const [extended, setExtended] = useState(false);
   const [overlayContentTop, setOverlayContentTop] = useState(0);
   const [overlayContentLeft, setOverlayContentLeft] = useState(0);
@@ -64,7 +64,7 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
         <AnimatePresence initial={false} mode={"wait"}>
             <motion.div
                 className={styles.arrowIcon}
-                key={extended}
+                // key={extended}
                 initial={{rotate: extended ? 0 : 180}}
                 animate={{rotate: extended ? 180 : 0}}
                 transition={{type: "tween"}}
@@ -92,8 +92,13 @@ const DropDownInput = ({ placeholder, isDisabled, selected, children}) => {
                             style={{top: overlayContentTop, left: overlayContentLeft}}
                         >
                             {children.map((option, index) => {
+                                // Each options key should be its "value", in order to render as a selected
                                 return (
-                                    <div className={`${styles.option}`} key={index} onClick={handleExtension}>
+                                    <div
+                                        className={`${styles.option} ${option.key === selected ? styles.optionSelected : ""} `}
+                                        key={index}
+                                        onClick={handleExtension}
+                                    >
                                         {option}
                                     </div>
                                 );

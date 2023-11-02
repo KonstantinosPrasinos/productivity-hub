@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {DayPicker} from "react-day-picker";
 import styles from "react-day-picker/dist/style.module.css";
-import customStyles from './TimePeriodInput.module.scss';
+import customStyles from './TimePeriodModal.module.scss';
 import Modal from "@/components/containers/Modal/Modal";
 import Button from "@/components/buttons/Button/Button";
 
@@ -32,8 +32,9 @@ const WeekDayInput = ({selected, setSelected}) => {
     );
 };
 
-const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2, toggleModal}) => {
-
+const TimePeriodModal = ({timePeriod, timePeriod2, setTimePeriod2, dismountFunction}) => {
+    const [tempTimePeriod2, setTempTimePeriod2] = useState(timePeriod2);
+    
     const formatCaption = (month) => {
         return (<div>{month.toLocaleDateString('default', {month: 'long'})}</div>)
     }
@@ -45,21 +46,26 @@ const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2, toggleModal})
         day: customStyles.calendarDay
     }
 
+    const handleSave = () => {
+        setTimePeriod2(tempTimePeriod2);
+        dismountFunction();
+    }
+
     return (
-        <Modal isOverlay={true} dismountFunction={toggleModal}>
+        <Modal isOverlay={true} dismountFunction={dismountFunction}>
             <div className={"Stack-Container"}>
                 <div className={"Display"}>Pick at least one date</div>
             </div>
-            <div>
+            <div className={"Horizontal-Flex-Container Align-Center"}>
                 {timePeriod === 'Weeks' &&
-                    <WeekDayInput selected={timePeriod2} setSelected={setTimePeriod2}></WeekDayInput>
+                    <WeekDayInput selected={tempTimePeriod2} setSelected={setTempTimePeriod2}></WeekDayInput>
                 }
                 {timePeriod === 'Months' &&
                     <DayPicker
                         mode="multiple"
                         styles={{caption: {display: 'none'}}}
-                        selected={timePeriod2}
-                        onSelect={setTimePeriod2}
+                        selected={tempTimePeriod2}
+                        onSelect={setTempTimePeriod2}
                         defaultMonth={new Date(2022, 4)}
                         classNames={classNames}
                     />
@@ -68,8 +74,8 @@ const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2, toggleModal})
                     <DayPicker
                         mode="multiple"
                         styles={{caption_label: {zIndex: 'auto'}}}
-                        selected={timePeriod2}
-                        onSelect={setTimePeriod2}
+                        selected={tempTimePeriod2}
+                        onSelect={setTempTimePeriod2}
                         fromDate={new Date(2022, 0)}
                         toDate={new Date(2022, 11, 31)}
                         formatters={{ formatCaption }}
@@ -79,11 +85,11 @@ const TimePeriodInput = ({timePeriod, timePeriod2, setTimePeriod2, toggleModal})
                 }
             </div>
             <div className={"Horizontal-Flex-Container Space-Between"}>
-                <Button size={"large"} filled={false}>Cancel</Button>
-                <Button size={"large"}>Save</Button>
+                <Button size={"large"} filled={false} onClick={dismountFunction}>Cancel</Button>
+                <Button size={"large"} disabled={tempTimePeriod2.length === 0} onClick={handleSave}>Save</Button>
             </div>
         </Modal>
     );
 };
 
-export default TimePeriodInput;
+export default TimePeriodModal;

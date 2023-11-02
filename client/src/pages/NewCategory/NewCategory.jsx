@@ -13,7 +13,7 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import Button from "../../components/buttons/Button/Button";
 import styles from './NewCategory.module.scss';
 import Chip from "../../components/buttons/Chip/Chip";
-import TimePeriodInput from "@/components/utilities/TimePeriodInputModal/TimePeriodInput";
+import TimePeriodModal from "@/components/inputs/TimePeriodModal/TimePeriodModal";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {findStartingDates} from "../../functions/findStartingDates";
@@ -67,6 +67,8 @@ const NewCategory = ({index, length, id}) => {
 
     const continueAfterModalFunctionRef = useRef();
     const initialCategoryValues = useRef();
+
+    const [visibleTimePeriodModal, setVisibleTimePeriodModal] = useState(false);
 
     const timeGroupList = useMemo(() => {
         if (timeGroups.filter(group => group?.deleted !== true).length === 0)
@@ -177,7 +179,6 @@ const NewCategory = ({index, length, id}) => {
                 }
 
             } else {
-                console.log(category, timeGroups);
                 await addCategoryToServer(
                     {
                         category,
@@ -400,6 +401,19 @@ const NewCategory = ({index, length, id}) => {
     const toggleConfirmModal = () => {
         setConfirmDeleteModalVisible(current => !current);
     }
+    
+    const toggleTimePeriodModal = () => {
+        setVisibleTimePeriodModal(current => !current);
+    }
+
+    const handleTimePeriodInput = (tempTimePeriod) => {
+        // Time period resets time period 2
+        if (tempTimePeriod !== timePeriod) {
+            setTimePeriod2([]);
+        }
+
+        setTimePeriod(tempTimePeriod);
+    }
 
     useEffect(() => {
         if (!categoriesLoading && !groupsLoading && id) {
@@ -411,6 +425,16 @@ const NewCategory = ({index, length, id}) => {
             initialCategoryValues.current = category;
         }
     }, [categoriesLoading, groupsLoading])
+
+    const disabledSaveGroupButton = useMemo(() => {
+        if (!timeGroupTitle) return true;
+        if (timePeriod2.length === 0) return true;
+        if (priority.toString().length === 0) return true;
+        if (timeGroupNumber.toString().length === 0) return true;
+        if (hasLongGoal && longGoalNumber.toString().length === 0) return true;
+
+        return false;
+    }, [timePeriod2, timeGroupTitle, priority, timeGroupNumber]);
 
     return (
         <>
@@ -492,12 +516,14 @@ const NewCategory = ({index, length, id}) => {
                     </InputWrapper>
                     <InputWrapper label={'Repeat every'}>
                         <TextBoxInput type='number' placeholder="Number" value={timeGroupNumber} setValue={setTimeGroupNumber} minNumber={1} />
-                        <DropDownInput placeholder={'Weeks'} selected={timePeriod} setSelected={setTimePeriod}>
-                            {timePeriods.map(tempTimePeriod => (tempTimePeriod))}
+                        <DropDownInput placeholder={'Weeks'} selected={timePeriod}>
+                            {timePeriods.map(tempTimePeriod =>
+                                <button key={tempTimePeriod} onClick={() => handleTimePeriodInput(tempTimePeriod)}>{tempTimePeriod}</button>
+                            )}
                         </DropDownInput>
                     </InputWrapper>
                     <InputWrapper label={'On'}>
-                        <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
+                        <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"}>Select dates</Button>
                     </InputWrapper>
                     <Divider />
                     <InputWrapper label={"Has goal"}>
@@ -549,7 +575,7 @@ const NewCategory = ({index, length, id}) => {
                     </InputWrapper>
                     <div className={"Horizontal-Flex-Container"}>
                         <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
-                        <Button width={"max"} onClick={handleTimeGroupSave}>Save Group</Button>
+                        <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>
                     </div>
                 </HeaderExtendContainer>
             </MiniPageContainer>
@@ -558,6 +584,13 @@ const NewCategory = ({index, length, id}) => {
                     dismountModal={toggleConfirmModal}
                     continueFunction={continueAfterModalFunctionRef.current}
                     groupTitles={getGroupTitlesForDeletion()}
+                />}
+            {visibleTimePeriodModal &&
+                <TimePeriodModal
+                    timePeriod={timePeriod}
+                    timePeriod2={timePeriod2}
+                    setTimePeriod2={setTimePeriod2}
+                    dismountFunction={toggleTimePeriodModal}
                 />}
         </>
     );

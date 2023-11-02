@@ -44,19 +44,13 @@
         border-color: var(--error-color);
     }
 
-    &:active:not(.disabled) {
-        transform: translateY(1px);
+    &:hover:not(:disabled) {
+        transform: translateY(-1px);
         box-shadow: v.$elevation-1;
     }
 
-    @media (hover: hover) and (pointer: fine) {
-        &:not(.disabled) {
-            transform: translateY(-1px);
-            box-shadow: v.$elevation-1;
-        }
-
-        &:active:not(.disabled) {
-            transform: translateY(1px);
-        }
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+        box-shadow: v.$elevation-1;
     }
 }

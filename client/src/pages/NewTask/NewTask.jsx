@@ -9,7 +9,7 @@ import MiniPageContainer from "../../components/containers/MiniPagesContainer/Mi
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import {TbChevronDown, TbPlus} from "react-icons/tb";
-import TimePeriodInput from "@/components/utilities/TimePeriodInputModal/TimePeriodInput";
+import TimePeriodModal from "@/components/inputs/TimePeriodModal/TimePeriodModal";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
@@ -364,10 +364,10 @@ const NewTask = ({index, length, id}) => {
                         >
                             None
                         </button>
-                        {...categories.map((tempCategory, id) => (
+                        {...categories.map(tempCategory => (
                             <button
                                 className={styles.dropDownOption}
-                                key={id}
+                                key={tempCategory.title}
                                 onClick={() => setCategory(tempCategory)}
                             >
                                 {tempCategory.title}
@@ -602,7 +602,7 @@ const NewTask = ({index, length, id}) => {
                 </InputWrapper>
                 <InputWrapper label={'On'}>
                     <Button>Select dates</Button>
-                    {dateModalIsVisible && <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />}
+                    {dateModalIsVisible && <TimePeriodModal timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />}
                 </InputWrapper>
             </HeaderExtendContainer>
             <HeaderExtendContainer
