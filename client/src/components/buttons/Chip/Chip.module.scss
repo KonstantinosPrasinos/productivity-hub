@@ -7,6 +7,9 @@
     transition: 0.2s background-color, 0.2s color, 0.2s box-shadow, 0.2s opacity, 0.2s transform;
     border: v.$base-border;
 
+    padding: 0 !important;
+    gap: 0 !important;
+
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
@@ -22,9 +25,34 @@
         border: none;
     }
 
+    &:not(.small) {
+        & > .children:only-child {
+            padding: 10px 24px;
+        }
+
+        & > .children:not(:only-child) {
+            padding: 10px 5px 10px 24px;
+
+            & ~ button {
+                padding: 10px 12px 10px 5px;
+            }
+        }
+    }
+
     &.small {
         font-size: v.$font-s;
-        padding: 8px 19px;
+
+        & > .children:only-child {
+            padding: 8px 19px;
+        }
+
+        & > .children:not(:only-child) {
+            padding: 8px 5px 8px 19px;
+
+            & ~ button {
+                padding: 8px 10px 8px 5px;
+            }
+        }
     }
 
     &.big {

@@ -74,24 +74,26 @@ function App() {
 
     useEffect(() => {
       //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
-      const loggedInUser = localStorage.getItem("user");
+      //TODO fix redirecting when user doesn't exist
 
-      if (loggedInUser) {
-          const userObject = JSON.parse(loggedInUser);
-
-          const dateValidUntil = new Date(userObject.validUntil);
-
-          if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
-              user.dispatch({type: "SET_USER", payload: userObject});
-              updateUserValidDate();
-          } else {
-              localStorage.removeItem("user");
-              navigate("/log-in");
-          }
-      } else {
-          user.dispatch({type: "SET_USER", payload: {isLoading: false}})
-          navigate('/log-in');
-      }
+        // const loggedInUser = localStorage.getItem("user");
+      //
+      // if (loggedInUser) {
+      //     const userObject = JSON.parse(loggedInUser);
+      //
+      //     const dateValidUntil = new Date(userObject.validUntil);
+      //
+      //     if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
+      //         user.dispatch({type: "SET_USER", payload: userObject});
+      //         updateUserValidDate();
+      //     } else {
+      //         localStorage.removeItem("user");
+      //         navigate("/log-in");
+      //     }
+      // } else {
+      //     user.dispatch({type: "SET_USER", payload: {isLoading: false}})
+      //     navigate('/log-in');
+      // }
     }, []);
 
     const [defaultThemeChanged, setDefaultThemeChanged] = useState(false);

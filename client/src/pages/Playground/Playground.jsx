@@ -20,8 +20,8 @@ import IconButton from "../../components/buttons/IconButton/IconButton";
 import {TbHome} from "react-icons/tb";
 import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import {AnimatePresence, motion} from "framer-motion";
-import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
+import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -34,8 +34,8 @@ const Playground = () => {
   const [textValue, setTextValue] = useState("");
   const [numberValue, setNumberValue] = useState(0);
   const [calendarValue, setCalendarValue] = useState("");
-  const [hourValue, setHourValue] = useState(20);
-  const [minuteValue, setMinuteValue] = useState(20)
+  const [hourValue, setHourValue] = useState("20");
+  const [minuteValue, setMinuteValue] = useState("20")
 
   const testingTask = {
       type: 'Number',
@@ -182,7 +182,7 @@ const Playground = () => {
                 <div>Hello</div>
             </HeaderExtendContainer>
         </InputWrapper>
-        <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} />
+        <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} isDisabled={false}></TimeInput>
         <InputWrapper label={"Text switch container"}>
             <TextSwitchContainer>
                 {textSwitch}

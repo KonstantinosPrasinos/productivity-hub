@@ -1,95 +1,176 @@
 @use "@/styles/variables" as v;
 
 .container {
-  font-size: v.$font-xl;
-  //line-height: 28px;
-  width: min-content;
+  height: 1.4em;
   position: relative;
-  padding: 6px 12px;
-  justify-content: center;
-  height: 2em;
-  flex-shrink: 0;
+}
 
-  text-align: center;
-  display: grid;
-  grid-template-columns: 2em 1em 2em auto;
-  gap: 0 0;
-  grid-template-areas: ". . .";
+.baseContainer {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  box-sizing: content-box;
+  gap: 10px;
+  padding: v.$base-padding;
 
-  .disabled {
-    opacity: v.$opacity-low;
+  font-size: v.$font-m;
+
+  width: fit-content;
+
+  border: v.$base-border;
+  border-radius: v.$base-border-radius;
+
+  & > .inputContainer > input {
+    height: 1.4em;
+    text-align: right;
+    line-height: 1.4em;
+
+    font-size: inherit;
+
+    width: 1.2em;
+    padding: 0;
+
+    transition: 0.2s opacity ease-in-out;
   }
 }
 
-.overlay {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  background-color: transparent;
-  transform-origin: center center;
+@keyframes expandFloatingContainer {
+  from {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }
 
-.overlayContentContainer {
+.floatingContainer {
   position: absolute;
-  font-size: v.$font-xl;
-  height: 2em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: visible;
-  padding-top: 6px;
-  border-top: 1px solid transparent;
-}
+  top: calc(-1.4em + 1px);
+  left: 0;
 
-.currentNumber {
-  width: 100%;
-  font-size: inherit;
-  text-align: center;
-  overscroll-behavior-y: contain;
-  padding: 0;
-}
+  background-color: var(--surface-color);
 
-.overlayCurrentContainer {
-  overflow: hidden;
-  flex-shrink: 0;
-  display: grid;
-  text-align: center;
-  grid-template-columns: 2em 1em 2em auto;
-  gap: 0 0;
-  height: 1.5em;
-  line-height: 1.5em;
-  grid-template-areas: ". . .";
-  align-items: center;
+  border: v.$base-border;
+  border-radius: v.$base-border-radius;
+  font-size: v.$font-m;
 
+  padding: v.$base-padding;
   box-shadow: v.$elevation-1;
 
-  & > div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.4em;
-    height: 1.5em;
+  box-sizing: border-box;
 
-    & > div:not(.separator), input {
-      flex-shrink: 0;
-      height: 1.5em;
-    }
+  transition: 0.2s opacity ease-in-out, 0.2s transform ease-in-out;
+
+  animation: 0.2s expandFloatingContainer;
+
+  &.collapsed {
+    opacity: 0;
+    transform: scaleY(0.8);
   }
 }
 
-.separator {
-  border-top: v.$base-border;
+@keyframes expandPickerUpDown {
+  from {
+    opacity: 1;
+    border-color: var(--surface-color);
+  }
+  to {
+    opacity: 0.7;
+    border-color: var(--border-primary-color);
+  }
 }
 
-.overlayHour, .overlayHourTop, .overlayHourBottom, .overlayMinute, .overlayMinuteTop, .overlayMinuteBottom {
-  opacity: 1;
+.relativeContainer {
+  //visibility: collapse;
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex: 0;
+  height: 4.2em;
+
+  //padding: v.$base-padding;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &:after, &:before {
+    content: "";
+    position: absolute;
+
+    height: 1.4em;
+    width: 100%;
+
+    left: 0;
+
+    background-color: var(--surface-color);
+    opacity: 0.7;
+
+    animation: 0.2s expandPickerUpDown;
+  }
+
+  &:before {
+    top: 0;
+    border-bottom: 1px solid var(--border-primary-color);
+  }
+
+  &:after {
+    bottom: 0;
+    border-top: 1px solid var(--border-primary-color);
+  }
 }
 
-.overlayHourTopEdge, .overlayHourBottomEdge, .overlayMinuteTopEdge, .overlayMinuteBottomEdge {
-  opacity: 0;
+.pickerContainer {
+  font-size: v.$font-m;
+  height: 4.2em;
+  width: 1.2em;
+  overflow: auto;
+  overflow-y: scroll;
+
+  padding: 0;
+
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+
+  // Hide scrollbar
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & > li {
+    list-style-type: none;
+    scroll-snap-align: center;
+    height: 1.4em;
+    text-align: right;
+
+    line-height: 1.4em;
+
+    font-size: v.$font-m;
+  }
+}
+
+.pickerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 3;
+}
+
+.inputContainer {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  & > div {
+    text-align: center;
+    height: 0.75em;
+    line-height: 0.75em;
+  }
 }

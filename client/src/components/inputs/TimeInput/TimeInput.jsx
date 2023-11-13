@@ -1,293 +1,258 @@
-import React, {useEffect, useRef, useState} from 'react';
-import styles from './TimeInput.module.scss';
-import IconButton from "@/components/buttons/IconButton/IconButton";
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import styles from "./TimeInput.module.scss";
 import {TbClock} from "react-icons/all";
+import IconButton from "@/components/buttons/IconButton/IconButton";
+import {debounce} from "lodash";
 import {createPortal} from "react-dom";
-import {AnimatePresence, motion} from "framer-motion";
-import {useStepAnimations} from "@/hooks/useStepAnimations";
 
-const TimeInput = ({hour, setHour, minute, setMinute, isDisabled}) => {
-    const [overlayIsVisible, setOverlayIsVisible] = useState(false);
-    const [overlayContentTop, setOverlayContentTop] = useState(0);
-    const [overlayContentLeft, setOverlayContentLeft] = useState(0);
-    const containerRef = useRef();
+const TimeInput = ({hour = "11", setHour, minute = "11", setMinute, isDisabled = false}) => {
+    const [pickerVisible, setPickerVisible] = useState(false);
 
-    const {scope: scopeHour, subtractUpdate: subtractUpdateHour, addUpdate: addUpdateHour} = useStepAnimations((0.8 + 1.5) * 20 + 1 /* 0.4em */, hour, setHour, styles.overlayHourTop, styles.overlayHourTopEdge, styles.overlayHourBottom, styles.overlayHourBottomEdge, styles.overlayHour, 0, 23);
-    const {scope: scopeMinute, subtractUpdate: subtractUpdateMinute, addUpdate: addUpdateMinute} = useStepAnimations((0.8 + 1.5) * 20 + 1 /* 0.4em */, minute, setMinute, styles.overlayMinuteTop, styles.overlayMinuteTopEdge, styles.overlayMinuteBottom, styles.overlayMinuteBottomEdge, styles.overlayMinute, 0, 59);
+    const pickerRef = useRef();
+    const hourPickerRef = useRef();
+    const minutePickerRef = useRef();
+    const baseRef = useRef();
 
-    const makeTwoDigits = (number) => {
-        const intNumber = parseInt(number)
-        if (intNumber < 10) return `0${intNumber}`;
-        return intNumber
+    const handleHourWheelEvent = useCallback(debounce((event) => {
+
+        const emSize = parseInt(window.getComputedStyle(event.target).fontSize);
+
+        if (!isNaN(emSize)) {
+            let value = Math.round((event.target.scrollTop / emSize) * (1 / 1.4));
+
+            setHour(value);
+        }
+    }, 100), []);
+
+    const handleMinuteWheelEvent = useCallback(debounce((event) => {
+        const emSize = parseInt(window.getComputedStyle(event.target).fontSize);
+
+        let value = Math.round((event.target.scrollTop / emSize) * (1 / 1.4));
+
+        if (value < 10) {
+            value = `0${value}`
+        }
+
+        setMinute(value);
+    }, 100), []);
+
+    const setPickerPosition = () => {
+        if (!pickerRef.current) return;
+
+        const emSize = parseFloat(window.getComputedStyle(pickerRef.current).fontSize);
+        let top, left;
+
+        top = baseRef.current.getBoundingClientRect().top;
+        left = baseRef.current.getBoundingClientRect().left;
+
+        pickerRef.current.style.top = `${top - 1.4 * emSize + 0.8}px`;
+        pickerRef.current.style.left = `${left}px`;
     }
 
-    const handleHourChange = (e) => {
-        const input = e.target.value;
-
-        if (input.match(/^([0-9]|[01][0-9]?|2[0-3]?)?$/)) {
-            setHour(input);
-        }
+    const collapsePicker = () => {
+        pickerRef.current.classList.add(styles.collapsed);
+        window.removeEventListener("resize", collapsePicker);
     }
 
-    const handleMinuteChange = (e) => {
-        const input = e.target.value;
-
-        if (input.match(/^([0-9]|[0-5][0-9]?)?$/)) {
-            setMinute(input);
-        }
+    const expandPicker = () => {
+        setPickerVisible(true);
+        window.addEventListener("resize", collapsePicker);
     }
 
-    const handleHourBlur = () => {
-        if (hour.length === 0) {
-            setHour('00');
-            return;
-        }
+    const handleTransitionEnd = (event) => {
+        if (event.target !== pickerRef.current) return;
 
-        if (hour.length === 1) {
-            setHour('0'.concat(hour));
-        }
+        setPickerVisible(false);
     }
 
-    const handleMinuteBlur = () => {
-        if (minute.length === 0) {
-            setMinute('00');
-            return;
-        }
+    useEffect(() => {
+        if (!pickerVisible) return;
 
-        if (minute.length === 1) {
-            setMinute('0'.concat(minute));
+        setPickerPosition();
+
+        const emSize = parseInt(window.getComputedStyle(pickerRef.current).fontSize);
+
+        const hourTop = (parseFloat(hour) / (1 / 1.4)) * emSize;
+        const minuteTop = (parseFloat(minute) / (1 / 1.4)) * emSize;
+
+        hourPickerRef.current.scrollTo({
+            top: hourTop,
+            left: 0,
+            behavior: "instant"
+        })
+
+        minutePickerRef.current.scrollTo({
+            top: minuteTop,
+            left: 0,
+            behavior: "instant"
+        })
+    }, [pickerVisible]);
+
+    useEffect(() => {
+        return () => {
+            window.removeEventListener("resize", collapsePicker);
         }
+    }, []);
+
+    const handleHourChange = (event) => {
+        // Only allow numbers
+        if (isNaN(event.target.value)) return;
+        if (event.target.value.length > 2) return;
+        if (parseInt(event.target.value) > 23) return;
+        setHour(event.target.value);
+    }
+    const handleHourBlur = (event) => {
+        if (event.target.value.length === 0) setHour("0");
     }
 
-    const handleHourFocus = () => {
-        if (hour !== '00' && hour[0] === '0') {
-            setHour(hour.substring(1));
-        }
+    const handleMinuteChange = (event) => {
+        if (isNaN(event.target.value)) return;
+        if (event.target.value.length > 2) return;
+        if (parseInt(event.target.value) > 59) return;
+        setMinute(event.target.value);
     }
 
-    const handleMinuteFocus = () => {
-        if (minute !== '00' && minute[0] === '0') {
-            setMinute(minute.substring(1));
-        }
-    }
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            e.target.blur();
-            if (overlayIsVisible) setOverlayIsVisible(false)
-        }
-    }
-
-    const handleClockClick = (e) => {
-        e.stopPropagation();
-        setOverlayIsVisible(current => !current);
+    const handleMinuteBlur = (event) => {
+        if (event.target.value.length === 0) setMinute("00");
+        if (event.target.value.length === 1) setMinute(`0${minute}`);
     }
 
     const handleOverlayClick = (e) => {
         e.stopPropagation();
-        setOverlayIsVisible(false);
+        collapsePicker();
     }
 
-    const handleOverlayHourWheel = (e) => {
-        if (e.deltaY < 0) {
-            // Go down
-            subtractUpdateHour();
-        } else if (e.deltaY > 0) {
-            // Go up
-            addUpdateHour();
-        }
-    }
-
-    const handleOverlayMinuteWheel = (e) => {
-        if (e.deltaY < 0) {
-            // Go down
-            subtractUpdateMinute();
-        } else if (e.deltaY > 0) {
-            // Go up
-            addUpdateMinute();
-        }
-    }
-
-    const previousTouchYHour = useRef(null);
-    const previousTouchYMinute = useRef(null);
-
-    const handleOverlayHourTouchEnd = () => {
-        previousTouchYHour.current = null;
-    }
-
-    const handleOverlayHourTouchMove = (e) => {
-        if (previousTouchYHour.current !== null) {
-            if (previousTouchYHour.current + 34 < e.touches[0].pageY) {
-                // Go down
-                subtractUpdateHour()
-            } else if (previousTouchYHour.current - 34 > e.touches[0].pageY) {
-                // Go up
-                addUpdateHour()
-            }
-        }
-
-        if (previousTouchYHour.current + 34 < e.touches[0].pageY || previousTouchYHour.current - 34 > e.touches[0].pageY) {
-            previousTouchYHour.current = e.touches[0].pageY;
-        }
-    }
-
-    const handleOverlayMinuteTouchEnd = () => {
-        previousTouchYMinute.current = null;
-    }
-
-    const handleOverlayMinuteTouchMove = (e) => {
-        if (previousTouchYMinute.current !== null) {
-            if (previousTouchYMinute.current + 34 < e.touches[0].pageY) {
-                // Go down
-                subtractUpdateMinute()
-            } else if (previousTouchYMinute.current - 34 > e.touches[0].pageY) {
-                // Go up
-                addUpdateMinute()
-            }
-        }
-
-        if (previousTouchYMinute.current + 34 < e.touches[0].pageY || previousTouchYMinute.current - 34 > e.touches[0].pageY) {
-            previousTouchYMinute.current = e.touches[0].pageY;
-        }
-    }
-
-    const handleOverlayContainerClick = (e) => {
+    const handlePickerClick = (e) => {
         e.stopPropagation();
     }
 
-    useEffect(() => {
-        if (overlayIsVisible) {
-            const setOverlayPosition = () => {
-                const {top, left} = containerRef.current.getBoundingClientRect();
-
-                setOverlayContentTop(top);
-                setOverlayContentLeft(left)
-            }
-            window.addEventListener("resize", setOverlayPosition);
-            setOverlayPosition();
-        }
-    }, [overlayIsVisible]);
-
     return (
-        <>
-            <div className={`Rounded-Container ${styles.container}`} ref={containerRef}>
-                <input
-                    className={styles.currentNumber}
-                    value={makeTwoDigits(hour)}
-                    onChange={handleHourChange}
-                    onBlur={handleHourBlur}
-                    onFocus={handleHourFocus}
-                    onKeyDown={handleKeyDown}
+        <div className={styles.container}>
+            <div className={styles.baseContainer} ref={baseRef}>
+                <div className={styles.inputContainer}>
+                    <input value={hour} onChange={handleHourChange} onBlur={handleHourBlur} disabled={isDisabled}/>
+                    <div>:</div>
+                    <input value={minute} onChange={handleMinuteChange} onBlur={handleMinuteBlur} disabled={isDisabled}/>
+                </div>
+                <IconButton
                     disabled={isDisabled}
-                    placeholder={"00"}
-                />
-                :
-                <input
-                    className={styles.currentNumber}
-                    value={makeTwoDigits(minute)}
-                    onChange={handleMinuteChange}
-                    onBlur={handleMinuteBlur}
-                    onFocus={handleMinuteFocus}
-                    onKeyDown={handleKeyDown}
-                    disabled={isDisabled}
-                    placeholder={"00"}
-                />
-                <IconButton onClick={handleClockClick} disabled={isDisabled}><TbClock /></IconButton>
+                    onClick={expandPicker}
+                >
+                    <TbClock/>
+                </IconButton>
             </div>
-            {createPortal((
-                <AnimatePresence>
-                    {overlayIsVisible && <div
-                        className={styles.overlay}
-                        onClick={handleOverlayClick}
-                    >
-                        <div
-                            className={styles.overlayContentContainer}
-                            style={{top: overlayContentTop, left: overlayContentLeft}}
-                        >
-                            <motion.div
-                                className={`Rounded-Container ${styles.container} ${styles.overlayCurrentContainer}`}
-                                onClick={handleOverlayContainerClick}
-
-                                initial={{height: "2em"}}
-                                animate={{height: "6em"}}
-                                exit={{height: "2em"}}
+            {pickerVisible && createPortal(
+                (<div className={styles.pickerOverlay} onClick={handleOverlayClick}>
+                    <div ref={pickerRef} onClick={handlePickerClick} className={styles.floatingContainer}
+                         onTransitionEnd={handleTransitionEnd}>
+                        <div className={styles.relativeContainer}>
+                            <div className={styles.inputContainer}>
+                                <ul className={styles.pickerContainer} onScroll={handleHourWheelEvent} ref={hourPickerRef}>
+                                    <li></li>
+                                    <li>0</li>
+                                    <li>1</li>
+                                    <li>2</li>
+                                    <li>3</li>
+                                    <li>4</li>
+                                    <li>5</li>
+                                    <li>6</li>
+                                    <li>7</li>
+                                    <li>8</li>
+                                    <li>9</li>
+                                    <li>10</li>
+                                    <li>11</li>
+                                    <li>12</li>
+                                    <li>13</li>
+                                    <li>14</li>
+                                    <li>15</li>
+                                    <li>16</li>
+                                    <li>17</li>
+                                    <li>18</li>
+                                    <li>19</li>
+                                    <li>20</li>
+                                    <li>21</li>
+                                    <li>22</li>
+                                    <li>23</li>
+                                    <li></li>
+                                </ul>
+                                <div>:</div>
+                                <ul className={styles.pickerContainer} onScroll={handleMinuteWheelEvent}
+                                    ref={minutePickerRef}>
+                                    <li></li>
+                                    <li>00</li>
+                                    <li>01</li>
+                                    <li>02</li>
+                                    <li>03</li>
+                                    <li>04</li>
+                                    <li>05</li>
+                                    <li>06</li>
+                                    <li>07</li>
+                                    <li>08</li>
+                                    <li>09</li>
+                                    <li>10</li>
+                                    <li>11</li>
+                                    <li>12</li>
+                                    <li>13</li>
+                                    <li>14</li>
+                                    <li>15</li>
+                                    <li>16</li>
+                                    <li>17</li>
+                                    <li>18</li>
+                                    <li>19</li>
+                                    <li>20</li>
+                                    <li>21</li>
+                                    <li>22</li>
+                                    <li>23</li>
+                                    <li>24</li>
+                                    <li>25</li>
+                                    <li>26</li>
+                                    <li>27</li>
+                                    <li>28</li>
+                                    <li>29</li>
+                                    <li>30</li>
+                                    <li>31</li>
+                                    <li>32</li>
+                                    <li>33</li>
+                                    <li>34</li>
+                                    <li>35</li>
+                                    <li>36</li>
+                                    <li>37</li>
+                                    <li>38</li>
+                                    <li>39</li>
+                                    <li>40</li>
+                                    <li>41</li>
+                                    <li>42</li>
+                                    <li>43</li>
+                                    <li>44</li>
+                                    <li>45</li>
+                                    <li>46</li>
+                                    <li>47</li>
+                                    <li>48</li>
+                                    <li>49</li>
+                                    <li>50</li>
+                                    <li>51</li>
+                                    <li>52</li>
+                                    <li>53</li>
+                                    <li>54</li>
+                                    <li>55</li>
+                                    <li>56</li>
+                                    <li>57</li>
+                                    <li>58</li>
+                                    <li>59</li>
+                                    <li></li>
+                                </ul>
+                            </div>
+                            <IconButton
+                                disabled={isDisabled}
+                                onClick={collapsePicker}
                             >
-                                <div
-                                    onWheel={handleOverlayHourWheel}
-                                    onTouchEnd={handleOverlayHourTouchEnd}
-                                    onTouchMove={handleOverlayHourTouchMove}
-                                    ref={scopeHour}
-                                >
-                                    <div className={`${styles.overlayHour} ${styles.overlayHourTopEdge}`}>{parseInt(hour) - 2 > -1 ? makeTwoDigits(hour - 2) : ""}</div>
-                                    <div className={styles.separator} />
-                                    <div className={`${styles.overlayHour} ${styles.overlayHourTop}`}>{parseInt(hour) - 1 > -1 ? makeTwoDigits(hour - 1) : ""}</div>
-                                    <motion.div
-                                        className={styles.separator}
-                                        initial={{opacity: 0}}
-                                        animate={{opacity: 1}}
-                                        exit={{opacity: 0}}
-                                    />
-                                    <input
-                                        className={`${styles.currentNumber} ${styles.overlayHour}`}
-                                        value={makeTwoDigits(hour)}
-                                        onChange={handleHourChange}
-                                        onBlur={handleHourBlur}
-                                        onFocus={handleHourFocus}
-                                        onKeyDown={handleKeyDown}
-                                        disabled={isDisabled}
-                                    />
-                                    <motion.div
-                                        className={styles.separator}
-                                        initial={{opacity: 0}}
-                                        animate={{opacity: 1}}
-                                        exit={{opacity: 0}}
-                                    />
-                                    <div className={`${styles.overlayHour} ${styles.overlayHourBottom}`}>{parseInt(hour) + 1 < 24 ? makeTwoDigits(hour + 1) : ""}</div>
-                                    <div className={styles.separator} />
-                                    <div className={`${styles.overlayHour} ${styles.overlayHourBottomEdge}`}>{parseInt(hour) + 2 < 23 ? makeTwoDigits(hour + 2) : ""}</div>
-                                </div>
-                                :
-                                <div
-                                    onWheel={handleOverlayMinuteWheel}
-                                    onTouchEnd={handleOverlayMinuteTouchEnd}
-                                    onTouchMove={handleOverlayMinuteTouchMove}
-                                    ref={scopeMinute}
-                                >
-                                    <div className={`${styles.overlayMinute} ${styles.overlayMinuteTopEdge}`}>{parseInt(minute) - 2 > -1 ? makeTwoDigits(minute - 2) : ""}</div>
-                                    <div className={styles.separator} />
-                                    <div className={`${styles.overlayMinute} ${styles.overlayMinuteTop}`}>{parseInt(minute) - 1 > -1 ? makeTwoDigits(minute - 1) : ""}</div>
-                                    <motion.div
-                                        className={styles.separator}
-                                        initial={{opacity: 0}}
-                                        animate={{opacity: 1}}
-                                        exit={{opacity: 0}}
-                                    />
-                                    <input
-                                        className={`${styles.currentNumber} ${styles.overlayMinute}`}
-                                        value={makeTwoDigits(minute)}
-                                        onChange={handleMinuteChange}
-                                        onBlur={handleMinuteBlur}
-                                        onFocus={handleMinuteFocus}
-                                        onKeyDown={handleKeyDown}
-                                        disabled={isDisabled}
-                                    />
-                                    <motion.div
-                                        className={styles.separator}
-                                        initial={{opacity: 0}}
-                                        animate={{opacity: 1}}
-                                        exit={{opacity: 0}}
-                                    />
-                                    <div className={`${styles.overlayMinute} ${styles.overlayMinuteBottom}`}>{parseInt(minute) + 1 < 60 ? makeTwoDigits(minute + 1) : ""}</div>
-                                    <div className={styles.separator} />
-                                    <div className={`${styles.overlayMinute} ${styles.overlayMinuteBottomEdge}`}>{parseInt(minute) + 2 < 59 ? makeTwoDigits(minute + 2) : ""}</div>
-                                </div>
-                                <IconButton onClick={handleClockClick} disabled={isDisabled}><TbClock /></IconButton>
-                            </motion.div>
+                                <TbClock/>
+                            </IconButton>
                         </div>
-                    </div>}
-                </AnimatePresence>
-            ), document.getElementById("app") ?? document.getElementById("root"))}
-        </>
+                    </div>
+                </div>),
+                document.getElementById("app") ?? document.getElementById("root"))}
+        </div>
     );
 };
 

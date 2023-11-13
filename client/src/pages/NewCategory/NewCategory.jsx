@@ -5,9 +5,8 @@ import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import IconButton from "../../components/buttons/IconButton/IconButton";
 
-import {TbPlus, TbX} from "react-icons/tb";
+import {TbPlus} from "react-icons/tb";
 
 import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import Button from "../../components/buttons/Button/Button";
@@ -24,8 +23,8 @@ import ConfirmDeleteGroupModal from "../../components/utilities/ConfirmDeleteGro
 import {useChangeCategory} from "../../hooks/change-hooks/useChangeCategory";
 import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import ToggleButton from "@/components/buttons/ToggleButton/ToggleButton";
-import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import Divider from "@/components/utilities/Divider/Divider";
+import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -52,7 +51,7 @@ const NewCategory = ({index, length, id}) => {
     const [endHour, setEndHour] = useState('23');
     const [endMinute, setEndMinute] = useState('59');
     const [timeGroupNumber, setTimeGroupNumber] = useState(settings.defaults.priority);
-    const [timePeriod, setTimePeriod] = useState('Weeks');
+    const [timePeriod, setTimePeriod] = useState('Days');
     const [timePeriod2, setTimePeriod2] = useState([]);
 
     const [hasLongGoal, setHasLongGoal] = useState(false);
@@ -197,8 +196,8 @@ const NewCategory = ({index, length, id}) => {
         setPriority(settings.defaults.priority);
 
         setTimeGroupNumber(1);
-        setTimePeriod('Weeks');
-        setTimePeriod2(null);
+        setTimePeriod('Days');
+        setTimePeriod2([]);
 
         setHasTime(false);
         setStartHour("00");
@@ -263,6 +262,7 @@ const NewCategory = ({index, length, id}) => {
         }
 
         if (hasTime) {
+            console.log(typeof startHour)
             if (
                 endHour !== "00" &&
                 (
@@ -428,7 +428,7 @@ const NewCategory = ({index, length, id}) => {
 
     const disabledSaveGroupButton = useMemo(() => {
         if (!timeGroupTitle) return true;
-        if (timePeriod2.length === 0) return true;
+        if (timePeriod !== "Days" && timePeriod2.length === 0) return true;
         if (priority.toString().length === 0) return true;
         if (timeGroupNumber.toString().length === 0) return true;
         if (hasLongGoal && longGoalNumber.toString().length === 0) return true;
@@ -458,8 +458,11 @@ const NewCategory = ({index, length, id}) => {
                         <InputWrapper label="Time Groups">
                             <div className={styles.groupTitlesContainer}>
                                 <Button filled={true} symmetrical={true} onClick={handleAddTimeGroup}><TbPlus /></Button>
+                                {timeGroupList[0]._id === -1 &&
+                                    <Chip type={'icon'} size={"small"}>None</Chip>
+                                }
                                 <AnimatePresence mode={"popLayout"}>
-                                    {timeGroupList.map((group) => (
+                                    {timeGroupList[0]._id !== -1 && timeGroupList.map((group) => (
                                         <motion.div
                                             layout
                                             key={group._id}
@@ -467,13 +470,8 @@ const NewCategory = ({index, length, id}) => {
                                             animate={{ scale: 1, opacity: 1 }}
                                             exit={{ scale: 0.8, opacity: 0 }}
                                         >
-                                            <Chip type={'icon'} onClick={(e) => {handleGroupClick(e, group)}} size={"small"}>
+                                            <Chip type={'icon'} onClick={(e) => {handleGroupClick(e, group)}} hasDeleteButton={true} deleteFunction={() => handleDelete(group)} size={"small"}>
                                                 {group.title}
-                                                {group._id !== -1 &&
-                                                    <IconButton onClick={() => handleDelete(group)}>
-                                                        <TbX />
-                                                    </IconButton>
-                                                }
                                             </Chip>
                                         </motion.div>
                                     ))}

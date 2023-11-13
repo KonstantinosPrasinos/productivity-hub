@@ -21,10 +21,10 @@ import HeaderExtendContainer from "../../components/containers/HeaderExtendConta
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import {motion} from "framer-motion";
 import styles from "./NewTask.module.scss";
-import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
 import {capitalizeFirstCharacter} from "../../functions/capitalizeFirstCharacter";
 import Button from "@/components/buttons/Button/Button";
+import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
