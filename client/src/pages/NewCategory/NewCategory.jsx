@@ -33,7 +33,7 @@ const NewCategory = ({index, length, id}) => {
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years']
-    const goalTypes = ['Streak', 'Total completed'];
+    const goalTypes = ['Streak', 'Total'];
     const goalLimits = ['At most', 'Exactly', 'At least'];
 
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
@@ -262,7 +262,6 @@ const NewCategory = ({index, length, id}) => {
         }
 
         if (hasTime) {
-            console.log(typeof startHour)
             if (
                 endHour !== "00" &&
                 (
@@ -527,28 +526,28 @@ const NewCategory = ({index, length, id}) => {
                     <InputWrapper label={"Has goal"}>
                         <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />
                     </InputWrapper>
-                    <InputWrapper label={"Type"}>
+                    <InputWrapper label={"Goal"}>
                         <DropDownInput
                             placeholder={'Type'}
                             selected={longGoalType}
                             isDisabled={!hasLongGoal}
+                            widthBasedOnChildren={true}
                         >
-                            {goalTypes.map(tempGoalLimit => (
+                            {goalTypes.map(tempGoalType => (
                                 <button
                                     className={styles.dropDownOption}
-                                    onClick={() => setLongGoalLimit(tempGoalLimit)}
-                                    key={tempGoalLimit}
+                                    onClick={() => setLongGoalType(tempGoalType)}
+                                    key={tempGoalType}
                                 >
-                                    {tempGoalLimit}
+                                    {tempGoalType}
                                 </button>
                             ))}
                         </DropDownInput>
-                    </InputWrapper>
-                    <InputWrapper label={"Limit"}>
                         <DropDownInput
                             placeholder={'Limit'}
                             selected={longGoalLimit}
                             isDisabled={!hasLongGoal}
+                            widthBasedOnChildren={true}
                         >
                             {goalLimits.map(tempGoalLimit => (
                                 <button
@@ -560,8 +559,6 @@ const NewCategory = ({index, length, id}) => {
                                 </button>
                             ))}
                         </DropDownInput>
-                    </InputWrapper>
-                    <InputWrapper label={"Number"}>
                         <TextBoxInput
                             type="number"
                             placeholder="Number"
@@ -571,6 +568,50 @@ const NewCategory = ({index, length, id}) => {
                             minNumber={1}
                         />
                     </InputWrapper>
+                    {/*<InputWrapper label={"Type"}>*/}
+                    {/*    <DropDownInput*/}
+                    {/*        placeholder={'Type'}*/}
+                    {/*        selected={longGoalType}*/}
+                    {/*        isDisabled={!hasLongGoal}*/}
+                    {/*    >*/}
+                    {/*        {goalTypes.map(tempGoalLimit => (*/}
+                    {/*            <button*/}
+                    {/*                className={styles.dropDownOption}*/}
+                    {/*                onClick={() => setLongGoalLimit(tempGoalLimit)}*/}
+                    {/*                key={tempGoalLimit}*/}
+                    {/*            >*/}
+                    {/*                {tempGoalLimit}*/}
+                    {/*            </button>*/}
+                    {/*        ))}*/}
+                    {/*    </DropDownInput>*/}
+                    {/*</InputWrapper>*/}
+                    {/*<InputWrapper label={"Limit"}>*/}
+                    {/*    <DropDownInput*/}
+                    {/*        placeholder={'Limit'}*/}
+                    {/*        selected={longGoalLimit}*/}
+                    {/*        isDisabled={!hasLongGoal}*/}
+                    {/*    >*/}
+                    {/*        {goalLimits.map(tempGoalLimit => (*/}
+                    {/*            <button*/}
+                    {/*                className={styles.dropDownOption}*/}
+                    {/*                onClick={() => setLongGoalLimit(tempGoalLimit)}*/}
+                    {/*                key={tempGoalLimit}*/}
+                    {/*            >*/}
+                    {/*                {tempGoalLimit}*/}
+                    {/*            </button>*/}
+                    {/*        ))}*/}
+                    {/*    </DropDownInput>*/}
+                    {/*</InputWrapper>*/}
+                    {/*<InputWrapper label={"Number"}>*/}
+                    {/*    <TextBoxInput*/}
+                    {/*        type="number"*/}
+                    {/*        placeholder="Number"*/}
+                    {/*        value={longGoalNumber}*/}
+                    {/*        setValue={setLongGoalNumber}*/}
+                    {/*        isDisabled={!hasLongGoal}*/}
+                    {/*        minNumber={1}*/}
+                    {/*    />*/}
+                    {/*</InputWrapper>*/}
                     <div className={"Horizontal-Flex-Container"}>
                         <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
                         <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>

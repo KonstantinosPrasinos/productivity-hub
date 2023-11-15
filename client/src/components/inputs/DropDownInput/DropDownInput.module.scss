@@ -17,6 +17,10 @@
 
     cursor: pointer;
 
+    &.widthBasedOnChildren {
+        width: auto;
+    }
+
     &.disabled {
         cursor: not-allowed;
         > * {
@@ -36,6 +40,12 @@
 
 .arrowIcon {
     transform-origin: center center;
+    height: 1em;
+    transition: 0.2s transform ease-in-out;
+
+    &.facingUp {
+        transform: rotate(180deg);
+    }
 }
 
 .optionsOverlay {
@@ -49,21 +59,43 @@
     transform-origin: center center;
 }
 
+@keyframes expandOptionsContainer {
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
 .optionsContainer {
     box-sizing: border-box;
     position: absolute;
     gap: 5px;
-    transform-origin: top;
+    transform-origin: bottom;
     width: 10em;
     
     z-index: 1;
     margin-top: 5px;
-    padding: v.$base-padding;
+    padding: v.$symmetrical-padding !important;
     box-shadow: v.$elevation-1;
 
     max-height: 10em;
     flex-flow: wrap;
     overflow-y: auto;
+    height: auto;
+
+    animation: 0.2s expandOptionsContainer ease-in-out;
+    transition: 0.2s transform ease-in-out;
+
+    &.collapsed {
+        transform: scaleY(0);
+
+        & > div {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+    }
 }
 
 .option {
@@ -121,6 +153,7 @@
 }
 
 .selected {
+    flex-shrink: 1;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

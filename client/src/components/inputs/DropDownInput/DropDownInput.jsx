@@ -1,115 +1,123 @@
-import {useEffect, useRef, useState} from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {useMemo, useRef, useState} from "react";
 
 import styles from "./DropDownInput.module.scss";
 import {TbChevronDown} from "react-icons/tb";
 import {createPortal} from "react-dom";
 
-const DropDownInput = ({placeholder, isDisabled, selected, children}) => {
-  const [extended, setExtended] = useState(false);
-  const [overlayContentTop, setOverlayContentTop] = useState(0);
-  const [overlayContentLeft, setOverlayContentLeft] = useState(0);
-  const containerRef = useRef();
-  const iconRef = useRef();
-  const hasEventListener = useRef(false);
+const DropDownInput = ({placeholder, isDisabled, selected, widthBasedOnChildren = false, children}) => {
+    const [extended, setExtended] = useState(false);
+    const containerRef = useRef();
+    const optionsRef = useRef();
+    const arrowRef = useRef();
 
-  const handleExtension = () => {
-      const collapse = (event) => {
-          if (
-              event.target !== containerRef.current &&
-              !containerRef.current?.contains(event.target) &&
-              event.target !== iconRef.current &&
-              iconRef.current?.contains(event.target)
-          ) {
-              setExtended(false);
-              document.body.removeEventListener('click', collapse);
-              hasEventListener.current = false;
-          }
-      }
+    const collapseOptions = () => {
+        optionsRef.current.classList.add(styles.collapsed);
+        arrowRef.current.classList.remove(styles.facingUp);
+    }
 
-      if (!isDisabled) {
-          setExtended(current => !current);
-          if (!extended && !hasEventListener.current) {
-              hasEventListener.current = true;
-              document.body.addEventListener('click', collapse);
-          }
-      }
-  }
+    const expandOptions = () => {
+        if (!isDisabled) {
+            setExtended(true);
+            arrowRef.current.classList.add(styles.facingUp);
 
-  const handleOverlayClick = (e) => {
-      e.stopPropagation();
-      setExtended(false);
-  }
+            // Collapse it when the screen resizes
+            window.addEventListener("resize", collapseOptions);
+        }
+    }
 
-  useEffect(() => {
-      if (extended) {
-          const setOverlayPosition = () => {
-              const {top, left} = containerRef.current.getBoundingClientRect();
+    // Change options container styles whenever it expands
+    const optionsContainerStyles = useMemo(() => {
+        if (!extended) return {};
 
-              setOverlayContentTop(`calc(${top}px + 2.5em)`);
-              setOverlayContentLeft(left)
-          }
-          window.addEventListener("resize", setOverlayPosition);
-          setOverlayPosition();
-      }
-  }, [extended]);
+        // Set its position
+        const styles = {};
+        const emSize = parseFloat(window.getComputedStyle(containerRef.current).fontSize);
+        const {top, left, right, bottom} = containerRef.current.getBoundingClientRect();
 
-  return (
-    <div className={`${isDisabled ? styles.disabled : ''} ${styles.container}`} ref={containerRef}>
-      <div
-        className={`Horizontal-Flex-Container Rounded-Container ${isDisabled ? styles.disabled : ''} ${styles.inputContainer}`}
-        onClick={handleExtension}
-      >
-        <div className={styles.selected}>{selected ? selected : placeholder}</div>
-        <AnimatePresence initial={false} mode={"wait"}>
-            <motion.div
-                className={styles.arrowIcon}
-                // key={extended}
-                initial={{rotate: extended ? 0 : 180}}
-                animate={{rotate: extended ? 180 : 0}}
-                transition={{type: "tween"}}
-                ref={iconRef}
+        // Check if it should go above or below the main container
+        if (top + 12.5 * emSize > window.innerHeight - emSize) {
+            // Would go outside of screen so go above
+            styles.bottom = `calc(100% - ${top}px + 0.5em)`;
+        } else {
+            styles.top = `${bottom}px`;
+            styles.transformOrigin = "top";
+        }
+
+        // Check if it should align to the left or the right of the main container
+        if (left + 10 * emSize > window.innerWidth - emSize) {
+            // Would go outside of screen so align to right
+            styles.right = `${right}px`;
+        } else {
+            styles.left = `${left}px`
+        }
+
+        return styles;
+    }, [extended]);
+
+    const handleOptionsContainerTransitionEnd = (event) => {
+        if (event.target !== optionsRef.current) return;
+        setExtended(false);
+    }
+
+    const maxChildLength = useMemo(() => {
+        let maxLength = 0;
+
+        for (const child of children) {
+            if (child.key?.length > maxLength) maxLength = child.key.length;
+        }
+
+        return maxLength;
+    }, [children]);
+
+    const handleOptionsContainerClick = (event) => {
+        // So that it doesn't collapse when an option is clicked
+        event.stopPropagation()
+    }
+
+    return (<div className={`${isDisabled ? styles.disabled : ''} ${styles.container}`} ref={containerRef}>
+            <div
+                className={`
+        Horizontal-Flex-Container
+        Rounded-Container
+        ${isDisabled ? styles.disabled : ''}
+        ${styles.inputContainer}
+        ${widthBasedOnChildren && maxChildLength ? styles.widthBasedOnChildren : ""}
+        `}
+                onClick={expandOptions}
             >
-                <TbChevronDown />
-            </motion.div>
-        </AnimatePresence>
-      </div>
-        {createPortal((
-            <AnimatePresence>
-                {extended && !isDisabled && (
-                    <div
-                        className={styles.optionsOverlay}
-                        onClick={handleOverlayClick}
-                    >
-                        <motion.div
-                            className={`${
-                                styles.optionsContainer
-                            } Stack-Container Rounded-Container`}
-                            initial={{height: 0, padding: "0 12px"}}
-                            animate={{height: 'auto', padding: '6px 12px'}}
-                            exit={{overflowY: "hidden", height: 0, padding: "0 12px"}}
-                            transition={{duration: 0.15}}
-                            style={{top: overlayContentTop, left: overlayContentLeft}}
+                <div className={styles.selected}
+                     style={{width: widthBasedOnChildren ? `${maxChildLength}ch` : "auto"}}>{selected ? selected : placeholder}</div>
+                <div
+                    className={styles.arrowIcon}
+                    ref={arrowRef}
+                >
+                    <TbChevronDown/>
+                </div>
+            </div>
+            {createPortal(extended && !isDisabled && (<div
+                className={styles.optionsOverlay}
+                onClick={collapseOptions}
+            >
+                <div
+                    className={`${styles.optionsContainer} Stack-Container Rounded-Container`}
+                    style={optionsContainerStyles}
+                    ref={optionsRef}
+                    onClick={handleOptionsContainerClick}
+                    onTransitionEnd={handleOptionsContainerTransitionEnd}
+                >
+                    {children.map((option, index) => {
+                        // Each options key should be its "value", in order to render as a selected
+                        return (<div
+                            className={`${styles.option} ${option.key === selected ? styles.optionSelected : ""} `}
+                            key={index}
+                            onClick={collapseOptions}
                         >
-                            {children.map((option, index) => {
-                                // Each options key should be its "value", in order to render as a selected
-                                return (
-                                    <div
-                                        className={`${styles.option} ${option.key === selected ? styles.optionSelected : ""} `}
-                                        key={index}
-                                        onClick={handleExtension}
-                                    >
-                                        {option}
-                                    </div>
-                                );
-                            })}
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-        ), document.getElementById("app") ?? document.getElementById("root"))}
-    </div>
-  );
+                            {option}
+                        </div>);
+                    })}
+                </div>
+            </div>), document.getElementById("app") ?? document.getElementById("root"))}
+        </div>);
 };
 
 export default DropDownInput;

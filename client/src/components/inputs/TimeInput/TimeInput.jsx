@@ -14,26 +14,31 @@ const TimeInput = ({hour = "11", setHour, minute = "11", setMinute, isDisabled =
     const baseRef = useRef();
 
     const handleHourWheelEvent = useCallback(debounce((event) => {
-
         const emSize = parseInt(window.getComputedStyle(event.target).fontSize);
 
         if (!isNaN(emSize)) {
             let value = Math.round((event.target.scrollTop / emSize) * (1 / 1.4));
 
-            setHour(value);
+            if (value < 10) {
+                setHour(`0${value.toString()}`);
+            } else {
+                setHour(value.toString());
+            }
         }
     }, 100), []);
 
     const handleMinuteWheelEvent = useCallback(debounce((event) => {
         const emSize = parseInt(window.getComputedStyle(event.target).fontSize);
 
-        let value = Math.round((event.target.scrollTop / emSize) * (1 / 1.4));
+        if (!isNaN(emSize)) {
+            let value = Math.round((event.target.scrollTop / emSize) * (1 / 1.4));
 
-        if (value < 10) {
-            value = `0${value}`
+            if (value < 10) {
+                setMinute(`0${value.toString()}`);
+            } else {
+                setMinute(value.toString());
+            }
         }
-
-        setMinute(value);
     }, 100), []);
 
     const setPickerPosition = () => {
@@ -50,6 +55,7 @@ const TimeInput = ({hour = "11", setHour, minute = "11", setMinute, isDisabled =
     }
 
     const collapsePicker = () => {
+        if (!pickerRef.current) return;
         pickerRef.current.classList.add(styles.collapsed);
         window.removeEventListener("resize", collapsePicker);
     }
