@@ -70,11 +70,19 @@ const TextBoxInput = ({
     const handleChange = (event) => {
         if (type === 'number') {
             if (isNaN(event.target.value)) {
-                return;
+                if (minNumber === null || minNumber < 0) {
+                    if (event.target.value !== "-") return;
+                } else {
+                    return;
+                }
+            }
+
+            if (event.target.value.length > 0) {
+                if (minNumber && parseFloat(event.target.value) < minNumber) return;
+                if (maxNumber && parseFloat(event.target.value) > maxNumber) return;
             }
         }
-        if (minNumber !== null && event.target.value < minNumber) return;
-        if (maxNumber !== null && event.target.value > maxNumber) return;
+
         setValue(event.target.value)
     }
 

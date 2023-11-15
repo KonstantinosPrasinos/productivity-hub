@@ -25,6 +25,7 @@ import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer
 import ToggleButton from "@/components/buttons/ToggleButton/ToggleButton";
 import Divider from "@/components/utilities/Divider/Divider";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
+import PriorityIndicator from "@/components/indicators/PriorityIndicator/PriorityIndicator";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -206,9 +207,9 @@ const NewCategory = ({index, length, id}) => {
         setEndMinute("59");
 
         setHasLongGoal(false);
-        setLongGoalType("At least");
+        setLongGoalType("Streak");
         setLongGoalNumber(settings.defaults.goal);
-        setLongGoalLimit("Streak");
+        setLongGoalLimit("At least");
     }
 
     const getGroupId = () => {
@@ -364,9 +365,9 @@ const NewCategory = ({index, length, id}) => {
         } else {
             // Default values
             setHasLongGoal(false);
-            setLongGoalType("At least");
+            setLongGoalType("Streak");
             setLongGoalNumber(settings.defaults.goal);
-            setLongGoalLimit("Streak");
+            setLongGoalLimit("At least");
         }
 
         currentEditedGroup.current = group;
@@ -489,6 +490,7 @@ const NewCategory = ({index, length, id}) => {
                     </InputWrapper>
                     <InputWrapper label={'Priority'}>
                         <TextBoxInput type='number' placeholder="Number" value={priority} setValue={setPriority} />
+                        <PriorityIndicator/>
                     </InputWrapper>
                     <Divider />
                     <InputWrapper label={"Repeat between certain times"}>
@@ -568,50 +570,6 @@ const NewCategory = ({index, length, id}) => {
                             minNumber={1}
                         />
                     </InputWrapper>
-                    {/*<InputWrapper label={"Type"}>*/}
-                    {/*    <DropDownInput*/}
-                    {/*        placeholder={'Type'}*/}
-                    {/*        selected={longGoalType}*/}
-                    {/*        isDisabled={!hasLongGoal}*/}
-                    {/*    >*/}
-                    {/*        {goalTypes.map(tempGoalLimit => (*/}
-                    {/*            <button*/}
-                    {/*                className={styles.dropDownOption}*/}
-                    {/*                onClick={() => setLongGoalLimit(tempGoalLimit)}*/}
-                    {/*                key={tempGoalLimit}*/}
-                    {/*            >*/}
-                    {/*                {tempGoalLimit}*/}
-                    {/*            </button>*/}
-                    {/*        ))}*/}
-                    {/*    </DropDownInput>*/}
-                    {/*</InputWrapper>*/}
-                    {/*<InputWrapper label={"Limit"}>*/}
-                    {/*    <DropDownInput*/}
-                    {/*        placeholder={'Limit'}*/}
-                    {/*        selected={longGoalLimit}*/}
-                    {/*        isDisabled={!hasLongGoal}*/}
-                    {/*    >*/}
-                    {/*        {goalLimits.map(tempGoalLimit => (*/}
-                    {/*            <button*/}
-                    {/*                className={styles.dropDownOption}*/}
-                    {/*                onClick={() => setLongGoalLimit(tempGoalLimit)}*/}
-                    {/*                key={tempGoalLimit}*/}
-                    {/*            >*/}
-                    {/*                {tempGoalLimit}*/}
-                    {/*            </button>*/}
-                    {/*        ))}*/}
-                    {/*    </DropDownInput>*/}
-                    {/*</InputWrapper>*/}
-                    {/*<InputWrapper label={"Number"}>*/}
-                    {/*    <TextBoxInput*/}
-                    {/*        type="number"*/}
-                    {/*        placeholder="Number"*/}
-                    {/*        value={longGoalNumber}*/}
-                    {/*        setValue={setLongGoalNumber}*/}
-                    {/*        isDisabled={!hasLongGoal}*/}
-                    {/*        minNumber={1}*/}
-                    {/*    />*/}
-                    {/*</InputWrapper>*/}
                     <div className={"Horizontal-Flex-Container"}>
                         <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
                         <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>

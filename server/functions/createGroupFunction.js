@@ -5,7 +5,7 @@ const groupSchema = Joi.object({
     title: Joi.string().required(),
     priority: Joi.number().required(),
     goal: Joi.object().keys({
-        type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
+        type: Joi.string().valid('Streak', 'Total'),
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(1)
     }),

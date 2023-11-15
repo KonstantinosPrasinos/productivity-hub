@@ -21,7 +21,11 @@ const DropDownInput = ({placeholder, isDisabled, selected, widthBasedOnChildren 
             arrowRef.current.classList.add(styles.facingUp);
 
             // Collapse it when the screen resizes
-            window.addEventListener("resize", collapseOptions);
+            window.addEventListener("resize", () => {
+                // Collapse options instantly
+                arrowRef.current.classList.remove(styles.facingUp)
+                setExtended(false)
+            });
         }
     }
 
@@ -39,7 +43,7 @@ const DropDownInput = ({placeholder, isDisabled, selected, widthBasedOnChildren 
             // Would go outside of screen so go above
             styles.bottom = `calc(100% - ${top}px + 0.5em)`;
         } else {
-            styles.top = `${bottom}px`;
+            styles.top = `calc(${bottom}px + 0.25em)`;
             styles.transformOrigin = "top";
         }
 

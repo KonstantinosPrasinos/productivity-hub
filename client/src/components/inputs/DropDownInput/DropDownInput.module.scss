@@ -69,7 +69,6 @@
 }
 
 .optionsContainer {
-    box-sizing: border-box;
     position: absolute;
     gap: 5px;
     transform-origin: bottom;
@@ -80,7 +79,7 @@
     padding: v.$symmetrical-padding !important;
     box-shadow: v.$elevation-1;
 
-    max-height: 10em;
+    max-height: calc(6em + 10px); // 3 options
     flex-flow: wrap;
     overflow-y: auto;
     height: auto;
@@ -109,6 +108,7 @@
     box-sizing: border-box;
     height: 2em;
     width: 100%;
+    flex-shrink: 0;
 
     & > * {
         padding: v.$base-padding;
