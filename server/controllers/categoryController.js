@@ -84,7 +84,7 @@ const deleteCategory = async (req, res) => {
         if (deleteTasks === undefined || deleteTasks === null) deleteTasks = false;
 
         // Delete category
-        try{
+        try {
             await Category.deleteOne({userId: req.user._id, _id: categoryId});
             const deleteResponse = await Group.deleteMany({userId: req.user._id, parent: categoryId});
 

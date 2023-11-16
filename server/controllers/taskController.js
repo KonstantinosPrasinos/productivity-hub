@@ -315,6 +315,8 @@ const createTask = async (req, res) => {
             const newTask = await Task.create({...validatedTask.value, userId: req.user._id});
             const entry = await Entry.create({userId: req.user._id, taskId: newTask._id});
 
+            console.log(newTask._doc);
+
             res.status(200).json({
                 ...newTask._doc,
                 mostRecentProperDate: undefined,
