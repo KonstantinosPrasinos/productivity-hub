@@ -348,6 +348,19 @@ table {
         }
     }
 
+    tr > th {
+        border: solid var(--border-primary-color);
+        border-width: 1px 0;
+
+        &:first-child {
+            border-left-width: 1px;
+        }
+
+        &:last-child {
+            border-right-width: 1px;
+        }
+    }
+
 
     tr:first-child {
         th:first-child {
@@ -375,10 +388,11 @@ table {
 
 thead {
     vertical-align: center;
-    border: none;
-    background-color: var(--primary-color);
-    color: var(--on-primary-color);
-    font-weight: normal;
+    //border: none;
+    background-color: var(--background-color);
+    border: 2px solid red;
+    color: var(--primary-color);
+    //font-weight: normal;
     text-align: left;
 }
 
