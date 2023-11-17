@@ -21,6 +21,7 @@ $base-size: 1.2em;
 .loadingIndicatorContainer {
   text-align: center;
   box-sizing: border-box;
+  padding: 7.8px; // + 1.6 * rows (6)  / 2
 }
 
 .tableButton {
@@ -53,4 +54,16 @@ $base-size: 1.2em;
 
 .isProperDate {
   text-decoration: underline;
+}
+
+.emptyRow {
+  & > td {
+    height: 1.5em;
+  }
+}
+
+.tableLoading {
+  & > tr:not(:last-child) > td {
+    border-bottom: none;
+  }
 }

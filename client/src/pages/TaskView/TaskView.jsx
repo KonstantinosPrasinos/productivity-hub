@@ -104,12 +104,27 @@ const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortO
     currentDate.setUTCHours(0, 0, 0, 0);
 
     if (isLoading) return (
-        <tbody>
-        <tr>
-            <td colSpan={3} className={styles.loadingIndicatorContainer}>
-                <LoadingIndicator size={"inline"} />
-            </td>
-        </tr>
+        <tbody className={styles.tableLoading}>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3}></td>
+            </tr>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3}></td>
+            </tr>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3} className={styles.loadingIndicatorContainer}>
+                    <LoadingIndicator size={"inline"} />
+                </td>
+            </tr>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3}></td>
+            </tr>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3}></td>
+            </tr>
+            <tr className={styles.emptyRow}>
+                <td colSpan={3}></td>
+            </tr>
         </tbody>
     )
 
@@ -151,10 +166,24 @@ const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortO
         setIsVisibleNewEntryModal(true);
     }
 
+    const n = 5;
+
+    const numbersArray = Array.from({length: n}, (_, index) => index);
+
     return (
         <>
-            <motion.tbody className={styles.tBody} key={pageNumber}>
-                        {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
+            <tbody className={styles.tBody} key={pageNumber}>
+                {numbersArray.map(i => {
+                    if (pageNumber * 5 + i >= sortedEntries.length) {
+                        return <tr key={`empty-row-${i}`} className={styles.emptyRow}>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    } else {
+                        const entry = sortedEntries[pageNumber * 5 + i];
+
+                        if (entry) {
                             const entryDate = new Date(entry.date);
                             entryDate.setHours(0, 0);
 
@@ -171,8 +200,31 @@ const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortO
                                     </IconButton>
                                 </td>
                             </tr>
-                        })}
-            </motion.tbody>
+                        }
+                    }
+                })}
+                        {/*{sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {*/}
+                        {/*    const entryDate = new Date(entry.date);*/}
+                        {/*    entryDate.setHours(0, 0);*/}
+
+                        {/*    const isProperDate = checkIfDateIsProper(entryDate, task, functionName, timeToAdd)*/}
+
+                        {/*    return <motion.tr*/}
+                        {/*        initial={{height: 0}}*/}
+                        {/*        animate={{height: "1em"}}*/}
+                        {/*        transition={{duration: 20}}*/}
+                        {/*        key={entry._id}*/}
+                        {/*    >*/}
+                        {/*        <td className={isProperDate ? styles.isProperDate : ""}>{entryDate.toLocaleDateString()}</td>*/}
+                        {/*        <td>{entry.value}</td>*/}
+                        {/*        <td>*/}
+                        {/*            <IconButton onClick={() => handleEditEntry(entry)}>*/}
+                        {/*                <TbEdit />*/}
+                        {/*            </IconButton>*/}
+                        {/*        </td>*/}
+                        {/*    </motion.tr>*/}
+                        {/*})}*/}
+            </tbody>
             <tfoot>
             <tr>
                 <td colSpan={3}>
