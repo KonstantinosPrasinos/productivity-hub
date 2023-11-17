@@ -22,9 +22,9 @@ const CategoryIndicator = ({categoryId, groupId}) => {
         return groups?.find(group => group._id === groupId)
     }
 
-    const category = useMemo(findCategory, [categoriesLoading]);
+    const category = useMemo(findCategory, [categoriesLoading, categories]);
 
-    const group = useMemo(findGroup, [groupsLoading]);
+    const group = useMemo(findGroup, [groupsLoading, groups]);
 
     const handleClick = (event) => {
         event.stopPropagation();

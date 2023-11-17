@@ -136,8 +136,6 @@ const NewTask = ({index, length, id}) => {
                     setLongGoalNumber(task.longGoal.number);
                 }
 
-                console.log(task);
-
                 if (task.group) {
                     setRepeatType('Time Group');
                     setTimeGroup(groups.find(group => group._id === task.group));
@@ -290,7 +288,6 @@ const NewTask = ({index, length, id}) => {
             if (id) {
                 await changeTask({...task, _id: id});
             } else {
-                console.log(task);
                 await addTask(task);
             }
 
@@ -301,8 +298,6 @@ const NewTask = ({index, length, id}) => {
     const toggleDateModal = () => {
         setDateModalIsVisible(current => !current);
     }
-
-    console.log(timeGroup);
 
     return (
         <>

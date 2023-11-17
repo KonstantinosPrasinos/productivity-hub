@@ -50,12 +50,15 @@ export function useChangeCategory() {
                         queryClient.setQueryData(["tasks"], (oldDataTasks) => {
                             return {
                                 tasks: [
-                                    ...oldDataTasks.tasks.filter(task => {
-                                        if (group.affectedTasks.find(tempTask => tempTask._id === task._id)) {
+                                    ...oldDataTasks.tasks.map(task => {
+                                        if (group.affectedTasks.find(tempTaskId => tempTaskId === task._id)) {
                                             return {
                                                 ...task,
-                                                repeatRate: group.repeatRate
+                                                repeatRate: group.repeatRate,
+                                                longGoal: group.goal
                                             }
+                                        } else {
+                                            return task;
                                         }
                                     })
                                 ]

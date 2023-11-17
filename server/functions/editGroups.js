@@ -8,7 +8,7 @@ async function editGroups(groups, userId) {
         for (const group of groups) {
             const editedGroup = await Group.findOneAndUpdate({userId, _id: group._id}, group, {returnDocument: 'after'});
 
-            const affectedTasks = await Task.find({userId, group: editedGroup._id});
+            const affectedTasks = (await Task.find({userId, group: editedGroup._id})).map(task => task._id);
             await Task.updateMany({userId, group: editedGroup._doc._id}, {$set: {repeatRate: editedGroup._doc.repeatRate}})
 
             newGroups.push({...editedGroup._doc, affectedTasks: affectedTasks});
