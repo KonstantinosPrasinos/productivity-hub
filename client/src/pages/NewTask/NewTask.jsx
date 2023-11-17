@@ -609,7 +609,7 @@ const NewTask = ({index, length, id}) => {
                         </DropDownInput>
                     </InputWrapper>
                     <InputWrapper label={'On'}>
-                        <Button onClick={toggleDateModal}>Select dates</Button>
+                        <Button onClick={toggleDateModal} disabled={timePeriod === "Days"}>Select dates</Button>
                     </InputWrapper>
                 </HeaderExtendContainer>
                 <HeaderExtendContainer
