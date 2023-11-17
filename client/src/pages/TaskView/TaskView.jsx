@@ -564,6 +564,7 @@ const TaskView = ({index, length, task}) => {
             <MiniPageContainer
                 index={index}
                 length={length}
+                showSaveButton={false}
             >
                 <section className={`Horizontal-Flex-Container Space-Between`}>
                     <div className={'Title'}>{task?.title}</div>

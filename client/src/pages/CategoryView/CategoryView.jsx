@@ -62,6 +62,7 @@ const CategoryView = ({index, length, category}) => {
         <MiniPageContainer
             index={index}
             length={length}
+            showSaveButton={false}
         >
             <section className={`Horizontal-Flex-Container Space-Between`}>
                 <div className={'Horizontal-Flex-Container'}>

@@ -7,7 +7,7 @@ import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {useScreenSize} from "../../../hooks/useScreenSize";
 import {TbX} from "react-icons/tb";
 
-const MiniPageContainer = ({children, onClickSave, length, index}) => {
+const MiniPageContainer = ({children, onClickSave, length, index, showSaveButton = true}) => {
     const containerRef = useRef();
     const animationControls = useAnimation();
 
@@ -95,7 +95,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
                 <div className={styles.actionButtonsContainer}>
                     <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><TbX /></IconButton>
-                    <Button onClick={onClickSave}>Save</Button>
+                    {showSaveButton && <Button onClick={onClickSave}>Save</Button>}
                 </div>
             </div>
             <motion.div className={`Stack-Container ${styles.childrenContainer}`} layout>
