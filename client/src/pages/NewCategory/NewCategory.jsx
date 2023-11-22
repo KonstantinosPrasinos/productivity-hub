@@ -23,7 +23,6 @@ import ConfirmDeleteGroupModal from "../../components/utilities/ConfirmDeleteGro
 import {useChangeCategory} from "../../hooks/change-hooks/useChangeCategory";
 import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import ToggleButton from "@/components/buttons/ToggleButton/ToggleButton";
-import Divider from "@/components/utilities/Divider/Divider";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import PriorityIndicator from "@/components/indicators/PriorityIndicator/PriorityIndicator";
 
@@ -40,30 +39,34 @@ const NewCategory = ({index, length, id}) => {
     const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
     const currentEditedGroup = useRef();
 
+    // Inputs for both category types
     const [title, setTitle] = useState('');
     const [color, setColor] = useState('Red');
+    const [repeats, setRepeats] = useState(false);
+
+    // Inputs for repeatable category
+    const [timePeriodNumber, setTimePeriodNumber] = useState(settings.defaults.priority);
+    const [timePeriod, setTimePeriod] = useState('Days');
+    const [timePeriod2, setTimePeriod2] = useState([]);
+    const [priority, setPriority] = useState(0);
+    const [hasLongGoal, setHasLongGoal] = useState(false);
+    const [longGoalLimit, setLongGoalLimit] = useState('At least');
+    const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
+    const [longGoalType, setLongGoalType] = useState("Streak");
     const [timeGroups, setTimeGroups] = useState([]);
 
+    // Inputs for current group
     const [timeGroupTitle, setTimeGroupTitle] = useState('');
-    const [priority, setPriority] = useState(0);
     const [hasTime, setHasTime] = useState(false);
     const [startHour, setStartHour] = useState('00');
     const [startMinute, setStartMinute] = useState('00');
     const [endHour, setEndHour] = useState('23');
     const [endMinute, setEndMinute] = useState('59');
-    const [timeGroupNumber, setTimeGroupNumber] = useState(settings.defaults.priority);
-    const [timePeriod, setTimePeriod] = useState('Days');
-    const [timePeriod2, setTimePeriod2] = useState([]);
-
-    const [hasLongGoal, setHasLongGoal] = useState(false);
-    const [longGoalLimit, setLongGoalLimit] = useState('At least');
-    const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
-    const [longGoalType, setLongGoalType] = useState("Streak");
 
     const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
 
     const {mutate: addCategoryToServer} = useAddCategory();
-    const {mutateAsync: changeCategory, isLoading: changeCategoryLoading} = useChangeCategory();
+    const {mutateAsync: changeCategory} = useChangeCategory();
 
     const continueAfterModalFunctionRef = useRef();
     const initialCategoryValues = useRef();
@@ -96,108 +99,130 @@ const NewCategory = ({index, length, id}) => {
     }
 
     const handleSave = async () => {
-        const checkAllInputs = () => {
-            if (!title) {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
-                return false;
-            } else if (!id && categories.find(category => category.title === title) !== undefined) {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "A category with that title already exists"}})
-                return false;
-            }
-
-            return true;
-        }
-
         if (categoriesLoading) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Categories currently loading"}})
         }
 
         if (creatingTimeGroup) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You have unsaved time group changes"}})
-            return false;
+            return;
         }
 
-        if (checkAllInputs()) {
-            const category = {
-                title,
-                color
+        // Check inputs for validity
+        if (!title) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
+            return;
+        }
+
+        if (!id && categories.find(category => category.title === title) !== undefined) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "A category with that title already exists"}})
+            return;
+        }
+
+        let repeatParameters = undefined;
+
+        if (repeats) {
+            if (timePeriodNumber.toString().length === 0) return;
+
+            repeatParameters = {
+                priority,
+                repeatRate: {
+                    number: timePeriodNumber,
+                    bigTimePeriod: timePeriod,
+                    startingDate: (new Date()).setUTCHours(0, 0, 0, 0)
+                }
             }
 
-            if (id) {
-                const groupsForDeletion = [];
-                const groupsForEdit = [];
-                const newGroups = [];
+            if (hasLongGoal) {
+                if (longGoalNumber.toString().length === 0) return;
 
-                // Get edited and deleted groups
-                for (const group of timeGroups) {
-                    if (group?.deleted) {
-                        groupsForDeletion.push(group._id);
-                    } else if (group?.edited) {
-                        delete group.edited;
-                        groupsForEdit.push(group);
-                    } else if (group?.isNew) {
-                        delete group._id;
-                        delete group.isNew;
-                        newGroups.push(group);
-                    }
+                repeatParameters.goal = {
+                    type: longGoalType,
+                    limit: longGoalLimit,
+                    number: longGoalNumber
                 }
+            }
+        }
 
-                const continueAfterModalFunction = async (action = settings.defaults.deleteGroupAction) => {
-                    const requestObject = {action};
+        const category = {
+            title,
+            color,
+            repeats,
+            ...repeatParameters
+        }
 
-                    if (groupsForDeletion.length) {
-                        requestObject.groupsForDeletion = groupsForDeletion
-                    }
+        if (id) {
+            // Editing category
+            const groupsForDeletion = [];
+            const groupsForEdit = [];
+            const newGroups = [];
 
-                    if (groupsForEdit.length > 0) {
-                        requestObject.groupsForEdit = groupsForEdit;
-                    }
-
-                    if (newGroups.length > 0) {
-                        requestObject.newGroups = newGroups;
-                        requestObject.parentId = id;
-                    }
-
-                    if (initialCategoryValues.current?.title !== category.title || initialCategoryValues.current?.color !== category.color) {
-                        requestObject.category = {...category, _id: id};
-                    }
-
-                    await changeCategory(requestObject);
-
-                    miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+            // Get edited and deleted groups
+            for (const group of timeGroups) {
+                if (group?.deleted) {
+                    groupsForDeletion.push(group._id);
+                } else if (group?.edited) {
+                    delete group.edited;
+                    groupsForEdit.push(group);
+                } else if (group?.isNew) {
+                    delete group._id;
+                    delete group.isNew;
+                    newGroups.push(group);
                 }
+            }
+
+            const continueAfterModalFunction = async (action = settings.defaults.deleteGroupAction) => {
+                const requestObject = {action};
 
                 if (groupsForDeletion.length) {
-                    if (settings.confirmDelete) {
-                        toggleConfirmModal()
-                        continueAfterModalFunctionRef.current = continueAfterModalFunction;
-                    } else {
-                        await continueAfterModalFunction();
-                    }
-                } else {
-                    await continueAfterModalFunction();
+                    requestObject.groupsForDeletion = groupsForDeletion
                 }
 
-            } else {
-                await addCategoryToServer(
-                    {
-                        category,
-                        groups: timeGroups.map(timeGroup => {
-                            return {...timeGroup, _id: undefined}
-                        })
-                    });
+                if (groupsForEdit.length > 0) {
+                    requestObject.groupsForEdit = groupsForEdit;
+                }
+
+                if (newGroups.length > 0) {
+                    requestObject.newGroups = newGroups;
+                    requestObject.parentId = id;
+                }
+
+                if (initialCategoryValues.current?.title !== category.title || initialCategoryValues.current?.color !== category.color) {
+                    requestObject.category = {...category, _id: id};
+                }
+
+                await changeCategory(requestObject);
 
                 miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
             }
+
+            if (groupsForDeletion.length) {
+                if (settings.confirmDelete) {
+                    toggleConfirmModal()
+                    continueAfterModalFunctionRef.current = continueAfterModalFunction;
+                } else {
+                    await continueAfterModalFunction();
+                }
+            } else {
+                await continueAfterModalFunction();
+            }
+
+        } else {
+            await addCategoryToServer(
+                {
+                    category,
+                    groups: timeGroups.map(timeGroup => {
+                        return {...timeGroup, _id: undefined}
+                    })
+                });
+
+            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
         }
     }
 
     const resetTimeGroupInputs = () => {
         setTimeGroupTitle('');
-        setPriority(settings.defaults.priority);
 
-        setTimeGroupNumber(1);
-        setTimePeriod('Days');
         setTimePeriod2([]);
 
         setHasTime(false);
@@ -205,11 +230,6 @@ const NewCategory = ({index, length, id}) => {
         setStartMinute("00");
         setEndHour("23");
         setEndMinute("59");
-
-        setHasLongGoal(false);
-        setLongGoalType("Streak");
-        setLongGoalNumber(settings.defaults.goal);
-        setLongGoalLimit("At least");
     }
 
     const getGroupId = () => {
@@ -252,14 +272,11 @@ const NewCategory = ({index, length, id}) => {
         const timeGroup = {
             _id: newId,
             title: timeGroupTitle,
-            priority,
             repeatRate: {
-                number: timeGroupNumber,
-                bigTimePeriod: timePeriod,
                 smallTimePeriod: timePeriod2,
                 startingDate: startingDates
             },
-            initial: currentEditedGroup.current?.initial,
+            initial: currentEditedGroup.current?.initial
         }
 
         if (hasTime) {
@@ -286,14 +303,6 @@ const NewCategory = ({index, length, id}) => {
                     }
                 })
                 return;
-            }
-        }
-
-        if (hasLongGoal) {
-            timeGroup.goal = {
-                type: longGoalType,
-                limit: longGoalLimit,
-                number: longGoalNumber
             }
         }
 
@@ -336,10 +345,6 @@ const NewCategory = ({index, length, id}) => {
 
         // Populate time group inputs
         setTimeGroupTitle(group.title);
-        setPriority(group.priority);
-
-        setTimeGroupNumber(group.repeatRate.number);
-        setTimePeriod(group.repeatRate.bigTimePeriod);
         setTimePeriod2(group.repeatRate.smallTimePeriod);
 
         if (group.repeatRate?.time) {
@@ -355,19 +360,6 @@ const NewCategory = ({index, length, id}) => {
             setStartMinute("00");
             setEndHour("23");
             setEndMinute("59");
-        }
-
-        if (group?.goal) {
-            setHasLongGoal(true);
-            setLongGoalType(group.goal.type);
-            setLongGoalLimit(group.goal.limit);
-            setLongGoalNumber(group.goal.number);
-        } else {
-            // Default values
-            setHasLongGoal(false);
-            setLongGoalType("Streak");
-            setLongGoalNumber(settings.defaults.goal);
-            setLongGoalLimit("At least");
         }
 
         currentEditedGroup.current = group;
@@ -429,12 +421,9 @@ const NewCategory = ({index, length, id}) => {
     const disabledSaveGroupButton = useMemo(() => {
         if (!timeGroupTitle) return true;
         if (timePeriod !== "Days" && timePeriod2.length === 0) return true;
-        if (priority.toString().length === 0) return true;
-        if (timeGroupNumber.toString().length === 0) return true;
-        if (hasLongGoal && longGoalNumber.toString().length === 0) return true;
 
         return false;
-    }, [timePeriod2, timeGroupTitle, priority, timeGroupNumber]);
+    }, [timePeriod2, timeGroupTitle, priority, timePeriodNumber]);
 
     return (
         <>
@@ -454,77 +443,26 @@ const NewCategory = ({index, length, id}) => {
                     <ColorInput selected={color} setSelected={setColor}/>
                 </InputWrapper>
                 <HeaderExtendContainer
-                    header={<div className={"Stack-Container"}>
-                        <InputWrapper label="Time Groups">
-                            <div className={styles.groupTitlesContainer}>
-                                <Button filled={true} symmetrical={true} onClick={handleAddTimeGroup}><TbPlus /></Button>
-                                {timeGroupList[0]._id === -1 &&
-                                    <Chip type={'icon'} size={"small"}>None</Chip>
-                                }
-                                <AnimatePresence mode={"popLayout"}>
-                                    {timeGroupList[0]._id !== -1 && timeGroupList.map((group) => (
-                                        <motion.div
-                                            layout
-                                            key={group._id}
-                                            initial={{ scale: 0.8, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            exit={{ scale: 0.8, opacity: 0 }}
-                                        >
-                                            <Chip type={'icon'} onClick={(e) => {handleGroupClick(e, group)}} hasDeleteButton={true} deleteFunction={() => handleDelete(group)} size={"small"}>
-                                                {group.title}
-                                            </Chip>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </div>
-                        </InputWrapper>
+                    header={<div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Title-Small"}>Turn into repeatable container</div>
+                        <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
                     </div>}
-                    extendedInherited={creatingTimeGroup}
-                    setExtendedInherited={handleAddTimeGroup}
-                    hasPointer={false}
                     extendOnClick={false}
+                    extendedInherited={repeats}
+                    hasPointer={false}
                 >
-                    <Divider />
-                    <InputWrapper label={'Title'}>
-                        <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle}/>
-                    </InputWrapper>
-                    <InputWrapper label={'Priority'}>
-                        <TextBoxInput type='number' placeholder="Number" value={priority} setValue={setPriority} />
-                        <PriorityIndicator/>
-                    </InputWrapper>
-                    <Divider />
-                    <InputWrapper label={"Repeat between certain times"}>
-                        <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
-                    </InputWrapper>
-                    <InputWrapper label={"From - To"}>
-                        <TimeInput
-                            hour={startHour}
-                            setHour={setStartHour}
-                            minute={startMinute}
-                            setMinute={setStartMinute}
-                            isDisabled={!hasTime}
-                        />
-                        -
-                        <TimeInput
-                            hour={endHour}
-                            setHour={setEndHour}
-                            minute={endMinute}
-                            setMinute={setEndMinute}
-                            isDisabled={!hasTime}
-                        />
-                    </InputWrapper>
                     <InputWrapper label={'Repeat every'}>
-                        <TextBoxInput type='number' placeholder="Number" value={timeGroupNumber} setValue={setTimeGroupNumber} minNumber={1} />
+                        <TextBoxInput type='number' placeholder="Number" value={timePeriodNumber} setValue={setTimePeriodNumber} minNumber={1} />
                         <DropDownInput placeholder={'Weeks'} selected={timePeriod}>
                             {timePeriods.map(tempTimePeriod =>
                                 <button key={tempTimePeriod} onClick={() => handleTimePeriodInput(tempTimePeriod)}>{tempTimePeriod}</button>
                             )}
                         </DropDownInput>
                     </InputWrapper>
-                    <InputWrapper label={'On'}>
-                        <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"}>Select dates</Button>
+                    <InputWrapper label={'Priority'}>
+                        <TextBoxInput type='number' placeholder="Number" value={priority} setValue={setPriority} />
+                        <PriorityIndicator/>
                     </InputWrapper>
-                    <Divider />
                     <InputWrapper label={"Has goal"}>
                         <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />
                     </InputWrapper>
@@ -570,10 +508,69 @@ const NewCategory = ({index, length, id}) => {
                             minNumber={1}
                         />
                     </InputWrapper>
-                    <div className={"Horizontal-Flex-Container"}>
-                        <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
-                        <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>
-                    </div>
+                    <HeaderExtendContainer
+                        header={<div className={"Stack-Container"}>
+                            <InputWrapper label="Subdivisions" hasPadding={false}>
+                                <div className={styles.groupTitlesContainer}>
+                                    <Button filled={false} symmetrical={true} onClick={handleAddTimeGroup} size={"small"} disabled={timePeriod === "Days"}>
+                                        Add new
+                                        <TbPlus />
+                                    </Button>
+                                    <AnimatePresence mode={"popLayout"}>
+                                        {timeGroupList[0]._id !== -1 && timeGroupList.map((group) => (
+                                            <motion.div
+                                                layout
+                                                key={group._id}
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                exit={{ scale: 0.8, opacity: 0 }}
+                                            >
+                                                <Chip type={'icon'} onClick={(e) => {handleGroupClick(e, group)}} hasDeleteButton={true} deleteFunction={() => handleDelete(group)} size={"small"}>
+                                                    {group.title}
+                                                </Chip>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            </InputWrapper>
+                        </div>}
+                        extendedInherited={creatingTimeGroup}
+                        setExtendedInherited={handleAddTimeGroup}
+                        hasPointer={false}
+                        extendOnClick={false}
+                        hasOutline={false}
+                    >
+                        <InputWrapper label={'Title'}>
+                            <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle}/>
+                        </InputWrapper>
+                        <InputWrapper label={'On'}>
+                            <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"}>Select dates</Button>
+                        </InputWrapper>
+                        <InputWrapper label={"Repeat between certain times"}>
+                            <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
+                        </InputWrapper>
+                        <InputWrapper label={"From - To"}>
+                            <TimeInput
+                                hour={startHour}
+                                setHour={setStartHour}
+                                minute={startMinute}
+                                setMinute={setStartMinute}
+                                isDisabled={!hasTime}
+                            />
+                            -
+                            <TimeInput
+                                hour={endHour}
+                                setHour={setEndHour}
+                                minute={endMinute}
+                                setMinute={setEndMinute}
+                                isDisabled={!hasTime}
+                            />
+                        </InputWrapper>
+                        <div className={"Horizontal-Flex-Container"}>
+                            <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
+                            <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>
+                        </div>
+                    </HeaderExtendContainer>
                 </HeaderExtendContainer>
             </MiniPageContainer>
             {confirmDeleteModalVisible &&

@@ -2,7 +2,16 @@ import React, {useState} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import styles from "./HeaderExtendContainer.module.scss";
 
-const HeaderExtendContainer = ({header, children, extendedInherited = null, setExtendedInherited = null, isDisabled = false, hasPointer = true, extendOnClick = true}) => {
+const HeaderExtendContainer = ({
+                                   header,
+                                   children,
+                                   extendedInherited = null,
+                                   setExtendedInherited = null,
+                                   isDisabled = false,
+                                   hasPointer = true,
+                                   extendOnClick = true,
+                                   hasOutline = true
+                               }) => {
     const [isExtended, setIsExtended] = useState(false);
 
     const handleClick = () => {
@@ -12,7 +21,7 @@ const HeaderExtendContainer = ({header, children, extendedInherited = null, setE
     }
 
     return (
-        <section className={styles.container}>
+        <section className={`${styles.container} ${hasOutline ? styles.hasOutline : ""} ${isExtended || extendedInherited ? styles.extended : ""}`}>
             <div
                 className={`${styles.headerContainer} ${isDisabled ? styles.disabled : ''} ${hasPointer ? styles.hasPointer : ""}`}
                 onClick={handleClick}

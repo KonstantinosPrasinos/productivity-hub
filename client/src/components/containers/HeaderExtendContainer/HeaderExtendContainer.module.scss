@@ -2,17 +2,26 @@
 @use "@/styles/variables" as v;
 
 .container {
-  @extend .Stack-Container, .Rounded-Container;
-  border: v.$base-border;
-  padding: 12px 12px 0 12px;
+  @extend .Stack-Container;
   width: 100%;
   box-sizing: border-box;
   gap: 0;
+
+  &:not(.hasOutline).extended > .headerContainer {
+    border-bottom: v.$base-border;
+  }
+
+  &.hasOutline {
+    @extend .Rounded-Container;
+    padding: 12px 12px 0 12px;
+    border: v.$base-border;
+  }
 }
 
 .headerContainer {
   text-align: left;
-  padding: 0 0 12px;
+  padding: 0 0 6px;
+  margin-bottom: 6px;
   transition: opacity 0.2s linear;
   overflow: hidden;
 

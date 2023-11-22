@@ -9,7 +9,19 @@ const {createGroupFunction, groupSchema} = require("../functions/createGroupFunc
 
 const categorySchema = Joi.object({
     title: Joi.string().required(),
-    color: Joi.string().required()
+    color: Joi.string().required(),
+    repeats: Joi.boolean().required(),
+    priority: Joi.number().integer().required(),
+    goal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
+        type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
+        number: Joi.number().min(1)
+    }),
+    repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
+        number: Joi.number().integer().min(1),
+        bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
+        startingDate: Joi.number()
+    })
 })
 
 const getCategories = (req, res) => {
@@ -33,6 +45,7 @@ const createCategory = async (req, res) => {
         const validatedCategory = categorySchema.validate(category);
 
         if (validatedCategory.error) {
+            console.log(validatedCategory.error)
             return res.status(400).json({message: validatedCategory.error});
         }
 

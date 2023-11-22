@@ -12,6 +12,20 @@ const Category = new mongoose.Schema({
     color: {
         type: String,
         required: true
+    },
+    priority: {
+        type: Number,
+        required: true
+    },
+    repeatRate: {
+        number: Number,
+        bigTimePeriod: String,
+        startingDate: [Date],
+    },
+    goal: {
+        limit: {type: String},
+        type: {type: String},
+        number: Number
     }
 })
 
