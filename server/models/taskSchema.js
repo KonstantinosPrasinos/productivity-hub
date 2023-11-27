@@ -15,7 +15,7 @@ const Task = new mongoose.Schema({
     },
     step: Number,
     goal: {
-        type: {
+        limit: {
             type: String
         },
         number: Number

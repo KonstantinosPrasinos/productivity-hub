@@ -7,7 +7,7 @@ const taskSchema = Joi.object({
     type: Joi.string().valid('Checkbox', 'Number').required(),
     step: Joi.number().min(1),
     goal: Joi.object().keys({
-        type: Joi.string().valid('At most', 'Exactly', 'At least'),
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(1).max(999)
     }),
     category: Joi.string(),

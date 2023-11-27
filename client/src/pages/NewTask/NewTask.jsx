@@ -236,16 +236,29 @@ const NewTask = ({index, length, id}) => {
             }
         }
 
-        let taskType = "Checkbox";
+        const typeParameters = {
+            type: "Checkbox"
+        }
 
-        if (isNumberTask) taskType = "Number";
+        if (isNumberTask) {
+            typeParameters.type = "Number";
+            typeParameters.step = step;
+
+            if (hasGoal) {
+                typeParameters.goal = {
+                    limit: goalLimit,
+                    number: goalNumber
+                }
+            }
+        }
+
 
         const task = {
             title,
             priority,
-            type: taskType,
             repeats,
             category: category._id,
+            ...typeParameters,
             ...repeatParameters
         }
 
@@ -325,35 +338,45 @@ const NewTask = ({index, length, id}) => {
                     <InputWrapper label="Step">
                         <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} maxNumber={999} />
                     </InputWrapper>
-                    <InputWrapper label={"Has goal"}>
-                        <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
-                    </InputWrapper>
-                    <InputWrapper label={"Goal"}>
-                        <DropDownInput
-                            placeholder={'Type'}
-                            options={goalLimits}
-                            selected={goalLimit}
-                            isDisabled={!hasGoal}
-                        >
-                            {goalLimits.map(tempGoalLimit => (
-                                <button
-                                    className={styles.dropDownOption}
-                                    onClick={() => setGoalLimit(tempGoalLimit)}
-                                    key={tempGoalLimit}
-                                >
-                                    {tempGoalLimit}
-                                </button>
-                            ))}
-                        </DropDownInput>
-                        <TextBoxInput
-                            type="number"
-                            placeholder="Number"
-                            value={goalNumber}
-                            setValue={setGoalNumber}
-                            isDisabled={!hasGoal}
-                            minNumber={1}
-                        />
-                    </InputWrapper>
+                    <HeaderExtendContainer
+                        header={
+                            <div className={"Horizontal-Flex-Container Space-Between"}>
+                                <div className={"Title-Small"}>Add a goal</div>
+                                <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
+                            </div>
+                        }
+                        extendOnClick={false}
+                        extendedInherited={hasGoal}
+                        hasPointer={false}
+                        hasOutline={false}
+                    >
+                        <InputWrapper>
+                            <DropDownInput
+                                placeholder={'Limit'}
+                                options={goalLimits}
+                                selected={goalLimit}
+                                isDisabled={!hasGoal}
+                            >
+                                {goalLimits.map(tempGoalLimit => (
+                                    <button
+                                        className={styles.dropDownOption}
+                                        onClick={() => setGoalLimit(tempGoalLimit)}
+                                        key={tempGoalLimit}
+                                    >
+                                        {tempGoalLimit}
+                                    </button>
+                                ))}
+                            </DropDownInput>
+                            <TextBoxInput
+                                type="number"
+                                placeholder="Number"
+                                value={goalNumber}
+                                setValue={setGoalNumber}
+                                isDisabled={!hasGoal}
+                                minNumber={1}
+                            />
+                        </InputWrapper>
+                    </HeaderExtendContainer>
                 </HeaderExtendContainer>
                 <HeaderExtendContainer
                     header={<div className={"Horizontal-Flex-Container Space-Between"}>
