@@ -14,8 +14,7 @@ const Category = new mongoose.Schema({
         required: true
     },
     priority: {
-        type: Number,
-        required: true
+        type: Number
     },
     repeatRate: {
         number: Number,

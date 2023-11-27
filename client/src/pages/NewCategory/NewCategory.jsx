@@ -101,6 +101,7 @@ const NewCategory = ({index, length, id}) => {
     const handleSave = async () => {
         if (categoriesLoading) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Categories currently loading"}})
+            return
         }
 
         if (creatingTimeGroup) {

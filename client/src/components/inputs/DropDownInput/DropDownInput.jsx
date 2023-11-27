@@ -23,8 +23,10 @@ const DropDownInput = ({placeholder, isDisabled, selected, widthBasedOnChildren 
             // Collapse it when the screen resizes
             window.addEventListener("resize", () => {
                 // Collapse options instantly
-                arrowRef.current.classList.remove(styles.facingUp)
-                setExtended(false)
+                if (arrowRef.current) {
+                    arrowRef.current.classList.remove(styles.facingUp)
+                    setExtended(false)
+                }
             });
         }
     }

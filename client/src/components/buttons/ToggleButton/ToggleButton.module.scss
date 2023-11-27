@@ -6,6 +6,10 @@
     width: 2.25em;
     background-color: var(--primary-color);
     cursor: pointer;
+    font-size: v.$font-m;
+    position: relative;
+    display: flex;
+    align-items: center;
 
     &::before {
         width: 1em;
@@ -14,14 +18,13 @@
         content: '';
         display: inline-block;
         border-radius: v.$button-border-radius;
-        transform: translate(0.25em, 0.25em);
-        vertical-align: top;
+        transform: translateX(0.25em);
         transition: transform 0.2s, width 0.2s, height 0.2s;
     }
 
     &.active {
         &::before {
-            transform: translate(1em, 0.25em);
+            transform: translateX(1em);
 
             &:hover {
                 background-color: red;
@@ -33,13 +36,12 @@
         &::before {
             height: 1.1em;
             width: 1.1em;
-            transform: translate(0.25em, 0.2em)
         }
         &.active {
             &::before {
                 height: 1.1em;
                 width: 1.1em;
-                transform: translate(0.95em, 0.2em)
+                transform: translateX(0.95em)
             }
             
         }
