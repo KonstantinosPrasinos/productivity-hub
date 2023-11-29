@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
-import Divider from "../../components/utilities/Divider/Divider";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
 import Chip from "../../components/buttons/Chip/Chip";
@@ -21,7 +20,7 @@ const CategoryView = ({index, length, category}) => {
 
     const groups = unfilteredGroups?.filter(group => group.parent === category._id);
 
-    const [selectedGroup, setSelectedGroup] = useState();
+    const [selectedGroup, setSelectedGroup] = useState("All");
     const [deletePromptVisible, setDeletePromptVisible] = useState(false);
     const {mutate: deleteCategory} = useDeleteCategory();
 
@@ -81,7 +80,12 @@ const CategoryView = ({index, length, category}) => {
                     <Button onClick={handleCancelButton}>Cancel</Button>
                 </InputWrapper>
             </CollapsibleContainer>
-            <Divider />
+            <section className={styles.groupsContainer}>
+                <Chip selected={selectedGroup} value={"All"} setSelected={setSelectedGroup}>All</Chip>
+                {groups.map(group => <Chip key={group._id} value={group.title} selected={selectedGroup} setSelected={setSelectedGroup}>
+                    {group.title}
+                </Chip>)}
+            </section>
             <section className={'Grid-Container Two-By-Two'}>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>Current Streak</div>
@@ -103,12 +107,6 @@ const CategoryView = ({index, length, category}) => {
                     <div>2 days</div>
                     <div className={'Label'}>Ended at: 05/10/2022</div>
                 </div>
-            </section>
-            <Divider />
-            <section className={'Horizontal-Flex-Container'}>
-                {groups.map(group => <Chip key={group.id} value={group.title} selected={selectedGroup} setSelected={setSelectedGroup}>
-                    {group.title}
-                </Chip>)}
             </section>
             {/*<section className={'Stack-Container'}>*/}
             {/*    <div className={'Horizontal-Flex-Container'}>*/}

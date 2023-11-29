@@ -37,5 +37,6 @@
 
 .groupTitlesContainer {
   @extend .Horizontal-Flex-Container;
-  flex-wrap: wrap;
+  padding-bottom: 4px;
+  overflow-x: auto;
 }

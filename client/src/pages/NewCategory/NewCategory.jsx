@@ -529,7 +529,7 @@ const NewCategory = ({index, length, id}) => {
                         header={<div className={"Stack-Container"}>
                             <InputWrapper label="Subdivisions" hasPadding={false}>
                                 <div className={styles.groupTitlesContainer}>
-                                    <Button filled={false} symmetrical={true} onClick={handleAddTimeGroup} size={"small"} disabled={timePeriod === "Days"}>
+                                    <Button filled={true} symmetrical={true} onClick={handleAddTimeGroup} size={"small"} disabled={timePeriod === "Days"}>
                                         Add new
                                         <TbPlus />
                                     </Button>

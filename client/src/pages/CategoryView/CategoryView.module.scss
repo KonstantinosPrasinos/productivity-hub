@@ -1,5 +1,13 @@
+@use "@/styles/index";
+
 .dot {
   width: 0.5em;
   height: 0.5em;
   border-radius: 0.5em;
+}
+
+.groupsContainer {
+  @extend .Horizontal-Flex-Container;
+  padding-bottom: 4px;
+  overflow-x: auto;
 }
