@@ -413,6 +413,23 @@ const NewCategory = ({index, length, id}) => {
 
             setTitle(category.title);
             setColor(category.color);
+
+            if (category?.repeatRate?.number) {
+                setRepeats(true);
+
+                setTimePeriodNumber(category.repeatRate.number);
+                setTimePeriod(category.repeatRate.bigTimePeriod);
+                setPriority(category.priority);
+            }
+
+            if (category?.goal?.number) {
+                setHasLongGoal(true);
+
+                setLongGoalLimit(category.goal.limit);
+                setLongGoalNumber(category.goal.number);
+                setLongGoalType(category.goal.number);
+            }
+
             setTimeGroups(groups?.filter(group => group.parent === category._id)?.map(group => {return {...group, initial: true}}));
             initialCategoryValues.current = category;
         }
@@ -546,26 +563,37 @@ const NewCategory = ({index, length, id}) => {
                         <InputWrapper label={'On'}>
                             <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"}>Select dates</Button>
                         </InputWrapper>
-                        <InputWrapper label={"Repeat between certain times"}>
-                            <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
-                        </InputWrapper>
-                        <InputWrapper label={"From - To"}>
-                            <TimeInput
-                                hour={startHour}
-                                setHour={setStartHour}
-                                minute={startMinute}
-                                setMinute={setStartMinute}
-                                isDisabled={!hasTime}
-                            />
-                            -
-                            <TimeInput
-                                hour={endHour}
-                                setHour={setEndHour}
-                                minute={endMinute}
-                                setMinute={setEndMinute}
-                                isDisabled={!hasTime}
-                            />
-                        </InputWrapper>
+                        <HeaderExtendContainer
+                            header={
+                                <div className={"Horizontal-Flex-Container Space-Between"}>
+                                    <div className={"Title-Small"}>Repeat time range</div>
+                                    <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
+                                </div>
+                            }
+                            extendOnClick={false}
+                            extendedInherited={hasTime && repeats}
+                            hasPointer={false}
+                            hasOutline={false}
+                            isDisabled={!repeats}
+                        >
+                            <InputWrapper>
+                                <TimeInput
+                                    hour={startHour}
+                                    setHour={setStartHour}
+                                    minute={startMinute}
+                                    setMinute={setStartMinute}
+                                    isDisabled={!hasTime}
+                                />
+                                -
+                                <TimeInput
+                                    hour={endHour}
+                                    setHour={setEndHour}
+                                    minute={endMinute}
+                                    setMinute={setEndMinute}
+                                    isDisabled={!hasTime}
+                                />
+                            </InputWrapper>
+                        </HeaderExtendContainer>
                         <div className={"Horizontal-Flex-Container"}>
                             <Button filled={false} width={"max"} onClick={handleCancel}>Cancel</Button>
                             <Button width={"max"} disabled={disabledSaveGroupButton} onClick={handleTimeGroupSave}>Save Group</Button>

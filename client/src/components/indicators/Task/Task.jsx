@@ -107,7 +107,7 @@ const Task = ({tasks}) => {
             onClick={(event) => handleTaskClick(event)}
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
-            <div className={styles.taskList}>
+            <div className={"Stack-Container"}>
                 {tasks.map((task, index) =>
                     <div key={index} className={styles.task}>
                         <div className={styles.detailsList}>

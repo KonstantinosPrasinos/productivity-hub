@@ -423,7 +423,7 @@ const NewTask = ({index, length, id}) => {
                         <HeaderExtendContainer
                             header={
                                 <div className={"Horizontal-Flex-Container Space-Between"}>
-                                    <div className={"Title-Small"}>Repeat time rage</div>
+                                    <div className={"Title-Small"}>Repeat time range</div>
                                     <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
                                 </div>
                             }
