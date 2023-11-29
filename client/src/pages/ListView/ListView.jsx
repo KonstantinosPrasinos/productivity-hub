@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence, motion} from "framer-motion";
-import {useRenderTasks} from "../../hooks/useRenderTasks";
+import {useRenderTasks} from "../../hooks/render-tasks-hook/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
 import Chip from "../../components/buttons/Chip/Chip";

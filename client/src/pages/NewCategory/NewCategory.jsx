@@ -265,7 +265,6 @@ const NewCategory = ({index, length, id}) => {
             return;
         }
 
-
         const newId = currentEditedGroup.current?._id ?? getGroupId();
 
         const startingDates = findStartingDates(timePeriod, timePeriod2);
