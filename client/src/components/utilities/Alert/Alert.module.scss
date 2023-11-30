@@ -1,47 +1,50 @@
 @use "@/styles/variables" as v;
+@use "@/styles/index";
 
 .container {
     width: 100%;
     max-width: 360px;
-    height: 3em;
-    color: var(--on-error-color);
+    background: var(--surface-color);
+    color: var(--on-surface-color);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: v.$base-padding;
+    align-items: stretch;
     transform-origin: top;
     border-radius: v.$base-border-radius;
+    border: v.$base-border;
+    overflow: hidden;
+
+    box-shadow: v.$elevation-1;
 }
 
 .textContainer {
-    display: inline-flex;
-    align-items: center;
-    gap: v.$base-gap;
+    @extend .Stack-Container;
+    padding: v.$base-padding;
+    flex-grow: 1;
+    & > :last-child {
+        opacity: 0.6;
+    }
 }
 
 .iconContainer {
     display: inline-flex;
-    align-items: center;
-    transition: transform 0.2s;
-    cursor: pointer;
+    padding: 10px;
+}
 
-    &:hover {
-        transform: scale(1.1);
+.typeIndicator {
+    width: 1em;
+    &.error {
+        background-color: var(--error-color);
     }
-}
 
-.error {
-    background-color: var(--error-color);
-}
+    &.warning {
+        background-color: var(--warning-color);
+    }
 
-.warning {
-    background-color: var(--warning-color);
-}
+    &.success {
+        background-color: var(--success-color);
+    }
 
-.success {
-    background-color: var(--success-color);
-}
-
-.info {
-    background-color: var(--info-color);
+    &.info {
+        background-color: var(--info-color);
+    }
 }

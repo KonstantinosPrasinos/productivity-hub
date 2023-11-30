@@ -56,17 +56,34 @@ const Playground = () => {
 
   return (
     <div className={styles.container}>
-        <InputWrapper label={"Alerts"} type={"vertical"}>
-            {/*<Alert type={"error"} message={"This is an error"}></Alert>*/}
-            {/*<Alert type={"warning"} message={"This is a warning"}></Alert>*/}
-            {/*<Alert type={"success"} message={"This is a success"}></Alert>*/}
-            {/*<Alert type={"info"} message={"This is an info"}></Alert>*/}
+        <InputWrapper label={"Alerts"}>
             <Button
                 onClick={() => {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Hello there, this is a warning"}})
                 }}
             >
                 Add warning alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add error alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "info", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add info alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add success alert
             </Button>
         </InputWrapper>
 
