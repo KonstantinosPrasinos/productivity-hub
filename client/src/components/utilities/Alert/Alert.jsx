@@ -1,5 +1,5 @@
 import styles from "./Alert.module.scss";
-import {useContext, useEffect, useRef} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {motion, useAnimation} from "framer-motion";
 import { AlertsContext } from "../../../context/AlertsContext";
 import { TbX } from "react-icons/tb";
@@ -8,9 +8,13 @@ import IconButton from "@/components/buttons/IconButton/IconButton.jsx";
 const Alert = ({ type, message, title = "This is a title", id }) => {
   const alertsContext = useContext(AlertsContext);
   const timer = useRef();
+  const timerStartTimestamp = useRef();
+  const timerRemainingTime = useRef(2500);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     // Automatically clear after 2 seconds
+    timerStartTimestamp.current = (new Date()).getTime();
     timer.current = setTimeout(() => {
       controls.start("hidden")
     }, 2500);
@@ -49,15 +53,20 @@ const Alert = ({ type, message, title = "This is a title", id }) => {
   }
 
   const handleMouseEnter = () => {
-    if (timer.current) {
+    if (timer.current && timerStartTimestamp.current) {
+      setIsPaused(true);
+      timerRemainingTime.current = timerRemainingTime.current - ((new Date()).getTime() - timerStartTimestamp.current);
+      timerStartTimestamp.current = null;
       clearTimeout(timer.current);
     }
   }
 
   const handleMouseLeave = () => {
+    setIsPaused(false);
     timer.current = setTimeout(() => {
-      controls.start("hidden")
-    }, 2500);
+      controls.start("hidden");
+    }, timerRemainingTime.current);
+    timerStartTimestamp.current = (new Date()).getTime();
   }
 
   return (
@@ -82,6 +91,9 @@ const Alert = ({ type, message, title = "This is a title", id }) => {
       <div className={styles.textContainer}>
         <span className={"Title-Small"}>{title}</span>
         <span className={"Body-Small"}>{message}</span>
+        <div className={styles.timerContainer}>
+          <div className={`${styles.timerIndicator} ${isPaused ? styles.paused : ""} ${styles[type]}`}></div>
+        </div>
       </div>
       <div className={styles.iconContainer}>
         <IconButton onClick={handleCloseClick}>
