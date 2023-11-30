@@ -80,12 +80,13 @@ const CategoryView = ({index, length, category}) => {
                     <Button onClick={handleCancelButton}>Cancel</Button>
                 </InputWrapper>
             </CollapsibleContainer>
-            <section className={styles.groupsContainer}>
+            {groups.length > 0 && <section className={styles.groupsContainer}>
                 <Chip selected={selectedGroup} value={"All"} setSelected={setSelectedGroup}>All</Chip>
-                {groups.map(group => <Chip key={group._id} value={group.title} selected={selectedGroup} setSelected={setSelectedGroup}>
+                {groups.map(group => <Chip key={group._id} value={group.title} selected={selectedGroup}
+                                           setSelected={setSelectedGroup}>
                     {group.title}
                 </Chip>)}
-            </section>
+            </section>}
             <section className={'Grid-Container Two-By-Two'}>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>Current Streak</div>
