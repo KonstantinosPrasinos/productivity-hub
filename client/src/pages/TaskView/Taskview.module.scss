@@ -67,3 +67,21 @@ $base-size: 1.2em;
     border-bottom: none;
   }
 }
+
+.customDay {
+  opacity: 0.87;
+  border-radius: 500px;
+  border: 6px solid transparent;
+
+  &:hover:not(.customSelectedDay) {
+    background-color: var(--border-primary-color) !important;
+    border-color: var(--border-primary-color);
+
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+}
+
+.customSelectedDay {
+  background-color: var(--primary-color) !important;
+  color: var(--on-primary-color);
+}

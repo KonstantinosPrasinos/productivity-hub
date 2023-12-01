@@ -561,7 +561,7 @@ const NewCategory = ({index, length, id}) => {
                             <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle}/>
                         </InputWrapper>
                         <InputWrapper label={'On'}>
-                            <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"}>Select dates</Button>
+                            <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"} size={"small"}>Select dates</Button>
                         </InputWrapper>
                         <HeaderExtendContainer
                             header={

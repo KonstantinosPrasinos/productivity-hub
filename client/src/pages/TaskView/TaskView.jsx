@@ -14,6 +14,7 @@ import LoadingIndicator from "../../components/indicators/LoadingIndicator/Loadi
 import {AnimatePresence, motion} from 'framer-motion';
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
+import pickerStyles from 'react-day-picker/dist/style.module.css';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
@@ -355,7 +356,9 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     }, [editedEntry, entryDates]);
 
 
-    const properDateStyles = { color: "var(--success-color)", fontSize: "120%", fontWeight: "bold" };
+    const classNames = {...pickerStyles, day: styles.customDay, day_selected: styles.customSelectedDay}
+
+    const properDateStyles = { fontSize: "120%", fontWeight: "bold", opacity: 1 };
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
 
     const tempFunction = (date) => {
@@ -418,6 +421,7 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
                 <div className={'Horizontal-Flex-Container Align-Center'}>
                     <DayPicker
                         mode={"single"}
+                        classNames={classNames}
                         selected={date}
                         onDayClick={handleDateClick}
                         disabled={disabledDates}
