@@ -91,8 +91,8 @@ const Task = ({tasks}) => {
 
     const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
 
-    const handleTaskClick = () => {
-        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}});
+    const handleTaskClick = (taskId) => {
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: taskId}});
     }
 
     return (
@@ -103,13 +103,11 @@ const Task = ({tasks}) => {
             exit={{ opacity: 0 }}
             transition={{duration: 1, type: "spring"}}
             layout
-
-            onClick={(event) => handleTaskClick(event)}
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
             <div className={"Stack-Container"}>
                 {tasks.map((task, index) =>
-                    <div key={index} className={styles.task}>
+                    <div key={index} className={styles.task} onClick={() => handleTaskClick(task._id)}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
                             <RepeatDetails task={task} />

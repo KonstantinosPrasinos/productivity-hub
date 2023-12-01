@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
@@ -11,6 +11,69 @@ import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import {useDeleteCategory} from "../../hooks/delete-hooks/useDeleteCategory";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {TbEdit, TbTrash} from "react-icons/tb";
+import {useGetTaskEntries} from "@/hooks/get-hooks/useGetTaskEntries.js";
+import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
+import Table from "@/components/utilities/Table/Table.jsx";
+
+const CategoryTable = ({tasks}) => {
+    const checkedDates = {};
+
+    tasks.forEach(task => {
+        const {data: entries} = useGetTaskEntries(task._id);
+        const {data: currentEntry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+
+        const allEntries = entries?.length ? [...entries, currentEntry] : [currentEntry];
+
+        allEntries.forEach(entry => {
+            if (task.type === "Checkbox" && entry.value === 0) return;
+
+            if (task.type === "Number") {
+                if (task?.goal?.number) {
+                    if (task.goal.number > entry.value) return;
+                } else {
+                    if (entry.value === 0) return;
+                }
+            }
+
+            if (entry.value > 0) {
+                if (checkedDates[entry.date]) {
+                    checkedDates[entry.date] += 1;
+                } else {
+                    checkedDates[entry.date] = 1;
+                }
+            }
+        })
+    })
+
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    if (!checkedDates.hasOwnProperty(currentDate)) {
+        checkedDates[currentDate] = 0;
+    }
+
+    const entriesWithIsProper = [];
+
+    for (const date in checkedDates) {
+        const percentage = (checkedDates[date] * 100 / tasks.length ?? 1).toFixed(0);
+
+        entriesWithIsProper.push({
+            isProperDate: false,
+            date,
+            value: `${percentage} %`
+        })
+    }
+
+    return (
+        <Table
+            entries={entriesWithIsProper}
+            entriesLoading={false}
+            setIsVisibleNewEntryModal={() => {}}
+            handleEditEntry={() => {}}
+            hasEditColumn={false}
+        />
+    )
+}
 
 const CategoryView = ({index, length, category}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -23,6 +86,18 @@ const CategoryView = ({index, length, category}) => {
     const [selectedGroup, setSelectedGroup] = useState("All");
     const [deletePromptVisible, setDeletePromptVisible] = useState(false);
     const {mutate: deleteCategory} = useDeleteCategory();
+
+    // Gets all the tasks depending on the selection
+    const selectionTasks = useMemo(() => {
+        if (selectedGroup === "All") {
+            return tasks.filter(task => task.category === category._id);
+        }
+
+        // Selection is a group
+        return tasks.filter(task => task.category === category._id && task.group === selectedGroup._id);
+    }, [selectedGroup, groups, tasks]);
+
+    console.log(selectionTasks);
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
     // const graphOptions = ['Average', 'Total'];
@@ -134,6 +209,7 @@ const CategoryView = ({index, length, category}) => {
             {/*        </IconButton>*/}
             {/*    </div>*/}
             {/*</section>*/}
+            <CategoryTable tasks={selectionTasks} />
             <section className={'Horizontal-Flex-Container Space-Between'}>
                 <Button filled={false} size={'small'}>
                     See all entries

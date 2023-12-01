@@ -10,8 +10,6 @@ import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
 import {useChangeEntryValue} from "../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
-import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
-import {AnimatePresence, motion} from 'framer-motion';
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
 import pickerStyles from 'react-day-picker/dist/style.module.css';
@@ -20,11 +18,9 @@ import CollapsibleContainer from "../../components/containers/CollapsibleContain
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
 import {
     TbCheck,
-    TbChevronDown,
-    TbChevronLeft,
-    TbChevronRight, TbChevronUp,
     TbEdit,
-    TbMinus, TbPlus, TbRefresh,
+    TbPlus,
+    TbRefresh,
     TbTrash
 } from "react-icons/tb";
 import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
@@ -35,6 +31,7 @@ import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 import {getDateAddDetails} from "@/functions/getDateAddDetails";
+import Table from "@/components/utilities/Table/Table.jsx";
 
 const checkIfDateIsProper = (date, task, functionName, timeToAdd) => {
     const today = new Date();
@@ -96,161 +93,6 @@ const StatSection = ({task}) => {
             </>}
         </section>
     );
-}
-
-const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal, task}) => {
-    const [pageNumber, setPageNumber] = useState(0);
-    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
-
-    if (isLoading) return (
-        <tbody className={styles.tableLoading}>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3}></td>
-            </tr>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3}></td>
-            </tr>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3} className={styles.loadingIndicatorContainer}>
-                    <LoadingIndicator size={"inline"} />
-                </td>
-            </tr>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3}></td>
-            </tr>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3}></td>
-            </tr>
-            <tr className={styles.emptyRow}>
-                <td colSpan={3}></td>
-            </tr>
-        </tbody>
-    )
-
-    if (entries.length === 0) return (
-        <tr>
-            <td colspan={3}>No entries</td>
-        </tr>
-    )
-
-    let sortedEntries;
-
-    if (sortOrderDate !== 0) {
-        sortedEntries = entries.sort((a, b) => {
-            const dA = Date.parse(a.date);
-            const dB = Date.parse(b.date);
-
-            return sortOrderDate * (dA - dB);
-        });
-    } else {
-        sortedEntries = entries.sort((a, b) => {
-            return sortOrderValue * (a.value - b.value);
-        });
-    }
-
-    const lastEntryNumber = () => {
-        if (entries.length - 5 * pageNumber > 5) return (pageNumber * 5  + 5);
-        return entries.length;
-    }
-
-    const increasePageNumber = () => {
-        setPageNumber(current => current + 1);
-    }
-    const decreasePageNumber = () => {
-        setPageNumber(current => current - 1);
-    }
-
-    const handleEditEntry = (entry) => {
-        setEditedEntry(entry);
-        setIsVisibleNewEntryModal(true);
-    }
-
-    const n = 5;
-
-    const numbersArray = Array.from({length: n}, (_, index) => index);
-
-    return (
-        <>
-            <tbody className={styles.tBody} key={pageNumber}>
-                {numbersArray.map(i => {
-                    if (pageNumber * 5 + i >= sortedEntries.length) {
-                        return <tr key={`empty-row-${i}`} className={styles.emptyRow}>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    } else {
-                        const entry = sortedEntries[pageNumber * 5 + i];
-
-                        if (entry) {
-                            const entryDate = new Date(entry.date);
-                            entryDate.setHours(0, 0);
-
-                            const isProperDate = checkIfDateIsProper(entryDate, task, functionName, timeToAdd)
-
-                            return <tr
-                                key={entry._id}
-                            >
-                                <td className={isProperDate ? styles.isProperDate : ""}>{entryDate.toLocaleDateString()}</td>
-                                <td>{entry.value}</td>
-                                <td>
-                                    <IconButton onClick={() => handleEditEntry(entry)}>
-                                        <TbEdit />
-                                    </IconButton>
-                                </td>
-                            </tr>
-                        }
-                    }
-                })}
-                        {/*{sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {*/}
-                        {/*    const entryDate = new Date(entry.date);*/}
-                        {/*    entryDate.setHours(0, 0);*/}
-
-                        {/*    const isProperDate = checkIfDateIsProper(entryDate, task, functionName, timeToAdd)*/}
-
-                        {/*    return <motion.tr*/}
-                        {/*        initial={{height: 0}}*/}
-                        {/*        animate={{height: "1em"}}*/}
-                        {/*        transition={{duration: 20}}*/}
-                        {/*        key={entry._id}*/}
-                        {/*    >*/}
-                        {/*        <td className={isProperDate ? styles.isProperDate : ""}>{entryDate.toLocaleDateString()}</td>*/}
-                        {/*        <td>{entry.value}</td>*/}
-                        {/*        <td>*/}
-                        {/*            <IconButton onClick={() => handleEditEntry(entry)}>*/}
-                        {/*                <TbEdit />*/}
-                        {/*            </IconButton>*/}
-                        {/*        </td>*/}
-                        {/*    </motion.tr>*/}
-                        {/*})}*/}
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colSpan={3}>
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div>{pageNumber * 5 + 1}-{lastEntryNumber()} of {entries.length}</div>
-                        <div>
-                            <IconButton
-                                onClick={decreasePageNumber}
-                                disabled={pageNumber === 0}
-                            >
-                                <TbChevronLeft />
-                            </IconButton>
-                            <IconButton
-                                onClick={increasePageNumber}
-                                disabled={pageNumber === Math.floor(entries.length / 5)}
-                            >
-                                <TbChevronRight />
-                            </IconButton>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tfoot>
-        </>
-    )
 }
 
 const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates, task}) => {
@@ -497,17 +339,6 @@ const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction, changeS
     );
 }
 
-const SortIcon = ({sortOrder}) => {
-    switch (sortOrder) {
-        case 0:
-            return <TbMinus/>
-        case 1:
-            return <TbChevronUp />
-        case -1:
-            return <TbChevronDown />
-    }
-}
-
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const undoContext = useContext(UndoContext);
@@ -524,8 +355,6 @@ const TaskView = ({index, length, task}) => {
     const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
     const [isVisibleConfirmDeleteModal, setIsVisibleConfirmDeleteModal] = useState(false);
-    const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
-    const [sortOrderValue, setSortOrderValue] = useState(0);
 
     // const graphOptions = ['Average', 'Total'];
 
@@ -581,38 +410,23 @@ const TaskView = ({index, length, task}) => {
         setIsVisibleConfirmDeleteModal(false);
     }
 
-    const handleChangeSortOrderValue = () => {
-        switch (sortOrderValue) {
-            case 0:
-                setSortOrderValue(-1);
-                setSortOrderDate(0);
-                break;
-            case 1:
-                setSortOrderValue(-1);
-                break;
-            case -1:
-                setSortOrderValue(1);
-                break;
-            default:
-                break;
-        }
-    }
+    const entriesWithIsProper = useMemo(() => {
+        if (entriesLoading) return;
 
-    const handleChangeSortOrderDate = () => {
-        switch (sortOrderDate) {
-            case 0:
-                setSortOrderDate(-1);
-                setSortOrderValue(0);
-                break;
-            case 1:
-                setSortOrderDate(-1);
-                break;
-            case -1:
-                setSortOrderDate(1);
-                break;
-            default:
-                break;
-        }
+        const allEntries = entries ? [...entries, entry] : [entry];
+        const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number)
+
+        return allEntries.map(entry => {
+            const entryDate = new Date(entry.date);
+            entryDate.setHours(0, 0);
+
+            return {...entry, isProperDate: checkIfDateIsProper(entryDate, task, functionName, timeToAdd)}
+        })
+    }, [entries, entry, entriesLoading]);
+
+    const handleEditEntry = (entry) => {
+        setEditedEntry(entry);
+        setIsVisibleNewEntryModal(true);
     }
 
     return (
@@ -680,54 +494,12 @@ const TaskView = ({index, length, task}) => {
                 {/*    </div>*/}
                 {/*</section>*/}
                 {task.repeats && <section>
-                    <motion.table className={styles.table}>
-                        <thead>
-                        <tr>
-                            <th>
-                                <button className={styles.tableButton} onClick={handleChangeSortOrderDate}>
-                                    Date:
-                                    <AnimatePresence mode={"wait"}>
-                                        <motion.div
-                                            key={sortOrderDate}
-                                            initial={{scale: 0}}
-                                            animate={{scale: 1}}
-                                            exit={{scale: 0}}
-                                            transition={{duration: 0.1}}
-                                        >
-                                            <SortIcon sortOrder={sortOrderDate}/>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </button>
-                            </th>
-                            <th>
-                                <button className={styles.tableButton} onClick={handleChangeSortOrderValue}>
-                                    Value:
-                                    <AnimatePresence mode={"wait"}>
-                                        <motion.div
-                                            key={sortOrderValue}
-                                            initial={{scale: 0}}
-                                            animate={{scale: 1}}
-                                            exit={{scale: 0}}
-                                            transition={{duration: 0.1}}
-                                        >
-                                            <SortIcon sortOrder={sortOrderValue}/>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </button>
-                            </th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <TaskTableContents
-                            entries={entries ? [...entries, entry] : [entry]}
-                            sortOrderDate={sortOrderDate}
-                            isLoading={entriesLoading}
-                            sortOrderValue={sortOrderValue}
-                            setEditedEntry={setEditedEntry}
-                            setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
-                            task={task}
-                        />
-                    </motion.table>
+                    <Table
+                        entries={entriesWithIsProper}
+                        entriesLoading={entriesLoading}
+                        setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
+                        handleEditEntry={handleEditEntry}
+                    />
                 </section>}
                 <section className={'Horizontal-Flex-Container Space-Between'}>
                     {task.repeats && <Button onClick={() => setIsVisibleNewEntryModal(true)}>

@@ -333,6 +333,11 @@ table {
     border-spacing: 0;
     width: 100%;
 
+    tr > td {
+        height: 40px;
+        box-sizing: border-box;
+    }
+
     tr>* {
         padding: v.$symmetrical-padding;
     }
@@ -344,7 +349,7 @@ table {
         &:first-child:not(:last-child) {
             border-right: none !important;
         }
-        &:last-child:not(:first-child) {
+        &:nth-child(3):not(:first-child) {
             border-left: none !important;
         }
     }
@@ -357,7 +362,7 @@ table {
             border-left-width: 1px;
         }
 
-        &:last-child {
+        &:nth-child(3) {
             border-right-width: 1px;
         }
     }

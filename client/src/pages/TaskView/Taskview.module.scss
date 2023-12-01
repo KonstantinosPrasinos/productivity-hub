@@ -24,48 +24,8 @@ $base-size: 1.2em;
   padding: 7.8px; // + 1.6 * rows (6)  / 2
 }
 
-.tableButton {
-  display: flex;
-  //font-weight: bold;
-  align-items: center;
-  font-size: v.$font-m;
-  gap: 6px;
-}
-
 .editIcons {
   font-size: v.$font-xl;
-}
-
-.table {
-  height: auto;
-  tr {
-    td {
-      width: 45%;
-    }
-    &:last-of-type(td) {
-      width: 10%;
-    }
-  }
-}
-
-.tBody {
-  height: auto;
-}
-
-.isProperDate {
-  text-decoration: underline;
-}
-
-.emptyRow {
-  & > td {
-    height: 1.5em;
-  }
-}
-
-.tableLoading {
-  & > tr:not(:last-child) > td {
-    border-bottom: none;
-  }
 }
 
 .customDay {

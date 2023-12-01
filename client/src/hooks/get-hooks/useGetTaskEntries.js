@@ -16,7 +16,7 @@ const fetchTaskEntries = async ({queryKey}) => {
 }
 
 
-export function useGetTaskEntries(taskId, ) {
+export function useGetTaskEntries(taskId) {
     const queryObject = useQuery(["task-entries", taskId], fetchTaskEntries, {
         staleTime: 30 * 60 * 60 * 1000
     });
