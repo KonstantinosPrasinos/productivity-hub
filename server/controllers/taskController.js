@@ -266,7 +266,7 @@ const getTasksWithHistory = async (tasks, userId) => {
                 } else {
                     tasksWithHistory.push({
                         ...editedTask._doc,
-                        streak: streak,
+                        streak: {number: streak, date: streakFrom},
                         currentEntryId: tasksWithCurrentEntry[i].currentEntryId,
                         totalCompletedEntries
                     });

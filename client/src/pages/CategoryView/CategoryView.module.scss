@@ -8,6 +8,6 @@
 
 .groupsContainer {
   @extend .Horizontal-Flex-Container;
-  padding-bottom: 4px;
+  padding: 4px;
   overflow-x: auto;
 }

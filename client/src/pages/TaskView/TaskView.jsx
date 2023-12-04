@@ -30,43 +30,8 @@ import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
-import {getDateAddDetails} from "@/functions/getDateAddDetails";
 import Table from "@/components/utilities/Table/Table.jsx";
-
-const checkIfDateIsProper = (date, task, functionName, timeToAdd) => {
-    const today = new Date();
-
-    if (date.getTime() >= today.getTime()) {
-        return false;
-    }
-
-    let startDate = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
-
-    startDate.setHours(0, 0, 0, 0);
-
-    while(startDate.getTime() > date.getTime()) {
-        startDate[`set${functionName}`](startDate[`get${functionName}`]() - timeToAdd);
-    }
-
-    for (let index in task.repeatRate.startingDate) {
-        if (index === "0") {
-            if (startDate.getTime() === date.getTime()) {
-                return true;
-            }
-        } else {
-            const currentStartingDate = new Date(task.repeatRate.startingDate[index]);
-            const previousStartingDate = new Date(task.repeatRate.startingDate[index - 1]);
-
-            startDate.setTime(startDate.getTime() + (currentStartingDate.getTime() - previousStartingDate.getTime()));
-
-            if (startDate.getTime() === date.getTime()) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-};
+import {dateIsProper} from "@/functions/dateIsProper.js";
 
 const StatSection = ({task}) => {
     return (
@@ -79,7 +44,7 @@ const StatSection = ({task}) => {
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Longest Streak</div>
                 <div>{task.longestStreak.number ?? 0} days</div>
-                <div className={'Label'}>Since: {task.longestStreak.number > 0 ? task.repeatStats.longestStreak.date : "Never"}</div>
+                <div className={'Label'}>Since: {task.longestStreak.number > 0 ? task.longestStreak.date : "Never"}</div>
             </div>
             {task.type === "Number" && <>
                 <div className={'Rounded-Container Stack-Container'}>
@@ -128,13 +93,20 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     const handleContinue = async () => {
         if (editedEntry) {
             if (date !== editedEntry.date || value !== editedEntry.value) {
-                await changeEntry({taskId, entryId: editedEntry._id, value, date});
+                const newDate = (new Date(date));
+                newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60)
+
+                await changeEntry({taskId, entryId: editedEntry._id, value, date: newDate});
             }
             if (!isErrorChange) {
                 dismountNewEntryModal();
             }
         } else {
-            await addEntry({date, value, taskId});
+            const newDate = (new Date(date));
+            newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60);
+            console.log(date, newDate.toISOString());
+
+            await addEntry({date: newDate, value, taskId});
             if (!isError) {
                 dismountNewEntryModal();
             }
@@ -201,10 +173,9 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     const classNames = {...pickerStyles, day: styles.customDay, day_selected: styles.customSelectedDay}
 
     const properDateStyles = { fontSize: "120%", fontWeight: "bold", opacity: 1 };
-    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), []);
 
     const tempFunction = (date) => {
-        return checkIfDateIsProper(date, task, functionName, timeToAdd);
+        return dateIsProper(date, task);
     }
 
     return (
@@ -414,13 +385,12 @@ const TaskView = ({index, length, task}) => {
         if (entriesLoading) return;
 
         const allEntries = entries ? [...entries, entry] : [entry];
-        const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number)
 
         return allEntries.map(entry => {
             const entryDate = new Date(entry.date);
             entryDate.setHours(0, 0);
 
-            return {...entry, isProperDate: checkIfDateIsProper(entryDate, task, functionName, timeToAdd)}
+            return {...entry, isProperDate: dateIsProper(entryDate, task)}
         })
     }, [entries, entry, entriesLoading]);
 

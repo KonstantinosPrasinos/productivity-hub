@@ -228,10 +228,8 @@ const NewTask = ({index, length, id}) => {
 
                 if (timeGroup._id) {
                     repeatParameters.group = timeGroup._id
-                    repeatParameters.repeatRate = {
-                        ...repeatParameters.repeatRate,
-                        ...timeGroup.repeatRate
-                    }
+                    repeatParameters.repeatRate.smallTimePeriod = timeGroup.repeatRate.smallTimePeriod;
+                    repeatParameters.repeatRate.startingDate = timeGroup.repeatRate.startingDate;
                 }
             }
         }

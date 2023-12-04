@@ -1,4 +1,4 @@
-import {useQuery} from "react-query";
+import {useQueries} from "react-query";
 
 const fetchTaskEntries = async ({queryKey}) => {
     const taskId = queryKey[1];
@@ -17,10 +17,35 @@ const fetchTaskEntries = async ({queryKey}) => {
 
 
 export function useGetTaskEntries(taskId) {
-    const queryObject = useQuery(["task-entries", taskId], fetchTaskEntries, {
-        staleTime: 30 * 60 * 60 * 1000
-    });
+    let queries;
 
+    if (Array.isArray(taskId)) {
+        queries = taskId.map(id => ({
+            queryKey: ["task-entries", id],
+            queryFn: fetchTaskEntries,
+            staleTime: 30 * 60 * 60 * 1000
+        }))
+    } else {
+        queries = [{
+            queryKey: ["task-entries", taskId],
+            queryFn: fetchTaskEntries,
+            staleTime: 30 * 60 * 60 * 1000
+        }]
+    }
 
-    return {...queryObject, data: queryObject.data?.entries}
+    const queryObject = useQueries(queries);
+
+    if (Array.isArray(taskId)) {
+        let isLoading = false;
+
+        return {
+            data: queryObject.map(entry => {
+                if (entry.isLoading) isLoading = true;
+                return entry.data?.entries
+            }),
+            isLoading
+        };
+    }
+
+    return {...queryObject[0], data: queryObject[0].data?.entries}
 }

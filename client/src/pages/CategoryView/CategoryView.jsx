@@ -14,48 +14,175 @@ import {TbEdit, TbTrash} from "react-icons/tb";
 import {useGetTaskEntries} from "@/hooks/get-hooks/useGetTaskEntries.js";
 import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
 import Table from "@/components/utilities/Table/Table.jsx";
+import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 
-const CategoryTable = ({tasks}) => {
-    const checkedDates = {};
+const CategoryContent = ({tasks, selection, category, groups}) => {
+    const {data: entriesArray, isLoading: entriesLoading} = useGetTaskEntries(tasks.map(task => task._id));
+    const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
 
-    tasks.forEach(task => {
-        const {data: entries} = useGetTaskEntries(task._id);
-        const {data: currentEntry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+    const {checkedDates, startedDates, perDateTotalTasks} = useMemo(() => {
+        const checkedDates = {};
+        const startedDates = [];
+        let perDateTotalTasks = {};
 
-        const allEntries = entries?.length ? [...entries, currentEntry] : [currentEntry];
+        if (entriesLoading || currentEntriesLoading) return {
+            checkedDates,
+            startedDates,
+            perDateTotalTasks
+        }
 
-        allEntries.forEach(entry => {
-            if (task.type === "Checkbox" && entry.value === 0) return;
+        const allEntries = [...currentEntriesArray];
 
-            if (task.type === "Number") {
-                if (task?.goal?.number) {
-                    if (task.goal.number > entry.value) return;
-                } else {
-                    if (entry.value === 0) return;
-                }
-            }
-
-            if (entry.value > 0) {
-                if (checkedDates[entry.date]) {
-                    checkedDates[entry.date] += 1;
-                } else {
-                    checkedDates[entry.date] = 1;
-                }
-            }
+        entriesArray.forEach(taskEntries => {
+            allEntries.push(...taskEntries);
         })
-    })
+
+        if (selection === "All") {
+            // This means show tasks for all groups of the category.
+            // Loop through every date from starting date to today for each group
+            groups.forEach(group => {
+                const date = new Date(group.repeatRate.startingDate);
+                const today = new Date();
+                today.setUTCHours(0, 0, 0, 0);
+
+                // Get all the group tasks
+                const groupTasks = tasks.filter(task => task.group === group._id);
+                const groupTasksIds = groupTasks.map(task => task._id);
+
+                // Loop through all the proper dates for the group
+                while (date.getTime() <= today.getTime()) {
+                    // Get all the entries for this group
+                    const dateEntries = allEntries.filter(entry => entry.value > 0 && groupTasksIds.includes(entry.taskId) && (new Date(entry.date)).getTime() === date.getTime());
+
+                    // Add per date total tasks
+                    if (perDateTotalTasks.hasOwnProperty(date.toISOString())) {
+                        perDateTotalTasks[date.toISOString()] += groupTasks.length;
+                    } else {
+                        perDateTotalTasks[date.toISOString()] = groupTasks.length;
+                    }
+
+                    // Now check if entries have value and if they are completed
+                    dateEntries.forEach(entry => {
+                        let dateCompleted = false;
+                        let dateStarted = false;
+                        const task = groupTasks.find(task => task._id === entry.taskId);
+
+                        if (task.type === "Checkbox") {
+                            dateCompleted = true;
+                            dateStarted = true;
+                        }
+
+                        if (task.type === "Number") {
+                            if (task?.goal?.number) {
+                                if (task.goal.number < entry.value) {
+                                    dateCompleted = true;
+                                    dateStarted = true;
+                                }
+                            } else {
+                                dateCompleted = true;
+                                dateStarted = true;
+                            }
+                        }
+
+                        if (dateCompleted) {
+                            if (checkedDates[date.toISOString()]) {
+                                checkedDates[date.toISOString()] += 1;
+                            } else {
+                                checkedDates[date.toISOString()] = 1;
+                            }
+                        }
+
+                        if (dateStarted && !startedDates.includes(date)) {
+                            startedDates.push(date.toISOString());
+                        }
+                    })
+
+                    if (!checkedDates.hasOwnProperty(date.toISOString())) {
+                        checkedDates[date.toISOString()] = 0;
+                    }
+
+                    date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+                }
+            })
+        } else {
+            const date = new Date(selection.repeatRate.startingDate);
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+
+            perDateTotalTasks = tasks?.length ?? 0;
+
+            while (date.getTime() <= today.getTime()) {
+                const dateEntries = allEntries.filter(entry => entry.value > 0  && (new Date(entry.date)).getTime() === date.getTime());
+
+                // Almost the same code block as above
+                dateEntries.forEach(entry => {
+                    let dateCompleted = false;
+                    let dateStarted = false;
+                    const task = tasks.find(task => task._id === entry.taskId);
+
+                    if (task.type === "Checkbox") {
+                        dateCompleted = true;
+                        dateStarted = true;
+                    }
+
+                    if (task.type === "Number") {
+                        if (task?.goal?.number) {
+                            if (task.goal.number < entry.value) {
+                                dateCompleted = true;
+                                dateStarted = true;
+                            }
+                        } else {
+                            dateCompleted = true;
+                            dateStarted = true;
+                        }
+                    }
+
+                    if (dateCompleted) {
+                        if (checkedDates[date.toISOString()]) {
+                            checkedDates[date.toISOString()] += 1;
+                        } else {
+                            checkedDates[date.toISOString()] = 1;
+                        }
+                    }
+
+                    if (dateStarted && !startedDates.includes(date)) {
+                        startedDates.push(date.toISOString());
+                    }
+                })
+
+                if (!checkedDates.hasOwnProperty(date.toISOString())) {
+                    checkedDates[date.toISOString()] = 0;
+                }
+
+                date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+            }
+        }
+
+        return {
+            checkedDates,
+            startedDates,
+            perDateTotalTasks
+        }
+    }, [tasks, selection, category, groups, currentEntriesArray, entriesArray, currentEntriesLoading, entriesLoading])
 
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
-    if (!checkedDates.hasOwnProperty(currentDate)) {
+    if (!checkedDates.hasOwnProperty(currentDate.toISOString())) {
         checkedDates[currentDate] = 0;
     }
 
     const entriesWithIsProper = [];
 
     for (const date in checkedDates) {
-        const percentage = (checkedDates[date] * 100 / tasks.length ?? 1).toFixed(0);
+        let percentage = (checkedDates[date] * 100 / (tasks.length ? tasks.length : 1)).toFixed(0);
+
+        if (selection === "All") {
+            percentage = (checkedDates[date] * 100 / (perDateTotalTasks[date] ? perDateTotalTasks[date] : 1)).toFixed(0);
+        } else {
+
+        }
 
         entriesWithIsProper.push({
             isProperDate: false,
@@ -65,13 +192,37 @@ const CategoryTable = ({tasks}) => {
     }
 
     return (
-        <Table
-            entries={entriesWithIsProper}
-            entriesLoading={false}
-            setIsVisibleNewEntryModal={() => {}}
-            handleEditEntry={() => {}}
-            hasEditColumn={false}
-        />
+        <>
+            <section className={'Grid-Container Two-By-Two'}>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>Current Streak</div>
+                    <div>2 days</div>
+                    <div className={'Label'}>Since: 05/10/2022</div>
+                </div>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>Best Streak</div>
+                    <div>2 days</div>
+                    <div className={'Label'}>Ended at: 05/10/2022</div>
+                </div>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>% Completed</div>
+                    <div>20.0</div>
+                    <div className={'Label'}>Total: 123</div>
+                </div>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>% Started</div>
+                    <div>2 days</div>
+                    <div className={'Label'}>Total Started</div>
+                </div>
+            </section>
+            <Table
+                entries={entriesWithIsProper}
+                entriesLoading={false}
+                setIsVisibleNewEntryModal={() => {}}
+                handleEditEntry={() => {}}
+                hasEditColumn={false}
+            />
+        </>
     )
 }
 
@@ -96,8 +247,6 @@ const CategoryView = ({index, length, category}) => {
         // Selection is a group
         return tasks.filter(task => task.category === category._id && task.group === selectedGroup._id);
     }, [selectedGroup, groups, tasks]);
-
-    console.log(selectionTasks);
 
     // const [selectedGraph, setSelectedGraph] = useState('Average');
     // const graphOptions = ['Average', 'Total'];
@@ -157,59 +306,12 @@ const CategoryView = ({index, length, category}) => {
             </CollapsibleContainer>
             {groups.length > 0 && <section className={styles.groupsContainer}>
                 <Chip selected={selectedGroup} value={"All"} setSelected={setSelectedGroup}>All</Chip>
-                {groups.map(group => <Chip key={group._id} value={group.title} selected={selectedGroup}
-                                           setSelected={setSelectedGroup}>
+                {groups.map(group => <Chip key={group._id} value={group} selected={selectedGroup}
+                                           setSelected={() => setSelectedGroup(group)}>
                     {group.title}
                 </Chip>)}
             </section>}
-            <section className={'Grid-Container Two-By-Two'}>
-                <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Current Streak</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Since: 05/10/2022</div>
-                </div>
-                <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Best Streak</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Ended at: 05/10/2022</div>
-                </div>
-                <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Total</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Since: 05/10/2022</div>
-                </div>
-                <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Unfilled Days</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Ended at: 05/10/2022</div>
-                </div>
-            </section>
-            {/*<section className={'Stack-Container'}>*/}
-            {/*    <div className={'Horizontal-Flex-Container'}>*/}
-            {/*        {graphOptions.map((option, index) => (*/}
-            {/*            <Chip*/}
-            {/*                selected={selectedGraph}*/}
-            {/*                setSelected={setSelectedGraph}*/}
-            {/*                value={option}*/}
-            {/*                key={index}*/}
-            {/*            >*/}
-            {/*                {option}*/}
-            {/*            </Chip>*/}
-            {/*        ))}*/}
-            {/*    </div>*/}
-            {/*    <div className={'Horizontal-Flex-Container Space-Between'}>*/}
-            {/*        <IconButton onClick={() => addToMonth(-1)}>*/}
-            {/*            <ArrowBackIosIcon />*/}
-            {/*        </IconButton>*/}
-            {/*        <div>*/}
-            {/*            {`${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`}*/}
-            {/*        </div>*/}
-            {/*        <IconButton onClick={() => addToMonth(1)}>*/}
-            {/*            <ArrowForwardIosIcon />*/}
-            {/*        </IconButton>*/}
-            {/*    </div>*/}
-            {/*</section>*/}
-            <CategoryTable tasks={selectionTasks} />
+            <CategoryContent tasks={selectionTasks} selection={selectedGroup} category={category} groups={groups} />
             <section className={'Horizontal-Flex-Container Space-Between'}>
                 <Button filled={false} size={'small'}>
                     See all entries
