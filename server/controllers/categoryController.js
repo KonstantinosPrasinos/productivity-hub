@@ -20,7 +20,7 @@ const categorySchema = Joi.object({
     repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
-        startingDate: Joi.number()
+        startingDate: Joi.array().items(Joi.date())
     })
 })
 

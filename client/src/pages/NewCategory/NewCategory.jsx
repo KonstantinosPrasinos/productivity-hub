@@ -125,12 +125,34 @@ const NewCategory = ({index, length, id}) => {
         if (repeats) {
             if (timePeriodNumber.toString().length === 0) return;
 
+            // Todo test new starting date calculator
+            const startingDate = new Date();
+
+            startingDate.setUTCHours(0, 0, 0, 0);
+
+            // For starting date reset to first day of time period (for example for week to monday)
+            switch (timePeriod) {
+                case "Weeks":
+                    startingDate.setDate(startingDate.getDate() - (startingDate.getDay() - 1));
+                    break;
+                case "Months":
+                    startingDate.setDate(1);
+                    break;
+                case "Years":
+                    startingDate.setMonth(0)
+                    startingDate.setDate(1);
+                    break;
+                case "Days":
+                default:
+                    break;
+            }
+
             repeatParameters = {
                 priority,
                 repeatRate: {
                     number: timePeriodNumber,
                     bigTimePeriod: timePeriod,
-                    startingDate: (new Date()).setUTCHours(0, 0, 0, 0)
+                    startingDate: [startingDate]
                 }
             }
 

@@ -16,7 +16,7 @@ const SortIcon = ({sortOrder}) => {
     }
 }
 
-const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, handleEntryEdit, hasEditColumn}) => {
+const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, handleEntryEdit, hasEditColumn, datesAreRange = false}) => {
     const [pageNumber, setPageNumber] = useState(0);
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
@@ -70,8 +70,15 @@ const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrder
 
     if (sortOrderDate !== 0) {
         sortedEntries = entries.sort((a, b) => {
-            const dA = Date.parse(a.date);
-            const dB = Date.parse(b.date);
+            let dA, dB
+
+            if (datesAreRange) {
+                dA = Date.parse(a.date.substring(0, a.date.indexOf(" ")));
+                dB = Date.parse(b.date.substring(0, b.date.indexOf(" ")));
+            } else {
+                dA = Date.parse(a.date);
+                dB = Date.parse(b.date);
+            }
 
             return sortOrderDate * (dA - dB);
         });
@@ -114,7 +121,7 @@ const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrder
                         return <tr
                             key={entry.date}
                         >
-                            <td className={entry.isProperDate ? styles.isProperDate : ""}>{(new Date(entry.date)).toLocaleDateString()}</td>
+                            <td className={entry.isProperDate ? styles.isProperDate : ""}>{datesAreRange ? entry.date : (new Date(entry.date)).toLocaleDateString()}</td>
                             <td>{entry.value}</td>
                             {hasEditColumn && <td>
                                 <IconButton onClick={() => handleEntryEdit(entry)}>
@@ -140,7 +147,7 @@ const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrder
                             </IconButton>
                             <IconButton
                                 onClick={increasePageNumber}
-                                disabled={pageNumber === Math.floor(entries.length / 5)}
+                                disabled={pageNumber === Math.floor((entries.length - 1) / 5)}
                             >
                                 <TbChevronRight />
                             </IconButton>
@@ -153,7 +160,7 @@ const TableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrder
     )
 }
 
-const Table = ({entries, entriesLoading, setIsVisibleNewEntryModal, handleEditEntry, hasEditColumn = true}) => {
+const Table = ({entries, entriesLoading, setIsVisibleNewEntryModal, handleEditEntry, hasEditColumn = true, datesAreRange = false}) => {
     const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
     const [sortOrderValue, setSortOrderValue] = useState(0);
 
@@ -238,6 +245,7 @@ const Table = ({entries, entriesLoading, setIsVisibleNewEntryModal, handleEditEn
                 setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
                 handleEntryEdit={handleEditEntry}
                 hasEditColumn={hasEditColumn}
+                datesAreRange={datesAreRange}
             />
         </motion.table>
     );

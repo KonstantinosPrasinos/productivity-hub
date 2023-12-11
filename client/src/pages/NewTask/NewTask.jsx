@@ -541,7 +541,7 @@ const NewTask = ({index, length, id}) => {
                         <InputWrapper label={"Category subdivision"}>
                             <DropDownInput
                                 placeholder={"None"}
-                                isDisabled={repeatType !== "Repeatable Category"} setSelected={setTimeGroup} selected={timeGroup?.title}
+                                isDisabled={repeatType !== "Repeatable Category" || category === "None" || categoryGroups.length === 1} setSelected={setTimeGroup} selected={timeGroup?.title}
                             >
                                 {categoryGroups.map((tempTimeGroup, index) => (
                                     <button

@@ -21,9 +21,10 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
     const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
 
+    // Todo calculate streak based on startedDates
     const {checkedDates, startedDates, perDateTotalTasks} = useMemo(() => {
-        const checkedDates = {};
-        const startedDates = [];
+        let checkedDates = {};
+        let startedDates = [];
         let perDateTotalTasks = {};
 
         if (entriesLoading || currentEntriesLoading) return {
@@ -51,6 +52,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 const groupTasksIds = groupTasks.map(task => task._id);
 
                 // Loop through all the proper dates for the group
+                // Todo include future dates in time period to checked dates and per date total tasks
                 while (date.getTime() <= today.getTime()) {
                     // Get all the entries for this group
                     const dateEntries = allEntries.filter(entry => entry.value > 0 && groupTasksIds.includes(entry.taskId) && (new Date(entry.date)).getTime() === date.getTime());
@@ -105,6 +107,45 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                     date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
                 }
             })
+
+            // Calculate percentage for each week
+            const date = new Date(category.repeatRate.startingDate[0]);
+            const nextDate = new Date(category.repeatRate.startingDate[0]);
+            const today = new Date();
+
+            const dateRangeCheckedDates = {};
+
+            nextDate[`set${functionName}`](nextDate[`get${functionName}`]() + timeToAdd);
+
+            let countingStreak = 0;
+            let biggestStreak = 0;
+
+            while (date.getTime() <= today.getTime()) {
+                // For each date range get all the entries as one
+                let dateRangeEntries;
+                let completed = 0;
+                let taskTotal = 0;
+
+                dateRangeEntries = Object.keys(checkedDates).filter(tempDate => {
+                    const tempDateObj = new Date(tempDate);
+
+                    return tempDateObj.getTime() >= date.getTime() && tempDateObj.getTime() < nextDate.getTime()
+                })
+
+                dateRangeEntries.forEach(entryDate => {
+                    completed += checkedDates[entryDate];
+                    taskTotal += perDateTotalTasks[entryDate];
+                });
+
+                // Set task and completed entries total
+                perDateTotalTasks[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] = taskTotal;
+                dateRangeCheckedDates[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] = completed;
+
+                nextDate[`set${functionName}`](nextDate[`get${functionName}`]() + timeToAdd);
+                date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+            }
+            
+            checkedDates = dateRangeCheckedDates;
         } else {
             const date = new Date(selection.repeatRate.startingDate);
             const today = new Date();
@@ -169,19 +210,19 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
-    if (!checkedDates.hasOwnProperty(currentDate.toISOString())) {
+    if (selection !== "All" && !checkedDates.hasOwnProperty(currentDate.toISOString())) {
         checkedDates[currentDate] = 0;
     }
 
     const entriesWithIsProper = [];
 
     for (const date in checkedDates) {
-        let percentage = (checkedDates[date] * 100 / (tasks.length ? tasks.length : 1)).toFixed(0);
+        let percentage;
 
         if (selection === "All") {
             percentage = (checkedDates[date] * 100 / (perDateTotalTasks[date] ? perDateTotalTasks[date] : 1)).toFixed(0);
         } else {
-
+            percentage = (checkedDates[date] * 100 / (tasks.length ? tasks.length : 1)).toFixed(0);
         }
 
         entriesWithIsProper.push({
@@ -221,6 +262,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 setIsVisibleNewEntryModal={() => {}}
                 handleEditEntry={() => {}}
                 hasEditColumn={false}
+                datesAreRange={selection === "All"}
             />
         </>
     )
