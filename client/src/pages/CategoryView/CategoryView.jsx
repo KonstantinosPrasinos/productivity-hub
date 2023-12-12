@@ -15,6 +15,7 @@ import {useGetTaskEntries} from "@/hooks/get-hooks/useGetTaskEntries.js";
 import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
 import Table from "@/components/utilities/Table/Table.jsx";
 import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
+import {translateVerticalScroll} from "@/functions/translateVerticalScroll.js";
 
 const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
     const {data: entriesArray, isLoading: entriesLoading} = useGetTaskEntries(tasks.map(task => task._id));
@@ -402,7 +403,7 @@ const CategoryView = ({index, length, category}) => {
                     <Button onClick={handleCancelButton}>Cancel</Button>
                 </InputWrapper>
             </CollapsibleContainer>
-            {groups.length > 0 && <section className={styles.groupsContainer}>
+            {groups.length > 0 && <section className={styles.groupsContainer} onWheel={translateVerticalScroll}>
                 <Chip selected={selectedGroup} value={"All"} setSelected={setSelectedGroup}>All</Chip>
                 {groups.map(group => <Chip key={group._id} value={group} selected={selectedGroup}
                                            setSelected={() => setSelectedGroup(group)}>

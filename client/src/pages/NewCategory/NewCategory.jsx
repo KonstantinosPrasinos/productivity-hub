@@ -25,6 +25,7 @@ import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer
 import ToggleButton from "@/components/buttons/ToggleButton/ToggleButton";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import PriorityIndicator from "@/components/indicators/PriorityIndicator/PriorityIndicator";
+import {translateVerticalScroll} from "@/functions/translateVerticalScroll.js";
 
 const NewCategory = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
@@ -550,7 +551,7 @@ const NewCategory = ({index, length, id}) => {
                     <HeaderExtendContainer
                         header={<div className={"Stack-Container"}>
                             <InputWrapper label="Subdivisions" hasPadding={false}>
-                                <div className={styles.groupTitlesContainer}>
+                                <div className={styles.groupTitlesContainer} onWheel={translateVerticalScroll}>
                                     <Button filled={true} symmetrical={true} onClick={handleAddTimeGroup} size={"small"} disabled={timePeriod === "Days"}>
                                         Add new
                                         <TbPlus />
