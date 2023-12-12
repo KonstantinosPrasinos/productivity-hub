@@ -221,8 +221,13 @@ const NewTask = ({index, length, id}) => {
                     return;
                 }
 
+                // For some reason if I do repeatRate: category.repeatRate and then change something on the repeatRate, the category mutates ㄟ( ▔, ▔ )ㄏ
                 repeatParameters = {
-                    repeatRate: category.repeatRate,
+                    repeatRate: {
+                        startingDate: [...category.repeatRate.startingDate],
+                        number: category.repeatRate.number,
+                        bigTimePeriod: category.repeatRate.bigTimePeriod
+                    },
                     longGoal: category.goal
                 }
 

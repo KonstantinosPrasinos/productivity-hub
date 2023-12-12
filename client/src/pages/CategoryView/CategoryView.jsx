@@ -57,13 +57,12 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
 
                 // Add group to perGroupNextEntry
                 const groupNextEntry = {
-                    taskNumber: null,
-                    date: null
+                    taskNumber: groupTasks.length,
+                    date: date
                 };
 
                 // Loop through all the proper dates for the group
                 while (date.getTime() <= today.getTime()) {
-
                     // Get all the entries for this group
                     const dateEntries = allEntries.filter(entry => entry.value > 0 && groupTasksIds.includes(entry.taskId) && (new Date(entry.date)).getTime() === date.getTime());
 
@@ -110,9 +109,9 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
 
                     groupNextEntry.date = date;
                     groupNextEntry.taskNumber = groupTasks.length;
-                    
-                    perGroupNextEntry[group._id] = groupNextEntry;
                 }
+
+                perGroupNextEntry[group._id] = groupNextEntry;
             });
 
             // Calculate entries per time period instead of per day
@@ -379,8 +378,6 @@ const CategoryView = ({index, length, category}) => {
         deleteCategory({categoryId: category._id, deleteTasks: false});
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
     }
-
-    console.log(category)
 
     return (
         <MiniPageContainer
