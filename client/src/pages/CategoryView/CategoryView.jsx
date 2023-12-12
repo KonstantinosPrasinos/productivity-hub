@@ -21,14 +21,16 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
     const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
 
-    const {checkedDates, perDateTotalTasks} = useMemo(() => {
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const entriesWithIsProper = useMemo(() => {
+        const entriesWithIsProper = [];
+
+        if (entriesLoading || currentEntriesLoading) return entriesWithIsProper;
+
         let checkedDates = {};
         let perDateTotalTasks = {};
-
-        if (entriesLoading || currentEntriesLoading) return {
-            checkedDates,
-            perDateTotalTasks
-        }
 
         const allEntries = [...currentEntriesArray];
 
@@ -37,10 +39,15 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
         })
 
         if (selection === "All") {
+            // Used to check if it has been included in a date range
+            const perGroupNextEntry = {};
+
             // This means show tasks for all groups of the category.
             // Loop through every date from starting date to today for each group
             groups.forEach(group => {
                 const date = new Date(group.repeatRate.startingDate);
+
+                // Maximum time should be next end date from today
                 const today = new Date();
                 today.setUTCHours(0, 0, 0, 0);
 
@@ -48,9 +55,15 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 const groupTasks = tasks.filter(task => task.group === group._id);
                 const groupTasksIds = groupTasks.map(task => task._id);
 
+                // Add group to perGroupNextEntry
+                const groupNextEntry = {
+                    taskNumber: null,
+                    date: null
+                };
+
                 // Loop through all the proper dates for the group
-                // Todo include future dates in time period to checked dates and per date total tasks
                 while (date.getTime() <= today.getTime()) {
+
                     // Get all the entries for this group
                     const dateEntries = allEntries.filter(entry => entry.value > 0 && groupTasksIds.includes(entry.taskId) && (new Date(entry.date)).getTime() === date.getTime());
 
@@ -94,8 +107,13 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                     }
 
                     date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
+
+                    groupNextEntry.date = date;
+                    groupNextEntry.taskNumber = groupTasks.length;
+                    
+                    perGroupNextEntry[group._id] = groupNextEntry;
                 }
-            })
+            });
 
             // Calculate entries per time period instead of per day
             const date = new Date(category.repeatRate.startingDate[0]);
@@ -103,6 +121,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
             const today = new Date();
 
             const dateRangeCheckedDates = {};
+            const dateRangeTotalTasks = {};
 
             nextDate[`set${functionName}`](nextDate[`get${functionName}`]() + timeToAdd);
 
@@ -116,7 +135,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                     const tempDateObj = new Date(tempDate);
 
                     return tempDateObj.getTime() >= date.getTime() && tempDateObj.getTime() < nextDate.getTime()
-                })
+                });
 
                 dateRangeEntries.forEach(entryDate => {
                     completed += checkedDates[entryDate];
@@ -124,14 +143,24 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 });
 
                 // Set task and completed entries total
-                perDateTotalTasks[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] = taskTotal;
+                dateRangeTotalTasks[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] = taskTotal;
                 dateRangeCheckedDates[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] = completed;
+
+                // Add not completed entries for groups that haven't come up yet
+                for (const index in perGroupNextEntry) {
+                    const {taskNumber, date: groupNextEntry} = perGroupNextEntry[index];
+
+                    if (groupNextEntry.getTime() >= date.getTime() && groupNextEntry.getTime() < nextDate.getTime()) {
+                        dateRangeTotalTasks[`${date.toLocaleDateString()} - ${nextDate.toLocaleDateString()}`] += taskNumber;
+                    }
+                }
 
                 nextDate[`set${functionName}`](nextDate[`get${functionName}`]() + timeToAdd);
                 date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
             }
             
             checkedDates = dateRangeCheckedDates;
+            perDateTotalTasks = dateRangeTotalTasks;
         } else {
             const date = new Date(selection.repeatRate.startingDate);
             const today = new Date();
@@ -178,36 +207,36 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
             }
         }
 
-        return {
-            checkedDates,
-            perDateTotalTasks
+        // Add percentage and isProperDate to everything
+        for (const date in checkedDates) {
+            let percentage, isProperDate = false;
+
+            if (selection === "All") {
+                percentage = (checkedDates[date] * 100 / (perDateTotalTasks[date] ? perDateTotalTasks[date] : 1)).toFixed(0);
+
+                const startDate = new Date(date.substring(0, date.indexOf(" ")));
+                const endDate = new Date(date.substring(date.lastIndexOf(" ") + 1));
+
+                if (currentDate.getTime() >= startDate.getTime() && currentDate.getTime() < endDate.getTime()) {
+                    isProperDate = true;
+                }
+            } else {
+                percentage = (checkedDates[date] * 100 / (tasks.length ? tasks.length : 1)).toFixed(0);
+
+                if ((new Date(date).getTime() === currentDate.getTime())) {
+                    isProperDate = true;
+                }
+            }
+
+            entriesWithIsProper.push({
+                isProperDate,
+                date,
+                value: `${percentage} %`
+            })
         }
+
+        return entriesWithIsProper;
     }, [tasks, selection, category, groups, currentEntriesArray, entriesArray, currentEntriesLoading, entriesLoading])
-
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
-
-    if (selection !== "All" && !checkedDates.hasOwnProperty(currentDate.toISOString())) {
-        checkedDates[currentDate] = 0;
-    }
-
-    const entriesWithIsProper = [];
-
-    for (const date in checkedDates) {
-        let percentage;
-
-        if (selection === "All") {
-            percentage = (checkedDates[date] * 100 / (perDateTotalTasks[date] ? perDateTotalTasks[date] : 1)).toFixed(0);
-        } else {
-            percentage = (checkedDates[date] * 100 / (tasks.length ? tasks.length : 1)).toFixed(0);
-        }
-
-        entriesWithIsProper.push({
-            isProperDate: false,
-            date,
-            value: `${percentage} %`
-        })
-    }
 
     const {maxStreak, currentStreak, maxStreakEndDate, currentStreakStartDate, startedDates, completedDates} = useMemo(() => {
         // Calculate maximum, current streak by looping through the entries
@@ -240,7 +269,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
 
         maxStreakEndDate = new Date(maxStreakEndDate);
 
-        if (selection === "All") {
+        if (selection === "All" && currentStreakStartDate) {
             currentStreakStartDate = new Date(currentStreakStartDate.substring(0, currentStreakStartDate.indexOf(" ")));
         }
 
