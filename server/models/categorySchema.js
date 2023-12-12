@@ -26,6 +26,6 @@ const Category = new mongoose.Schema({
         type: {type: String},
         number: Number
     }
-})
+}, {timestamps: true})
 
 module.exports = mongoose.model('Category', Category);

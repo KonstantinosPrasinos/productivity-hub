@@ -16,7 +16,7 @@ import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.j
 import Table from "@/components/utilities/Table/Table.jsx";
 import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 
-const CategoryContent = ({tasks, selection, category, groups}) => {
+const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
     const {data: entriesArray, isLoading: entriesLoading} = useGetTaskEntries(tasks.map(task => task._id));
     const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
@@ -380,6 +380,8 @@ const CategoryView = ({index, length, category}) => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
     }
 
+    console.log(category)
+
     return (
         <MiniPageContainer
             index={index}
@@ -410,14 +412,12 @@ const CategoryView = ({index, length, category}) => {
                     {group.title}
                 </Chip>)}
             </section>}
-            <CategoryContent tasks={selectionTasks} selection={selectedGroup} category={category} groups={groups} />
+            {category?.repeatRate?.number && <RepeatCategoryContent tasks={selectionTasks} selection={selectedGroup} category={category}
+                                    groups={groups}/>}
             <section className={'Horizontal-Flex-Container Space-Between'}>
-                <Button filled={false} size={'small'}>
-                    See all entries
-                </Button>
-                <div className={'Label'}>
-                    Created at: 02/10/2022
-                </div>
+                {category.createdAt && <div className={'Label'}>
+                    Created at: {(new Date(category.createdAt)).toLocaleDateString()}
+                </div>}
             </section>
         </MiniPageContainer>
     );
