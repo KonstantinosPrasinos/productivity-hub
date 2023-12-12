@@ -21,15 +21,12 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
     const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
 
-    // Todo calculate streak based on startedDates
-    const {checkedDates, startedDates, perDateTotalTasks} = useMemo(() => {
+    const {checkedDates, perDateTotalTasks} = useMemo(() => {
         let checkedDates = {};
-        let startedDates = [];
         let perDateTotalTasks = {};
 
         if (entriesLoading || currentEntriesLoading) return {
             checkedDates,
-            startedDates,
             perDateTotalTasks
         }
 
@@ -67,23 +64,19 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                     // Now check if entries have value and if they are completed
                     dateEntries.forEach(entry => {
                         let dateCompleted = false;
-                        let dateStarted = false;
                         const task = groupTasks.find(task => task._id === entry.taskId);
 
                         if (task.type === "Checkbox") {
                             dateCompleted = true;
-                            dateStarted = true;
                         }
 
                         if (task.type === "Number") {
                             if (task?.goal?.number) {
                                 if (task.goal.number < entry.value) {
                                     dateCompleted = true;
-                                    dateStarted = true;
                                 }
                             } else {
                                 dateCompleted = true;
-                                dateStarted = true;
                             }
                         }
 
@@ -93,10 +86,6 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                             } else {
                                 checkedDates[date.toISOString()] = 1;
                             }
-                        }
-
-                        if (dateStarted && !startedDates.includes(date)) {
-                            startedDates.push(date.toISOString());
                         }
                     })
 
@@ -108,7 +97,7 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 }
             })
 
-            // Calculate percentage for each week
+            // Calculate entries per time period instead of per day
             const date = new Date(category.repeatRate.startingDate[0]);
             const nextDate = new Date(category.repeatRate.startingDate[0]);
             const today = new Date();
@@ -116,9 +105,6 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
             const dateRangeCheckedDates = {};
 
             nextDate[`set${functionName}`](nextDate[`get${functionName}`]() + timeToAdd);
-
-            let countingStreak = 0;
-            let biggestStreak = 0;
 
             while (date.getTime() <= today.getTime()) {
                 // For each date range get all the entries as one
@@ -159,23 +145,19 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                 // Almost the same code block as above
                 dateEntries.forEach(entry => {
                     let dateCompleted = false;
-                    let dateStarted = false;
                     const task = tasks.find(task => task._id === entry.taskId);
 
                     if (task.type === "Checkbox") {
                         dateCompleted = true;
-                        dateStarted = true;
                     }
 
                     if (task.type === "Number") {
                         if (task?.goal?.number) {
                             if (task.goal.number < entry.value) {
                                 dateCompleted = true;
-                                dateStarted = true;
                             }
                         } else {
                             dateCompleted = true;
-                            dateStarted = true;
                         }
                     }
 
@@ -185,10 +167,6 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
                         } else {
                             checkedDates[date.toISOString()] = 1;
                         }
-                    }
-
-                    if (dateStarted && !startedDates.includes(date)) {
-                        startedDates.push(date.toISOString());
                     }
                 })
 
@@ -202,7 +180,6 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
 
         return {
             checkedDates,
-            startedDates,
             perDateTotalTasks
         }
     }, [tasks, selection, category, groups, currentEntriesArray, entriesArray, currentEntriesLoading, entriesLoading])
@@ -232,28 +209,79 @@ const CategoryContent = ({tasks, selection, category, groups}) => {
         })
     }
 
+    const {maxStreak, currentStreak, maxStreakEndDate, currentStreakStartDate, startedDates, completedDates} = useMemo(() => {
+        // Calculate maximum, current streak by looping through the entries
+        let currentStreak = 0;
+        let maxStreak = 0;
+
+        let maxStreakEndDate = null;
+        let currentStreakStartDate = null;
+
+        for (const entry of entriesWithIsProper) {
+            if (entry.value === "100 %") {
+                currentStreak++;
+                if (!currentStreakStartDate) {
+                    currentStreakStartDate = entry.date;
+                }
+
+            } else {
+                currentStreak = 0;
+                currentStreakStartDate = null;
+            }
+            if (currentStreak > maxStreak) {
+                maxStreak = currentStreak;
+                if (selection === "All") {
+                    maxStreakEndDate = entry.date.substring(entry.date.lastIndexOf(" ") + 1)
+                } else {
+                    maxStreakEndDate = entry.date;
+                }
+            }
+        }
+
+        maxStreakEndDate = new Date(maxStreakEndDate);
+
+        if (selection === "All") {
+            currentStreakStartDate = new Date(currentStreakStartDate.substring(0, currentStreakStartDate.indexOf(" ")));
+        }
+
+        // Calculate the amount of completed and started dates
+        let completedDates = 0;
+        let startedDates = 0;
+
+        for (const entry of entriesWithIsProper) {
+            if (entry.value === "100 %") {
+                completedDates++;
+                startedDates++;
+            } else if (entry.value !== "0 %") {
+                startedDates++;
+            }
+        }
+
+        return {maxStreak, currentStreak, maxStreakEndDate, currentStreakStartDate, startedDates, completedDates}
+    }, [entriesWithIsProper])
+
     return (
         <>
             <section className={'Grid-Container Two-By-Two'}>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>Current Streak</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Since: 05/10/2022</div>
+                    <div>{currentStreak} {currentStreak === 1 ? "entry" : "entries"}</div>
+                    <div className={'Label'}>{currentStreakStartDate ? `Since: ${(new Date(currentStreakStartDate)).toLocaleDateString()}` : ""}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>Best Streak</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Ended at: 05/10/2022</div>
+                    <div>{maxStreak} {maxStreak === 1 ? "entry" : "entries"}</div>
+                    <div className={'Label'}>{currentDate.getTime() === maxStreakEndDate.getTime() ? "Ongoing" : `Ended At: ${maxStreakEndDate.toLocaleDateString()}`}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>% Completed</div>
-                    <div>20.0</div>
-                    <div className={'Label'}>Total: 123</div>
+                    <div>{((completedDates / entriesWithIsProper.length) * 100).toFixed(1)}</div>
+                    <div className={'Label'}>Total: {completedDates}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>% Started</div>
-                    <div>2 days</div>
-                    <div className={'Label'}>Total Started</div>
+                    <div>{((startedDates / entriesWithIsProper.length) * 100).toFixed(1)}</div>
+                    <div className={'Label'}>Total: {startedDates}</div>
                 </div>
             </section>
             <Table

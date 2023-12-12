@@ -104,7 +104,6 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         } else {
             const newDate = (new Date(date));
             newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60);
-            console.log(date, newDate.toISOString());
 
             await addEntry({date: newDate, value, taskId});
             if (!isError) {

@@ -142,8 +142,8 @@ a {
 
 .Grid-Container {
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: auto auto;
+    grid-template-columns: calc(50% - 5px) calc(50% - 5px);
+    grid-template-rows: calc(50% - 5px) calc(50% - 5px);
     gap: 10px 10px;
     grid-template-areas:
     ". ."
@@ -362,7 +362,7 @@ table {
             border-left-width: 1px;
         }
 
-        &:nth-child(3) {
+        &:last-child {
             border-right-width: 1px;
         }
     }
