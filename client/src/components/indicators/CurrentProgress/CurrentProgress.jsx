@@ -28,7 +28,7 @@ const CurrentProgress = ({task}) => {
     const getEntryColor = () => {
         if (task.type === "Checkbox") return entry?.value === 1;
 
-        switch (task.goal.type) {
+        switch (task?.goal?.type) {
             case "At least":
                 if (task.goal.number <= entry?.value) {
                     return "var(--green-color)";

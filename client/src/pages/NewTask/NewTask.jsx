@@ -267,7 +267,7 @@ const NewTask = ({index, length, id}) => {
 
         if (id) {
             // Editing task
-            await changeTask(task);
+            await changeTask({...task, _id: id});
         } else {
             // Creating task
             await addTask(task);

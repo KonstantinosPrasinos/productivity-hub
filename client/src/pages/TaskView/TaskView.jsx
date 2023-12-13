@@ -35,45 +35,60 @@ import {dateIsProper} from "@/functions/dateIsProper.js";
 import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 
 const StatSection = ({task}) => {
-    const {data: entries} = useGetTaskEntries(task._id);
+    const {data: entries, isLoading} = useGetTaskEntries(task._id);
+
     const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), [task]);
 
-    const {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate} = useMemo(() => {
-        const allEntries = [entry, ...entries];
-
-        const streakDate = new Date(task.repeatRate.startingDate[0]);
-
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
-
+    const {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate, totalEntries, totalStarted, totalCompleted} = useMemo(() => {
         let currentStreak = 0;
         let longestStreak = 0;
 
         let currentStreakStartingDate = null
         let longestStreakEndDate = null;
 
+        let totalEntries = 0;
+        let totalStarted = 0;
+        let totalCompleted = 0;
+
+        if (isLoading) return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate};
+
+        const allEntries = entries?.length ? [entry, ...entries] : [entry];
+
+        const streakDate = new Date(task.repeatRate.startingDate[0]);
+
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
         while (streakDate.getTime() <= today.getTime()) {
             let dateCompleted = false;
 
+            totalEntries++;
+
             const streakEntry = allEntries.find(entry => entry.value > 0 && (new Date(entry.date)).getTime() === streakDate.getTime());
 
-            if (task.type === "Checkbox" && streakEntry) {
-                dateCompleted = true;
-            }
+            if (streakEntry) {
 
-            if (task.type === "Number") {
-                if (task?.goal?.number) {
-                    if (task.goal.number < entry.value) {
+                if (task.type === "Checkbox" && streakEntry) {
+                    dateCompleted = true;
+                }
+
+                if (task.type === "Number") {
+                    if (task?.goal?.number) {
+                        if (task.goal.number < entry.value) {
+                            dateCompleted = true;
+                        } else {
+                            totalStarted++;
+                        }
+                    } else {
                         dateCompleted = true;
                     }
-                } else {
-                    dateCompleted = true;
                 }
             }
 
             if (dateCompleted) {
                 currentStreak++;
+                totalCompleted++;
 
                 if (!currentStreakStartingDate) {
                     currentStreakStartingDate = new Date(streakEntry.date);
@@ -97,8 +112,8 @@ const StatSection = ({task}) => {
             longestStreakEndDate = "Ongoing";
         }
 
-        return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate};
-    }, [task, entries, entry]);
+        return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate, totalEntries, totalCompleted, totalStarted};
+    }, [task, entries, entry, isLoading]);
 
     return (
         <section className={'Grid-Container'}>
@@ -114,12 +129,14 @@ const StatSection = ({task}) => {
             </div>
             {task.type === "Number" && <>
                 <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Total Sum</div>
-                    <div>{task.totalNumber}</div>
+                    <div className={'Label'}>% Completed</div>
+                    <div>{totalEntries > 0 ? ((totalCompleted / totalEntries) * 100).toFixed(1) : 0 }</div>
+                    <div className={'Label'}>Total: {totalCompleted}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
-                    <div className={'Label'}>Total Completed</div>
-                    <div>{task.totalCompletedEntries}</div>
+                    <div className={'Label'}>% Started</div>
+                    <div>{totalEntries > 0 ? ((totalStarted / totalEntries) * 100).toFixed(1) : 0 }</div>
+                    <div className={'Label'}>Total: {totalStarted}</div>
                 </div>
             </>}
         </section>

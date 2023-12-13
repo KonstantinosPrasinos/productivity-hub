@@ -22,7 +22,7 @@ export function useChangeTask() {
         mutationFn: postChangeTask,
         onSuccess: (newTask) => {
             queryClient.setQueryData(["tasks"], (oldData) => {
-                const taskBeforeEdit = oldData.tasks.find(task => task._id === newTask._id)
+                const taskBeforeEdit = oldData.tasks.find(task => task._id === newTask._id);
 
                 return {
                     tasks: [
