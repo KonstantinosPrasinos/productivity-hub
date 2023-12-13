@@ -338,7 +338,7 @@ const TaskView = ({index, length, task}) => {
     // }
 
     const updateSettings = async () => {
-        await setSettings({...settings, confirmDeleteTask: false, priorityBounds: undefined});
+        await setSettings({...settings, priorityBounds: undefined});
     }
 
     const handleDelete = () => {
@@ -348,7 +348,7 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleDeleteClick = () => {
-        if (settings.confirmDeleteTask) { // check with user settings for prompt to delete task
+        if (settings.confirmDelete) { // check with user settings for prompt to delete task
             setIsVisibleConfirmDeleteModal(true);
         } else {
             handleDelete()
