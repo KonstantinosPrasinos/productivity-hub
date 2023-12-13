@@ -226,21 +226,18 @@ a {
     border: v.$base-border;
     display: inline-flex;
 
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-
-    &:not(.No-Hover):hover {
+    &.Has-Hover:hover {
         transition: transform 0.2s ease-in-out;
         transform: scale(1.005) !important;
     }
 
     &.Has-Shadow {
-        border: none;
-        box-shadow: v.$elevation-1;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     }
 }
 
 .Empty-Indicator-Container {
-    @extend .Horizontal-Flex-Container, .Rounded-Container;
+    @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow, .Has-Hover;
     font-size: v.$font-m;
     height: 2.5em;
     width: 22.15em;

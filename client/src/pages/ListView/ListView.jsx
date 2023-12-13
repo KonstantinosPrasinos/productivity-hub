@@ -78,7 +78,7 @@ const ListView = () => {
 
                         return (
                             <motion.div
-                                className={`Rounded-Container Stack-Container ${styles.categoryContainer}`}
+                                className={`Rounded-Container Has-Shadow Has-Hover Stack-Container ${styles.categoryContainer}`}
                                 key={category._id}
                                 onClick={() => handleCategoryClick(category._id)}
                                 initial={{ opacity: 0, y: 50, scale: 0.8 }}

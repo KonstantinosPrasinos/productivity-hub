@@ -3,7 +3,7 @@
 @use '@/styles/mixins' as m;
 
 .container {
-  @extend .Rounded-Container, .Stack-Container;
+  @extend .Rounded-Container, .Stack-Container, .Has-Shadow, .Has-Hover;
 
   display: inline-flex;
   position: relative;
