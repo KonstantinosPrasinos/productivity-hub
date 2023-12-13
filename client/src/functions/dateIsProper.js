@@ -8,9 +8,7 @@ export function dateIsProper(date, task) {
         return false;
     }
 
-    let startDate = new Date(task.mostRecentProperDate ?? task.repeatRate.startingDate[0]);
-
-    startDate.setHours(0, 0, 0, 0);
+    let startDate = new Date(task.repeatRate.startingDate[0]);
 
     while(startDate.getTime() < date.getTime()) {
         startDate[`set${functionName}`](startDate[`get${functionName}`]() + timeToAdd);

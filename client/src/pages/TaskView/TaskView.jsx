@@ -387,7 +387,7 @@ const TaskView = ({index, length, task}) => {
 
         return allEntries.map(entry => {
             const entryDate = new Date(entry.date);
-            entryDate.setHours(0, 0);
+            entryDate.setUTCHours(0, 0, 0, 0);
 
             return {...entry, isProperDate: dateIsProper(entryDate, task)}
         })

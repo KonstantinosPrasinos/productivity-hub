@@ -32,6 +32,7 @@ $base-size: 1.2em;
   opacity: 0.87;
   border-radius: 500px;
   border: 6px solid transparent;
+  width: 2em;
 
   &:hover:not(.customSelectedDay) {
     background-color: var(--border-primary-color) !important;
