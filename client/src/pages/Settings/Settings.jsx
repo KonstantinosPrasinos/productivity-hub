@@ -214,11 +214,10 @@ const Settings = () => {
 
     return (
         <motion.div
-            className={`Rounded-Container ${styles.container} Has-Shadow`}
+            className={`Rounded-Container ${styles.container} No-Hover`}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}
-            transition={{duration: 0.2}}
         >
             <div className={`Stack-Container To-Edge ${styles.subContainer} Huge-Gap`}>
                 <section className={`Stack-Container Big-Gap ${styles.firstSection}`}>

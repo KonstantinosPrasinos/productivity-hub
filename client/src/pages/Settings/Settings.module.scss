@@ -14,7 +14,7 @@
 
 @media (min-width: v.$tablet-breakpoint) {
     .container {
-        width: 600px;
+        min-width: 600px;
         height: calc(100% - 4em);
         padding: 20px !important;
         padding-right: 12px !important;

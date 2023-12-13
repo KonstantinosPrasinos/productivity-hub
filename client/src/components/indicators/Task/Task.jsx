@@ -98,10 +98,9 @@ const Task = ({tasks}) => {
     return (
         <motion.div
             className={`${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{duration: 1, type: "spring"}}
+            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
             layout
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}

@@ -63,10 +63,9 @@ const ListView = () => {
                 <motion.button
                     className={`Empty-Indicator-Container Clickable`}
                     onClick={handleNewCategoryClick}
-                    initial={{ opacity: 0, scale: 0.3}}
-                    animate={{ opacity: 1, scale: 1}}
-                    exit={{ opacity: 0, scale: 0.3}}
-                    transition={{duration: 0.4, type: "spring"}}
+                    initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                     layout
                 >
                     {categories.length > 0 && "Add category"}
@@ -79,13 +78,12 @@ const ListView = () => {
 
                         return (
                             <motion.div
-                                className={`Rounded-Container Has-Shadow Stack-Container ${styles.categoryContainer}`}
+                                className={`Rounded-Container Stack-Container ${styles.categoryContainer}`}
                                 key={category._id}
                                 onClick={() => handleCategoryClick(category._id)}
-                                initial={{ opacity: 0, scale: 0.3}}
-                                animate={{ opacity: 1, scale: 1}}
-                                exit={{ opacity: 0, scale: 0.3}}
-                                transition={{duration: 0.4, type: "spring"}}
+                                initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                                 layout
                             >
                                 <div className={'Horizontal-Flex-Container'}>
