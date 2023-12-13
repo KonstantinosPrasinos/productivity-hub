@@ -10,12 +10,13 @@ import CollapsibleContainer from "../../components/containers/CollapsibleContain
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import {useDeleteCategory} from "../../hooks/delete-hooks/useDeleteCategory";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
-import {TbEdit, TbTrash} from "react-icons/tb";
+import {TbChevronDown, TbEdit, TbTrash} from "react-icons/tb";
 import {useGetTaskEntries} from "@/hooks/get-hooks/useGetTaskEntries.js";
 import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
 import Table from "@/components/utilities/Table/Table.jsx";
 import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 import {translateVerticalScroll} from "@/functions/translateVerticalScroll.js";
+import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer/HeaderExtendContainer.jsx";
 
 const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
     const {data: entriesArray, isLoading: entriesLoading} = useGetTaskEntries(tasks.map(task => task._id));
@@ -306,7 +307,6 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
         }
     }
 
-
     return (
         <>
             <section className={'Grid-Container Two-By-Two'}>
@@ -352,6 +352,7 @@ const CategoryView = ({index, length, category}) => {
     const groups = unfilteredGroups?.filter(group => group.parent === category._id);
 
     const [selectedGroup, setSelectedGroup] = useState("All");
+    const [tasksExtended, setTasksExtended] = useState(false);
     const [deletePromptVisible, setDeletePromptVisible] = useState(false);
     const {mutate: deleteCategory} = useDeleteCategory();
 
@@ -398,6 +399,14 @@ const CategoryView = ({index, length, category}) => {
         miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
     }
 
+    const handleExtendTasks = () => {
+        setTasksExtended(current => !current);
+    }
+
+    const handleTaskClick = (task) => {
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: task._id}});
+    }
+
     return (
         <MiniPageContainer
             index={index}
@@ -430,6 +439,26 @@ const CategoryView = ({index, length, category}) => {
             </section>}
             {category?.repeatRate?.number && <RepeatCategoryContent tasks={selectionTasks} selection={selectedGroup} category={category}
                                     groups={groups}/>}
+            <HeaderExtendContainer
+                header={
+                    <section className={"Horizontal-Flex-Container Space-Between"}>
+                        <span className={"Title-Small"}>Show category tasks</span>
+                        <div className={`${styles.chevronDown} ${tasksExtended ? styles.facingUp : ""}`}>
+                            <TbChevronDown />
+                        </div>
+                    </section>
+                }
+                extendedInherited={tasksExtended}
+                setExtendedInherited={handleExtendTasks}
+            >
+                <section className={styles.tasksContainer}>
+                    <ul>
+                        {selectionTasks.map(task => (
+                            <li key={task._id}><button onClick={() => handleTaskClick(task)}>{task.title}</button></li>
+                        ))}
+                    </ul>
+                </section>
+            </HeaderExtendContainer>
             <section className={'Horizontal-Flex-Container Space-Between'}>
                 {category.createdAt && <div className={'Label'}>
                     Created at: {(new Date(category.createdAt)).toLocaleDateString()}
