@@ -24,6 +24,7 @@
 
 @media (max-width: v.$tablet-breakpoint) {
   .leftSide {
-    padding-top: 1em;
+    width: 100%;
+    padding: 1em 4px 0 4px;
   }
 }

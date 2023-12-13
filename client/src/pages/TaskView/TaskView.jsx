@@ -68,7 +68,6 @@ const StatSection = ({task}) => {
             const streakEntry = allEntries.find(entry => entry.value > 0 && (new Date(entry.date)).getTime() === streakDate.getTime());
 
             if (streakEntry) {
-
                 if (task.type === "Checkbox" && streakEntry) {
                     dateCompleted = true;
                 }

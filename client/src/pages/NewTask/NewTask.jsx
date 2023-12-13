@@ -110,6 +110,7 @@ const NewTask = ({index, length, id}) => {
             setTitle(task.title);
 
             if (task.type === 'Number') {
+                setIsNumberTask(true);
                 setStep(task.step);
                 if (task?.goal.type) {
                     setHasGoal(true);
