@@ -24,7 +24,7 @@ export function useResetAccount() {
     return useMutation({
         mutationFn: postResetAccount,
         onError: () => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to reset account"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Reset Account", message: "Please try again."}});
         },
         onSettled: () => {
             queryClient.invalidateQueries({queryKey: ["tasks"]});

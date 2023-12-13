@@ -63,7 +63,7 @@ const ResetPassword = () => {
                     await sendCode(email);
                     setCurrentPage(2);
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Email is Invalid", message: "Please enter a valid email address."}});
                 }
                 break;
             case 1:
@@ -90,10 +90,10 @@ const ResetPassword = () => {
                             setCurrentPage(4)
                         }
                     } else {
-                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Passwords don't match", message: "The password and repeat password fields must match."}});
                     }
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Password too Weak", message: "Please enter a stronger password."}});
                 }
                 break;
             case 4:

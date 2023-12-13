@@ -165,12 +165,12 @@ const NewTask = ({index, length, id}) => {
 
         // First check that all the categories and groups have loaded. Also do the first check.
         if (categoriesLoading || groupsLoading) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Categories currently loading"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Categories loading", message: "Please wait until the categories are done loading."}});
             return
         }
 
         if (!title) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You must input a title for the task"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Task Title is Missing", message: "Tasks must have a title. Please enter a title to continue."}});
             return;
         }
 
@@ -179,12 +179,12 @@ const NewTask = ({index, length, id}) => {
         if (repeats) {
             if (repeatType === "Custom Rules") {
                 if (repeatNumber.toString().length === 0) {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You must input a title for the task"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Repeat Number is Missing", message: "For the task to repeat using custom rules, you need to input a repeat number."}});
                     return;
                 }
 
                 if (timePeriod2.length === 0) {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must select at least one day to repeat on"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "No repeat days selected", message: "You must select at least one day to repeat on"}});
                     return;
                 }
 
@@ -204,7 +204,7 @@ const NewTask = ({index, length, id}) => {
 
                 if (hasLongGoal) {
                     if (longGoalNumber.toString().length === 0) {
-                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a number for the goal"}});
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Long Term Goal Number is Missing", message: "For the task to have a long term goal, you need to input a goal number."}});
                         return;
                     }
 
@@ -217,7 +217,7 @@ const NewTask = ({index, length, id}) => {
             } else {
                 // Repeatable Category
                 if (category === "None") {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "You must select a repeatable category"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Repeat Category is Missing", message: "For the task to repeat using a repeat category, you need to select a category."}});
                     return;
                 }
 

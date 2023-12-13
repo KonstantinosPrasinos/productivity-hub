@@ -6,8 +6,8 @@ export const alertsReducer = (state, action) => {
     switch (action.type) {
         case 'ADD_ALERT':
             if (state.length < 10) {
-                for (let i=0; i < 10; i++) {
-                    if (!state.find(alert => alert.id === i)) {
+                for (let i = 0; i < 10; i++) {
+                    if (!state.find(alert => alert.id === i || alert.title === action.payload.title)) {
                         let obj = {id: i};
                         return [...state, {...action.payload, ...obj}];
                     }

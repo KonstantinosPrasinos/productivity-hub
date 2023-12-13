@@ -43,6 +43,7 @@ export function useChangeSettings() {
             alertsContext.dispatch({
                 type: "ADD_ALERT", payload: {
                     type: "error",
+                    title: "Failed to Change Settings",
                     message: "An error occurred while trying to change your settings. They have been reverted to their previous values. Please try again."
                 }
             })

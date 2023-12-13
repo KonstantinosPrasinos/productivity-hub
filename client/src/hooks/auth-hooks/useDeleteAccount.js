@@ -26,7 +26,7 @@ export function useDeleteAccount() {
     return useMutation({
         mutationFn: postDeleteAccount,
         onError: () => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to delete account"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to delete account", message: "Please try again."}});
         },
         onSettled: () => {
             localStorage.removeItem("user");

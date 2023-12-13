@@ -67,10 +67,10 @@ const LogIn = () => {
                             setSelectedTab(1);
                         }
                     } else {
-                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Passwords don't match", message: "The password and repeat password fields must match."}});
                     }
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Email is Invalid", message: "Please enter a valid email address."}});
                 }
             }
         } else if (selectedTab === 1) {

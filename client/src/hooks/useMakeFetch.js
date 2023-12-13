@@ -16,7 +16,7 @@ export function useMakeFetch(setIsLoading) {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "An error has occurred", message: data.message}});
             setIsLoading(false);
             return false;
         }

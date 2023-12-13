@@ -21,7 +21,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
         } else {
             const data = await response.json();
             const date = new Date();
@@ -44,7 +44,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
         } else {
             const data = await response.json();
             const date = new Date();
@@ -69,7 +69,7 @@ export function useAuth() {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: data.message}});
             setIsLoading(false);
             return false;
         }
@@ -85,7 +85,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to log out user."}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log out user", message: "Please try again."}});
         } else {
             localStorage.removeItem('user');
             localStorage.removeItem('settings');
@@ -105,7 +105,7 @@ export function useAuth() {
         const data = await response.json();
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Reset Account", message: data.message}});
             return;
         }
 

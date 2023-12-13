@@ -101,23 +101,23 @@ const NewCategory = ({index, length, id}) => {
 
     const handleSave = async () => {
         if (categoriesLoading) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Categories currently loading"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Categories loading", message: "Please wait until the categories are done loading."}});
             return
         }
 
         if (creatingTimeGroup) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You have unsaved time group changes"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Unsaved Subdivision Changes", message: "You have unsaved subdivision changes. Please save or cancel the changes to continue."}})
             return;
         }
 
         // Check inputs for validity
         if (!title) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the category"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Category Title is Missing", message: "Categories must have a title. Please enter a title to continue."}})
             return;
         }
 
         if (!id && categories.find(category => category.title === title) !== undefined) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "A category with that title already exists"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Duplicate Category", message: "A category with that title already exists. Please change the title to continue."}})
             return;
         }
 
@@ -126,7 +126,6 @@ const NewCategory = ({index, length, id}) => {
         if (repeats) {
             if (timePeriodNumber.toString().length === 0) return;
 
-            // Todo test new starting date calculator
             const startingDate = new Date();
 
             startingDate.setUTCHours(0, 0, 0, 0);
@@ -272,19 +271,19 @@ const NewCategory = ({index, length, id}) => {
         // Restrictions based on title
         // Has title
         if (!timeGroupTitle) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Time group title must be filled"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Subdivision Title is Missing", message: "Subdivisions must have a title. Please enter a title to continue."}})
             return;
         }
 
         // Unique title (in category)
         if (timeGroupTitle !== currentEditedGroup.current?.title && timeGroups.find(group => group.title === timeGroupTitle && !group?.deleted))  {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Time group title must be unique for this category"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Duplicate Subdivision", message: "A subdivision with that title already exists in the category. Change the title to continue."}})
             return;
         }
 
         // At least one day must be selected
         if (timePeriod !== 'Days' && !timePeriod2) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must select at least one day"}})
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "No repeat days selected", message: "You must select at least one day to repeat on"}})
             return;
         }
 
@@ -322,7 +321,8 @@ const NewCategory = ({index, length, id}) => {
                     type: "ADD_ALERT",
                     payload: {
                         type: "error",
-                        message: "The \"from\" time must be before the \"after\" time."
+                        title: "Subdivision Time is Invalid",
+                        message: "A subdivision can't end before it starts."
                     }
                 })
                 return;

@@ -32,7 +32,7 @@ export function useChangeEntryValue(taskTitle) {
         onError: (err, data) => {
             // If the mutation fails reset the client state to the previous value and send an alert
             queryClient.setQueryData(["task-entries", data.taskId, data.entryId], (oldData) => {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: `Couldn't apply changes to entry "${taskTitle}"`}});
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed Change Entry", message: `Couldn't apply changes to "${taskTitle}", please try again`}});
 
                 const entry = {
                     ...oldData.entry,

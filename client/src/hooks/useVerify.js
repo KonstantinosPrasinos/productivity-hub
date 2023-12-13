@@ -17,7 +17,7 @@ export function useVerify() {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Verify Code", message: data.message}});
             setIsLoading(false);
             return false;
         } else {
@@ -36,10 +36,10 @@ export function useVerify() {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Resend Code", message: data.message}});
             return false;
         } else {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Email resent successfully"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", title: "Code Sent Successfully", message: "Please check your email."}});
             return true;
         }
     }
@@ -56,11 +56,11 @@ export function useVerify() {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Create Account", message: data.message}});
             setIsLoading(false);
             return false;
         } else {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Account created successfully."}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", title: "Account created successfully", message: "You can now log in."}});
             setIsLoading(false);
             return true;
         }
@@ -76,10 +76,10 @@ export function useVerify() {
 
         if (!response.ok) {
             const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Resend Code", message: data.message}});
             return false;
         } else {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Email resent successfully"}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", title: "Code Sent Successfully", message: "Please check your email."}});
             return true;
         }
     }

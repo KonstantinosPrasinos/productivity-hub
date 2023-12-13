@@ -7,7 +7,7 @@ const AlertHandler = () => {
     const alertsContext = useContext(AlertsContext);
 
     return (<div className={styles.container}>
-        {alertsContext.state.length > 0 && alertsContext.state.map((alert) => alertsContext.state[0].id === alert.id && <Alert key={alert.id} id={alert.id} message={alert.message} type={alert.type} />)}
+        {alertsContext.state.length > 0 && alertsContext.state.map((alert) => alertsContext.state[0].id === alert.id && <Alert key={alert.id} id={alert.id} message={alert.message} title={alert.title} type={alert.type} />)}
     </div>);
 }
  
