@@ -32,19 +32,85 @@ import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
 import Table from "@/components/utilities/Table/Table.jsx";
 import {dateIsProper} from "@/functions/dateIsProper.js";
+import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 
 const StatSection = ({task}) => {
+    const {data: entries} = useGetTaskEntries(task._id);
+    const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), [task]);
+
+    const {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate} = useMemo(() => {
+        const allEntries = [entry, ...entries];
+
+        const streakDate = new Date(task.repeatRate.startingDate[0]);
+
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
+        let currentStreak = 0;
+        let longestStreak = 0;
+
+        let currentStreakStartingDate = null
+        let longestStreakEndDate = null;
+
+        while (streakDate.getTime() <= today.getTime()) {
+            let dateCompleted = false;
+
+            const streakEntry = allEntries.find(entry => entry.value > 0 && (new Date(entry.date)).getTime() === streakDate.getTime());
+
+            if (task.type === "Checkbox" && streakEntry) {
+                dateCompleted = true;
+            }
+
+            if (task.type === "Number") {
+                if (task?.goal?.number) {
+                    if (task.goal.number < entry.value) {
+                        dateCompleted = true;
+                    }
+                } else {
+                    dateCompleted = true;
+                }
+            }
+
+            if (dateCompleted) {
+                currentStreak++;
+
+                if (!currentStreakStartingDate) {
+                    currentStreakStartingDate = new Date(streakEntry.date);
+                }
+
+                if (currentStreak > longestStreak) {
+                    longestStreak = currentStreak;
+                    longestStreakEndDate = new Date(streakEntry.date);
+                }
+            } else {
+                currentStreak = 0;
+                currentStreakStartingDate = null;
+            }
+
+            streakDate[`set${functionName}`](streakDate[`get${functionName}`]() + timeToAdd);
+        }
+
+        // If end date is today and current streak is not 0 then the longest streak is ongoing
+        streakDate[`set${functionName}`](streakDate[`get${functionName}`]() - timeToAdd);
+        if (longestStreakEndDate && longestStreakEndDate.getTime() === streakDate.getTime() && currentStreak > 0) {
+            longestStreakEndDate = "Ongoing";
+        }
+
+        return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate};
+    }, [task, entries, entry]);
+
     return (
         <section className={'Grid-Container'}>
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Current Streak</div>
-                <div>{task.streak.number} days</div>
-                <div className={'Label'}>Since: {task.streak.number > 0 ? task.streak.date : "Never"}</div>
+                <div>{currentStreak === 1 ? `${currentStreak} entry` : `${currentStreak} entries`}</div>
+                <div className={'Label'}>{currentStreak > 0 ? `Since: ${currentStreakStartingDate.toLocaleDateString()}` : ""}</div>
             </div>
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Longest Streak</div>
-                <div>{task.longestStreak.number ?? 0} days</div>
-                <div className={'Label'}>Since: {task.longestStreak.number > 0 ? task.longestStreak.date : "Never"}</div>
+                <div>{longestStreak === 1 ? `${longestStreak} entry` : `${longestStreak} entries`}</div>
+                <div className={'Label'}>{longestStreakEndDate === "Ongoing" ? "Ongoing" : (longestStreakEndDate?.toLocaleDateString() ?? "")}</div>
             </div>
             {task.type === "Number" && <>
                 <div className={'Rounded-Container Stack-Container'}>

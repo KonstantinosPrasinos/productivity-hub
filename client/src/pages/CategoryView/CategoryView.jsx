@@ -25,10 +25,11 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
-    const entriesWithIsProper = useMemo(() => {
+    const {entriesWithIsProper, groupLatestEntry} = useMemo(() => {
         const entriesWithIsProper = [];
+        let groupLatestEntry = null;
 
-        if (entriesLoading || currentEntriesLoading) return entriesWithIsProper;
+        if (entriesLoading || currentEntriesLoading) return {entriesWithIsProper, groupLatestEntry};
 
         let checkedDates = {};
         let perDateTotalTasks = {};
@@ -205,6 +206,10 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
 
                 date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
             }
+
+            // Get group latest entry
+            date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
+            groupLatestEntry = date;
         }
 
         // Add percentage and isProperDate to everything
@@ -235,7 +240,7 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
             })
         }
 
-        return entriesWithIsProper;
+        return {entriesWithIsProper, groupLatestEntry};
     }, [tasks, selection, category, groups, currentEntriesArray, entriesArray, currentEntriesLoading, entriesLoading])
 
     const {maxStreak, currentStreak, maxStreakEndDate, currentStreakStartDate, startedDates, completedDates} = useMemo(() => {
@@ -267,7 +272,9 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
             }
         }
 
-        maxStreakEndDate = new Date(maxStreakEndDate);
+
+
+        maxStreakEndDate = maxStreakEndDate ? new Date(maxStreakEndDate) : maxStreakEndDate;
 
         if (selection === "All" && currentStreakStartDate) {
             currentStreakStartDate = new Date(currentStreakStartDate.substring(0, currentStreakStartDate.indexOf(" ")));
@@ -287,7 +294,18 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
         }
 
         return {maxStreak, currentStreak, maxStreakEndDate, currentStreakStartDate, startedDates, completedDates}
-    }, [entriesWithIsProper])
+    }, [entriesWithIsProper]);
+
+    let streakIsOngoing = false;
+
+    if (selection !== "All") {
+        const latestEntry = entriesWithIsProper.find(entry => (new Date(entry.date)).getTime() === groupLatestEntry.getTime())
+
+        if (latestEntry && latestEntry.value === "100 %") {
+            streakIsOngoing = true;
+        }
+    }
+
 
     return (
         <>
@@ -300,16 +318,16 @@ const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>Best Streak</div>
                     <div>{maxStreak} {maxStreak === 1 ? "entry" : "entries"}</div>
-                    <div className={'Label'}>{currentDate.getTime() === maxStreakEndDate.getTime() ? "Ongoing" : `Ended At: ${maxStreakEndDate.toLocaleDateString()}`}</div>
+                    <div className={'Label'}>{streakIsOngoing ? "Ongoing" : (maxStreakEndDate?.toLocaleDateString() ?? "")}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>% Completed</div>
-                    <div>{((completedDates / entriesWithIsProper.length) * 100).toFixed(1)}</div>
+                    <div>{entriesWithIsProper.length > 0 ? (((completedDates / entriesWithIsProper.length) * 100).toFixed(1)) : 0}</div>
                     <div className={'Label'}>Total: {completedDates}</div>
                 </div>
                 <div className={'Rounded-Container Stack-Container'}>
                     <div className={'Label'}>% Started</div>
-                    <div>{((startedDates / entriesWithIsProper.length) * 100).toFixed(1)}</div>
+                    <div>{entriesWithIsProper.length > 0 ? ((startedDates / entriesWithIsProper.length) * 100).toFixed(1) : 0}</div>
                     <div className={'Label'}>Total: {startedDates}</div>
                 </div>
             </section>
