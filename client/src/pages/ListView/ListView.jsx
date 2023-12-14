@@ -7,7 +7,7 @@ import {MiniPagesContext} from "../../context/MiniPagesContext";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {useScreenSize} from "../../hooks/useScreenSize";
-import {TbPlus} from "react-icons/tb";
+import {TbPlus, TbRefresh} from "react-icons/tb";
 import SwitchContainer from "@/components/containers/SwitchContainer/SwitchContainer.jsx";
 
 const CategoriesView = () => {
@@ -57,9 +57,12 @@ const CategoriesView = () => {
                                 exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                                 layout
                             >
-                                <div className={'Horizontal-Flex-Container'}>
-                                    <div className={`${category.color} ${styles.categoryCircle}`}></div>
-                                    <div className={'Title'}>{category.title}</div>
+                                <div className={'Horizontal-Flex-Container Space-Between'}>
+                                    <div className={'Horizontal-Flex-Container'}>
+                                        <div className={`${category.color} ${styles.categoryCircle}`}></div>
+                                        <div className={'Title'}>{category.title}</div>
+                                    </div>
+                                    {category?.repeatRate?.number && <TbRefresh />}
                                 </div>
                                 {categoryGroups.length > 0 && <ul>
                                     {categoryGroups.map((group, index) => <li key={index}>{group.title}</li>)}
