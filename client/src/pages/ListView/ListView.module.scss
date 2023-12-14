@@ -1,5 +1,7 @@
 @use "@/styles/variables" as v;
 
+$selection-height: 3.5em;
+
 .container {
   width: 100%;
   height: 100%;
@@ -37,11 +39,6 @@
   .leftSide, .rightSide {
     width: 100%;
     box-sizing: border-box;
-    padding: 10px 4px 10px 4px;
-    position: absolute;
-    top: 4.5em;
-
-    height: calc(100% - 3em - 22px);
   }
   .container {
     overflow-y: hidden;
@@ -63,22 +60,85 @@
 }
 
 .selectionBar {
-  background-color: var(--surface-color);
-  padding: 1em;
-  border-bottom: v.$base-border;
+  background: var(--background-color);
+  background: linear-gradient(180deg, var(--background-color) 0%, rgba(0,0,0,0) 100%);
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  height: calc(100% - 10px);
+  padding-top: 10px;
+  position: relative;
+
+  width: calc(100% + 10px);
+
+  &::before {
+    content: "";
+    border-radius: v.$button-border-radius;
+    background-color: var(--surface-color);
+
+    height: calc(1em + 16px - 0.25em);
+    width: 6.75em;
+    top: calc(0.25em + 10px);
+
+    position: absolute;
+    transform: translateX(-3.5em);
+
+    transition: 0.2s transform ease-in-out;
+
+    z-index: 1;
+  }
+
+  &.selection1 {
+    &::before {
+      transform: translateX(3.5em);
+    }
+  }
+
+  & > button {
+    background-color: var(--border-primary-color);
+    font-size: inherit;
+    padding: 8px;
+    width: 7em;
+
+    &:first-child {
+      border-top-left-radius: v.$button-border-radius;
+      border-bottom-left-radius: v.$button-border-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: v.$button-border-radius;
+      border-bottom-right-radius: v.$button-border-radius;
+    }
+
+    & > span {
+      z-index: 1;
+      position: relative;
+      color: var(--primary-color);
+    }
+  }
+}
+
+.selectionBarContainer {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100% - 2em) !important;
+  width: calc(100% - 10px) !important;
   z-index: 2;
   flex-grow: 0;
-  height: 2.5em;
-  box-shadow: v.$elevation-1;
+  height: $selection-height;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.mobileView {
-  height: 100%;
-  overflow-y: auto;
-  align-items: center;
+.smallScreenContainer {
   width: 100%;
+  box-sizing: border-box;
+
+  padding: calc($selection-height - 10px - 0.5em) 4px 10px 4px;
+  position: absolute;
+  top: 4px;
+
+  height: calc(100% - 8px);
 }

@@ -1,65 +1,36 @@
-import React, {useContext, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import Task from "../../components/indicators/Task/Task";
 import {AnimatePresence, motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/render-tasks-hook/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import Chip from "../../components/buttons/Chip/Chip";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
 import {useScreenSize} from "../../hooks/useScreenSize";
 import {TbPlus} from "react-icons/tb";
+import SwitchContainer from "@/components/containers/SwitchContainer/SwitchContainer.jsx";
 
-const ListView = () => {
-    const miniPagesContext = useContext(MiniPagesContext);
-    const {screenSize} = useScreenSize();
-    const {data: tasks, isLoading: tasksLoading} = useRenderTasks(false);
+const CategoriesView = () => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
-    const chipOptions = ['Tasks', 'Categories'];
-    const [selectedSection, setSelectedSection] = useState('Tasks');
+    const miniPagesContext = useContext(MiniPagesContext);
 
-    const handleCategoryClick = (categoryId) => {
+    const handleCategoryClick = useCallback((categoryId) => {
         miniPagesContext.dispatch({
             type: 'ADD_PAGE', payload: {type: 'category-view', id: categoryId}
         })
-    }
+    }, []);
 
-    const handleNewCategoryClick = () => {
+    const handleNewCategoryClick = useCallback(() => {
         miniPagesContext.dispatch({
             type: 'ADD_PAGE', payload: {type: 'new-category'}
         })
-    }
-
+    }, []);
+    
     return (
-        <motion.div
-            className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
-        >
-            {screenSize === 'small' &&
-                <div className={`Horizontal-Flex-Container Space-Between ${styles.selectionBar}`}>
-                    {chipOptions.map((chip, index) => <Chip size={'large'} key={index} selected={selectedSection} setSelected={setSelectedSection} value={chip}>{chip}</Chip>)}
-                </div>
-            }
-            <div className={`Stack-Container ${styles.leftSide}`}>
-                {!tasksLoading && tasks.length === 0 &&
-                    <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.3 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                        className={`Empty-Indicator-Container`}
-                    >
-                        No tasks for now
-                    </motion.div>
-                }
-                <AnimatePresence>
-                    {!tasksLoading && tasks.length > 0 && tasks.map((task) => !task.hasOwnProperty('tasks') ?
-                        (<Task key={task._id} tasks={[task]}></Task>) :
-                        (<Task key={task.tasks[0]._id} tasks={task.tasks}></Task>)
-                    )}
-                </AnimatePresence>
-            </div>
-            {screenSize !== 'small' && <div className={`Stack-Container ${styles.rightSide}`}>
+        <div className={`Stack-Container ${styles.rightSide}`}>
+            {!categoriesLoading && !groupsLoading && <>
                 <motion.button
                     className={`Empty-Indicator-Container Clickable`}
                     onClick={handleNewCategoryClick}
@@ -97,11 +68,71 @@ const ListView = () => {
                         )
                     }))}
                 </AnimatePresence>
-            </div>}
+            </>}
+        </div>
+    );
+}
 
-            {/*{screenSize !== 'small' ? <Tasks /> : <SwitchComponent />}*/}
-            {/*<Tasks />*/}
-            {/*{screenSize !== 'small' && <Categories />}*/}
+const TasksView = () => {
+    const {data: tasks, isLoading: tasksLoading} = useRenderTasks(false);
+    
+    return (
+        <div className={`Stack-Container ${styles.leftSide}`}>
+            {!tasksLoading && tasks.length === 0 &&
+                <motion.div
+                    initial={{ opacity: 0, y: 50, scale: 0.3 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+                    className={`Empty-Indicator-Container`}
+                >
+                    No tasks for now
+                </motion.div>
+            }
+            <AnimatePresence>
+                {!tasksLoading && tasks.length > 0 && tasks.map((task) => !task.hasOwnProperty('tasks') ?
+                    (<Task key={task._id} tasks={[task]}></Task>) :
+                    (<Task key={task.tasks[0]._id} tasks={task.tasks}></Task>)
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+const ListView = () => {
+    const {screenSize} = useScreenSize();
+    const [selectedSection, setSelectedSection] = useState(0);
+
+    return (
+        <motion.div
+            className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
+        >
+            {screenSize === 'small' && <>
+                <div className={styles.selectionBarContainer}>
+                    <div className={`${styles.selectionBar} ${selectedSection !== 0 ? styles.selection1 : ""}`}>
+                        <button
+                            onClick={() => setSelectedSection(0)}
+                        >
+                            <span>Tasks</span>
+                        </button>
+                        <button
+                            onClick={() => setSelectedSection(1)}
+                        >
+                            <span>Categories</span>
+                        </button>
+                        {/*  Leave space for potential filter  */}
+                    </div>
+                </div>
+                <div className={styles.smallScreenContainer}>
+                    <SwitchContainer selectedTab={selectedSection}>
+                        <TasksView />
+                        <CategoriesView />
+                    </SwitchContainer>
+                </div>
+            </>}
+            {screenSize !== 'small' && <>
+                <TasksView />
+                <CategoriesView />
+            </>}
         </motion.div>);
 };
 

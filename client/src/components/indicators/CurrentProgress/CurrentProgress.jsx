@@ -300,12 +300,16 @@ const CurrentProgress = ({task}) => {
                     {isLoading ? "..." : `+${addValue}`}
                 </button>}
                 {task.type === 'Checkbox' &&
-                    <IconButton
-                        color={entry?.value > 0 ? 'green' : 'normal'}
-                        selected={true}
-                    >
-                    <TbCheck />
-                </IconButton>}
+                    <div className={styles.checkBoxContainer}>
+
+                        <IconButton
+                            color={entry?.value > 0 ? 'green' : 'normal'}
+                            selected={true}
+                        >
+                            <TbCheck />
+                        </IconButton>
+                    </div>
+                }
             </div>
             {createPortal((
                 <AnimatePresence>
