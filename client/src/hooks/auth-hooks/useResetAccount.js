@@ -11,7 +11,7 @@ const postResetAccount = async (password) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to reset account.');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -23,8 +23,8 @@ export function useResetAccount() {
 
     return useMutation({
         mutationFn: postResetAccount,
-        onError: () => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Reset Account", message: "Please try again."}});
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to reset account"}})
         },
         onSettled: () => {
             queryClient.invalidateQueries({queryKey: ["tasks"]});

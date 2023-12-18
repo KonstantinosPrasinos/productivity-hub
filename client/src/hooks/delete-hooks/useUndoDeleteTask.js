@@ -9,7 +9,7 @@ const postUndoDeleteTask = async (taskId) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to delete task.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -31,6 +31,9 @@ export function useUndoDeleteTask() {
                     })]
                 } : oldData
             })
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to undo task deletion"}})
         }
     })
 }

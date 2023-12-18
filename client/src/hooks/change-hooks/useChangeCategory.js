@@ -1,5 +1,7 @@
 import {useMutation, useQueryClient} from "react-query";
 import {useHandleDeleteGroups} from "@/hooks/delete-hooks/useHandleDeleteGroups";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postChangeCategory = async (data) => {
     const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/set`, {
@@ -9,9 +11,9 @@ const postChangeCategory = async (data) => {
         credentials: 'include'
     });
 
-    // if (!response.ok) {
-    //     throw new Error('Failed to edit settings.')
-    // }
+    if (!response.ok) {
+        throw new Error((await response.json()).message);
+    }
 
     return response.json();
 }
@@ -19,6 +21,7 @@ const postChangeCategory = async (data) => {
 export function useChangeCategory() {
     const queryClient = useQueryClient();
     const {deleteGroups} = useHandleDeleteGroups();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postChangeCategory,
@@ -94,8 +97,8 @@ export function useChangeCategory() {
                 })
             }
         },
-        onError: (error) => {
-            console.log(error);
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to edit category"}})
         }
     })
 }

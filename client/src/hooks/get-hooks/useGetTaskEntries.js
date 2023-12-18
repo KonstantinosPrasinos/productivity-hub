@@ -1,4 +1,6 @@
 import {useQueries} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const fetchTaskEntries = async ({queryKey}) => {
     const taskId = queryKey[1];
@@ -9,7 +11,7 @@ const fetchTaskEntries = async ({queryKey}) => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to get task entries from server');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,19 +19,26 @@ const fetchTaskEntries = async ({queryKey}) => {
 
 
 export function useGetTaskEntries(taskId) {
+    const alertsContext = useContext(AlertsContext);
     let queries;
 
     if (Array.isArray(taskId)) {
         queries = taskId.map(id => ({
             queryKey: ["task-entries", id],
             queryFn: fetchTaskEntries,
-            staleTime: 30 * 60 * 60 * 1000
+            staleTime: 30 * 60 * 60 * 1000,
+            onError: err => {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to get task entries"}})
+            }
         }))
     } else {
         queries = [{
             queryKey: ["task-entries", taskId],
             queryFn: fetchTaskEntries,
-            staleTime: 30 * 60 * 60 * 1000
+            staleTime: 30 * 60 * 60 * 1000,
+            onError: err => {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to get task entries"}})
+            }
         }]
     }
 

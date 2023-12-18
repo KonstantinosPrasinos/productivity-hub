@@ -12,7 +12,7 @@ const postDeleteAccount = async (password) => {
     });
 
     if (!response.ok) {
-        throw new Error(await response.json());
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -25,8 +25,8 @@ export function useDeleteAccount() {
 
     return useMutation({
         mutationFn: postDeleteAccount,
-        onError: () => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to delete account", message: "Please try again."}});
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to delete account"}})
         },
         onSettled: () => {
             localStorage.removeItem("user");

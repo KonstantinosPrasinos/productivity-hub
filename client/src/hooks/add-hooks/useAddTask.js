@@ -1,4 +1,6 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postTask = async (task) => {
     const response = await fetch('http://localhost:5000/api/task/create', {
@@ -9,7 +11,7 @@ const postTask = async (task) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to add task to server');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -19,6 +21,7 @@ const postTask = async (task) => {
 
 export function useAddTask() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     const updateSettingsLowAndHigh = (task) => {
         queryClient.setQueryData(["settings"], (oldData) => {
@@ -45,6 +48,9 @@ export function useAddTask() {
                     tasks: [...oldData.tasks, {...data, hidden: false}]
                 } : oldData
             });
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to create task"}})
         }
     })
 }

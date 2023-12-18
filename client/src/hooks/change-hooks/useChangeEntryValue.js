@@ -12,13 +12,13 @@ const postChangeEntryValue = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to change entry value.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
 }
 
-export function useChangeEntryValue(taskTitle) {
+export function useChangeEntryValue() {
     const queryClient = useQueryClient();
     const currentServerValue = useRef();
     const alertsContext = useContext(AlertsContext);
@@ -32,7 +32,7 @@ export function useChangeEntryValue(taskTitle) {
         onError: (err, data) => {
             // If the mutation fails reset the client state to the previous value and send an alert
             queryClient.setQueryData(["task-entries", data.taskId, data.entryId], (oldData) => {
-                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed Change Entry", message: `Couldn't apply changes to "${taskTitle}", please try again`}});
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed Change Entry", message: err.message}});
 
                 const entry = {
                     ...oldData.entry,
