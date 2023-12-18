@@ -141,64 +141,62 @@ function App() {
     return (
         <div className={`App ${theme}`} id={"app"}>
             <AlertHandler />
-            {/*<AnimatePresence mode="wait">*/}
-                <Routes>
-                    <Route element={<ProtectedLayout />}>
-                        <Route element={<NavLayout />}>
-                            <Route
-                                exact
-                                path="/"
-                                element={
-                                    <Home />
-                                }
-                            />
-                            <Route
-                                exact
-                                path="/home"
-                                element={
-                                    <Navigate to="/"/>
-                                }
-                            />
-                            <Route
-                                path="/list"
-                                element={
-                                    <ListView />
-                                }
-                            />
-                            <Route
-                                path="/settings"
-                                element={
-                                    <Settings/>
-                                }
-                            />
-                        </Route>
+            <Routes>
+                <Route element={<ProtectedLayout />}>
+                    <Route element={<NavLayout />}>
+                        <Route
+                            exact
+                            path="/"
+                            element={
+                                <Home />
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/home"
+                            element={
+                                <Navigate to="/"/>
+                            }
+                        />
+                        <Route
+                            path="/list"
+                            element={
+                                <ListView />
+                            }
+                        />
+                        <Route
+                            path="/settings"
+                            element={
+                                <Settings/>
+                            }
+                        />
                     </Route>
-                    <Route
-                        exact
-                        path="/change-email"
-                        element={
-                            <ChangeEmail/>
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/log-in"
-                        element={
-                            !user.state?.id ? <LogIn/> : <Navigate to="/" />
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/reset-password"
-                        element={
-                            <ResetPassword/>
-                        }
-                    />
-                    <Route path="/playground" element={<Playground/>}/>
-                    <Route path="*" element={<Navigate to={"/not-found"} />}/>
-                    <Route path="/not-found" element={<NotFound/>}/>
-                </Routes>
-            {/*</AnimatePresence>*/}
+                </Route>
+                <Route
+                    exact
+                    path="/change-email"
+                    element={
+                        <ChangeEmail/>
+                    }
+                />
+                <Route
+                    exact
+                    path="/log-in"
+                    element={
+                        !user.state?.id ? <LogIn/> : <Navigate to="/" />
+                    }
+                />
+                <Route
+                    exact
+                    path="/reset-password"
+                    element={
+                        <ResetPassword/>
+                    }
+                />
+                <Route path="/playground" element={<Playground/>}/>
+                <Route path="*" element={<Navigate to={"/not-found"} />}/>
+                <Route path="/not-found" element={<NotFound/>}/>
+            </Routes>
             <ReactQueryDevtools />
         </div>
     );

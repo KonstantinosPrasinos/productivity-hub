@@ -116,7 +116,7 @@ const LogIn = () => {
     }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
-        <Modal isLoading={isLoading || isLoadingVerify}>
+        <Modal isLoading={isLoading || isLoadingVerify} isPortal={false}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>

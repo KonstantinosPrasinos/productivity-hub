@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {motion} from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import styles from './SwitchContainer.module.scss';
 
 const SwitchContainer = ({children, selectedTab}) => {
@@ -13,27 +13,29 @@ const SwitchContainer = ({children, selectedTab}) => {
 
     return (
         <div className={styles.bigContainer}>
-            {selectedTab >= 0 && selectedTab < children.length && <motion.div
-                className={styles.container}
-                key={selectedTab}
+            <AnimatePresence initial={false}>
+                {selectedTab >= 0 && selectedTab < children.length && <motion.div
+                    className={styles.container}
+                    key={selectedTab}
 
-                initial={{
-                    x: previousTab.current < selectedTab ? 500 : -500,
-                    opacity: 0
-                }}
-                animate={{
-                    x: 0,
-                    opacity: 1
-                }}
+                    initial={{
+                        x: previousTab.current < selectedTab ? 500 : -500,
+                        opacity: 0
+                    }}
+                    animate={{
+                        x: 0,
+                        opacity: 1
+                    }}
 
-                transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                }}
-            >
-                {children[selectedTab]}
-            </motion.div>}
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                    }}
+                >
+                    {children[selectedTab]}
+                </motion.div>}
+            </AnimatePresence>
         </div>
     );
 };
