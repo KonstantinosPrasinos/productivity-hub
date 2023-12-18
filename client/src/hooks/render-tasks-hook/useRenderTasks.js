@@ -79,7 +79,7 @@ const addCategoriesToArray = (groupedTasks, usesTime, tasks, groups, categories)
         const repeatGroups = groups.filter(group => [...new Set(groupTasks.map(task => task.group))].includes(group._id));
 
         if (categoryOnlyTasks.length) {
-            if (!usesTime || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: tasks[0].mostRecentProperDate})) {
+            if (!usesTime || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
                 groupedTasks.push({
                     priority: category.priority,
                     tasks: categoryOnlyTasks
@@ -90,8 +90,9 @@ const addCategoriesToArray = (groupedTasks, usesTime, tasks, groups, categories)
         // Then also check group also tasks
         repeatGroups.forEach(group => {
             const localGroupTasks = groupTasks.filter(task => task.group === group._id)
+
             if (localGroupTasks.length) {
-                if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: tasks[0].mostRecentProperDate})){
+                if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
                     groupedTasks.push({
                         priority: category.priority,
                         tasks: localGroupTasks.sort((a, b) => b.priority - a.priority)

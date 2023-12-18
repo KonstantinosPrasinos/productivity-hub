@@ -24,6 +24,7 @@ import {useGetTasks} from "@/hooks/get-hooks/useGetTasks";
 import {useGetGroups} from "@/hooks/get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
 import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
+import {ReactQueryDevtools} from "react-query/devtools";
 
 const NavLayout = () => {
     // Server state
@@ -198,7 +199,7 @@ function App() {
                     <Route path="/not-found" element={<NotFound/>}/>
                 </Routes>
             {/*</AnimatePresence>*/}
-            {/*<ReactQueryDevtools />*/}
+            <ReactQueryDevtools />
         </div>
     );
 }
