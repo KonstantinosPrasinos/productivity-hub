@@ -147,8 +147,10 @@ const LogIn = () => {
                         <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
-                    <div>or</div>
-                    <GoogleSignInButton />
+                    {window?.google && <>
+                        <div>or</div>
+                        <GoogleSignInButton />
+                    </>}
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>
