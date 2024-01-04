@@ -23,7 +23,8 @@
     "start": "vite --host",
     "build": "vite build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "tauri": "tauri"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +45,7 @@
     ]
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^1.5.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
