@@ -13,6 +13,7 @@ import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
 import GoogleSignInButton from "../../../components/utilities/GoogleSignInButton/GoogleSignInButton";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -61,7 +62,9 @@ const LogIn = () => {
                 // Attempt sign up
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
+                        console.log('test')
                         const response = await register(email, password);
+                        console.log('test2')
 
                         if (response) {
                             setSelectedTab(1);
@@ -116,7 +119,7 @@ const LogIn = () => {
     }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
-        <Modal isLoading={isLoading || isLoadingVerify} isPortal={false}>
+        <Modal isPortal={false}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>
@@ -146,7 +149,10 @@ const LogIn = () => {
                         <Button size={"small"} filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
                         <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
-                    <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
+                    <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>
+                        {!isLoading && (!isSigningUp ? 'Log in' : 'Register')}
+                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} />}
+                    </Button>
                     {window?.google && <>
                         <div>or</div>
                         <GoogleSignInButton />
@@ -176,7 +182,8 @@ const LogIn = () => {
                         filled={verificationCode.length === 6}
                         onClick={handleVerificationContinue}
                     >
-                        {verificationCode.length === 6 ? 'Continue' : 'Cancel'}
+                        {!isLoadingVerify && (verificationCode.length === 6 ? 'Continue' : 'Cancel')}
+                        {isLoadingVerify && <LoadingIndicator size={"inline"} type={"dots"} />}
                     </Button>
                 </div>
             </SwitchContainer>

@@ -13,22 +13,26 @@ export function useAuth() {
     const login = async (email, password) => {
         setIsLoading(true);
 
-        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password}),
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password}),
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
-        } else {
-            const data = await response.json();
-            const date = new Date();
-            date.setMonth(date.getMonth() + 1);
-            date.setHours(date.getHours() - 1);
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+            if (!response.ok) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
+            } else {
+                const data = await response.json();
+                const date = new Date();
+                date.setMonth(date.getMonth() + 1);
+                date.setHours(date.getHours() - 1);
+                dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+                localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+            }
+        } catch (error) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: "Connection to server couldn't be made"}});
         }
         setIsLoading(false);
     }
@@ -59,20 +63,31 @@ export function useAuth() {
 
     const register = async (email, password) => {
         setIsLoading(true);
+        // Todo fix registration
+        console.log('test3');
 
-        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password}),
-            credentials: 'include'
-        });
+        try {
+            console.log('test4')
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password}),
+                credentials: 'include'
+            });
+            console.log(response);
 
-        if (!response.ok) {
-            const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: data.message}});
-            setIsLoading(false);
-            return false;
+            if (!response.ok) {
+                const data = await response.json();
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: data.message}});
+                setIsLoading(false);
+                return false;
+            }
+        } catch (error) {
+            console.log('test5')
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: "Connection to server couldn't be made"}});
         }
+
+
         setIsLoading(false);
         return true;
     }
