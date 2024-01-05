@@ -16,7 +16,7 @@ const ResetPassword = () => {
     const alertsContext = useContext(AlertsContext);
     const queryClient = useQueryClient();
 
-    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : null);
+    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : 0);
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
@@ -139,7 +139,7 @@ const ResetPassword = () => {
     }, [user.state?.isLoading])
 
     return (
-        <Modal isLoading={user.state?.isLoading && true}>
+        <Modal>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container Big-Gap'}>
                     {/* When the user is signed in, this tab (0) is skipped. */}
