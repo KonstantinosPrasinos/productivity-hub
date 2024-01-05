@@ -64,17 +64,14 @@ export function useAuth() {
     const register = async (email, password) => {
         setIsLoading(true);
         // Todo fix registration
-        console.log('test3');
 
         try {
-            console.log('test4')
             const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({email, password}),
                 credentials: 'include'
             });
-            console.log(response);
 
             if (!response.ok) {
                 const data = await response.json();
@@ -83,7 +80,6 @@ export function useAuth() {
                 return false;
             }
         } catch (error) {
-            console.log('test5')
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: "Connection to server couldn't be made"}});
         }
 
@@ -93,19 +89,23 @@ export function useAuth() {
     }
 
     const logout = async () => {
-        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/logout`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/logout`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
+            if (!response.ok) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log out user", message: "Please try again."}});
+            } else {
+                localStorage.removeItem('user');
+                localStorage.removeItem('settings');
+                dispatch({type: "REMOVE_USER"});
+                queryClient.removeQueries();
+            }
+        } catch(error) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log out user", message: "Please try again."}});
-        } else {
-            localStorage.removeItem('user');
-            localStorage.removeItem('settings');
-            dispatch({type: "REMOVE_USER"});
-            queryClient.removeQueries();
         }
     }
 

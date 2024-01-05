@@ -62,9 +62,7 @@ const LogIn = () => {
                 // Attempt sign up
                 if (passwordScore !== 0) {
                     if (password === repeatPassword) {
-                        console.log('test')
                         const response = await register(email, password);
-                        console.log('test2')
 
                         if (response) {
                             setSelectedTab(1);
