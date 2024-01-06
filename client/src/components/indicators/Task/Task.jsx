@@ -95,12 +95,16 @@ const Task = ({tasks}) => {
         miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: taskId}});
     }
 
+    const variants = {
+        hidden: { opacity: 0, y: 50, scale: 0.8 },
+        visible: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
+    }
+
     return (
         <motion.div
             className={`${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            variants={variants}
             layout
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
@@ -116,7 +120,6 @@ const Task = ({tasks}) => {
                 )}
             </div>
         </motion.div>
-
     );
 };
 
