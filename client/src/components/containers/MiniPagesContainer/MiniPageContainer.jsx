@@ -74,6 +74,20 @@ const MiniPageContainer = ({children, onClickSave, length, index, showSaveButton
         animationControls.start(screenSize === "small" ? "mobileExtended" : "desktopExtended")
     }, [])
 
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+            }
+        }
+
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+        }
+    }, []);
+
     return (
         <motion.div
             className={`${styles.container} Stack-Container Symmetrical Big-Padding`}
