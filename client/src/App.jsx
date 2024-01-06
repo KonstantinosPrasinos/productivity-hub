@@ -25,6 +25,7 @@ import {useGetGroups} from "@/hooks/get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
 import {ReactQueryDevtools} from "react-query/devtools";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
+import {MiniPagesContext} from "@/context/MiniPagesContext.jsx";
 
 const NavLayout = () => {
     // Server state
@@ -33,12 +34,32 @@ const NavLayout = () => {
     const {isLoading: categoriesLoading} = useGetCategories();
     const {isLoading: groupsLoading} = useGetGroups()
 
+    const miniPagesContext = useContext(MiniPagesContext);
+
+    const eventListenerExits = useRef(false);
+
+    useEffect(() => {
+        const handleKeydown = (event) => {
+            if (event.ctrlKey && event.key === "Enter" && miniPagesContext.state.length === 0) {
+
+                miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}});
+            }
+        }
+
+        if (!eventListenerExits.current) {
+            document.addEventListener("keydown", handleKeydown);
+        }
+
+        return () => {
+            document.removeEventListener("keydown", handleKeydown);
+        }
+    }, [miniPagesContext, eventListenerExits]);
+
     if (settingsLoading || tasksLoading || categoriesLoading || groupsLoading){
         return (
             <LoadingIndicator size={"fullscreen"} indicatorSize={"large"} type={"dots"} />
         )
     }
-
 
     return (
         <UndoContextProvider>
