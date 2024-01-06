@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -70,6 +70,8 @@ const NewTask = ({index, length, id}) => {
 
     const [repeatType, setRepeatType] = useState('Custom Rules')
 
+    const titleRef = useRef();
+
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
     const {isLoading, data: tasks} = useGetTasks();
@@ -104,6 +106,7 @@ const NewTask = ({index, length, id}) => {
     const categoryGroups = useMemo(findMatchingGroups, [groupsLoading, categories, category]);
 
     useEffect(() => {
+        // Fill in all the fields if editing task
         if (id && !isLoading) {
             const task = tasks.find(task => task._id === id);
 
@@ -151,6 +154,11 @@ const NewTask = ({index, length, id}) => {
 
 
             }
+        }
+
+        // Focus the title textbox
+        if (titleRef.current) {
+            titleRef.current?.focus();
         }
     }, [isLoading]);
 
@@ -295,6 +303,7 @@ const NewTask = ({index, length, id}) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    ref={titleRef}
                 />
                 <InputWrapper label={"Category"}>
                     <DropDownInput
