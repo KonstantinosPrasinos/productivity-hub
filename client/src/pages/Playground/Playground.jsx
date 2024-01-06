@@ -22,6 +22,7 @@ import HeaderExtendContainer from "../../components/containers/HeaderExtendConta
 import {AnimatePresence, motion} from "framer-motion";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -205,6 +206,13 @@ const Playground = () => {
                 {textSwitch}
             </TextSwitchContainer>
             <button onClick={handleChangeText}>Click me to change text</button>
+        </InputWrapper>
+        <InputWrapper label={"Loading indicators"}>
+            <LoadingIndicator />
+            <LoadingIndicator invertColors={true} color={"inverted"} />
+            <LoadingIndicator type={"dots"} indicatorSize={"large"} />
+            <LoadingIndicator type={"dots"} invertColors={true} />
+            <LoadingIndicator type={"dots"} size={"inline"} />
         </InputWrapper>
 
       {/*<Button onClick={() => console.log("Clicked!")}>*/}

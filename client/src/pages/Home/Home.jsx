@@ -11,7 +11,7 @@ const Home = () => {
     const {screenSize} = useScreenSize();
 
     if (isLoading) {
-        return <LoadingIndicator />
+        return <LoadingIndicator type={"dots"} />
     }
 
     return (

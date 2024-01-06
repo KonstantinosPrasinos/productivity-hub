@@ -2,7 +2,7 @@ import {Routes, Route, Navigate, useNavigate, useLocation, Outlet} from "react-r
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/Auth/LogIn/LogIn";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -23,8 +23,8 @@ import UndoHandler from "./components/handlers/UndoHandler/UndoHandler";
 import {useGetTasks} from "@/hooks/get-hooks/useGetTasks";
 import {useGetGroups} from "@/hooks/get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
-import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
 import {ReactQueryDevtools} from "react-query/devtools";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const NavLayout = () => {
     // Server state
@@ -35,7 +35,7 @@ const NavLayout = () => {
 
     if (settingsLoading || tasksLoading || categoriesLoading || groupsLoading){
         return (
-            <LoadingScreen />
+            <LoadingIndicator size={"fullscreen"} indicatorSize={"large"} type={"dots"} />
         )
     }
 

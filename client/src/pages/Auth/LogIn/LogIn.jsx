@@ -149,7 +149,7 @@ const LogIn = () => {
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>
                         {!isLoading && (!isSigningUp ? 'Log in' : 'Register')}
-                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} />}
+                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
                     </Button>
                     {window?.google && <>
                         <div>or</div>
@@ -181,7 +181,7 @@ const LogIn = () => {
                         onClick={handleVerificationContinue}
                     >
                         {!isLoadingVerify && (verificationCode.length === 6 ? 'Continue' : 'Cancel')}
-                        {isLoadingVerify && <LoadingIndicator size={"inline"} type={"dots"} />}
+                        {isLoadingVerify && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
                     </Button>
                 </div>
             </SwitchContainer>

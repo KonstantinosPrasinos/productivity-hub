@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Modal.module.scss';
 import {motion} from "framer-motion";
 import {createPortal} from "react-dom";
-import LoadingScreen from "@/components/indicators/LoadingScreen/LoadingScreen";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const Modal = ({children, isLoading, isOverlay = false, dismountFunction = () => {}, isPortal = true}) => {
     const handleContainerClick = (e) => {
@@ -10,7 +10,7 @@ const Modal = ({children, isLoading, isOverlay = false, dismountFunction = () =>
     }
 
     if (isLoading) return (
-        <LoadingScreen />
+        <LoadingIndicator size={"fullscreen"} indicatorSize={"large"} type={"dots"}/>
     )
 
     if (isPortal) return createPortal((
