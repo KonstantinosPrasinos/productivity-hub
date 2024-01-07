@@ -76,30 +76,6 @@ const ProtectedLayout = () => {
     const user = useContext(UserContext);
 
     const location = useLocation();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        // This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
-
-        const loggedInUser = localStorage.getItem("user");
-
-        if (loggedInUser) {
-            const userObject = JSON.parse(loggedInUser);
-
-            const dateValidUntil = new Date(userObject.validUntil);
-
-            if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
-                user.dispatch({type: "SET_USER", payload: userObject});
-                updateUserValidDate();
-            } else {
-                localStorage.removeItem("user");
-                navigate("/log-in");
-            }
-        } else {
-            user.dispatch({type: "SET_USER", payload: {isLoading: false}})
-            navigate('/log-in');
-        }
-    }, []);
 
     if (!user.state?.id) {
         return <Navigate to="/log-in" replace state={{path: location.pathname}} />
@@ -109,7 +85,7 @@ const ProtectedLayout = () => {
 }
 
 function App() {
-    // const location = useLocation();
+    const navigate = useNavigate();
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
@@ -133,6 +109,28 @@ function App() {
             }
         }
     }, [settings?.theme])
+
+    useEffect(() => {
+        // This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
+        const loggedInUser = localStorage.getItem("user");
+
+        if (loggedInUser) {
+            const userObject = JSON.parse(loggedInUser);
+
+            const dateValidUntil = new Date(userObject.validUntil);
+
+            if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
+                user.dispatch({type: "SET_USER", payload: userObject});
+                updateUserValidDate();
+            } else {
+                localStorage.removeItem("user");
+                navigate("/log-in");
+            }
+        } else {
+            user.dispatch({type: "SET_USER", payload: {isLoading: false}})
+            navigate('/log-in');
+        }
+    }, []);
 
     const getDeviceTheme = () => {
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
