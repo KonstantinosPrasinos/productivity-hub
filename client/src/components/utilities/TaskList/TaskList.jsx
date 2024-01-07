@@ -7,7 +7,7 @@ const variants = {
     hidden: {opacity: 0},
     visible: {
         opacity: 1,
-        transition: {staggerChildren: 0.2}
+        transition: {staggerChildren: 0.1}
     },
     exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
 }

@@ -108,6 +108,10 @@ a {
         column-gap: v.$big-gap;
         row-gap: v.$base-gap;
     }
+
+    &.Small-Gap {
+        gap: v.$small-gap;
+    }
 }
 
 .Stack-Container {

@@ -350,6 +350,20 @@ const Settings = () => {
                 </section>
                 <Divider />
                 <section className={'Stack-Container Big-Gap'}>
+                    <div className={`Headline-Large`}>Keyboard Shortcuts</div>
+                    <div className={styles.keyBindsContainer}>
+                        <div>Create new task</div>
+                        <div className={"Horizontal-Flex-Container Small-Gap"}>
+                            <div className={styles.emptyChip}>Ctrl</div>
+                            <div className={styles.emptyChip}>Enter</div>
+                        </div>
+
+                        <div>Close all pages</div>
+                        <div className={styles.emptyChip}>Esc</div>
+                    </div>
+                </section>
+                <Divider />
+                <section className={'Stack-Container Big-Gap'}>
                     <div className={`Headline-Large`}>About</div>
                     <div className={'Title-Small'}>App Version<div className={'Body-Small Opacity-Very-Low'}>1.0</div></div>
                     <div className={'Stack-Container Big-Gap'}>
