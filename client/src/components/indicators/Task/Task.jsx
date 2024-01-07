@@ -12,6 +12,8 @@ import {TbCheck} from "react-icons/tb";
 const RepeatDetails = ({task}) => {
     const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
 
+    if (!task.repeats && task.type !== "Number") return;
+
     return (
         <div className={styles.repeatDetails}>
             {task.type === "Number" &&
