@@ -19,7 +19,7 @@ const Home = () => {
             className={`${styles.container}`}
         >
             <TaskList tasks={data} />
-            {screenSize !== 'small' &&
+            {screenSize === 'big' &&
                 <div className={`Stack-Container ${styles.rightSide}`}>
 
                 </div>}

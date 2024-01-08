@@ -1,6 +1,6 @@
 @use "@/styles/variables" as v;
 
-@media (max-width: v.$tablet-breakpoint) {
+@media (max-width: v.$phone-breakpoint) {
   .container {
     border-top: v.$base-border;
     width: 100%;
@@ -12,7 +12,7 @@
   }
 }
 
-@media (min-width: v.$tablet-breakpoint) {
+@media (min-width: v.$phone-breakpoint) {
   .container {
     width: 400px;
     height: 100%;

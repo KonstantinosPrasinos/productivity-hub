@@ -1,6 +1,6 @@
 @use "@/styles/variables" as v;
 
-@media (min-width: v.$tablet-breakpoint) {
+@media (min-width: v.$phone-breakpoint) {
 
   .surface {
     width: 600px;

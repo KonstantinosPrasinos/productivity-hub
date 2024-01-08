@@ -446,7 +446,7 @@ button {
 }
 
 // App.jsx
-@media (max-width: v.$tablet-breakpoint) {
+@media (max-width: v.$phone-breakpoint) {
     .Content-Container {
         justify-content: center;
         width: 100vw;
@@ -471,12 +471,21 @@ button {
     }
 }
 
-@media (min-width: v.$tablet-breakpoint) {
+@media (min-width: v.$desktop-breakpoint) {
     .Content-Container {
         box-sizing: border-box;
         width: calc(100% - 300px - 8em);
         height: 100%;
         padding: 2em;
+    }
+}
+
+@media (min-width: v.$phone-breakpoint) and (max-width: v.$desktop-breakpoint) {
+    .Content-Container {
+        box-sizing: border-box;
+        width: calc(100% - 300px - 8em);
+        height: 100%;
+        padding: 0 2em;
     }
 }
 

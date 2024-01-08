@@ -111,7 +111,7 @@ const ListView = () => {
         <motion.div
             className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
         >
-            {screenSize === 'small' && <>
+            {screenSize !== 'big' && <>
                 <div className={styles.selectionBarContainer}>
                     <div className={`${styles.selectionBar} ${selectedSection !== 0 ? styles.selection1 : ""}`}>
                         <button
@@ -138,7 +138,7 @@ const ListView = () => {
                     </SwitchContainer>
                 </div>
             </>}
-            {screenSize !== 'small' && <>
+            {screenSize === 'big' && <>
                 <TaskList tasks={tasks} />
                 <CategoryList categories={categories} groups={groups} />
             </>}

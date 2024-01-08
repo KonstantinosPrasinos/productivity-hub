@@ -2,7 +2,7 @@
 @use '@/styles/mixins' as m;
 @use '@/styles/index';
 
-@media (max-width: v.$tablet-breakpoint) {
+@media (max-width: v.$phone-breakpoint) {
     .container {
         width: 100%;
         height: auto;
@@ -12,7 +12,7 @@
     }
 }
 
-@media (min-width: v.$tablet-breakpoint) {
+@media (min-width: v.$phone-breakpoint) {
     .container {
         min-width: 600px;
         height: calc(100% - 4em);

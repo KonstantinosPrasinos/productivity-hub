@@ -1,6 +1,6 @@
 @use "@/styles/variables" as v;
 
-@media (max-width: v.$tablet-breakpoint) {
+@media (max-width: v.$phone-breakpoint) {
   .container {
     order: 3;
   }
@@ -10,8 +10,7 @@
     background-color: var(--surface-color);
     display: flex;
     align-items: center;
-    padding: v.$base-padding;
-    padding-bottom: 0;
+    padding: v.$base-padding v.$base-padding 0;
     justify-content: space-around;
     border-top: v.$base-border;
     z-index: 3;
@@ -29,7 +28,7 @@
   }
 }
 
-@media (min-width: v.$tablet-breakpoint) {
+@media (min-width: v.$phone-breakpoint) {
   .container {
     height: 100%;
     width: 4em;

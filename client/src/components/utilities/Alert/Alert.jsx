@@ -4,7 +4,6 @@ import {motion, useAnimation} from "framer-motion";
 import { AlertsContext } from "../../../context/AlertsContext";
 import { TbX } from "react-icons/tb";
 import IconButton from "@/components/buttons/IconButton/IconButton.jsx";
-import {useScreenSize} from "@/hooks/useScreenSize.js";
 
 const Alert = ({ type, message, title = "This is a title", id }) => {
   const alertsContext = useContext(AlertsContext);
@@ -12,7 +11,6 @@ const Alert = ({ type, message, title = "This is a title", id }) => {
   const timerStartTimestamp = useRef();
   const timerRemainingTime = useRef(2500);
   const [isPaused, setIsPaused] = useState(false);
-  const {screenSize} = useScreenSize();
 
   useEffect(() => {
     // Automatically clear after 2 seconds
@@ -55,7 +53,7 @@ const Alert = ({ type, message, title = "This is a title", id }) => {
   }
 
   const handleMouseEnter = () => {
-    if (timer.current && timerStartTimestamp.current && screenSize !== "small") {
+    if (timer.current && timerStartTimestamp.current) {
       setIsPaused(true);
       timerRemainingTime.current = timerRemainingTime.current - ((new Date()).getTime() - timerStartTimestamp.current);
       timerStartTimestamp.current = null;
