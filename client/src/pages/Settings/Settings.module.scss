@@ -130,3 +130,8 @@
         justify-self: flex-end;
     }
 }
+
+.keyBindsComboContainer {
+    @extend .Horizontal-Flex-Container, .Small-Gap;
+    justify-self: flex-end;
+}

@@ -1,0 +1,26 @@
+@use "@/styles/variables" as v;
+
+.leftSide {
+  align-items: center;
+  width: 22.15em;
+  min-width: 22.15em;
+  max-width: 100%;
+  overflow: auto;
+  padding: 0 10px;
+  scrollbar-color: red red;
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--background-color);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--border-primary-color);
+  }
+}
+
+@media (max-width: v.$tablet-breakpoint) {
+  .leftSide {
+    width: 100%;
+    padding: 1em 4px 0 4px;
+  }
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from "@/pages/Home/Home.module.scss";
+import styles from "./TaskList.module.scss";
 import {motion} from "framer-motion";
 import Task from "@/components/indicators/Task/Task.jsx";
 

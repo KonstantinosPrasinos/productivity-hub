@@ -1,5 +1,3 @@
-@use "@/styles/variables" as v;
-
 .container {
   display: flex;
   flex-direction: row;
@@ -10,21 +8,6 @@
   overflow-x: visible;
 }
 
-.leftSide {
-  align-items: center;
-  width: 22.15em;
-  max-width: 100%;
-  overflow-x: visible;
-  padding: 0 10px;
-}
-
 .rightSide {
   flex: 2;
-}
-
-@media (max-width: v.$tablet-breakpoint) {
-  .leftSide {
-    width: 100%;
-    padding: 1em 4px 0 4px;
-  }
 }

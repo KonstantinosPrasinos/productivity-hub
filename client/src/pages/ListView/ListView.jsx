@@ -51,7 +51,7 @@ const CategoryList = ({categories, groups}) => {
             exit={"exit"}
         >
             <motion.button
-                className={`Empty-Indicator-Container Clickable`}
+                className={styles.newCategoryButton}
                 onClick={handleNewCategoryClick}
 
                 variants={childVariants}

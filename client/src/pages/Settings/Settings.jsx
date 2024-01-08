@@ -358,6 +358,12 @@ const Settings = () => {
                             <div className={styles.emptyChip}>Enter</div>
                         </div>
 
+                        <div>Create new category</div>
+                        <div className={styles.keyBindsComboContainer}>
+                            <div className={styles.emptyChip}>Ctrl</div>
+                            <div className={styles.emptyChip}>\</div>
+                        </div>
+
                         <div>Close all pages</div>
                         <div className={styles.emptyChip}>Esc</div>
                     </div>

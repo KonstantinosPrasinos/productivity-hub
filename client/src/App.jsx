@@ -40,9 +40,13 @@ const NavLayout = () => {
 
     useEffect(() => {
         const handleKeydown = (event) => {
+            // Add new task
             if (event.ctrlKey && event.key === "Enter" && miniPagesContext.state.length === 0) {
-
                 miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}});
+            }
+
+            if (event.ctrlKey && event.key === "\\" && miniPagesContext.state.length === 0) {
+                miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}});
             }
         }
 
