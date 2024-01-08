@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useState} from 'react';
-import {AnimatePresence, motion} from "framer-motion";
+import {motion} from "framer-motion";
 import {useRenderTasks} from "../../hooks/render-tasks-hook/useRenderTasks";
 import styles from './ListView.module.scss';
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -10,6 +10,21 @@ import {TbPlus, TbRefresh} from "react-icons/tb";
 import SwitchContainer from "@/components/containers/SwitchContainer/SwitchContainer.jsx";
 import TaskList from "@/components/utilities/TaskList/TaskList.jsx";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
+
+const variants = {
+    hidden: {opacity: 0},
+    visible: {
+        opacity: 1,
+        transition: {staggerChildren: 0.1}
+    },
+    exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
+}
+
+const childVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.8 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
+}
 
 const CategoryList = ({categories, groups}) => {
     const miniPagesContext = useContext(MiniPagesContext);
@@ -27,48 +42,51 @@ const CategoryList = ({categories, groups}) => {
     }, []);
     
     return (
-        <div className={`Stack-Container ${styles.rightSide}`}>
+        <motion.div
+            className={`Stack-Container ${styles.rightSide}`}
+
+            variants={variants}
+            initial={"hidden"}
+            animate={"visible"}
+            exit={"exit"}
+        >
             <motion.button
                 className={`Empty-Indicator-Container Clickable`}
                 onClick={handleNewCategoryClick}
-                initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+
+                variants={childVariants}
                 layout
             >
                 {categories.length > 0 && "Add category"}
                 {categories.length === 0 && "No categories, add one "}
                 <TbPlus/>
             </motion.button>
-            <AnimatePresence>
-                {categories?.length > 0 && (categories.map(category => {
-                    const categoryGroups = groups?.filter(group => group.parent === category._id);
+            {categories?.length > 0 && (categories.map(category => {
+                const categoryGroups = groups?.filter(group => group.parent === category._id);
 
-                    return (
-                        <motion.div
-                            className={`Rounded-Container Has-Shadow Has-Hover Stack-Container ${styles.categoryContainer}`}
-                            key={category._id}
-                            onClick={() => handleCategoryClick(category._id)}
-                            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                            layout
-                        >
-                            <div className={'Horizontal-Flex-Container Space-Between'}>
-                                <div className={'Horizontal-Flex-Container'}>
-                                    <div className={`${category.color} ${styles.categoryCircle}`}></div>
-                                    <div className={'Title'}>{category.title}</div>
-                                </div>
-                                {category?.repeatRate?.number && <TbRefresh />}
+                return (
+                    <motion.div
+                        className={`Rounded-Container Has-Shadow Has-Hover Stack-Container ${styles.categoryContainer}`}
+                        key={category._id}
+                        onClick={() => handleCategoryClick(category._id)}
+
+                        variants={childVariants}
+                        layout
+                    >
+                        <div className={'Horizontal-Flex-Container Space-Between'}>
+                            <div className={'Horizontal-Flex-Container'}>
+                                <div className={`${category.color} ${styles.categoryCircle}`}></div>
+                                <div className={'Title'}>{category.title}</div>
                             </div>
-                            {categoryGroups.length > 0 && <ul>
-                                {categoryGroups.map((group, index) => <li key={index}>{group.title}</li>)}
-                            </ul>}
-                        </motion.div>
-                    )
-                }))}
-            </AnimatePresence>
-        </div>
+                            {category?.repeatRate?.number && <TbRefresh />}
+                        </div>
+                        {categoryGroups.length > 0 && <ul>
+                            {categoryGroups.map((group, index) => <li key={index}>{group.title}</li>)}
+                        </ul>}
+                    </motion.div>
+                )
+            }))}
+        </motion.div>
     );
 }
 

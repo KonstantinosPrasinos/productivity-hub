@@ -1,5 +1,5 @@
 import styles from "./TextBoxInput.module.scss";
-import {useState} from "react";
+import {forwardRef, useState} from "react";
 import IconButton from "../../buttons/IconButton/IconButton";
 import { TbEye, TbEyeOff, TbCaretDown, TbCaretUp, TbCalendar } from "react-icons/tb";
 
@@ -47,23 +47,23 @@ const TypeCalendar = ({toggleCalendar, isDisabled}) => {
     )
 }
 
-const TextBoxInput = ({
-                          placeholder = "placeholder",
-                          type = "text",
-                          icon,
-                          isDisabled = false,
-                          value,
-                          setValue,
-                          size = 'medium',
-                          width = 'medium',
-                          onKeydown = () => {
-                          },
-                            alignment = 'left',
-                          invalid = null,
-                            toggleCalendar = null,
-                            minNumber = null,
-                            maxNumber = null
-                      }) => {
+const TextBoxInput = forwardRef(({
+                                     placeholder = "placeholder",
+                                     type = "text",
+                                     icon,
+                                     isDisabled = false,
+                                     value,
+                                     setValue,
+                                     size = 'medium',
+                                     width = 'medium',
+                                     onKeydown = () => {
+                                     },
+                                     alignment = 'left',
+                                     invalid = null,
+                                     toggleCalendar = null,
+                                     minNumber = null,
+                                     maxNumber = null
+                                 }, ref) => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -154,12 +154,14 @@ const TextBoxInput = ({
               onChange={handleChange}
               onBlur={handleBlur}
               onKeyDown={onKeydown}
+
+              ref={ref}
           />
       </span>
         {type === "number" && <TypeNumber decrement={decrement} increment={increment} isDisabled={isDisabled} />}
         {type === "password" && <TypePassword passwordVisible={passwordVisible} setPasswordVisible={setPasswordVisible} />}
         {type === "calendar" && <TypeCalendar toggleCalendar={toggleCalendar} isDisabled={isDisabled} />}
     </div>);
-};
+});
 
 export default TextBoxInput;

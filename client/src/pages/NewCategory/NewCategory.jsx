@@ -71,6 +71,8 @@ const NewCategory = ({index, length, id}) => {
 
     const continueAfterModalFunctionRef = useRef();
     const initialCategoryValues = useRef();
+    const titleRef = useRef();
+    const groupTitleRef = useRef();
 
     const [visibleTimePeriodModal, setVisibleTimePeriodModal] = useState(false);
 
@@ -98,6 +100,18 @@ const NewCategory = ({index, length, id}) => {
     const handleAddTimeGroup = () => {
         setCreatingTimeGroup(current => !current);
     }
+
+    useEffect(() => {
+        if (!creatingTimeGroup) return;
+
+        // If the timeout doesn't exist the layout breaks ㄟ( ▔, ▔ )ㄏ
+        setTimeout(() => {
+            if (groupTitleRef.current) {
+                groupTitleRef.current.focus();
+            }
+        }, 100);
+
+    }, [creatingTimeGroup])
 
     const handleSave = async () => {
         if (categoriesLoading) {
@@ -456,6 +470,10 @@ const NewCategory = ({index, length, id}) => {
             setTimeGroups(groups?.filter(group => group.parent === category._id)?.map(group => {return {...group, initial: true}}));
             initialCategoryValues.current = category;
         }
+
+        if (titleRef.current) {
+            titleRef.current?.focus();
+        }
     }, [categoriesLoading, groupsLoading])
 
     const disabledSaveGroupButton = useMemo(() => {
@@ -478,6 +496,7 @@ const NewCategory = ({index, length, id}) => {
                     placeholder="Add category title" value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    ref={titleRef}
                 />
                 <InputWrapper label="Color">
                     <ColorInput selected={color} setSelected={setColor}/>
@@ -581,7 +600,7 @@ const NewCategory = ({index, length, id}) => {
                         hasOutline={false}
                     >
                         <InputWrapper label={'Title'}>
-                            <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle}/>
+                            <TextBoxInput placeholder="Title" value={timeGroupTitle} setValue={setTimeGroupTitle} ref={groupTitleRef}/>
                         </InputWrapper>
                         <InputWrapper label={'On'}>
                             <Button onClick={toggleTimePeriodModal} disabled={timePeriod === "Days"} size={"small"}>Select dates</Button>

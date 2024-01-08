@@ -12,6 +12,12 @@ const variants = {
     exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
 }
 
+const childVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.8 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
+}
+
 const TaskList = ({tasks = []}) => {
     return (
         <motion.div
@@ -24,9 +30,10 @@ const TaskList = ({tasks = []}) => {
         >
             {tasks.length === 0 &&
                 <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+                    initial={"hidden"}
+                    animate={"visible"}
+                    exit={"exit"}
+                    variants={childVariants}
                     className={`Empty-Indicator-Container`}
                 >
                     No tasks for now
