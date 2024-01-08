@@ -15,7 +15,7 @@ const variants = {
     hidden: {opacity: 0},
     visible: {
         opacity: 1,
-        transition: {staggerChildren: 0.1}
+        transition: {staggerChildren: 0.05}
     },
     exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
 }
@@ -102,6 +102,11 @@ const ListView = () => {
         return <LoadingIndicator />
     }
 
+    const changeSection = (section) => {
+        setSelectedSection(section);
+        window.scrollTo(0, 0);
+    }
+
     return (
         <motion.div
             className={`${screenSize !== 'small' ? 'Horizontal-Flex-Container' : 'Stack-Container'} ${styles.container}`}
@@ -110,12 +115,12 @@ const ListView = () => {
                 <div className={styles.selectionBarContainer}>
                     <div className={`${styles.selectionBar} ${selectedSection !== 0 ? styles.selection1 : ""}`}>
                         <button
-                            onClick={() => setSelectedSection(0)}
+                            onClick={() => changeSection(0)}
                         >
                             <span>Tasks</span>
                         </button>
                         <button
-                            onClick={() => setSelectedSection(1)}
+                            onClick={() => changeSection(1)}
                         >
                             <span>Categories</span>
                         </button>
@@ -124,8 +129,12 @@ const ListView = () => {
                 </div>
                 <div className={styles.smallScreenContainer}>
                     <SwitchContainer selectedTab={selectedSection}>
-                        <TaskList tasks={tasks} />
-                        <CategoryList categories={categories} groups={groups} />
+                        <section className={styles.smallScreenList}>
+                            <TaskList tasks={tasks} />
+                        </section>
+                        <section className={styles.smallScreenList}>
+                            <CategoryList categories={categories} groups={groups} />
+                        </section>
                     </SwitchContainer>
                 </div>
             </>}

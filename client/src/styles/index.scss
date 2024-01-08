@@ -484,6 +484,7 @@ button {
     box-sizing: border-box;
     flex-grow: 1;
     display: flex;
+    overflow: hidden;
 }
 
 .icon {
