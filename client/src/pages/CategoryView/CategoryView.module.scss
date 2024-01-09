@@ -1,5 +1,48 @@
+@use "@/styles/index";
+@use "@/styles/variables" as v;
+
 .dot {
   width: 0.5em;
   height: 0.5em;
   border-radius: 0.5em;
+}
+
+.groupsContainer {
+  @extend .Horizontal-Flex-Container;
+  padding: 4px;
+  overflow-x: auto;
+}
+
+.chevronDown {
+  transition: 0.2s transform ease-in-out;
+  transform-origin: center;
+
+  &.facingUp {
+    transform: rotate(180deg);
+  }
+}
+
+.tasksContainer {
+  max-height: calc(5em + 100px);
+  overflow: auto;
+
+  & ul {
+    @extend .Stack-Container;
+    padding: 0 0 0 20px;
+    gap: 0;
+  }
+
+  & li {
+    height: 1em;
+    line-height: 1;
+    padding: 10px 10px 10px 0;
+
+    & > button {
+      font-size: inherit;
+    }
+
+    &::marker {
+      color: var(--primary-color);
+    }
+  }
 }

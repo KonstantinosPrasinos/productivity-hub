@@ -1,41 +1,56 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-    border-radius: $button-border-radius;
+    border-radius: v.$button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
-    font-size: $font-l;
+    transition: 0.2s box-shadow, 0.2s transform;
+    font-size: v.$font-l;
 
     &.square {
-        border-radius: $base-border-radius;
+        border-radius: v.$base-border-radius;
         padding: 10px
     }
 
     &.outlined {
-        border: 2px solid var(--primary-color);
+        border: 1px solid var(--border-primary-color);
         background-color: var(--surface-color);
         color: var(--on-surface-color);
     }
 
     &.small {
-        font-size: $font-s;
+        font-size: v.$font-s;
     }
 
     &.large {
-        font-size: $font-xxl;
+        font-size: v.$font-xxl;
     }
 
     &.max {
         width: 100%;
     }
 
+    &.symmetrical {
+        padding: 11px;
+    }
+
     &:disabled {
-        opacity: $opacity-low;
+        opacity: v.$opacity-low;
         cursor: not-allowed;
     }
 
     &.isWarning {
         color: var(--error-color);
         border-color: var(--error-color);
+    }
+
+    &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+        box-shadow: v.$elevation-1;
     }
 }

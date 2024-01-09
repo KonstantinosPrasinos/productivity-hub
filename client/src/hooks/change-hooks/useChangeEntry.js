@@ -1,7 +1,9 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postChangeEntry = async (data) => {
-    const response = await fetch('http://localhost:5000/api/entry/set', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/set`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data),
@@ -9,7 +11,7 @@ const postChangeEntry = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to edit settings.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,6 +19,7 @@ const postChangeEntry = async (data) => {
 
 export function useChangeEntry() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postChangeEntry,
@@ -39,6 +42,9 @@ export function useChangeEntry() {
                     } : oldData
                 })
             }
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to edit entry"}})
         }
     })
 }

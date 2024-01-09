@@ -15,7 +15,7 @@ const Task = new mongoose.Schema({
     },
     step: Number,
     goal: {
-        type: {
+        limit: {
             type: String
         },
         number: Number
@@ -43,7 +43,7 @@ const Task = new mongoose.Schema({
         number: Number,
         bigTimePeriod: String,
         smallTimePeriod: [String],
-        startingDate: [Number],
+        startingDate: [Date],
         time: {
             start: String,
             end: String
@@ -51,7 +51,7 @@ const Task = new mongoose.Schema({
     },
     mostRecentProperDate: {
         type: Date,
-        default: Date.now
+        default: null
     },
     forDeletion: {
         type: Boolean,

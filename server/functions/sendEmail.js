@@ -31,7 +31,7 @@ const sendEmail = async (email, type) => {
         // });
     }
 
-    await VerificationCode.findOneAndDelete({userEmail: email});
+    await VerificationCode.deleteMany({userEmail: email});
 
     let randomCode = crypto.randomInt(100000, 999999);
 

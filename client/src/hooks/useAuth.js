@@ -13,22 +13,26 @@ export function useAuth() {
     const login = async (email, password) => {
         setIsLoading(true);
 
-        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password}),
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password}),
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
-        } else {
-            const data = await response.json();
-            const date = new Date();
-            date.setMonth(date.getMonth() + 1);
-            date.setHours(date.getHours() - 1);
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+            if (!response.ok) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
+            } else {
+                const data = await response.json();
+                const date = new Date();
+                date.setMonth(date.getMonth() + 1);
+                date.setHours(date.getHours() - 1);
+                dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+                localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+            }
+        } catch (error) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: "Connection to server couldn't be made"}});
         }
         setIsLoading(false);
     }
@@ -44,7 +48,7 @@ export function useAuth() {
         });
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: (await response.json()).message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
         } else {
             const data = await response.json();
             const date = new Date();
@@ -59,43 +63,54 @@ export function useAuth() {
 
     const register = async (email, password) => {
         setIsLoading(true);
+        // Todo fix registration
 
-        const response = await fetch('http://localhost:5000/api/user/signup', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password}),
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password}),
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
-            const data = await response.json();
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
-            setIsLoading(false);
-            return false;
+            if (!response.ok) {
+                const data = await response.json();
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: data.message}});
+                setIsLoading(false);
+                return false;
+            }
+        } catch (error) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: "Connection to server couldn't be made"}});
         }
+
+
         setIsLoading(false);
         return true;
     }
 
     const logout = async () => {
-        const response = await fetch('http://localhost:5000/api/user/logout', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/logout`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to log out user."}});
-        } else {
-            localStorage.removeItem('user');
-            localStorage.removeItem('settings');
-            dispatch({type: "REMOVE_USER"});
-            queryClient.removeQueries();
+            if (!response.ok) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log out user", message: "Please try again."}});
+            } else {
+                localStorage.removeItem('user');
+                localStorage.removeItem('settings');
+                dispatch({type: "REMOVE_USER"});
+                queryClient.removeQueries();
+            }
+        } catch(error) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log out user", message: "Please try again."}});
         }
     }
 
     const resetAccount = async (password) => {
-        const response = await fetch('http://localhost:5000/api/user/reset', {
+        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/reset`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({password}),
@@ -105,7 +120,7 @@ export function useAuth() {
         const data = await response.json();
 
         if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: data.message}});
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to Reset Account", message: data.message}});
             return;
         }
 

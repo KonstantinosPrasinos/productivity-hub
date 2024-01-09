@@ -2,11 +2,14 @@
   display: inline-block;
   width: auto;
   overflow: hidden;
+  height: 16px;
 
   > div {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     width: 100%;
+    height: 16px;
+    vertical-align: top;
   }
 }

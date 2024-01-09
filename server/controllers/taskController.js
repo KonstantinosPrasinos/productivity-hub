@@ -5,10 +5,10 @@ const Entry = require("../models/entrySchema");
 const taskSchema = Joi.object({
     title: Joi.string().required(),
     type: Joi.string().valid('Checkbox', 'Number').required(),
-    step: Joi.number().min(0),
+    step: Joi.number().min(1),
     goal: Joi.object().keys({
-        type: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
+        limit: Joi.string().valid('At most', 'Exactly', 'At least'),
+        number: Joi.number().min(1).max(999)
     }),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
@@ -16,7 +16,7 @@ const taskSchema = Joi.object({
     longGoal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
         type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
-        number: Joi.number().min(0)
+        number: Joi.number().min(1)
     }),
     // expiresAt: Joi.object().keys({
     //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
@@ -27,7 +27,7 @@ const taskSchema = Joi.object({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         smallTimePeriod: Joi.array().items(Joi.string()),
-        startingDate: Joi.array().items(Joi.number()),
+        startingDate: Joi.array().items(Joi.date()),
         time: Joi.object().keys({
             start: Joi.string(),
             end: Joi.string()
@@ -61,95 +61,103 @@ const getDateAddDetails = (bigTimePeriod, number) => {
     return {functionName, timeToAdd};
 }
 
-const findMostRecentDate = (task) => {
+const findMostRecentDate = (task, currentDate = null) => { // current date for tests
     const date = new Date();
 
     if (task.mostRecentProperDate) {
         date.setTime(task.mostRecentProperDate.getTime());
     } else {
-        date.setTime(task.repeatRate.startingDate.getTime());
+        date.setTime(task.repeatRate.startingDate[0].getTime());
     }
 
-    date.setUTCHours(0, 0, 0, 0);
+    if (!currentDate) {
+        currentDate = new Date();
+    }
 
-    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
-    
+
     while(currentDate.getTime() > date.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
     }
 
-    return date.getTime();
+    return date;
 }
 
-const assembleEntryHistory = (entries, task) => {
+const assembleEntryHistory = (entries, task, currentDate = null) => { // current date for tests
+    let streak = 0;
+    let streakStartDate = null;
     const {functionName, timeToAdd} = getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number);
+
+    if (!currentDate) {
+        currentDate = new Date();
+    }
+
+    currentDate.setUTCHours(0, 0, 0, 0);
 
     const date = new Date(task.mostRecentProperDate);
     date.setUTCHours(0, 0, 0, 0);
 
-    let properEntries = "0".repeat(7);
-
-    for (let i = 0; i < entries.length; i++) {
+    if (date.getTime() === currentDate.getTime()) {
         date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
-
-        const entryFound = entries.find(entry => {
-            entry.createdAt.setUTCHours(0, 0, 0, 0);
-
-            return entry.createdAt.getTime() === date.getTime();
-        })
-
-        if (entryFound) {
-
-            let addedValue = '0';
-
-            if (task.type === 'Checkbox') {
-                if (entryFound?.value === 1) {
-                    addedValue = '3';
-                }
-            } else {
-                switch(task.goal.type) {
-                    case 'None':
-                        if (entryFound?.value > 0) {
-                            addedValue = '3';
-                        }
-                        break;
-                    case 'At most':
-                        if (entryFound?.value > 0) {
-                            if (entryFound?.value < task.goal.number) {
-                                addedValue = '3';
-                            } else if (entryFound?.value === task.goal.number) {
-                                addedValue = '1';
-                            }
-                        }
-                        break;
-                    case 'Exactly':
-                        if (entryFound?.value === task.goal.number) {
-                            addedValue = '3';
-                        }
-                        break;
-                    case 'At least':
-                        if (entryFound?.value >= task.goal.number) {
-                            addedValue = '3';
-                        } else if (entryFound?.value >= Math.ceil(task.goal.number / 2)) {
-                            addedValue = '2';
-                        } else if (entryFound?.value > 0) {
-                            addedValue = '1';
-                        }
-                        break;
-                }
-            }
-
-            properEntries = properEntries.substring(0, properEntries.length - 1 - i) + addedValue + properEntries.substring(properEntries.length, properEntries.length - i);
-        }
     }
 
-    return properEntries;
+    let entryFound = true;
+
+    while(entryFound) {
+        for (let i = task.repeatRate.startingDate.length - 1; i >= 0; i--) {
+            let timeDifference = task.repeatRate.startingDate[i] - task.repeatRate.startingDate[0];
+            timeDifference = timeDifference / (24 * 3600 * 1000); // Turn into days
+
+            date.setDate(date.getDate() + timeDifference);
+
+            entryFound = entries.find(entry => {
+                if (entry.date.getTime() === date.getTime()) {
+                    if (task.type === "Checkbox") {
+                        return entry.value === 1;
+                    } else {
+                        switch (task.goal.type) {
+                            case "At least":
+                                if (entry.value >= task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            case "Exactly":
+                                if (entry.value === task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            case "At most":
+                                if (entry.value <= task.goal.number) {
+                                    return true;
+                                }
+                                break;
+                            default: break;
+                        }
+                    }
+                }
+
+                return false;
+            });
+
+            if (entryFound) {
+                streak++;
+                streakStartDate = date.getTime();
+            } else {
+                break;
+            }
+
+            date.setDate(date.getDate() - timeDifference);
+        }
+
+        date[`set${functionName}`](date[`get${functionName}`]() - timeToAdd);
+    }
+
+    return {streak, date: streakStartDate ? new Date(streakStartDate) : streakStartDate};
 }
 
 const getTasksWithHistory = async (tasks, userId) => {
-    let tasksWithHistory = [];
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
@@ -157,7 +165,7 @@ const getTasksWithHistory = async (tasks, userId) => {
     let tasksWithCurrentEntry = [];
 
     for (const task of tasks) {
-        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: {$gte: currentDate}});
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: currentDate});
 
         if (!currentEntry) {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})
@@ -166,32 +174,7 @@ const getTasksWithHistory = async (tasks, userId) => {
         tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id, forDeletion: undefined, hidden: false}) // Remove the for deletion property, add the hidden property
     }
 
-    // Add streak to tasks
-    for (let i = 0; i < tasksWithCurrentEntry.length; i++) {
-        if (tasksWithCurrentEntry[i].repeats) {
-            const entriesHistory = await Entry
-                .find({userId: userId, taskId: tasksWithCurrentEntry[i]._id, createdAt: {$lt: currentDate}})
-                .sort({ $natural: -1 })
-                .limit(7)
-                .exec();
-
-            if (entriesHistory.length) {
-                const mostRecentDate = findMostRecentDate(tasksWithCurrentEntry[i]);
-
-                const editedTask = await Task.findOneAndUpdate({userId: req.user._id, _id: tasksWithCurrentEntry[i]._id}, {"$set": {"mostRecentProperDate": mostRecentDate}}, {new: true});
-                const streak = assembleEntryHistory(entriesHistory, editedTask);
-
-                tasksWithHistory.push({...editedTask._doc, streak: streak, currentEntryId: tasksWithCurrentEntry[i].currentEntryId, mostRecentProperDate: undefined});
-            } else {
-
-                tasksWithHistory.push({...tasksWithCurrentEntry[i], streak: "0000000", mostRecentProperDate: undefined});
-            }
-        } else {
-            tasksWithHistory.push({...tasksWithCurrentEntry[i], mostRecentProperDate: undefined});
-        }
-    }
-
-    return tasksWithHistory;
+    return tasksWithCurrentEntry;
 }
 
 const getTasks = async (req, res) => {
@@ -228,9 +211,11 @@ const createTask = async (req, res) => {
 
             res.status(200).json({
                 ...newTask._doc,
-                streak: newTask.repeats ? "0000000" : undefined,
                 mostRecentProperDate: undefined,
-                currentEntryId: entry._id
+                currentEntryId: entry._id,
+                streak: {number: 0, date: null},
+                totalCompletedEntries: 0,
+                totalNumber: newTask._doc.type === "Number" ? 0 : undefined
             });
         } catch (error) {
             res.status(400).json({message: error.message})
@@ -300,4 +285,4 @@ const setTask = async (req, res) => {
     }
 }
 
-module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask};
+module.exports = {getTasks, createTask, deleteTask, setTask, undoDeleteTask, assembleEntryHistory, getDateAddDetails, findMostRecentDate};

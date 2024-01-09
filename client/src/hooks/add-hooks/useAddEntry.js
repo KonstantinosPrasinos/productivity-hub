@@ -1,4 +1,6 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postEntry = async (entry) => {
     const response = await fetch('http://localhost:5000/api/entry/create', {
@@ -9,7 +11,7 @@ const postEntry = async (entry) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to add entry to server');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -19,6 +21,7 @@ const postEntry = async (entry) => {
 
 export function useAddEntry() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postEntry,
@@ -28,6 +31,9 @@ export function useAddEntry() {
                     entries: [...oldData.entries, data.entry]
                 } : oldData
             });
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to add entry"}})
         }
     })
 }

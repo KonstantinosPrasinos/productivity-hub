@@ -1,7 +1,9 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postDeleteCategory = async (data) => {
-    const response = await fetch('http://localhost:5000/api/category/delete', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/delete`, {
         method: 'POST',
         body: JSON.stringify({categoryId: data.categoryId, deleteTasks: data.deleteTasks}),
         headers: {'Content-Type': 'application/json'},
@@ -9,7 +11,7 @@ const postDeleteCategory = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to delete task.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,6 +19,7 @@ const postDeleteCategory = async (data) => {
 
 export function useDeleteCategory() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postDeleteCategory,
@@ -28,6 +31,9 @@ export function useDeleteCategory() {
                     categories: [...oldData.categories.filter(category => category._id !== data.categoryId)]
                 } : oldData
             })
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to delete category"}})
         }
     })
 }

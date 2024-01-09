@@ -16,7 +16,7 @@ const ResetPassword = () => {
     const alertsContext = useContext(AlertsContext);
     const queryClient = useQueryClient();
 
-    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : null);
+    const [currentPage, setCurrentPage] = useState(user.state?.id ? 1 : 0);
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
@@ -63,7 +63,7 @@ const ResetPassword = () => {
                     await sendCode(email);
                     setCurrentPage(2);
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Email is invalid."}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Email is Invalid", message: "Please enter a valid email address."}});
                 }
                 break;
             case 1:
@@ -90,10 +90,10 @@ const ResetPassword = () => {
                             setCurrentPage(4)
                         }
                     } else {
-                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Passwords don't match", message: "The password and repeat password fields must match."}});
                     }
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Password too Weak", message: "Please enter a stronger password."}});
                 }
                 break;
             case 4:
@@ -139,7 +139,7 @@ const ResetPassword = () => {
     }, [user.state?.isLoading])
 
     return (
-        <Modal isLoading={user.state?.isLoading && true}>
+        <Modal>
             <SwitchContainer selectedTab={currentPage}>
                 <div className={'Stack-Container Big-Gap'}>
                     {/* When the user is signed in, this tab (0) is skipped. */}

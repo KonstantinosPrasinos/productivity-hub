@@ -10,7 +10,7 @@ const User = new mongoose.Schema({
             type: String, required: false
         }
     }, googleId: {
-        type: String, unique: true, required: false
+        type: String, unique: true, required: false, sparse: true
     }, createdAt: {
         type: Date, default: new Date()
     }, active: {
@@ -28,6 +28,8 @@ User.pre('validate', function(next) {
     if (!that.local.password) {
         next(new Error('No password provided'));
     }
+
+    next();
 });
 
 User.index({createdAt: 1}, {expireAfterSeconds: 30 * 60, partialFilterExpression: {active: false}});

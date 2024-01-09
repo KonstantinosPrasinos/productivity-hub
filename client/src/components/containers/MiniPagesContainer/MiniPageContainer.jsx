@@ -7,7 +7,7 @@ import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {useScreenSize} from "../../../hooks/useScreenSize";
 import {TbX} from "react-icons/tb";
 
-const MiniPageContainer = ({children, onClickSave, length, index}) => {
+const MiniPageContainer = ({children, onClickSave, length, index, showSaveButton = true}) => {
     const containerRef = useRef();
     const animationControls = useAnimation();
 
@@ -30,12 +30,12 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
     const makeFullHeight = () => {
         animationControls.set({height: containerRef.current.offsetHeight});
-        animationControls.start({height: `calc(100% - 4em - 32px)`});
+        animationControls.start({height: `calc(100% - 4em - 12px)`});
     }
 
     const makeHalfHeight = () => {
         animationControls.set({height: containerRef.current.offsetHeight});
-        animationControls.start({height: `calc(50% - 4em - 32px)`});
+        animationControls.start({height: `calc(50% - 4em - 12px)`});
     }
 
     const handleEnd = (e) => {
@@ -74,6 +74,20 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
         animationControls.start(screenSize === "small" ? "mobileExtended" : "desktopExtended")
     }, [])
 
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+            }
+        }
+
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+        }
+    }, []);
+
     return (
         <motion.div
             className={`${styles.container} Stack-Container Symmetrical Big-Padding`}
@@ -95,7 +109,7 @@ const MiniPageContainer = ({children, onClickSave, length, index}) => {
 
                 <div className={styles.actionButtonsContainer}>
                     <IconButton onClick={() => {miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''})}}><TbX /></IconButton>
-                    <Button onClick={onClickSave}>Save</Button>
+                    {showSaveButton && <Button onClick={onClickSave}>Save</Button>}
                 </div>
             </div>
             <motion.div className={`Stack-Container ${styles.childrenContainer}`} layout>

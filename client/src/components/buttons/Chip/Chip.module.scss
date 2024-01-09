@@ -1,23 +1,22 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
     background-color: var(--surface-color);
     color: var(--on-surface-color);
-    border-radius: $base-border-radius;
-    transition: 0.2s background-color, 0.2s color, 0.2s filter;
-    border: $base-border;
+    border-radius: v.$base-border-radius;
+    transition: 0.2s background-color, 0.2s color, 0.2s box-shadow, 0.2s opacity, 0.2s transform;
+    border: v.$base-border;
+
+    padding: 0 !important;
+    gap: 0 !important;
 
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
     }
 
-    &:hover {
-        filter: brightness(95%);
-    }
-
     &.round {
-        border-radius: $button-border-radius;
+        border-radius: v.$button-border-radius;
     }
 
     &.filled {
@@ -26,11 +25,51 @@
         border: none;
     }
 
+    &:not(.small) {
+        & > .children:only-child {
+            padding: 10px 24px;
+        }
+
+        & > .children:not(:only-child) {
+            padding: 10px 5px 10px 24px;
+
+            & ~ button {
+                padding: 10px 12px 10px 5px;
+            }
+        }
+    }
+
     &.small {
-        font-size: $font-s;
+        font-size: v.$font-s;
+
+        & > .children:only-child {
+            padding: 8px 19px;
+        }
+
+        & > .children:not(:only-child) {
+            padding: 8px 5px 8px 19px;
+
+            & ~ button {
+                padding: 8px 10px 8px 5px;
+            }
+        }
     }
 
     &.big {
-        font-size: $font-xxl;
+        font-size: v.$font-xxl;
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: v.$opacity-low;
+    }
+
+    &:hover:not(.disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+
+    &:active:not(.disabled) {
+        transform: translateY(1px);
     }
 }

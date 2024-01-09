@@ -14,7 +14,9 @@ const Entry = require('../models/entrySchema');
 
 const createUser = async (parameters) => {
     const user = await User.create(parameters);
-    await Settings.create({userId: user._id});
+    if (user?._id) {
+        await Settings.create({userId: user._id});
+    }
 
     return user;
 }
@@ -43,7 +45,7 @@ const signupUser = (req, res) => {
 }
 
 const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
-    User.findOne({'local.email': email, 'googleId': undefined}, (err, user) =>{
+    User.findOne({'local.email': email}, (err, user) =>{
         if (err) {return done(err)}
         if (!user) {return done(null, false, {message: 'Incorrect email or password.'})}
         if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect email or password.' })}

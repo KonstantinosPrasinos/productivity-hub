@@ -1,9 +1,10 @@
 import styles from './IconButton.module.scss';
 
-const IconButton = ({children, label, selected = null, onClick, border, color = 'inherit', disabled}) => {
+const IconButton = ({children, label, selected = null, onClick, border, color = 'inherit', disabled, onContextMenu}) => {
     return (
         <button
             onClick={onClick}
+            onContextMenu={onContextMenu}
             className={`
                 ${styles.container}
                 ${selected !== null ? (selected === true ? styles.selected : (selected === false ? styles.notSelected : '')) : ''}

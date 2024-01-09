@@ -21,13 +21,21 @@ $theme: 'light';
         --on-info-color: #ffffff;
         --border-primary-color: #E2E6EB;
         --border-secondary-color: #79747E;
+
+        --red-color: #FC5C65;
+        --orange-color: #FD9644;
+        --yellow-color: #FED330;
+        --green-color: #26DE81;
+        --light-blue-color: #45AAF2;
+        --blue-color: #4B7BEC;
+        --purple-color: #A55EEA;
     } @else if $theme == 'dark' {
         $theme: 'dark';
 
-        --background-color: #202225;
+        --background-color: #191919;
         --on-background-color: #fafafa;
-        --surface-color: #2f3136;
-        --on-surface-color: #fafafa;
+        --surface-color: #202020;
+        --on-surface-color: #e7eaeb;
         --primary-color: #fafafa;
         --on-primary-color: #1C1B1F;
         --error-color: #db3b21;
@@ -38,7 +46,15 @@ $theme: 'light';
         --on-success-color: #ffffff;
         --info-color: #1f78d1;
         --on-info-color: #ffffff;
-        --border-primary-color: #938F99;
+        --border-primary-color: #242424;
+
+        --red-color: #EA2027;
+        --orange-color: #EE5A24;
+        --yellow-color: #FFC312;
+        --green-color: #009432;
+        --light-blue-color: #1289A7;
+        --blue-color: #0652DD;
+        --purple-color: #833471;
     }
 }
 
@@ -48,6 +64,7 @@ $symmetrical-padding: 10px;
 $big-padding: 40px 80px;
 $base-margin: 0.75rem;
 
+$small-gap: 5px;
 $base-gap: 10px;
 $big-gap: 20px;
 $huge-gap: 30px;
@@ -80,6 +97,5 @@ $opacity-low: 0.6;
 $opacity-very-low: 0.38;
 
 // breakpoints
-$phone-breakpoint: 320px;
-$tablet-breakpoint: 768px;
-$desktop-breakpoint: 1024px;
+$phone-breakpoint: 500px;
+$desktop-breakpoint: 930px;

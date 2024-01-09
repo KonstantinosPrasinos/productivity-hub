@@ -7,6 +7,8 @@ import {TbHome, TbList, TbPlus, TbSettings} from "react-icons/tb";
 import {useLocation, useNavigate} from "react-router-dom";
 import {MiniPagesContext} from "../../../context/MiniPagesContext";
 import {motion} from "framer-motion";
+import {useScreenSize} from "@/hooks/useScreenSize";
+import OfflineBadge from "@/components/utilities/OfflineBadge/OfflineBadge";
 
 const NavBar = () => {
     const navigate = useNavigate();
@@ -34,8 +36,15 @@ const NavBar = () => {
         }
     }, [location]);
 
+    const {screenSize} = useScreenSize();
+
+    const variants = {
+        initial: screenSize === "small" ? {y: "3em"} : {x: "-3em"},
+        animate: screenSize === "small" ? {y: 0} : {x: 0}
+    }
+
     return (
-        <div className={styles.container}>
+        <motion.div className={styles.container} initial={"initial"} animate={"animate"} variants={variants}>
             <div className={`${styles.navBar}`}>
                 <div className={styles.item}>
                     <IconButton
@@ -79,8 +88,9 @@ const NavBar = () => {
                 >
                     <TbPlus />
                 </Button>
+                <OfflineBadge />
             </div>
-        </div>
+        </motion.div>
 
     );
 }

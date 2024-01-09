@@ -13,15 +13,16 @@ import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import CurrentProgress from "../../components/indicators/CurrentProgress/CurrentProgress";
 import Alert from "../../components/utilities/Alert/Alert";
 import styles from "./Playground.module.scss";
-import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import TimePeriodModal from "@/components/inputs/TimePeriodModal/TimePeriodModal";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import {TbHome} from "react-icons/tb";
 import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
 import {AnimatePresence, motion} from "framer-motion";
-import TimeInput from "../../components/inputs/TimeInput/TimeInput";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
+import TimeInput from "@/components/inputs/TimeInput/TimeInput";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -35,7 +36,7 @@ const Playground = () => {
   const [numberValue, setNumberValue] = useState(0);
   const [calendarValue, setCalendarValue] = useState("");
   const [hourValue, setHourValue] = useState("20");
-  const [minuteValue, setMinuteValue] = useState('20')
+  const [minuteValue, setMinuteValue] = useState("20")
 
   const testingTask = {
       type: 'Number',
@@ -56,17 +57,34 @@ const Playground = () => {
 
   return (
     <div className={styles.container}>
-        <InputWrapper label={"Alerts"} type={"vertical"}>
-            {/*<Alert type={"error"} message={"This is an error"}></Alert>*/}
-            {/*<Alert type={"warning"} message={"This is a warning"}></Alert>*/}
-            {/*<Alert type={"success"} message={"This is a success"}></Alert>*/}
-            {/*<Alert type={"info"} message={"This is an info"}></Alert>*/}
+        <InputWrapper label={"Alerts"}>
             <Button
                 onClick={() => {
                     alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "warning", message: "Hello there, this is a warning"}})
                 }}
             >
                 Add warning alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add error alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "info", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add info alert
+            </Button>
+            <Button
+                onClick={() => {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "success", message: "Hello there, this is a warning"}})
+                }}
+            >
+                Add success alert
             </Button>
         </InputWrapper>
 
@@ -124,13 +142,13 @@ const Playground = () => {
         {/*<InputWrapper label={"Time Period Input"}>*/}
         {/*    <div className={styles.alignTopContainer}>*/}
         {/*        <InputWrapper label={"In a week"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Weeks"} />*/}
+        {/*            <TimePeriodModal timePeriod={"Weeks"} />*/}
         {/*        </InputWrapper>*/}
         {/*        <InputWrapper label={"In a month"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Months"} />*/}
+        {/*            <TimePeriodModal timePeriod={"Months"} />*/}
         {/*        </InputWrapper>*/}
         {/*        <InputWrapper label={"In a year"}>*/}
-        {/*            <TimePeriodInput timePeriod={"Years"} />*/}
+        {/*            <TimePeriodModal timePeriod={"Years"} />*/}
         {/*        </InputWrapper>*/}
         {/*    </div>*/}
         {/*</InputWrapper>*/}
@@ -138,7 +156,7 @@ const Playground = () => {
         <InputWrapper label={"Normal Button Styles"}>
             <div className={styles.alignTopContainer}>
                 <InputWrapper label={"Default (size: medium, filled: true, type: round)"}>
-                    <Button>Button</Button>
+                    <Button onClick={() => console.log("clicked")}>Button</Button>
                 </InputWrapper>
                 <InputWrapper label={"Size Small"}>
                     <Button size={"small"}>Button</Button>
@@ -182,12 +200,19 @@ const Playground = () => {
                 <div>Hello</div>
             </HeaderExtendContainer>
         </InputWrapper>
-        <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} />
+        <TimeInput hour={hourValue} setHour={setHourValue} minute={minuteValue} setMinute={setMinuteValue} isDisabled={false}></TimeInput>
         <InputWrapper label={"Text switch container"}>
             <TextSwitchContainer>
                 {textSwitch}
             </TextSwitchContainer>
             <button onClick={handleChangeText}>Click me to change text</button>
+        </InputWrapper>
+        <InputWrapper label={"Loading indicators"}>
+            <LoadingIndicator />
+            <LoadingIndicator invertColors={true} color={"inverted"} />
+            <LoadingIndicator type={"dots"} indicatorSize={"large"} />
+            <LoadingIndicator type={"dots"} invertColors={true} />
+            <LoadingIndicator type={"dots"} size={"inline"} />
         </InputWrapper>
 
       {/*<Button onClick={() => console.log("Clicked!")}>*/}

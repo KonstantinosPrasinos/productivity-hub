@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {AlertsContext} from "../../context/AlertsContext";
 
 const postChangeSettings = async (newSettings) => {
-    const response = await fetch('http://localhost:5000/api/settings/update', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/settings/update`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({settings: newSettings}),
@@ -11,7 +11,7 @@ const postChangeSettings = async (newSettings) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to edit settings.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -43,7 +43,8 @@ export function useChangeSettings() {
             alertsContext.dispatch({
                 type: "ADD_ALERT", payload: {
                     type: "error",
-                    message: "An error occurred while trying to change your settings. They have been reverted to their previous values. Please try again."
+                    title: "Failed to change settings",
+                    message: error.message
                 }
             })
         }
