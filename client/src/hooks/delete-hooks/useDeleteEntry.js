@@ -1,7 +1,9 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postDeleteEntry = async ({taskId, entryId}) => {
-    const response = await fetch('http://localhost:5000/api/entry/delete-single', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/delete-single`, {
         method: 'POST',
         body: JSON.stringify({taskId, entryId}),
         headers: {'Content-Type': 'application/json'},
@@ -9,7 +11,7 @@ const postDeleteEntry = async ({taskId, entryId}) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to delete task.')
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,6 +19,7 @@ const postDeleteEntry = async ({taskId, entryId}) => {
 
 export function useDeleteEntry() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postDeleteEntry,
@@ -28,6 +31,9 @@ export function useDeleteEntry() {
                     entries: [...oldData.entries.filter(entry => entry._id !== variables.entryId)]
                 } : oldData
             })
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to delete entry"}})
         }
     })
 }

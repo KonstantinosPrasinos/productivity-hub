@@ -2,7 +2,7 @@ import {Routes, Route, Navigate, useNavigate, useLocation, Outlet} from "react-r
 import NavBar from './components/bars/NavBar/NavBar';
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/Auth/LogIn/LogIn";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -16,27 +16,72 @@ import ResetPassword from "./pages/Auth/ResetPassword/ResetPassword";
 import {UserContext} from "./context/UserContext";
 
 import {useGetSettings} from "./hooks/get-hooks/useGetSettings";
-import {ReactQueryDevtools} from "react-query/devtools";
 import {updateUserValidDate} from "./functions/updateUserValidDate";
 import 'react-day-picker/dist/style.css';
 import UndoContextProvider from "./context/UndoContext";
 import UndoHandler from "./components/handlers/UndoHandler/UndoHandler";
+import {useGetTasks} from "@/hooks/get-hooks/useGetTasks";
+import {useGetGroups} from "@/hooks/get-hooks/useGetGroups";
+import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
+import {ReactQueryDevtools} from "react-query/devtools";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
+import {MiniPagesContext} from "@/context/MiniPagesContext.jsx";
 
-const NavLayout = () => (
-    <UndoContextProvider>
-        <NavBar/>
-        <MiniPagesHandler />
-        <UndoHandler />
-        <div className="Content-Container">
-            <Outlet />
-        </div>
-    </UndoContextProvider>
-)
+const NavLayout = () => {
+    // Server state
+    const {isLoading: settingsLoading} = useGetSettings();
+    const {isLoading: tasksLoading} = useGetTasks();
+    const {isLoading: categoriesLoading} = useGetCategories();
+    const {isLoading: groupsLoading} = useGetGroups()
+
+    const miniPagesContext = useContext(MiniPagesContext);
+
+    const eventListenerExits = useRef(false);
+
+    useEffect(() => {
+        const handleKeydown = (event) => {
+            // Add new task
+            if (event.ctrlKey && event.key === "Enter" && miniPagesContext.state.length === 0) {
+                miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-task'}});
+            }
+
+            if (event.ctrlKey && event.key === "\\" && miniPagesContext.state.length === 0) {
+                miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}});
+            }
+        }
+
+        if (!eventListenerExits.current) {
+            document.addEventListener("keydown", handleKeydown);
+        }
+
+        return () => {
+            document.removeEventListener("keydown", handleKeydown);
+        }
+    }, [miniPagesContext, eventListenerExits]);
+
+    if (settingsLoading || tasksLoading || categoriesLoading || groupsLoading){
+        return (
+            <LoadingIndicator size={"fullscreen"} indicatorSize={"large"} type={"dots"} />
+        )
+    }
+
+    return (
+        <UndoContextProvider>
+            <NavBar/>
+            <MiniPagesHandler/>
+            <UndoHandler/>
+            <div className="Content-Container">
+                <Outlet/>
+            </div>
+        </UndoContextProvider>
+    )
+}
 const ProtectedLayout = () => {
-    const userExists = useContext(UserContext).state?.id;
+    const user = useContext(UserContext);
+
     const location = useLocation();
 
-    if (!userExists) {
+    if (!user.state?.id) {
         return <Navigate to="/log-in" replace state={{path: location.pathname}} />
     }
 
@@ -44,36 +89,12 @@ const ProtectedLayout = () => {
 }
 
 function App() {
-    // const location = useLocation();
+    const navigate = useNavigate();
     
     const user = useContext(UserContext);
     const matchMediaHasEventListener = useRef(false);
 
-    const navigate = useNavigate();
-
     const {data: settings, isLoading: settingsLoading} = useGetSettings();
-
-    useEffect(() => {
-      //This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
-      const loggedInUser = localStorage.getItem("user");
-
-      if (loggedInUser) {
-          const userObject = JSON.parse(loggedInUser);
-
-          const dateValidUntil = new Date(userObject.validUntil);
-
-          if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
-              user.dispatch({type: "SET_USER", payload: userObject});
-              updateUserValidDate();
-          } else {
-              localStorage.removeItem("user");
-              navigate("/log-in");
-          }
-      } else {
-          user.dispatch({type: "SET_USER", payload: {isLoading: false}})
-          navigate('/log-in');
-      }
-    }, []);
 
     const [defaultThemeChanged, setDefaultThemeChanged] = useState(false);
 
@@ -92,6 +113,28 @@ function App() {
             }
         }
     }, [settings?.theme])
+
+    useEffect(() => {
+        // This attempts to get the user data from localstorage. If present it sets the user using them, if not it sets the user to false meaning they should log in.
+        const loggedInUser = localStorage.getItem("user");
+
+        if (loggedInUser) {
+            const userObject = JSON.parse(loggedInUser);
+
+            const dateValidUntil = new Date(userObject.validUntil);
+
+            if (dateValidUntil && dateValidUntil.getTime() > (new Date()).getTime()) {
+                user.dispatch({type: "SET_USER", payload: userObject});
+                updateUserValidDate();
+            } else {
+                localStorage.removeItem("user");
+                navigate("/log-in");
+            }
+        } else {
+            user.dispatch({type: "SET_USER", payload: {isLoading: false}})
+            navigate('/log-in');
+        }
+    }, []);
 
     const getDeviceTheme = () => {
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -119,66 +162,64 @@ function App() {
     const theme = useMemo(getTheme, [settings?.theme, defaultThemeChanged]);
 
     return (
-        <div className={`App ${theme}`}>
+        <div className={`App ${theme}`} id={"app"}>
             <AlertHandler />
-            {/*<AnimatePresence mode="wait">*/}
-                <Routes>
-                    <Route element={<ProtectedLayout />}>
-                        <Route element={<NavLayout />}>
-                            <Route
-                                exact
-                                path="/"
-                                element={
-                                    <Home />
-                                }
-                            />
-                            <Route
-                                exact
-                                path="/home"
-                                element={
-                                    <Navigate to="/"/>
-                                }
-                            />
-                            <Route
-                                path="/list"
-                                element={
-                                    <ListView />
-                                }
-                            />
-                            <Route
-                                path="/settings"
-                                element={
-                                    <Settings/>
-                                }
-                            />
-                        </Route>
+            <Routes>
+                <Route element={<ProtectedLayout />}>
+                    <Route element={<NavLayout />}>
+                        <Route
+                            exact
+                            path="/"
+                            element={
+                                <Home />
+                            }
+                        />
+                        <Route
+                            exact
+                            path="/home"
+                            element={
+                                <Navigate to="/"/>
+                            }
+                        />
+                        <Route
+                            path="/list"
+                            element={
+                                <ListView />
+                            }
+                        />
+                        <Route
+                            path="/settings"
+                            element={
+                                <Settings/>
+                            }
+                        />
                     </Route>
-                    <Route
-                        exact
-                        path="/change-email"
-                        element={
-                            <ChangeEmail/>
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/log-in"
-                        element={
-                            !user.state?.id ? <LogIn/> : <Navigate to="/" />
-                        }
-                    />
-                    <Route
-                        exact
-                        path="/reset-password"
-                        element={
-                            <ResetPassword/>
-                        }
-                    />
-                    <Route path="/playground" element={<Playground/>}/>
-                    <Route path="*" element={<Navigate to={"/not-found"} />}/>
-                    <Route path="/not-found" element={<NotFound/>}/>
-                </Routes>
-            {/*</AnimatePresence>*/}
+                </Route>
+                <Route
+                    exact
+                    path="/change-email"
+                    element={
+                        <ChangeEmail/>
+                    }
+                />
+                <Route
+                    exact
+                    path="/log-in"
+                    element={
+                        !user.state?.id ? <LogIn/> : <Navigate to="/" />
+                    }
+                />
+                <Route
+                    exact
+                    path="/reset-password"
+                    element={
+                        <ResetPassword/>
+                    }
+                />
+                <Route path="/playground" element={<Playground/>}/>
+                <Route path="*" element={<Navigate to={"/not-found"} />}/>
+                <Route path="/not-found" element={<NotFound/>}/>
+            </Routes>
             <ReactQueryDevtools />
         </div>
     );

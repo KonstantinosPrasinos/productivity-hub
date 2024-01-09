@@ -5,31 +5,67 @@ import {motion} from "framer-motion";
 import {MiniPagesContext} from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import {TbFlame, TbHash, TbTargetArrow} from "react-icons/all";
+import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry";
+import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
+import {TbCheck} from "react-icons/tb";
 
-const RepeatDetails = ({longGoal}) => {
+const RepeatDetails = ({task}) => {
+    const {data: entry, isLoading} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+
+    if (!task.repeats && task.type !== "Number") return;
+
     return (
         <div className={styles.repeatDetails}>
-            <div>
-                {longGoal.type === "Streak" &&
-                    <>
-                        <TbFlame />
-                    </>
-                }
-                {longGoal.type === "Total completed" &&
-                    <>
-
-                    </>
-                }
-                {longGoal.type === "Total number" &&
-                    <>
-                        <TbHash />
-                    </>
-                }
-            </div>
-            <div>
-                <TbTargetArrow />
-                {longGoal?.number}
-            </div>
+            {task.type === "Number" &&
+                <div>
+                    <TbHash />
+                    <TextSwitchContainer>
+                        {isLoading && "..."}
+                        {!isLoading && entry.value}
+                    </TextSwitchContainer>
+                </div>
+            }
+            {task.type === "Number" && task.goal?.number &&
+                <div>
+                    <TbTargetArrow />
+                    <TextSwitchContainer>
+                        {task.goal?.number}
+                    </TextSwitchContainer>
+                </div>
+            }
+            {task.type === "Number" && task.longGoal?.type &&
+                <div className={styles.repeatSeparator}>
+                    |
+                </div>
+            }
+            {task.longGoal?.type &&
+                <>
+                    <div>
+                        {task.longGoal?.type === "Streak" &&
+                            <>
+                                <TbFlame />
+                                <TextSwitchContainer>
+                                    {task.streak?.number}
+                                </TextSwitchContainer>
+                            </>
+                        }
+                        {task.longGoal?.type === "Total Completed" &&
+                            <>
+                                <TbCheck />
+                                <TextSwitchContainer>
+                                    {task.totalCompletedEntries}
+                                </TextSwitchContainer>
+                            </>
+                        }
+                    </div>
+                    <div>
+                        <TbTargetArrow />
+                        <TextSwitchContainer>
+                            {task.longGoal?.number}
+                        </TextSwitchContainer>
+                    </div>
+                </>
+            }
         </div>
     );
 }
@@ -57,50 +93,35 @@ const Task = ({tasks}) => {
 
     const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
 
-    const handleTaskClick = event => {
-        if (event.target.getAttribute("data-value") === 'Clickable') {
-            miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: tasks[0]._id}});
-        }
+    const handleTaskClick = (taskId) => {
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'task-view', id: taskId}});
+    }
+
+    const variants = {
+        hidden: { opacity: 0, y: 50, scale: 0.8 },
+        visible: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } }
     }
 
     return (
         <motion.div
             className={`${styles.container} ${!tasksIsCompleted ? styles.completed : ''}`}
-            initial={{ opacity: 0, y: 50, scale: 0.3 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-            // layout
-
-            onClick={(event) => handleTaskClick(event)}
+            variants={variants}
+            layout
         >
             {tasks[0].category && <CategoryIndicator categoryId={tasks[0].category} groupId={tasks[0].group}/>}
-            <div className={styles.taskList}>
+            <div className={"Stack-Container"}>
                 {tasks.map((task, index) =>
-                    // <div key={index} className={`Stack-Container`} data-value={'Clickable'}>
-                    //     <div className={'Horizontal-Flex-Container Space-Between'} data-value={'Clickable'}>
-                    //         <div className={'Horizontal-Flex-Container'} data-value={'Clickable'}>
-                    //             {/*{tasks.length === 0 && task.category &&*/}
-                    //             {/*    <CategoryIndicator*/}
-                    //             {/*        categoryId={task.category}*/}
-                    //             {/*        groupId={task?.group}*/}
-                    //             {/*    />}*/}
-                    //             <div className={styles.titleContainer}>{task.title}</div>
-                    //         </div>
-                    //         <CurrentProgress task={task}/>
-                    //     </div>
-                    //     {/*{task.repeats && <Streak streak={task.streak} />}*/}
-                    // </div>
-                    <div key={index} className={styles.task} data-value={'Clickable'}>
+                    <div key={index} className={styles.task} onClick={() => handleTaskClick(task._id)}>
                         <div className={styles.detailsList}>
                             <div className={styles.titleContainer}>{task.title}</div>
-                            {task.longGoal?.type && <RepeatDetails longGoal={task?.longGoal}/>}
+                            <RepeatDetails task={task} />
                         </div>
                         <CurrentProgress task={task}/>
                     </div>
                 )}
             </div>
         </motion.div>
-
     );
 };
 

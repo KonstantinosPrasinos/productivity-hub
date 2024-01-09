@@ -1,4 +1,5 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
+@use "@/styles/index";
 
 .bottomButtonsContainer {
   display: flex;
@@ -7,15 +8,35 @@
 }
 
 .groupsContainer {
-  display: inline-flex;
-  flex-direction: row;
-  gap: $base-gap;
-  align-items: center;
-  overflow-x: auto;
-  padding-bottom: 10px;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
 }
 
 .addGroupButton {
-  font-size: $font-xxl;
+  font-size: v.$font-xxl;
+}
+
+.dropDownOption {
+  font-size: inherit;
+  width: 100%;
+  height: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.temp {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.groupTitlesContainer {
+  @extend .Horizontal-Flex-Container;
+  padding: 4px;
+  overflow-x: auto;
 }

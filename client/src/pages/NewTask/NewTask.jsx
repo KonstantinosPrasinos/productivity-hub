@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import PriorityIndicator from "../../components/indicators/PriorityIndicator/PriorityIndicator";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
@@ -8,8 +8,8 @@ import DropDownInput from "../../components/inputs/DropDownInput/DropDownInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import {AlertsContext} from "../../context/AlertsContext";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
-import {TbChevronDown, TbPlus} from "react-icons/tb";
-import TimePeriodInput from "../../components/inputs/TimeUnitInput/TimePeriodInput/TimePeriodInput";
+import {TbPlus} from "react-icons/tb";
+import TimePeriodModal from "@/components/inputs/TimePeriodModal/TimePeriodModal";
 import {useGetTasks} from "../../hooks/get-hooks/useGetTasks";
 import {useGetCategories} from "../../hooks/get-hooks/useGetCategories";
 import {useGetGroups} from "../../hooks/get-hooks/useGetGroups";
@@ -18,24 +18,31 @@ import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {findStartingDates} from "../../functions/findStartingDates";
 import {useChangeTask} from "../../hooks/change-hooks/useChangeTask";
 import HeaderExtendContainer from "../../components/containers/HeaderExtendContainer/HeaderExtendContainer";
-import IconButton from "../../components/buttons/IconButton/IconButton";
-import {motion} from "framer-motion";
 import styles from "./NewTask.module.scss";
-import TimeInput from "../../components/inputs/TimeInput/TimeInput";
-import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
-import {capitalizeFirstCharacter} from "../../functions/capitalizeFirstCharacter";
+import Button from "@/components/buttons/Button/Button";
+import TimeInput from "@/components/inputs/TimeInput/TimeInput";
+import CollapsibleContainer from "@/components/containers/CollapsibleContainer/CollapsibleContainer";
 
 const NewTask = ({index, length, id}) => {
     const {isLoading: categoriesLoading, data: categories} = useGetCategories();
+
+    const repeatCategories = useMemo(() => {
+        return categories.filter(category => !isNaN(category.repeatRate?.number));
+    }, [categories]);
+
+    const nonRepeatCategories = useMemo(() => {
+        return categories.filter(category => isNaN(category.repeatRate?.number));
+    }, [categories]);
 
     const {data: settings} = useGetSettings();
 
     const {mutate: addTask} = useAddTask();
     const {mutate: changeTask} = useChangeTask();
 
+    const [isNumberTask, setIsNumberTask] = useState(false);
+
 
     const [title, setTitle] = useState('');
-    const [type, setType] = useState('Checkbox');
     const [step, setStep] = useState(settings.defaults.step);
     const [hasGoal, setHasGoal] = useState(false);
     const [goalLimit, setGoalLimit] = useState('At least');
@@ -63,33 +70,27 @@ const NewTask = ({index, length, id}) => {
 
     const [repeatType, setRepeatType] = useState('Custom Rules')
 
+    const titleRef = useRef();
+
     const {isLoading: groupsLoading, data: groups} = useGetGroups();
 
     const {isLoading, data: tasks} = useGetTasks();
 
     const alertsContext = useContext(AlertsContext);
     const miniPagesContext = useContext(MiniPagesContext);
-
-    const [extendedSection, setExtendedSection] = useState(0);
+    const [dateModalIsVisible, setDateModalIsVisible] = useState(false);
 
     // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
-    const taskType = ['Checkbox', 'Number'];
+    // const taskType = ['Checkbox', 'Number'];
     const goalLimits = ['At most', 'Exactly', 'At least'];
     const timePeriods = ['Days', 'Weeks', 'Months', 'Years'];
-    const repeatTypes = ['Custom Rules', 'Time Group'];
-    const goalTypes = ['Streak', 'Total completed', 'Total number'];
+    const repeatTypes = ['Custom Rules', 'Repeatable Category'];
+    const goalTypes = ['Streak', 'Total'];
 
     const handleKeyDown = (e) => {
         if (e.code === 'Enter') {
             handleSave();
         }
-    }
-
-    const handleSetType = (e) => {
-        if (e.type === "Checkbox" && goalTypes.indexOf(longGoalType) > 1) {
-            setLongGoalType("Streak");
-        }
-        setType(e);
     }
 
     const findMatchingGroups = () => {
@@ -105,15 +106,16 @@ const NewTask = ({index, length, id}) => {
     const categoryGroups = useMemo(findMatchingGroups, [groupsLoading, categories, category]);
 
     useEffect(() => {
+        // Fill in all the fields if editing task
         if (id && !isLoading) {
             const task = tasks.find(task => task._id === id);
 
             setTitle(task.title);
-            setType(task.type);
 
             if (task.type === 'Number') {
+                setIsNumberTask(true);
                 setStep(task.step);
-                if (task?.goal.type) {
+                if (task?.goal?.type) {
                     setHasGoal(true);
                     setGoalLimit(task.goal.type);
                     setGoalNumber(task.goal.number);
@@ -129,18 +131,19 @@ const NewTask = ({index, length, id}) => {
 
             if (task.repeats) {
                 if (task.longGoal?.type) {
+                    setHasLongGoal(true);
                     setLongGoalLimit(task.longGoal.type);
                     setLongGoalNumber(task.longGoal.number);
                 }
 
                 if (task.group) {
-                    setRepeatType('Time Group');
-                    setTimeGroup(groups.find(group => group._id === task.group._id));
+                    setRepeatType('Repeatable Category');
+                    setTimeGroup(groups.find(group => group._id === task.group));
                 } else {
                     setRepeatNumber(task.repeatRate.number);
                     setTimePeriod(task.repeatRate.bigTimePeriod);
                     setTimePeriod2(task.repeatRate.smallTimePeriod);
-                    if (task.repeatRate.time) {
+                    if (task.repeatRate.time?.start) {
                         setHasTime(true);
                         setStartHour(task.repeatRate.time.start.substring(0, 2));
                         setStartMinute(task.repeatRate.time.start.substring(2));
@@ -152,17 +155,14 @@ const NewTask = ({index, length, id}) => {
 
             }
         }
+
+        // Focus the title textbox
+        if (titleRef.current) {
+            titleRef.current?.focus();
+        }
     }, [isLoading]);
 
     const handleSave = async () => {
-        const checkAllInputs = () => {
-            if (title) {
-                return true
-            }
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "You must input a title for the task"}})
-            return false;
-        }
-
         // The rules for if the task can be created are:
         // a) title always required
         // b) priority, type, category and repeats are also technically required, but they are pre-filled
@@ -173,185 +173,143 @@ const NewTask = ({index, length, id}) => {
         //    This is done so that if the user decides to delete the group, they can keep their repeat data.
 
         // First check that all the categories and groups have loaded. Also do the first check.
-        if (!categoriesLoading && !groupsLoading && checkAllInputs()) {
-            let repeatProperties = {};
-
-            if (!repeats) {
-                repeatProperties = undefined;
-            } else {
-                if (repeatType === "Time Group") {
-                    if (timeGroup.title !== "None") {
-                        if (timeGroup) repeatProperties = {
-                            repeatRate: timeGroup.repeatRate,
-                            group: timeGroup._id
-                        };
-                    } else {
-                        alertsContext.dispatch({
-                            type: "ADD_ALERT",
-                            payload: {
-                                type: "warning",
-                                message: "You need to select a time group, select the custom rules options or toggle the repeats option to false."
-                            }
-                        })
-                        return;
-                    }
-                } else {
-                    // Repeat type is set to custom rules
-                    const repeatRate = {
-                        number: repeatNumber,
-                        bigTimePeriod: timePeriod
-                    };
-
-                    if (timePeriod2) {
-                        repeatRate.smallTimePeriod = timePeriod2;
-                        repeatRate.startingDate = findStartingDates(timePeriod, timePeriod2);
-                    } else {
-                        alertsContext.dispatch({
-                            type: "ADD_ALERT",
-                            payload: {
-                                type: "error",
-                                message: "You need to enter at least one value into the \"On\" field."
-                            }
-                        })
-                        return;
-                    }
-
-                    if (hasTime) {
-                        if (
-                            endHour !== "00" &&
-                            (
-                                (parseInt(startHour) < parseInt(endHour)) ||
-                                (
-                                    parseInt(startHour) === parseInt(endHour) &&
-                                    parseInt(startMinute) < parseInt(endMinute)
-                                )
-                            )
-                        ) {
-                            repeatRate.time = {
-                                start: startHour.concat(startMinute),
-                                end: endHour.concat(endMinute)
-                            }
-                        } else {
-                            alertsContext.dispatch({
-                                type: "ADD_ALERT",
-                                payload: {
-                                    type: "error",
-                                    message: "The \"from\" time must be before the \"after\" time."
-                                }
-                            })
-                            return;
-                        }
-                    }
-
-                    repeatProperties.repeatRate = repeatRate;
-                }
-            }
-
-            const task = {
-                title,
-                type,
-                priority,
-                repeats,
-                ...repeatProperties
-            }
-
-            if (category !== "None") {
-                task.category = category._id;
-            }
-
-            if (task.type === "Number") {
-                task.step = step;
-                if (hasGoal) {
-                    task.goal = {
-                        type: goalLimit,
-                        number: goalNumber,
-                    }
-                }
-            }
-
-            if (hasLongGoal) {
-                task.longGoal = {
-                    type: longGoalType,
-                    limit: longGoalLimit,
-                    number: longGoalNumber,
-                }
-            }
-
-            if (id) {
-                await changeTask({...task, _id: id});
-            } else {
-                await addTask(task);
-            }
-
-            miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+        if (categoriesLoading || groupsLoading) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Categories loading", message: "Please wait until the categories are done loading."}});
+            return
         }
+
+        if (!title) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Task Title is Missing", message: "Tasks must have a title. Please enter a title to continue."}});
+            return;
+        }
+
+        let repeatParameters = undefined;
+
+        if (repeats) {
+            if (repeatType === "Custom Rules") {
+                if (repeatNumber.toString().length === 0) {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Repeat Number is Missing", message: "For the task to repeat using custom rules, you need to input a repeat number."}});
+                    return;
+                }
+
+                if (timePeriod2.length === 0) {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "No repeat days selected", message: "You must select at least one day to repeat on"}});
+                    return;
+                }
+
+                repeatParameters = {
+                    number: repeatNumber,
+                    bigTimePeriod: timePeriod,
+                    smallTimePeriod: timePeriod2,
+                    startingDate: findStartingDates(timePeriod, timePeriod2)
+                }
+
+                if (hasTime) {
+                    repeatParameters.time = {
+                        start: startHour.concat(startMinute),
+                        end: endHour.concat(endMinute)
+                    }
+                }
+
+                if (hasLongGoal) {
+                    if (longGoalNumber.toString().length === 0) {
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Long Term Goal Number is Missing", message: "For the task to have a long term goal, you need to input a goal number."}});
+                        return;
+                    }
+
+                    repeatParameters.longGoal = {
+                        limit: longGoalLimit,
+                        type: longGoalType,
+                        number: longGoalNumber
+                    }
+                }
+            } else {
+                // Repeatable Category
+                if (category === "None") {
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Repeat Category is Missing", message: "For the task to repeat using a repeat category, you need to select a category."}});
+                    return;
+                }
+
+                // For some reason if I do repeatRate: category.repeatRate and then change something on the repeatRate, the category mutates ㄟ( ▔, ▔ )ㄏ
+                repeatParameters = {
+                    repeatRate: {
+                        startingDate: [...category.repeatRate.startingDate],
+                        number: category.repeatRate.number,
+                        bigTimePeriod: category.repeatRate.bigTimePeriod
+                    },
+                    longGoal: category.goal
+                }
+
+                if (timeGroup._id) {
+                    repeatParameters.group = timeGroup._id
+                    repeatParameters.repeatRate.smallTimePeriod = timeGroup.repeatRate.smallTimePeriod;
+                    repeatParameters.repeatRate.startingDate = timeGroup.repeatRate.startingDate;
+                }
+            }
+        }
+
+        const typeParameters = {
+            type: "Checkbox"
+        }
+
+        if (isNumberTask) {
+            typeParameters.type = "Number";
+            typeParameters.step = step;
+
+            if (hasGoal) {
+                typeParameters.goal = {
+                    limit: goalLimit,
+                    number: goalNumber
+                }
+            }
+        }
+
+
+        const task = {
+            title,
+            priority,
+            repeats,
+            category: category._id,
+            ...typeParameters,
+            ...repeatParameters
+        }
+
+        if (id) {
+            // Editing task
+            await changeTask({...task, _id: id});
+        } else {
+            // Creating task
+            await addTask(task);
+        }
+
+        miniPagesContext.dispatch({type: 'REMOVE_PAGE', payload: ''});
+    }
+
+    const toggleDateModal = () => {
+        setDateModalIsVisible(current => !current);
     }
 
     return (
-        <MiniPageContainer
-            onClickSave={handleSave}
-            index={index}
-            length={length}
-        >
-            <input
-                type="text"
-                className="Title-Large"
-                placeholder="Add task title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-            />
-            <HeaderExtendContainer
-                header={(
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>General options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
-                                <div>
-                                    Type: <TextSwitchContainer>{type}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Category: <TextSwitchContainer>{category?.title ?? category}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Priority: <TextSwitchContainer>{priority}</TextSwitchContainer>
-                                </div>
-                            </motion.div>
-                        </div>
-                        <IconButton>
-                            <motion.div
-                                className={"Title-Large"}
-                                key={extendedSection === 0}
-                                initial={{rotate: extendedSection === 0 ? 0 : 180}}
-                                animate={{rotate: !(extendedSection === 0) ? 0 : 180}}
-                            >
-                                <TbChevronDown />
-                            </motion.div>
-                        </IconButton>
-                    </div>
-                )}
-                setExtendedInherited={() => {setExtendedSection(extendedSection === 0 ? null : 0)}}
-                extendedInherited={extendedSection === 0}
+        <>
+            <MiniPageContainer
+                onClickSave={handleSave}
+                index={index}
+                length={length}
             >
-                <InputWrapper label="Type">
-                    <div className={`Horizontal-Flex-Container`}>
-                        {taskType.map((task, index) => (
-                            <Chip
-                                selected={type}
-                                setSelected={handleSetType}
-                                value={task}
-                                key={index}
-                            >
-                                {task}
-                            </Chip>
-                        ))
-                        }
-                    </div>
-                </InputWrapper>
+                <input
+                    type="text"
+                    className="Title-Large"
+                    placeholder="Add task title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    ref={titleRef}
+                />
                 <InputWrapper label={"Category"}>
                     <DropDownInput
                         placeholder={'None'}
                         selected={category?.title}
+                        isDisabled={repeats && repeatType === "Repeatable Category"}
                     >
                         <button
                             onClick={() => setCategory("None")}
@@ -359,10 +317,10 @@ const NewTask = ({index, length, id}) => {
                         >
                             None
                         </button>
-                        {...categories.map((tempCategory, id) => (
+                        {...nonRepeatCategories.map(tempCategory => (
                             <button
                                 className={styles.dropDownOption}
-                                key={id}
+                                key={tempCategory.title}
                                 onClick={() => setCategory(tempCategory)}
                             >
                                 {tempCategory.title}
@@ -382,305 +340,240 @@ const NewTask = ({index, length, id}) => {
                     <TextBoxInput type="number" placeholder="Priority" value={priority} setValue={setPriority}/>
                     <PriorityIndicator/>
                 </InputWrapper>
-            </HeaderExtendContainer>
-            <HeaderExtendContainer
-                header={(
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>Number type options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
-                                <div>
-                                    Goal type: <TextSwitchContainer>{hasGoal ? goalLimit : "None"}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Step: <TextSwitchContainer>{step}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Goal number: <TextSwitchContainer>{hasGoal ? goalNumber : "None"}</TextSwitchContainer>
-                                </div>
-                            </motion.div>
-                        </div>
-                        <motion.div
-                            className={"Title-Large"}
-                            key={extendedSection === 1}
-                            initial={{rotate: extendedSection === 1 ? 0 : 180}}
-                            animate={{rotate: !(extendedSection === 1) ? 0 : 180}}
-                        >
-                            <TbChevronDown />
-                        </motion.div>
-                    </div>
-                )}
-                setExtendedInherited={() => {setExtendedSection(extendedSection === 1 ? null : 1)}}
-                extendedInherited={extendedSection === 1}
-                isDisabled={type !== 'Number'}
-            >
-                <InputWrapper label="Step">
-                    <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} />
-                </InputWrapper>
-                <InputWrapper label={"Has goal"}>
-                    <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
-                </InputWrapper>
-                <InputWrapper label={"Goal"}>
-                    <DropDownInput
-                        placeholder={'Type'}
-                        options={goalLimits}
-                        selected={goalLimit}
-                        isDisabled={!hasGoal}
-                    >
-                        {goalLimits.map(tempGoalLimit => (
-                            <button
-                                className={styles.dropDownOption}
-                                onClick={() => setGoalLimit(tempGoalLimit)}
-                                key={tempGoalLimit}
-                            >
-                                {tempGoalLimit}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                    <TextBoxInput
-                        type="number"
-                        placeholder="Number"
-                        value={goalNumber}
-                        setValue={setGoalNumber}
-                        isDisabled={!hasGoal}
-                    />
-                </InputWrapper>
-            </HeaderExtendContainer>
-            <HeaderExtendContainer
-                header={(
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>Repeat options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
-                                <div>
-                                    Repeats: <TextSwitchContainer>{capitalizeFirstCharacter(repeats.toString())}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Method: <TextSwitchContainer>{repeatType === "Custom Rules" ? "Custom" : timeGroup.title}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Goal number: <TextSwitchContainer>{hasLongGoal ? longGoalNumber : "None"}</TextSwitchContainer>
-                                </div>
-                            </motion.div>
-                        </div>
-                        <IconButton>
-                            <motion.div
-                                className={"Title-Large"}
-                                key={extendedSection === 2}
-                                initial={{rotate: extendedSection === 2 ? 0 : 180}}
-                                animate={{rotate: !(extendedSection === 2) ? 0 : 180}}
-                            >
-                                <TbChevronDown />
-                            </motion.div>
-                        </IconButton>
-                    </div>
-                )}
-                setExtendedInherited={() => {setExtendedSection(extendedSection === 2 ? null : 2)}}
-                extendedInherited={extendedSection === 2}
-            >
-                <InputWrapper label="Repeats">
-                    <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
-                </InputWrapper>
-                <InputWrapper label={"Repeat using"}>
-                    {repeatTypes.map(item => (
-                        <Chip
-                            key={item}
-                            value={item}
-                            selected={repeatType}
-                            setSelected={setRepeatType}
-                        >
-                            {item}
-                        </Chip>
-                    ))}
-                </InputWrapper>
-                <InputWrapper label={"Select a category time group"}>
-                    <DropDownInput
-                        placeholder={"None"}
-                        isDisabled={repeatType !== "Time Group"} setSelected={setTimeGroup} selected={timeGroup?.title}
-                    >
-                        {categoryGroups.map((tempTimeGroup, index) => (
-                            <button
-                                className={styles.dropDownOption}
-                                key={index}
-                                onClick={() => setTimeGroup(tempTimeGroup)}
-                            >
-                                {tempTimeGroup.title}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                </InputWrapper>
-            </HeaderExtendContainer>
-            <HeaderExtendContainer
-                header={(
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>Custom rules for repeat</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
-                                <div>
-                                    Number: <TextSwitchContainer>{repeatNumber}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Time:
-                                    <TextSwitchContainer>
-                                        {!hasTime && "None"}
-                                        {hasTime && <>
-                                            {startHour}:{startMinute} - {endHour}:{endMinute}
-                                        </>}
-                                    </TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Time period: <TextSwitchContainer>{timePeriod}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    On:
-                                    <TextSwitchContainer>
-                                        {timePeriod === "Days" ? "Option doesn't apply" : timePeriod2.length}
-                                    </TextSwitchContainer>
-                                    <TextSwitchContainer>
-                                        {timePeriod !== "Days" && "days"}
-                                    </TextSwitchContainer>
-                                </div>
-                            </motion.div>
-                        </div>
-                        <motion.div
-                            className={"Title-Large"}
-                            key={extendedSection === 3}
-                            initial={{rotate: extendedSection === 3 ? 0 : 180}}
-                            animate={{rotate: !(extendedSection === 3) ? 0 : 180}}
-                        >
-                            <TbChevronDown />
-                        </motion.div>
-                    </div>
-                )}
-                setExtendedInherited={() => {setExtendedSection(extendedSection === 3 ? null : 3)}}
-                extendedInherited={extendedSection === 3}
-                isDisabled={!repeats || repeatType !== "Custom Rules"}
-            >
-                <InputWrapper label={"Repeat between certain times"}>
-                    <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
-                </InputWrapper>
-                <InputWrapper label={"From - To"}>
-                    <TimeInput
-                        hour={startHour}
-                        setHour={setStartHour}
-                        minute={startMinute}
-                        setMinute={setStartMinute}
-                        isDisabled={!hasTime}
-                    />
-                    -
-                    <TimeInput
-                        hour={endHour}
-                        setHour={setEndHour}
-                        minute={endMinute}
-                        setMinute={setEndMinute}
-                        isDisabled={!hasTime}
-                    />
-                </InputWrapper>
-                <InputWrapper label={'Repeat every'}>
-                    <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber}/>
-                    <DropDownInput
-                        placeholder={'Weeks'}
-                        selected={timePeriod}
-                    >
-                        {timePeriods.map(tempTimePeriod => (
-                            <button
-                                className={styles.dropDownOption}
-                                onClick={() => setTimePeriod(tempTimePeriod)}
-                                key={tempTimePeriod}
-                            >
-                                {tempTimePeriod}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                </InputWrapper>
-                {timePeriod !== 'Days' &&
-                    <InputWrapper label={'On'}>
-                        <TimePeriodInput timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} />
+                <HeaderExtendContainer
+                    header={<div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Title-Small"}>Turn into number task</div>
+                        <ToggleButton isToggled={isNumberTask} setIsToggled={setIsNumberTask}></ToggleButton>
+                    </div>}
+                    extendOnClick={false}
+                    extendedInherited={isNumberTask}
+                    hasPointer={false}
+                >
+                    <InputWrapper label="Step">
+                        <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} maxNumber={999} />
                     </InputWrapper>
-                }
-            </HeaderExtendContainer>
-            <HeaderExtendContainer
-                header={(
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div className={styles.headerLeftSide}>
-                            <div className={"Title-Medium"}>Long term goal options</div>
-                            <motion.div className={`Label-Small ${styles.titleMedium}`} layout>
-                                <div>
-                                    Has goal: <TextSwitchContainer>{capitalizeFirstCharacter(hasLongGoal.toString())}</TextSwitchContainer>
+                    <HeaderExtendContainer
+                        header={
+                            <div className={"Horizontal-Flex-Container Space-Between"}>
+                                <div className={"Title-Small"}>Add a goal</div>
+                                <ToggleButton isToggled={hasGoal} setIsToggled={setHasGoal} />
+                            </div>
+                        }
+                        extendOnClick={false}
+                        extendedInherited={hasGoal}
+                        hasPointer={false}
+                        hasOutline={false}
+                    >
+                        <InputWrapper>
+                            <DropDownInput
+                                placeholder={'Limit'}
+                                options={goalLimits}
+                                selected={goalLimit}
+                                isDisabled={!hasGoal}
+                            >
+                                {goalLimits.map(tempGoalLimit => (
+                                    <button
+                                        className={styles.dropDownOption}
+                                        onClick={() => setGoalLimit(tempGoalLimit)}
+                                        key={tempGoalLimit}
+                                    >
+                                        {tempGoalLimit}
+                                    </button>
+                                ))}
+                            </DropDownInput>
+                            <TextBoxInput
+                                type="number"
+                                placeholder="Number"
+                                value={goalNumber}
+                                setValue={setGoalNumber}
+                                isDisabled={!hasGoal}
+                                minNumber={1}
+                            />
+                        </InputWrapper>
+                    </HeaderExtendContainer>
+                </HeaderExtendContainer>
+                <HeaderExtendContainer
+                    header={<div className={"Horizontal-Flex-Container Space-Between"}>
+                        <div className={"Title-Small"}>Make it repeat</div>
+                        <ToggleButton isToggled={repeats} setIsToggled={setRepeats}></ToggleButton>
+                    </div>}
+                    extendOnClick={false}
+                    extendedInherited={repeats}
+                    hasPointer={false}
+                >
+                    <InputWrapper label={"Repeat using"}>
+                        {repeatTypes.map(item => (
+                            <Chip
+                                key={item}
+                                value={item}
+                                selected={repeatType}
+                                setSelected={setRepeatType}
+                            >
+                                {item}
+                            </Chip>
+                        ))}
+                    </InputWrapper>
+                    <CollapsibleContainer hasBorder={false} isVisible={repeatType === "Custom Rules"}>
+                        <InputWrapper label={'Repeat every'}>
+                            <TextBoxInput type="number" placeholder="Number" value={repeatNumber} setValue={setRepeatNumber} minNumber={1}/>
+                            <DropDownInput
+                                placeholder={'Weeks'}
+                                selected={timePeriod}
+                            >
+                                {timePeriods.map(tempTimePeriod => (
+                                    <button
+                                        className={"DropDownOption"}
+                                        onClick={() => setTimePeriod(tempTimePeriod)}
+                                        key={tempTimePeriod}
+                                    >
+                                        {tempTimePeriod}
+                                    </button>
+                                ))}
+                            </DropDownInput>
+                        </InputWrapper>
+                        <InputWrapper label={'On'}>
+                            <Button onClick={toggleDateModal} disabled={timePeriod === "Days"} size={"small"}>Select dates</Button>
+                        </InputWrapper>
+                        <HeaderExtendContainer
+                            header={
+                                <div className={"Horizontal-Flex-Container Space-Between"}>
+                                    <div className={"Title-Small"}>Repeat time range</div>
+                                    <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
                                 </div>
-                                <div>
-                                    Goal type: <TextSwitchContainer>{hasLongGoal ? longGoalType : "None"}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Goal limit: <TextSwitchContainer>{hasLongGoal ? longGoalLimit : "None"}</TextSwitchContainer>
-                                </div>
-                                <div>
-                                    Goal number: <TextSwitchContainer>{hasLongGoal ? longGoalNumber : "None"}</TextSwitchContainer>
-                                </div>
-                            </motion.div>
-                        </div>
-                        <motion.div
-                            className={"Title-Large"}
-                            key={extendedSection === 4}
-                            initial={{rotate: extendedSection === 4 ? 0 : 180}}
-                            animate={{rotate: !(extendedSection === 4) ? 0 : 180}}
+                            }
+                            extendOnClick={false}
+                            extendedInherited={hasTime && repeats && repeatType === "Custom Rules"}
+                            hasPointer={false}
+                            hasOutline={false}
+                            isDisabled={!repeats || repeatType !== "Custom Rules"}
                         >
-                            <TbChevronDown />
-                        </motion.div>
-                    </div>
-                )}
-                setExtendedInherited={() => {setExtendedSection(extendedSection === 4 ? null : 4)}}
-                extendedInherited={extendedSection === 4}
-                isDisabled={!repeats}
-            >
-                <InputWrapper label={"Has long term goal"}>
-                    <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal} />
-                </InputWrapper>
-                <InputWrapper label={"Type"}>
-                    <DropDownInput
-                        placeholder={'Type'}
-                        selected={longGoalType}
-                        isDisabled={!hasLongGoal}
-                    >
-                        {goalTypes.slice(0, type === "Number" ? 3 : 2).map(tempGoalLimit => (
-                            <button
-                                className={styles.dropDownOption}
-                                onClick={() => setLongGoalLimit(tempGoalLimit)}
-                                key={tempGoalLimit}
+                            <InputWrapper>
+                                <TimeInput
+                                    hour={startHour}
+                                    setHour={setStartHour}
+                                    minute={startMinute}
+                                    setMinute={setStartMinute}
+                                    isDisabled={!hasTime}
+                                />
+                                -
+                                <TimeInput
+                                    hour={endHour}
+                                    setHour={setEndHour}
+                                    minute={endMinute}
+                                    setMinute={setEndMinute}
+                                    isDisabled={!hasTime}
+                                />
+                            </InputWrapper>
+                        </HeaderExtendContainer>
+                        <HeaderExtendContainer
+                            header={
+                                <div className={"Horizontal-Flex-Container Space-Between"}>
+                                    <div className={"Title-Small"}>Add a long term goal</div>
+                                    <ToggleButton isToggled={hasLongGoal} setIsToggled={setHasLongGoal}></ToggleButton>
+                                </div>
+                            }
+                            extendOnClick={false}
+                            extendedInherited={hasLongGoal && repeats && repeatType === "Custom Rules"}
+                            hasPointer={false}
+                            hasOutline={false}
+                            isDisabled={!repeats || repeatType !== "Custom Rules"}
+                        >
+                            <InputWrapper>
+                                <DropDownInput
+                                    placeholder={'Type'}
+                                    selected={longGoalType}
+                                    isDisabled={!hasLongGoal}
+                                    widthBasedOnChildren={true}
+                                >
+                                    {goalTypes.map(tempGoalType => (
+                                        <button
+                                            className={styles.dropDownOption}
+                                            onClick={() => setLongGoalType(tempGoalType)}
+                                            key={tempGoalType}
+                                        >
+                                            {tempGoalType}
+                                        </button>
+                                    ))}
+                                </DropDownInput>
+                                <DropDownInput
+                                    placeholder={'Limit'}
+                                    selected={longGoalLimit}
+                                    isDisabled={!hasLongGoal}
+                                    widthBasedOnChildren={true}
+                                >
+                                    {goalLimits.map(tempGoalLimit => (
+                                        <button
+                                            className={styles.dropDownOption}
+                                            onClick={() => setLongGoalLimit(tempGoalLimit)}
+                                            key={tempGoalLimit}
+                                        >
+                                            {tempGoalLimit}
+                                        </button>
+                                    ))}
+                                </DropDownInput>
+                                <TextBoxInput
+                                    type="number"
+                                    placeholder="Number"
+                                    value={longGoalNumber}
+                                    setValue={setLongGoalNumber}
+                                    isDisabled={!hasLongGoal}
+                                    minNumber={1}
+                                />
+                            </InputWrapper>
+                        </HeaderExtendContainer>
+                    </CollapsibleContainer>
+                    <CollapsibleContainer hasBorder={false} isVisible={repeatType === "Repeatable Category"}>
+                        <InputWrapper label={"Repeatable Category"}>
+                            <DropDownInput
+                                placeholder={'None'}
+                                selected={category?.title}
                             >
-                                {tempGoalLimit}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                </InputWrapper>
-                <InputWrapper label={"Limit"}>
-                    <DropDownInput
-                        placeholder={'Limit'}
-                        selected={longGoalLimit}
-                        isDisabled={!hasLongGoal}
-                    >
-                        {goalLimits.map(tempGoalLimit => (
-                            <button
-                                className={styles.dropDownOption}
-                                onClick={() => setLongGoalLimit(tempGoalLimit)}
-                                key={tempGoalLimit}
+                                <button
+                                    onClick={() => setCategory("None")}
+                                    className={styles.dropDownOption}
+                                >
+                                    None
+                                </button>
+                                {...repeatCategories.map(tempCategory => (
+                                    <button
+                                        className={styles.dropDownOption}
+                                        key={tempCategory.title}
+                                        onClick={() => setCategory(tempCategory)}
+                                    >
+                                        {tempCategory.title}
+                                    </button>
+                                ))}
+                                <button
+                                    className={styles.dropDownOption}
+                                    onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'new-category'}})}
+                                    style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}
+                                >
+                                    Add new
+                                    <TbPlus />
+                                </button>
+                            </DropDownInput>
+                        </InputWrapper>
+                        <InputWrapper label={"Category subdivision"}>
+                            <DropDownInput
+                                placeholder={"None"}
+                                isDisabled={repeatType !== "Repeatable Category" || category === "None" || categoryGroups.length === 1} setSelected={setTimeGroup} selected={timeGroup?.title}
                             >
-                                {tempGoalLimit}
-                            </button>
-                        ))}
-                    </DropDownInput>
-                </InputWrapper>
-                <InputWrapper label={"Number"}>
-                    <TextBoxInput
-                        type="number"
-                        placeholder="Number"
-                        value={longGoalNumber}
-                        setValue={setLongGoalNumber}
-                        isDisabled={!hasLongGoal}
-                    />
-                </InputWrapper>
-            </HeaderExtendContainer>
-        </MiniPageContainer>
+                                {categoryGroups.map((tempTimeGroup, index) => (
+                                    <button
+                                        className={styles.dropDownOption}
+                                        key={index}
+                                        onClick={() => setTimeGroup(tempTimeGroup)}
+                                    >
+                                        {tempTimeGroup.title}
+                                    </button>
+                                ))}
+                            </DropDownInput>
+                        </InputWrapper>
+                    </CollapsibleContainer>
+                </HeaderExtendContainer>
+            </MiniPageContainer>
+            {dateModalIsVisible && <TimePeriodModal timePeriod={timePeriod} timePeriod2={timePeriod2} setTimePeriod2={setTimePeriod2} dismountFunction={toggleDateModal} />}
+        </>
     );
 };
 

@@ -2,19 +2,28 @@ import React, {useState} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import styles from "./HeaderExtendContainer.module.scss";
 
-const HeaderExtendContainer = ({header, children, extendedInherited = null, setExtendedInherited = null, isDisabled = false}) => {
+const HeaderExtendContainer = ({
+                                   header,
+                                   children,
+                                   extendedInherited = null,
+                                   setExtendedInherited = null,
+                                   isDisabled = false,
+                                   hasPointer = true,
+                                   extendOnClick = true,
+                                   hasOutline = true
+                               }) => {
     const [isExtended, setIsExtended] = useState(false);
 
     const handleClick = () => {
-        if (!isDisabled) {
+        if (!isDisabled && extendOnClick) {
             setExtendedInherited ? setExtendedInherited() : setIsExtended(current => !current)
         }
     }
 
     return (
-        <section className={styles.container}>
+        <section className={`${styles.container} ${hasOutline ? styles.hasOutline : ""} ${isExtended || extendedInherited ? styles.extended : ""}`}>
             <div
-                className={`${styles.headerContainer} ${isDisabled ? styles.disabled : ''}`}
+                className={`${styles.headerContainer} ${isDisabled ? styles.disabled : ''} ${hasPointer ? styles.hasPointer : ""}`}
                 onClick={handleClick}
             >
                 {header}
@@ -22,7 +31,7 @@ const HeaderExtendContainer = ({header, children, extendedInherited = null, setE
             <AnimatePresence initial={false}>
                 {(isExtended || extendedInherited) &&
                     <motion.section
-                        className={styles.contentContainer}
+                        className={`${styles.contentContainer}`}
                         key={isExtended || extendedInherited}
                         initial={{height: 0, paddingBottom: 0}}
                         animate={{height: 'auto', paddingBottom: 12, transitionEnd: {overflowY: 'visible'}}}

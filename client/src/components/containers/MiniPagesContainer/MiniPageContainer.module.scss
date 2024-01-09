@@ -1,36 +1,35 @@
-@import '@/styles/variables';
+@use "@/styles/variables" as v;
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: v.$phone-breakpoint) {
   .container {
-    border-top: $base-border;
-    width: calc(100% - 40px);
-    height: calc(100% - 4em - 32px);
+    border-top: v.$base-border;
+    width: 100%;
+    height: calc(100% - 4em - 12px);
     bottom: calc(4em + 12px);
     min-height: 25%;
-    max-height: calc(100% - 4em - 32px);
+    max-height: calc(100% - 4em - 12px);
     border-radius: 10px 10px 0 0;
   }
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: v.$phone-breakpoint) {
   .container {
     width: 400px;
     height: 100%;
     right: 0;
     top: 0;
     box-sizing: border-box;
-    border-left: $base-border;
+    border-left: v.$base-border;
   }
 }
 
 .container {
   position: fixed;
-  padding: 20px 20px;
   background-color: var(--surface-color);
   z-index: 3;
   flex-wrap: nowrap;
   gap: 0;
-  box-shadow: $elevation-1;
+  box-shadow: v.$elevation-1;
 }
 
 .topLineContainer {
@@ -51,13 +50,13 @@
 .actionButtonsContainer {
   display: flex;
   justify-content: space-between;
-  font-size: $font-xl;
-  padding: 0 0 10px 0;
+  font-size: v.$font-xl;
+  padding: 12px 12px 10px 12px;
   background-color: var(--surface-color);
 }
 
 .childrenContainer {
-  padding-right: 12px;
+  padding: 0 12px;
   overflow-y: auto;
   flex: 1;
   gap: 0;

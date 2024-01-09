@@ -1,5 +1,5 @@
 import styles from "./TextBoxInput.module.scss";
-import {useState} from "react";
+import {forwardRef, useState} from "react";
 import IconButton from "../../buttons/IconButton/IconButton";
 import { TbEye, TbEyeOff, TbCaretDown, TbCaretUp, TbCalendar } from "react-icons/tb";
 
@@ -47,30 +47,42 @@ const TypeCalendar = ({toggleCalendar, isDisabled}) => {
     )
 }
 
-const TextBoxInput = ({
-                          placeholder = "placeholder",
-                          type = "text",
-                          icon,
-                          isDisabled = false,
-                          value,
-                          setValue,
-                          size = 'medium',
-                          width = 'medium',
-                          onKeydown = () => {
-                          },
-                            alignment = 'left',
-                          invalid = null,
-                            toggleCalendar = null
-                      }) => {
+const TextBoxInput = forwardRef(({
+                                     placeholder = "placeholder",
+                                     type = "text",
+                                     icon,
+                                     isDisabled = false,
+                                     value,
+                                     setValue,
+                                     size = 'medium',
+                                     width = 'medium',
+                                     onKeydown = () => {
+                                     },
+                                     alignment = 'left',
+                                     invalid = null,
+                                     toggleCalendar = null,
+                                     minNumber = null,
+                                     maxNumber = null
+                                 }, ref) => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
 
     const handleChange = (event) => {
         if (type === 'number') {
             if (isNaN(event.target.value)) {
-                return;
+                if (minNumber === null || minNumber < 0) {
+                    if (event.target.value !== "-") return;
+                } else {
+                    return;
+                }
+            }
+
+            if (event.target.value.length > 0) {
+                if (minNumber && parseFloat(event.target.value) < minNumber) return;
+                if (maxNumber && parseFloat(event.target.value) > maxNumber) return;
             }
         }
+
         setValue(event.target.value)
     }
 
@@ -97,12 +109,16 @@ const TextBoxInput = ({
 
     const increment = () => {
         checkIfNull();
-        setValue(parseInt(value) + 1);
+        if (maxNumber === null || value + 1 <= maxNumber) {
+            setValue(parseInt(value) + 1);
+        }
     }
 
     const decrement = () => {
         checkIfNull();
-        setValue(parseInt(value) - 1);
+        if (minNumber === null || parseInt(value) - 1 >= minNumber) {
+            setValue(parseInt(value) - 1);
+        }
     }
 
     const handleType = () => {
@@ -138,12 +154,14 @@ const TextBoxInput = ({
               onChange={handleChange}
               onBlur={handleBlur}
               onKeyDown={onKeydown}
+
+              ref={ref}
           />
       </span>
         {type === "number" && <TypeNumber decrement={decrement} increment={increment} isDisabled={isDisabled} />}
         {type === "password" && <TypePassword passwordVisible={passwordVisible} setPasswordVisible={setPasswordVisible} />}
         {type === "calendar" && <TypeCalendar toggleCalendar={toggleCalendar} isDisabled={isDisabled} />}
     </div>);
-};
+});
 
 export default TextBoxInput;

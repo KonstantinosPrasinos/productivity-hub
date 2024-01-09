@@ -17,7 +17,6 @@ const SwitchContainer = ({children, selectedTab}) => {
                 {selectedTab >= 0 && selectedTab < children.length && <motion.div
                     className={styles.container}
                     key={selectedTab}
-                    layout
 
                     initial={{
                         x: previousTab.current < selectedTab ? 500 : -500,
@@ -26,11 +25,6 @@ const SwitchContainer = ({children, selectedTab}) => {
                     animate={{
                         x: 0,
                         opacity: 1
-                    }}
-                    exit={{
-                        x: previousTab.current < selectedTab ? 500 : -500,
-                        opacity: 0,
-                        height: 0
                     }}
 
                     transition={{

@@ -13,6 +13,7 @@ import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
 import GoogleSignInButton from "../../../components/utilities/GoogleSignInButton/GoogleSignInButton";
+import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -67,10 +68,10 @@ const LogIn = () => {
                             setSelectedTab(1);
                         }
                     } else {
-                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Passwords don't match"}});
+                        alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Passwords don't match", message: "The password and repeat password fields must match."}});
                     }
                 } else {
-                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Password isn't strong enough"}});
+                    alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Email is Invalid", message: "Please enter a valid email address."}});
                 }
             }
         } else if (selectedTab === 1) {
@@ -116,7 +117,7 @@ const LogIn = () => {
     }, [user, navigate, isLoading, isLoadingVerify])
 
     return (
-        <Modal isLoading={isLoading || isLoadingVerify}>
+        <Modal isPortal={false}>
             <SwitchContainer selectedTab={selectedTab}>
                 <div className={styles.container}>
                     <div className={'Display'}>Welcome to Productivity Hub</div>
@@ -143,12 +144,17 @@ const LogIn = () => {
                         />
                     </CollapsibleContainer>
                     <div className={`Horizontal-Flex-Container Space-Between ${styles.buttonContainer}`}>
-                        <Button filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
-                        <Button filled={false} onClick={handleForgotPassword}>Forgot password</Button>
+                        <Button size={"small"} filled={false} onClick={handleChangeAction}>{!isSigningUp ? 'Register' : 'Log in'}</Button>
+                        <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
-                    <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>{!isSigningUp ? 'Log in' : 'Register'}</Button>
-                    <div>or</div>
-                    <GoogleSignInButton />
+                    <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>
+                        {!isLoading && (!isSigningUp ? 'Log in' : 'Register')}
+                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
+                    </Button>
+                    {window?.google && <>
+                        <div>or</div>
+                        <GoogleSignInButton />
+                    </>}
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>
@@ -174,7 +180,8 @@ const LogIn = () => {
                         filled={verificationCode.length === 6}
                         onClick={handleVerificationContinue}
                     >
-                        {verificationCode.length === 6 ? 'Continue' : 'Cancel'}
+                        {!isLoadingVerify && (verificationCode.length === 6 ? 'Continue' : 'Cancel')}
+                        {isLoadingVerify && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
                     </Button>
                 </div>
             </SwitchContainer>

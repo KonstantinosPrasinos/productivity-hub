@@ -1,3 +1,5 @@
+@use "@/styles/index";
+
 .container {
   width: calc(22.15em - 20px);
   padding: 20px !important;
@@ -7,8 +9,12 @@
   justify-content: center;
   align-items: center;
 
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
 
-  &.fullSize {
     height: 100%;
     width: 100%;
   }
@@ -19,6 +25,40 @@
     border: none;
     padding: 0 !important;
     border-radius: 2em !important;
+    box-shadow: none !important;
+    font-size: inherit;
+
+    background-color: transparent;
+  }
+
+  --loading-color: var(--primary-color);
+  --loading-background-color: var(--background-color);
+  --loading-secondary-color: var(--surface-color);
+
+  &.inverted {
+    background-color: var(--primary-color);
+
+    --loading-color: var(--on-primary-color);
+    --loading-background-color: var(--primary-color);
+    --loading-secondary-color: var(--primary-color);
+  }
+
+  &.large {
+    font-size: 2em;
+
+    &:not(.fullscreen) {
+      width: calc(11.075em - 20px);
+      height: 1em;
+    }
+  }
+
+  &.small {
+    font-size: 0.5em;
+
+    &:not(.fullscreen) {
+      width: calc(44.3em - 20px);
+      height: 4em;
+    }
   }
 }
 
@@ -32,13 +72,13 @@
   height: 2em;
   width: 2em;
   border-radius: 2em;
-  background-color: var(--background-color);
+  background-color: var(--loading-background-color);
   overflow: hidden;
 
   &::after {
     content: '';
     position: absolute;
-    background-color: var(--surface-color);
+    background-color: var(--loading-secondary-color);
     top: 0.25em;
     left: 0.25em;
     height: 1.5em;
@@ -49,7 +89,7 @@
   &::before {
     content: '';
     position: absolute;
-    background-color: var(--primary-color);
+    background-color: var(--loading-color);
     top: 0;
     left: 0;
     height: 1em;
@@ -57,4 +97,40 @@
     animation: rotating 0.75s linear infinite;
     transform-origin: bottom right;
   }
+}
+
+@keyframes pulseSize {
+  0% {transform: scale(0.3)}
+  33% {transform: scale(0.6)}
+  66% {transform: scale(0.3)}
+  100% {transform: scale(0.3)}
+}
+
+.dotsIndicator {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+
+  .dots {
+    height: 1.23333em;
+    width: 1.23333em;
+    border-radius: 1.23333em;
+    transform: scale(0.3);
+
+    background-color: var(--loading-color);
+
+    &:first-child {
+      animation: pulseSize 1.5s linear infinite;
+    }
+
+    &:nth-child(2) {
+      animation: pulseSize 1.5s linear infinite 0.3s;
+    }
+
+    &:last-child {
+      animation: pulseSize 1.5s linear infinite 0.6s;
+    }
+  }
+
 }

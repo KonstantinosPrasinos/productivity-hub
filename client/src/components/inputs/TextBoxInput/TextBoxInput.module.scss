@@ -1,11 +1,11 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 
 .container {
     width: 10em;
     height: 2.5em;
     min-height: 2.5em;
-    font-size: $font-m;
+    font-size: v.$font-m;
     box-sizing: border-box;
     box-shadow: none;
     display: flex;
@@ -28,10 +28,10 @@
     }
 
     &.large {
-        font-size: $font-xl;
+        font-size: v.$font-xl;
 
         & > * {
-            font-size: $font-xl;
+            font-size: v.$font-xl;
         }
     }
 

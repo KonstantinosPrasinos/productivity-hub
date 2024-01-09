@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {AlertsContext} from "../../context/AlertsContext";
 
 const postResetAccount = async (password) => {
-    const response = await fetch('http://localhost:5000/api/user/reset', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/reset`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({password}),
@@ -11,7 +11,7 @@ const postResetAccount = async (password) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to reset account.');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -23,8 +23,8 @@ export function useResetAccount() {
 
     return useMutation({
         mutationFn: postResetAccount,
-        onError: () => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: "Failed to reset account"}});
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to reset account"}})
         },
         onSettled: () => {
             queryClient.invalidateQueries({queryKey: ["tasks"]});

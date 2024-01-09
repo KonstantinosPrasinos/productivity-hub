@@ -1,7 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import CategoryIndicator from "../../components/indicators/CategoryIndicator/CategoryIndicator";
-import Divider from "../../components/utilities/Divider/Divider";
 import IconButton from "../../components/buttons/IconButton/IconButton";
 import Button from "../../components/buttons/Button/Button";
 import {MiniPagesContext} from "../../context/MiniPagesContext";
@@ -11,20 +10,17 @@ import {useDeleteTask} from "../../hooks/delete-hooks/useDeleteTask";
 import {useChangeEntryValue} from "../../hooks/change-hooks/useChangeEntryValue";
 import {useGetTaskCurrentEntry} from "../../hooks/get-hooks/useGetTaskCurrentEntry";
 import {useGetTaskEntries} from "../../hooks/get-hooks/useGetTaskEntries";
-import LoadingIndicator from "../../components/indicators/LoadingIndicator/LoadingIndicator";
-import {AnimatePresence, motion} from 'framer-motion';
 import Modal from "../../components/containers/Modal/Modal";
 import {DayPicker} from "react-day-picker";
+import pickerStyles from 'react-day-picker/dist/style.module.css';
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useAddEntry} from "../../hooks/add-hooks/useAddEntry";
 import {
     TbCheck,
-    TbChevronDown,
-    TbChevronLeft,
-    TbChevronRight, TbChevronUp,
     TbEdit,
-    TbMinus, TbPlus, TbRefresh,
+    TbPlus,
+    TbRefresh,
     TbTrash
 } from "react-icons/tb";
 import {useDeleteEntry} from "../../hooks/delete-hooks/useDeleteEntry";
@@ -34,134 +30,119 @@ import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import {UndoContext} from "../../context/UndoContext";
 import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
 import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
+import Table from "@/components/utilities/Table/Table.jsx";
+import {dateIsProper} from "@/functions/dateIsProper.js";
+import {getDateAddDetails} from "@/functions/getDateAddDetails.js";
 
-const StatSection = ({entries}) => {
+const StatSection = ({task}) => {
+    const {data: entries, isLoading} = useGetTaskEntries(task._id);
+
+    const {data: entry} = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+    const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number), [task]);
+
+    const {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate, totalEntries, totalStarted, totalCompleted} = useMemo(() => {
+        let currentStreak = 0;
+        let longestStreak = 0;
+
+        let currentStreakStartingDate = null
+        let longestStreakEndDate = null;
+
+        let totalEntries = 0;
+        let totalStarted = 0;
+        let totalCompleted = 0;
+
+        if (isLoading) return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate};
+
+        const allEntries = entries?.length ? [entry, ...entries] : [entry];
+
+        const streakDate = new Date(task.repeatRate.startingDate[0]);
+
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
+        while (streakDate.getTime() <= today.getTime()) {
+            let dateCompleted = false;
+
+            totalEntries++;
+
+            const streakEntry = allEntries.find(entry => entry.value > 0 && (new Date(entry.date)).getTime() === streakDate.getTime());
+
+            if (streakEntry) {
+                if (task.type === "Checkbox" && streakEntry) {
+                    dateCompleted = true;
+                }
+
+                if (task.type === "Number") {
+                    if (task?.goal?.number) {
+                        if (task.goal.number < entry.value) {
+                            dateCompleted = true;
+                        } else {
+                            totalStarted++;
+                        }
+                    } else {
+                        dateCompleted = true;
+                    }
+                }
+            }
+
+            if (dateCompleted) {
+                currentStreak++;
+                totalCompleted++;
+
+                if (!currentStreakStartingDate) {
+                    currentStreakStartingDate = new Date(streakEntry.date);
+                }
+
+                if (currentStreak > longestStreak) {
+                    longestStreak = currentStreak;
+                    longestStreakEndDate = new Date(streakEntry.date);
+                }
+            } else {
+                currentStreak = 0;
+                currentStreakStartingDate = null;
+            }
+
+            streakDate[`set${functionName}`](streakDate[`get${functionName}`]() + timeToAdd);
+        }
+
+        // If end date is today and current streak is not 0 then the longest streak is ongoing
+        streakDate[`set${functionName}`](streakDate[`get${functionName}`]() - timeToAdd);
+        if (longestStreakEndDate && longestStreakEndDate.getTime() === streakDate.getTime() && currentStreak > 0) {
+            longestStreakEndDate = "Ongoing";
+        }
+
+        return {currentStreak, longestStreak, longestStreakEndDate, currentStreakStartingDate, totalEntries, totalCompleted, totalStarted};
+    }, [task, entries, entry, isLoading]);
+
     return (
-        <section className={'Grid-Container Two-By-Two'}>
+        <section className={'Grid-Container'}>
             <div className={'Rounded-Container Stack-Container'}>
                 <div className={'Label'}>Current Streak</div>
-                <div>2 days</div>
-                <div className={'Label'}>Since: 05/10/2022</div>
+                <div>{currentStreak === 1 ? `${currentStreak} entry` : `${currentStreak} entries`}</div>
+                <div className={'Label'}>{currentStreak > 0 ? `Since: ${currentStreakStartingDate.toLocaleDateString()}` : ""}</div>
             </div>
             <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Best Streak</div>
-                <div>2 days</div>
-                <div className={'Label'}>Ended at: 05/10/2022</div>
+                <div className={'Label'}>Longest Streak</div>
+                <div>{longestStreak === 1 ? `${longestStreak} entry` : `${longestStreak} entries`}</div>
+                <div className={'Label'}>{longestStreakEndDate === "Ongoing" ? "Ongoing" : (longestStreakEndDate?.toLocaleDateString() ?? "")}</div>
             </div>
-            <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Total</div>
-                <div>3 days</div>
-                <div></div>
-            </div>
-            <div className={'Rounded-Container Stack-Container'}>
-                <div className={'Label'}>Unfilled Days</div>
-                <div>2 days</div>
-                <div className={'Label'}>Ended at: 05/10/2022</div>
-            </div>
+            {task.type === "Number" && <>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>% Completed</div>
+                    <div>{totalEntries > 0 ? ((totalCompleted / totalEntries) * 100).toFixed(1) : 0 }</div>
+                    <div className={'Label'}>Total: {totalCompleted}</div>
+                </div>
+                <div className={'Rounded-Container Stack-Container'}>
+                    <div className={'Label'}>% Started</div>
+                    <div>{totalEntries > 0 ? ((totalStarted / totalEntries) * 100).toFixed(1) : 0 }</div>
+                    <div className={'Label'}>Total: {totalStarted}</div>
+                </div>
+            </>}
         </section>
     );
 }
 
-const TaskTableContents = ({entries, isLoading = false, sortOrderDate = 1, sortOrderValue = 0, setEditedEntry, setIsVisibleNewEntryModal}) => {
-    const [pageNumber, setPageNumber] = useState(0);
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
-
-    if (isLoading) return (
-        <tbody>
-        <tr>
-            <td colSpan={3} className={styles.loadingIndicatorContainer}>
-                <LoadingIndicator size={"inline"} />
-            </td>
-        </tr>
-        </tbody>
-    )
-
-    if (entries.length === 0) return (
-        <tr>
-            <td colspan={3}>No entries</td>
-        </tr>
-    )
-
-    let sortedEntries;
-
-    if (sortOrderDate !== 0) {
-        sortedEntries = entries.sort((a, b) => {
-            const dA = Date.parse(a.date);
-            const dB = Date.parse(b.date);
-
-            return sortOrderDate * (dA - dB);
-        });
-    } else {
-        sortedEntries = entries.sort((a, b) => {
-            return sortOrderValue * (a.value - b.value);
-        });
-    }
-
-    const lastEntryNumber = () => {
-        if (entries.length - 5 * pageNumber > 5) return (pageNumber * 5  + 5);
-        return entries.length;
-    }
-
-    const increasePageNumber = () => {
-        setPageNumber(current => current + 1);
-    }
-    const decreasePageNumber = () => {
-        setPageNumber(current => current - 1);
-    }
-
-    const handleEditEntry = (entry) => {
-        setEditedEntry(entry);
-        setIsVisibleNewEntryModal(true);
-    }
-
-    return (
-        <>
-            <motion.tbody className={styles.tBody} key={pageNumber}>
-                        {sortedEntries.slice(pageNumber * 5, pageNumber * 5 + 5).map(entry => {
-                            const entryDate = new Date(entry.date);
-
-                            return <tr
-                                key={entry._id}
-                            >
-                                <td>{entryDate.toLocaleDateString()}</td>
-                                <td>{entry.value}</td>
-                                <td>
-                                    <IconButton onClick={() => handleEditEntry(entry)}>
-                                        <TbEdit />
-                                    </IconButton>
-                                </td>
-                            </tr>
-                        })}
-            </motion.tbody>
-            <tfoot>
-            <tr>
-                <td colSpan={3}>
-                    <div className={"Horizontal-Flex-Container Space-Between"}>
-                        <div>{pageNumber * 5 + 1}-{lastEntryNumber()} of {entries.length}</div>
-                        <div>
-                            <IconButton
-                                onClick={decreasePageNumber}
-                                disabled={pageNumber === 0}
-                            >
-                                <TbChevronLeft />
-                            </IconButton>
-                            <IconButton
-                                onClick={increasePageNumber}
-                                disabled={pageNumber === Math.floor(entries.length / 5)}
-                            >
-                                <TbChevronRight />
-                            </IconButton>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tfoot>
-        </>
-    )
-}
-
-const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates}) => {
+const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDates, task}) => {
     const [value, setValue] = useState(editedEntry ? editedEntry.value : '0');
     const [date, setDate] = useState(editedEntry ? new Date(editedEntry.date) : "");
     const [isVisibleCalendar, setIsVisibleCalendar] = useState(false);
@@ -194,13 +175,19 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
     const handleContinue = async () => {
         if (editedEntry) {
             if (date !== editedEntry.date || value !== editedEntry.value) {
-                await changeEntry({taskId, entryId: editedEntry._id, value, date});
+                const newDate = (new Date(date));
+                newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60)
+
+                await changeEntry({taskId, entryId: editedEntry._id, value, date: newDate});
             }
             if (!isErrorChange) {
                 dismountNewEntryModal();
             }
         } else {
-            await addEntry({date, value, taskId});
+            const newDate = (new Date(date));
+            newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60);
+
+            await addEntry({date: newDate, value, taskId});
             if (!isError) {
                 dismountNewEntryModal();
             }
@@ -249,13 +236,27 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
         );
     }
 
-    const disabledDates = () => {
+    const disabledDates = useMemo(() => {
+        const datesToDisable = [{after: new Date()}];
+
         if (editedEntry) {
             const editedEntryDate = new Date(editedEntry.date);
 
-            return entryDates.filter(date => editedEntryDate.getTime() !== date.getTime());
+            datesToDisable.push(...entryDates.filter(date => editedEntryDate.getTime() !== date.getTime()));
+        } else {
+            datesToDisable.push(...entryDates);
         }
-        return entryDates;
+
+        return datesToDisable;
+    }, [editedEntry, entryDates]);
+
+
+    const classNames = {...pickerStyles, day: styles.customDay, day_selected: styles.customSelectedDay}
+
+    const properDateStyles = { fontSize: "120%", fontWeight: "bold", opacity: 1 };
+
+    const tempFunction = (date) => {
+        return dateIsProper(date, task);
     }
 
     return (
@@ -273,16 +274,22 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
                         }
                     </div>
                 </div>
-                <div className={"Label"}>{editedEntry ?
-                    <div>
-                        The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
-                        <br />
-                        You can edit the entry below. {isToday && (<><br />You cannot delete today's entry, you can only reset it's value.</>)}
-                        <br />
-                        <TextButton onClick={resetToOriginalValues}>Reset to original values.</TextButton>
-                    </div>:
-                    "In order to create a new entry you need to enter a valid date and value."
-                }</div>
+                <div className={"Label"}>
+                    {editedEntry ?
+                        <div>
+                            The original date was {(new Date(editedEntry.date)).toLocaleDateString()} and the original value was {editedEntry.value}
+                            <br />
+                            You can edit the entry below. {isToday && (<><br />You cannot delete today's entry, you can only reset it's value.</>)}
+                            <br />
+                            <TextButton onClick={resetToOriginalValues}>Reset to original values.</TextButton>
+                        </div>:
+                        "In order to create a new entry you need to enter a valid date and value."
+                    }
+                    <br />
+                    <br />
+                    Note: Only dates that follow the rules stated when creating the entry will be counted towards the streak and other statistics.
+                    Such dates are marked on the calendar picker.
+                </div>
             </div>
             <div className={'Horizontal-Flex-Container Space-Between'}>
                 <InputWrapper label={"Date"}>
@@ -308,9 +315,12 @@ const EntryModal = ({dismountNewEntryModal, taskId, editedEntry = null, entryDat
                 <div className={'Horizontal-Flex-Container Align-Center'}>
                     <DayPicker
                         mode={"single"}
+                        classNames={classNames}
                         selected={date}
                         onDayClick={handleDateClick}
-                        disabled={disabledDates()}
+                        disabled={disabledDates}
+                        modifiers={{proper: tempFunction}}
+                        modifiersStyles={{proper: properDateStyles}}
                     />
                 </div>
             </CollapsibleContainer>
@@ -381,17 +391,6 @@ const ConfirmDeleteModal = ({dismountConfirmDeleteModal, deleteFunction, changeS
     );
 }
 
-const SortIcon = ({sortOrder}) => {
-    switch (sortOrder) {
-        case 0:
-            return <TbMinus/>
-        case 1:
-            return <TbChevronUp />
-        case -1:
-            return <TbChevronDown />
-    }
-}
-
 const TaskView = ({index, length, task}) => {
     const miniPagesContext = useContext(MiniPagesContext);
     const undoContext = useContext(UndoContext);
@@ -408,8 +407,6 @@ const TaskView = ({index, length, task}) => {
     const [editedEntry, setEditedEntry] = useState(null);
     const [isVisibleNewEntryModal, setIsVisibleNewEntryModal] = useState(false);
     const [isVisibleConfirmDeleteModal, setIsVisibleConfirmDeleteModal] = useState(false);
-    const [sortOrderDate, setSortOrderDate] = useState(-1); // -1 for most recent -> less recent, 1 for less recent -> most recent, 0 if sorting by other type.
-    const [sortOrderValue, setSortOrderValue] = useState(0);
 
     // const graphOptions = ['Average', 'Total'];
 
@@ -423,7 +420,7 @@ const TaskView = ({index, length, task}) => {
     // }
 
     const updateSettings = async () => {
-        await setSettings({...settings, confirmDeleteTask: false, priorityBounds: undefined});
+        await setSettings({...settings, priorityBounds: undefined});
     }
 
     const handleDelete = () => {
@@ -433,7 +430,7 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleDeleteClick = () => {
-        if (settings.confirmDeleteTask) { // check with user settings for prompt to delete task
+        if (settings.confirmDelete) { // check with user settings for prompt to delete task
             setIsVisibleConfirmDeleteModal(true);
         } else {
             handleDelete()
@@ -441,16 +438,16 @@ const TaskView = ({index, length, task}) => {
     }
 
     const handleSetCurrentValueCheckbox = () => {
-        setTaskCurrentEntry(task?._id, entry?._id, entry?.value === 0 ? 1 : 0);
+        setTaskCurrentEntry({taskId: task?._id, entryId: entry?._id, value: entry?.value === 0 ? 1 : 0});
     }
 
     const handleSetCurrentValueNumber = (e) => {
         const eventNumber = parseInt(e);
 
         if (isNaN(eventNumber) || eventNumber < 0) {
-            setTaskCurrentEntry(task?._id, entry._id, 0);
+            setTaskCurrentEntry({taskId: task?._id, entryId: entry._id, value: 0});
         } else {
-            setTaskCurrentEntry(task?._id, entry._id, eventNumber);
+            setTaskCurrentEntry({taskId: task?._id, entryId: entry._id, value: eventNumber});
         }
     }
 
@@ -465,38 +462,22 @@ const TaskView = ({index, length, task}) => {
         setIsVisibleConfirmDeleteModal(false);
     }
 
-    const handleChangeSortOrderValue = () => {
-        switch (sortOrderValue) {
-            case 0:
-                setSortOrderValue(-1);
-                setSortOrderDate(0);
-                break;
-            case 1:
-                setSortOrderValue(-1);
-                break;
-            case -1:
-                setSortOrderValue(1);
-                break;
-            default:
-                break;
-        }
-    }
+    const entriesWithIsProper = useMemo(() => {
+        if (entriesLoading) return;
 
-    const handleChangeSortOrderDate = () => {
-        switch (sortOrderDate) {
-            case 0:
-                setSortOrderDate(-1);
-                setSortOrderValue(0);
-                break;
-            case 1:
-                setSortOrderDate(-1);
-                break;
-            case -1:
-                setSortOrderDate(1);
-                break;
-            default:
-                break;
-        }
+        const allEntries = entries ? [...entries, entry] : [entry];
+
+        return allEntries.map(entry => {
+            const entryDate = new Date(entry.date);
+            entryDate.setUTCHours(0, 0, 0, 0);
+
+            return {...entry, isProperDate: dateIsProper(entryDate, task)}
+        })
+    }, [entries, entry, entriesLoading]);
+
+    const handleEditEntry = (entry) => {
+        setEditedEntry(entry);
+        setIsVisibleNewEntryModal(true);
     }
 
     return (
@@ -504,6 +485,7 @@ const TaskView = ({index, length, task}) => {
             <MiniPageContainer
                 index={index}
                 length={length}
+                showSaveButton={false}
             >
                 <section className={`Horizontal-Flex-Container Space-Between`}>
                     <div className={'Title'}>{task?.title}</div>
@@ -536,9 +518,7 @@ const TaskView = ({index, length, task}) => {
                             <TextBoxInput value={entry?.value ?? 0} setValue={handleSetCurrentValueNumber} type={"number"}></TextBoxInput>
                         </div>}
                 </section>
-                <Divider />
-                <StatSection entries={entries ? [...entries, entry] : [entry]} />
-                <Divider />
+                {task.repeats && <StatSection task={task} />}
                 {/*<section className={'Stack-Container'}>*/}
                 {/*    <div className={'Horizontal-Flex-Container'}>*/}
                 {/*        {graphOptions.map((option, index) => (*/}
@@ -564,60 +544,18 @@ const TaskView = ({index, length, task}) => {
                 {/*        </IconButton>*/}
                 {/*    </div>*/}
                 {/*</section>*/}
-                <section>
-                    <motion.table className={styles.table}>
-                        <thead>
-                        <tr>
-                            <th>
-                                <button className={styles.tableButton} onClick={handleChangeSortOrderDate}>
-                                    Date:
-                                    <AnimatePresence mode={"wait"}>
-                                        <motion.div
-                                            key={sortOrderDate}
-                                            initial={{scale: 0}}
-                                            animate={{scale: 1}}
-                                            exit={{scale: 0}}
-                                            transition={{duration: 0.1}}
-                                        >
-                                            <SortIcon sortOrder={sortOrderDate} />
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </button>
-                            </th>
-                            <th>
-                                <button className={styles.tableButton} onClick={handleChangeSortOrderValue}>
-                                    Value:
-                                    <AnimatePresence mode={"wait"}>
-                                        <motion.div
-                                            key={sortOrderValue}
-                                            initial={{scale: 0}}
-                                            animate={{scale: 1}}
-                                            exit={{scale: 0}}
-                                            transition={{duration: 0.1}}
-                                        >
-                                            <SortIcon sortOrder={sortOrderValue} />
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </button>
-                            </th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <TaskTableContents
-                            entries={entries ? [...entries, entry] : [entry]}
-                            sortOrderDate={sortOrderDate}
-                            isLoading={entriesLoading}
-                            sortOrderValue={sortOrderValue}
-                            setEditedEntry={setEditedEntry}
-                            setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
-                        />
-                    </motion.table>
-
-                </section>
+                {task.repeats && <section>
+                    <Table
+                        entries={entriesWithIsProper}
+                        entriesLoading={entriesLoading}
+                        setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
+                        handleEditEntry={handleEditEntry}
+                    />
+                </section>}
                 <section className={'Horizontal-Flex-Container Space-Between'}>
-                    <Button onClick={() => setIsVisibleNewEntryModal(true)}>
-                        Add new entry <TbPlus />
-                    </Button>
+                    {task.repeats && <Button onClick={() => setIsVisibleNewEntryModal(true)}>
+                        Add new entry <TbPlus/>
+                    </Button>}
                     <div className={'Label Stack-Container'}>
                         <div>Created at:</div>
                         <div>{" " + new Date(task?.createdAt).toLocaleString()}</div>
@@ -630,6 +568,7 @@ const TaskView = ({index, length, task}) => {
                     taskId={task?._id}
                     editedEntry={editedEntry}
                     entryDates={!entriesLoading ? [...entries, entry].map(tempEntry => new Date(tempEntry.date)) : [new Date(entry.date)]}
+                    task={task}
                 />}
             {isVisibleConfirmDeleteModal &&
                 <ConfirmDeleteModal

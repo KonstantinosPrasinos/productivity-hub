@@ -15,8 +15,24 @@ import {useNavigate} from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
 import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin, TbBrandGoogle} from "react-icons/tb";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
+import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
+import Divider from "@/components/utilities/Divider/Divider";
 
 const Settings = () => {
+    const deleteTimeGroupActions = [
+        {display: "Keep repeat", actual: 'Keep their repeat details'},
+        {display: "Remove repeat", actual: 'Remove their repeat details'},
+        {display: "Delete them", actual: 'Delete them'}
+    ]
+
+    const getDeleteActionDefault = () => {
+        for (const action of deleteTimeGroupActions) {
+            if (action.actual === settings.defaults.deleteGroupAction) return action;
+        }
+
+        return deleteTimeGroupActions[0];
+    }
+
     const {data: settings} = useGetSettings();
     const {email, googleLinked} = useContext(UserContext).state;
     const {mutateAsync: setSettings, isError: isErrorSetSettings} = useChangeSettings();
@@ -24,7 +40,8 @@ const Settings = () => {
     const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
 
     const [selectedTheme, setSelectedTheme] = useState(settings.theme);
-    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDeleteTask);
+    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
+    const [deleteAction, setDeleteAction] = useState(getDeleteActionDefault());
     const [priority, setPriority] = useState(settings.defaults.priority)
     const [goal, setGoal] = useState(settings.defaults.goal);
     const [step, setStep] = useState(settings.defaults.step);
@@ -42,7 +59,15 @@ const Settings = () => {
 
     const handleSaveChanges = async () => {
         if (!isErrorSetSettings) {
-            await setSettings({theme: selectedTheme, confirmDeleteTask, defaults: {step, goal, priority}});
+            let tempDeleteAction;
+
+            if (typeof deleteAction === "string") {
+                tempDeleteAction = deleteAction
+            } else {
+                tempDeleteAction = deleteAction.actual
+            }
+
+            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority, deleteGroupAction: tempDeleteAction}});
             setSettingsChanges({});
         }
     }
@@ -67,8 +92,8 @@ const Settings = () => {
     }
 
     const handleSetConfirmDelete = () => {
-        if (settings.confirmDeleteTask !== !confirmDelete) {
-            setSettingsChanges({...settingsChanges, confirmDeleteTask: !confirmDelete});
+        if (settings.confirmDelete !== !confirmDelete) {
+            setSettingsChanges({...settingsChanges, confirmDelete: !confirmDelete});
         } else {
             setSettingsChanges((current) => {
                 const {confirmDelete, ...rest} = current;
@@ -78,6 +103,19 @@ const Settings = () => {
         }
 
         setConfirmDelete(!confirmDelete);
+    }
+
+    const handleSetDeleteAction = (action) => {
+        if (settings.defaults.deleteGroupAction !== action.actual) {
+            setSettingsChanges({...settingsChanges, deleteGroupAction: action.actual})
+        } else {
+            setSettingsChanges((current) => {
+                const {deleteGroupAction, ...rest} = current;
+
+                return rest;
+            });
+        }
+        setDeleteAction(action);
     }
 
     const handleSetPriority = (e) => {
@@ -118,6 +156,7 @@ const Settings = () => {
             });
         }
     }
+
     const handleChangeEmail = () => {
         navigate('/change-email')
     }
@@ -179,25 +218,24 @@ const Settings = () => {
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}
-            transition={{duration: 0.2}}
         >
-            <div className={`Stack-Container To-Edge ${styles.subContainer}`}>
-                <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>Profile</div>
+            <div className={`Stack-Container To-Edge ${styles.subContainer} Huge-Gap`}>
+                <section className={`Stack-Container Big-Gap ${styles.firstSection}`}>
+                    <div className={`Headline-Large`}>Profile</div>
                     <div className={'Stack-Container Big-Gap'}>
                         <div className={'Stack-Container'}>
-                            <div className={'Horizontal-Flex-Container'}>Logout</div>
-                            <div className={`Horizontal-Flex-Container Space-Between`}>
-                                <div className={'Label'}>Disconnect your account from this device.</div>
+                            <div className={'Title-Small'}>Logout</div>
+                            <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Disconnect your account from this device.</div>
                                 <Button filled={false} size={'small'} onClick={handleLogOut}>Logout</Button>
                             </div>
                         </div>
-                        <div className={styles.subSectionTitle}>Account Details</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Large'}>Account Details</div>
+                        <section className={`Stack-Container`}>
                             {googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><TbBrandGoogle/>Google Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                <div className={'Horizontal-Flex-Container Title-Small'}><TbBrandGoogle/>Google Account</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
                                         You are connected using a Google Account with the following email address:
                                         <br />
                                         {email}
@@ -205,9 +243,9 @@ const Settings = () => {
                                 </div>
                             </div>}
                             {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}><TbMail/>Email</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                <div className={'Horizontal-Flex-Container Title-Small'}><TbMail/>Email</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
                                         {email}
                                         <br/>
                                         Note: if you change your email, you will be logged out.
@@ -216,9 +254,9 @@ const Settings = () => {
                                 </div>
                             </div>}
                             {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Change Password</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>
+                                <div className={'Title-Small'}>Change Password</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
                                         Change the password you use when logging in using your email.
                                         <br/>
                                         Note: this action will log you out.
@@ -227,39 +265,40 @@ const Settings = () => {
                                 </div>
                             </div>}
                         </section>
-                        <div className={styles.subSectionTitle}>Danger Zone</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Large'}>Danger Zone</div>
+                        <section className={`Stack-Container`}>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Delete Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>Delete all the data of your account.</div>
+                                <div className={'Title-Small'}>Delete Account</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Delete all the data of your account.</div>
                                     <Button filled={false} size={'small'} onClick={toggleDeleteAccountModal} isWarning={true}>Delete</Button>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Reset Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>Keep your account but delete all the task data and reset settings.</div>
+                                <div className={'Title-Small'}>Reset Account</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Keep your account but delete all the task data and reset settings.</div>
                                     <Button filled={false} size={'small'} onClick={toggleResetAccountModal} isWarning={true}>Reset</Button>
                                 </div>
                             </div>
                         </section>
                     </div>
                 </section>
+                <Divider />
                 <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>General</div>
+                    <div className={`Headline-Large`}>General</div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>App Theme</div>
-                        <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>The color theme the app uses.</div>
+                        <div className={'Title-Small'}>App Theme</div>
+                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The color theme the app uses.</div>
                             <div className={'Horizontal-Flex-Container'}>{themeChips.map(theme =>
                                 <Chip key={theme} value={theme} selected={selectedTheme} setSelected={handleSetTheme}>{theme}</Chip>)}
                             </div>
                         </div>
 
-                        <div className={'Horizontal-Flex-Container'}>Show confirm prompt on delete</div>
-                        <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>
+                        <div className={'Title-Small'}>Show confirm prompt on delete</div>
+                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody} `}>
+                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
                                 Show a prompt to confirm your action when deleting a task or category.
                                 <br />
                                 Note: regardless of this option, an undo button appears for 10 seconds after deletion.
@@ -268,40 +307,75 @@ const Settings = () => {
                                 <ToggleButton isToggled={confirmDelete} setIsToggled={handleSetConfirmDelete} />
                             </div>
                         </div>
-
-                        <div className={styles.subSectionTitle}>Input Fields Default</div>
-                        <section className={`Stack-Container ${styles.subSection}`}>
+                        <div className={'Title-Small'}>Delete time-group action</div>
+                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
+                                What happens to tasks whose time group parent is deleted
+                            </div>
+                            <div className={'Horizontal-Flex-Container'}>
+                                <DropDownInput placeholder={"Keep repeat"} selected={deleteAction.display}>
+                                    {deleteTimeGroupActions.map(action => (
+                                        <button key={action.display} className={"DropDownOption"} onClick={() => handleSetDeleteAction(action)}>
+                                            {action.display}
+                                        </button>
+                                    ))}
+                                </DropDownInput>
+                            </div>
+                        </div>
+                        <div className={'Title-Large'}>Input Fields Default Values</div>
+                        <section className={`Stack-Container`}>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Priority</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value all fields labeled priority are filled by default.</div>
+                                <div className={'Title-Small'}>Priority</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value all fields labeled priority are filled by default.</div>
                                     <TextBoxInput type={'number'} value={priority} setValue={handleSetPriority}></TextBoxInput>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Number Task Step</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value the step field in a “number” task is filled by default.</div>
+                                <div className={'Title-Small'}>Number Task Step</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value the step field in a “number” task is filled by default.</div>
                                     <TextBoxInput type={'number'} value={step} setValue={handleSetStep}></TextBoxInput>
                                 </div>
                             </div>
                             <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container'}>Goal Number</div>
-                                <div className={`Horizontal-Flex-Container Space-Between`}>
-                                    <div className={'Label'}>The value the goal fields are filled by default. </div>
+                                <div className={'Title-Small'}>Goal Number</div>
+                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value the goal fields are filled by default. </div>
                                     <TextBoxInput type={'number'} value={goal} setValue={handleSetGoal}></TextBoxInput>
                                 </div>
                             </div>
                         </section>
                     </div>
                 </section>
+                <Divider />
                 <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Horizontal-Flex-Container Title`}>About</div>
-                    <div className={'Horizontal-Flex-Container'}>App Version<div className={'Label'}>1.0</div></div>
+                    <div className={`Headline-Large`}>Keyboard Shortcuts</div>
+                    <div className={styles.keyBindsContainer}>
+                        <div>Create new task</div>
+                        <div className={"Horizontal-Flex-Container Small-Gap"}>
+                            <div className={styles.emptyChip}>Ctrl</div>
+                            <div className={styles.emptyChip}>Enter</div>
+                        </div>
+
+                        <div>Create new category</div>
+                        <div className={styles.keyBindsComboContainer}>
+                            <div className={styles.emptyChip}>Ctrl</div>
+                            <div className={styles.emptyChip}>\</div>
+                        </div>
+
+                        <div>Close all pages</div>
+                        <div className={styles.emptyChip}>Esc</div>
+                    </div>
+                </section>
+                <Divider />
+                <section className={'Stack-Container Big-Gap'}>
+                    <div className={`Headline-Large`}>About</div>
+                    <div className={'Title-Small'}>App Version<div className={'Body-Small Opacity-Very-Low'}>1.0</div></div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>App Details</div>
-                        <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>
+                        <div className={'Title-Small'}>App Details</div>
+                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                            <div className={'Body-Small Opacity-Very-Low'}>
                                 Available as a Web App, on Android and on Windows.
                                 You can view the source code for this
                                 app <a href={"https://github.com/KonstantinosPrasinos/productivity-hub"} target="_blank">on github</a>.
@@ -309,9 +383,9 @@ const Settings = () => {
                         </div>
                     </div>
                     <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Horizontal-Flex-Container'}>About the App Creator</div>
-                        <div className={`Horizontal-Flex-Container Space-Between`}>
-                            <div className={'Label'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
+                        <div className={'Title-Small'}>About the App Creator</div>
+                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
+                            <div className={'Body-Small Opacity-Very-Low'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
                         </div>
                         <div className={'Horizontal-Flex-Container'}>
                             <IconButton onClick={handleGithubClick}><TbBrandGithub/></IconButton>
@@ -320,7 +394,6 @@ const Settings = () => {
                         </div>
                     </div>
                 </section>
-
                 {/* Modal for password confirmation in order to delete account*/}
                 {deleteModalVisible && <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
                     <div className={'Stack-Container Big-Gap'} >
@@ -335,7 +408,7 @@ const Settings = () => {
                             setValue={setCurrentPassword}
                         />
                     </div>
-                    <div className={`Horizontal-Flex-Container Space-Between`}>
+                    <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
                         <Button
                             size={'large'}
                             filled={false}
@@ -368,7 +441,7 @@ const Settings = () => {
                             setValue={setCurrentPassword}
                         />
                     </div>
-                    <div className={`Horizontal-Flex-Container Space-Between`}>
+                    <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
                         <Button
                             size={'large'}
                             filled={false}
@@ -394,7 +467,6 @@ const Settings = () => {
                     <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className={styles.saveSettingsContainer}>
                         <Button onClick={handleSaveChanges}>Save changes</Button>
                     </motion.div>
-
                 }
             </AnimatePresence>
         </motion.div>

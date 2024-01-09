@@ -10,11 +10,7 @@ const Settings = new mongoose.Schema({
         type: String,
         default: 'Light'
     },
-    confirmDeleteTask: {
-        type: Boolean,
-        default: true
-    },
-    confirmDeleteGroup: {
+    confirmDelete: {
         type: Boolean,
         default: true
     },

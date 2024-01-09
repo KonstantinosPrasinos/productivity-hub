@@ -5,10 +5,12 @@ export const MiniPagesContext = createContext();
 export const miniPagesReducer = (state, action) => {
     switch (action.type) {
         case 'ADD_PAGE':
-            if (state.filter(page => page.type === action.payload.type && page.id === action.payload.id).length === 0){
+            // Only allow one page of the same type at a time
+            if (state.find(page => page.type === action.payload.type)) {
+                return [...state.filter(page => page.type !== action.payload.type), action.payload]
+            } else {
                 return [...state, action.payload];
             }
-            return state;
         case 'REMOVE_PAGE':
             return state.filter((_, i) => i !== state.length - 1)
         case 'REMOVE_SPECIFIC_PAGE':

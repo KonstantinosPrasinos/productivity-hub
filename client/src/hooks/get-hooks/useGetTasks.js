@@ -1,4 +1,7 @@
 import {useQuery, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {UserContext} from "@/context/UserContext";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const fetchTasks = async () => {
     const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/task`, {
@@ -8,7 +11,7 @@ const fetchTasks = async () => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to get tasks from server');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,9 +20,12 @@ const fetchTasks = async () => {
 
 export function useGetTasks() {
     const queryClient = useQueryClient();
+    const user = useContext(UserContext);
+    const alertsContext = useContext(AlertsContext);
 
     const queryObject = useQuery(["tasks"], fetchTasks, {
         staleTime: 30 * 60 * 60 * 1000,
+        enabled: user.state?.id !== undefined,
         onSuccess: (data) => {
             // Update the priority lowest and highest used value
             queryClient.setQueryData(["settings"], (oldData) => {
@@ -33,6 +39,9 @@ export function useGetTasks() {
                     }
                 }
             });
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to get tasks"}})
         }
     });
 

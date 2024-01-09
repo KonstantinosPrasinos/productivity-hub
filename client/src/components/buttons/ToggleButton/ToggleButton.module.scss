@@ -1,11 +1,15 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
-    border-radius: $button-border-radius;
+    border-radius: v.$button-border-radius;
     height: 1.5em;
     width: 2.25em;
     background-color: var(--primary-color);
     cursor: pointer;
+    font-size: v.$font-m;
+    position: relative;
+    display: flex;
+    align-items: center;
 
     &::before {
         width: 1em;
@@ -13,15 +17,14 @@
         background-color: var(--on-primary-color);
         content: '';
         display: inline-block;
-        border-radius: $button-border-radius;
-        transform: translate(0.25em, 0.25em);
-        vertical-align: top;
+        border-radius: v.$button-border-radius;
+        transform: translateX(0.25em);
         transition: transform 0.2s, width 0.2s, height 0.2s;
     }
 
     &.active {
         &::before {
-            transform: translate(1em, 0.25em);
+            transform: translateX(1em);
 
             &:hover {
                 background-color: red;
@@ -33,13 +36,12 @@
         &::before {
             height: 1.1em;
             width: 1.1em;
-            transform: translate(0.25em, 0.2em)
         }
         &.active {
             &::before {
                 height: 1.1em;
                 width: 1.1em;
-                transform: translate(0.95em, 0.2em)
+                transform: translateX(0.95em)
             }
             
         }

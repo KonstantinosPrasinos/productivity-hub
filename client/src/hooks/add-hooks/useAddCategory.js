@@ -1,4 +1,6 @@
 import {useMutation, useQueryClient} from "react-query";
+import {useContext} from "react";
+import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postCategory = async (data) => {
     const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/category/create`, {
@@ -9,7 +11,7 @@ const postCategory = async (data) => {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to add category to server');
+        throw new Error((await response.json()).message);
     }
 
     return response.json();
@@ -17,6 +19,7 @@ const postCategory = async (data) => {
 
 export function useAddCategory() {
     const queryClient = useQueryClient();
+    const alertsContext = useContext(AlertsContext);
 
     return useMutation({
         mutationFn: postCategory,
@@ -39,6 +42,9 @@ export function useAddCategory() {
                     } : oldData
                 });
             }
+        },
+        onError: err => {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to create category"}})
         }
     })
 }

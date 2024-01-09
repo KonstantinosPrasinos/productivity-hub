@@ -1,0 +1,38 @@
+@use "@/styles/variables" as v;
+
+.tBody {
+  height: auto;
+}
+
+.isProperDate {
+  text-decoration: underline;
+}
+
+.tableLoading {
+  & > tr:not(:last-child) > td {
+    border-bottom: none;
+  }
+}
+
+.table {
+  height: auto;
+  tr {
+    td {
+      width: 40%;
+      &:last-child:not(:nth-child(2)) {
+        width: 10%;
+      }
+      &:first-child {
+        width: 50%;
+      }
+    }
+  }
+}
+
+.tableButton {
+  display: flex;
+  //font-weight: bold;
+  align-items: center;
+  font-size: v.$font-m;
+  gap: 6px;
+}

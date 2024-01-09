@@ -7,8 +7,10 @@
 
 .bigContainer {
   display: grid;
-  grid-template: 1fr / 1 fr;
-  overflow: hidden;
+  grid-template: 100% / 100%;
+  //overflow: hidden;
+  max-height: 100%;
+  overflow-x: visible;
   width: 100%;
   justify-content: center;
 

@@ -1,4 +1,4 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 $base-size: 1.2em;
 
 .checkbox {
@@ -21,32 +21,28 @@ $base-size: 1.2em;
 .loadingIndicatorContainer {
   text-align: center;
   box-sizing: border-box;
-}
-
-.tableButton {
-  display: flex;
-  font-weight: bold;
-  align-items: center;
-  font-size: $font-m;
-  gap: 6px;
+  padding: 7.8px; // + 1.6 * rows (6)  / 2
 }
 
 .editIcons {
-  font-size: $font-xl;
+  font-size: v.$font-xl;
 }
 
-.table {
-  height: auto;
-  tr {
-    td {
-      width: 45%;
-    }
-    &:last-of-type(td) {
-      width: 10%;
-    }
+.customDay {
+  opacity: 0.87;
+  border-radius: 500px;
+  border: 6px solid transparent;
+  width: 2em;
+
+  &:hover:not(.customSelectedDay) {
+    background-color: var(--border-primary-color) !important;
+    border-color: var(--border-primary-color);
+
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
   }
 }
 
-.tBody {
-  height: auto;
+.customSelectedDay {
+  background-color: var(--primary-color) !important;
+  color: var(--on-primary-color);
 }

@@ -1,7 +1,7 @@
-@import 'src/styles/variables.scss';
+@use "@/styles/variables" as v;
 
 .container {
   width: 100%;
-  border-top: $base-border;
+  border-top: v.$base-border;
   display: block;
 }

@@ -21,7 +21,7 @@ export function findStartingDates(timePeriod, smallTimePeriods) {
                 break;
         }
         startingDate.setUTCHours(0, 0, 0, 0);
-        startingDates.push(startingDate.getTime());
+        startingDates.push(startingDate);
     });
 
     return startingDates;

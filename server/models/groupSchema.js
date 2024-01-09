@@ -9,15 +9,9 @@ const Group = new mongoose.Schema({
         type: String,
         required: true
     },
-    priority: {
-        type: Number,
-        required: true
-    },
     repeatRate: {
-        number: Number,
-        bigTimePeriod: String,
         smallTimePeriod: [String],
-        startingDate: [Number],
+        startingDate: [Date],
         time: {
             start: String,
             end: String

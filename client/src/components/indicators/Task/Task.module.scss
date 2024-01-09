@@ -3,13 +3,16 @@
 @use '@/styles/mixins' as m;
 
 .container {
-  @extend .Rounded-Container, .Stack-Container, .Has-Shadow;
+  @extend .Rounded-Container, .Stack-Container, .Has-Shadow, .Has-Hover;
 
   display: inline-flex;
   position: relative;
-  width: 22.15em;
+  width: 100%;
   padding: v.$symmetrical-padding;
   gap: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  opacity: 0;
 }
 
 .topLine {
@@ -70,11 +73,7 @@
   }
 
   width: 100%;
-  display: grid;
-  grid-template-columns: 15% 15%;
-  grid-template-rows: repeat(auto-fill, auto);
-  grid-row-gap: 0;
-  grid-column-gap: 0.5em;
+  gap: 0.5em;
 
   & > div {
     text-overflow: ellipsis;
@@ -83,5 +82,12 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
+    width: 14%;
+
+    &.repeatSeparator {
+      text-align: center;
+      width: auto;
+    }
   }
 }
+

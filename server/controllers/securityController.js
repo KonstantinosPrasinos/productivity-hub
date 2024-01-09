@@ -192,4 +192,30 @@ const changeEmailVerifyCode = async (req, res) => {
     }
 }
 
-module.exports = {resetPasswordSendCode, resetPasswordResendCode, resetPasswordVerifyCode, resetPasswordSetPassword, changeEmailVerifyPassword,changeEmailSendCode, changeEmailVerifyCode, changeEmailResendCode};
+const registerVerifyCode = async (req, res) => {
+    const {email, code} = req.body;
+
+    const {verificationError, errorCode} = checkVerificationCode(email, code);
+
+    if (verificationError) {
+        return res.status(errorCode).json({message: verificationError});
+    }
+
+    try {
+        await User.findOneAndUpdate({"local.email": email}, {$set: {active: true}});
+    } catch (error) {
+        return res.status(400).json({message: error.message});
+    }
+
+    return res.status(200).json({message: "Account created successfully."});
+}
+
+const registerResendCode = async (req, res) => {
+    const {email} = req.body;
+
+    await sendEmail(email, 'setEmail');
+
+    return res.status(200).json({message: 'Email verification code sent.'});
+}
+
+module.exports = { registerVerifyCode, registerResendCode, resetPasswordSendCode, resetPasswordResendCode, resetPasswordVerifyCode, resetPasswordSetPassword, changeEmailVerifyPassword,changeEmailSendCode, changeEmailVerifyCode, changeEmailResendCode};

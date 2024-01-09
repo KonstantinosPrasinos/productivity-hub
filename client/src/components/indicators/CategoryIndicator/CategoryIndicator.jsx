@@ -22,15 +22,20 @@ const CategoryIndicator = ({categoryId, groupId}) => {
         return groups?.find(group => group._id === groupId)
     }
 
-    const category = useMemo(findCategory, [categoriesLoading]);
+    const category = useMemo(findCategory, [categoriesLoading, categories]);
 
-    const group = useMemo(findGroup, [groupsLoading]);
+    const group = useMemo(findGroup, [groupsLoading, groups]);
+
+    const handleClick = (event) => {
+        event.stopPropagation();
+        miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}})
+    }
 
     return (
         <>
             {category && <button
                 className={`${styles.container} Horizontal-Flex-Container ${category.color}`}
-                onClick={() => miniPagesContext.dispatch({type: 'ADD_PAGE', payload: {type: 'category-view', id: category._id}})}
+                onClick={handleClick}
             >
                 <div className={styles.text}>{category.title}</div>
                 {group && <div>|</div>}
