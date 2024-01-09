@@ -305,7 +305,7 @@ const NewTask = ({index, length, id}) => {
                     onKeyDown={handleKeyDown}
                     ref={titleRef}
                 />
-                <InputWrapper label={"Category"}>
+                <InputWrapper label={"Category"} tooltipMessage={"Only categories that don't repeat show up here"}>
                     <DropDownInput
                         placeholder={'None'}
                         selected={category?.title}
@@ -349,7 +349,7 @@ const NewTask = ({index, length, id}) => {
                     extendedInherited={isNumberTask}
                     hasPointer={false}
                 >
-                    <InputWrapper label="Step">
+                    <InputWrapper label="Step" tooltipMessage={"How much the number increases every time"}>
                         <TextBoxInput type="number" placeholder="Step" value={step} setValue={setStep} minNumber={1} maxNumber={999} />
                     </InputWrapper>
                     <HeaderExtendContainer
@@ -431,7 +431,7 @@ const NewTask = ({index, length, id}) => {
                                 ))}
                             </DropDownInput>
                         </InputWrapper>
-                        <InputWrapper label={'On'}>
+                        <InputWrapper label={'On'} tooltipMessage={"Required: repeat rate bigger than \"day\""}>
                             <Button onClick={toggleDateModal} disabled={timePeriod === "Days"} size={"small"}>Select dates</Button>
                         </InputWrapper>
                         <HeaderExtendContainer

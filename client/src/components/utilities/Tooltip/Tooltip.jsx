@@ -3,6 +3,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import IconButton from "@/components/buttons/IconButton/IconButton.jsx";
 import {TbInfoCircle, TbX} from "react-icons/tb";
 import styles from "./Tooltip.module.scss";
+import {createPortal} from "react-dom";
 
 const variants = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -46,23 +47,23 @@ const Tooltip = ({message}) => {
             const windowWidth = window.innerWidth;
 
             // Tooltip scale is set to 0.8 at the start so compensate for that.
-            const tooltipActualWidth = 1.25 * tooltipRect.width;
-            const tooltipActualHeight = 1.25 * tooltipRect.height;
+            const tooltipActualWidth = 1.11 * tooltipRect.width;
+            const tooltipActualHeight = 1.11 * tooltipRect.height;
 
             // Account for it going out the left or right.
-            if (buttonRect.right + tooltipRect.width / 2 + fontSize > windowWidth) {
+            if (buttonRect.x + buttonRect.width + tooltipActualWidth / 2 + fontSize > windowWidth) {
                 tooltipRef.current.style.right = `${windowWidth - fontSize}px`;
-            } else if (buttonRect.left - tooltipActualWidth - fontSize / 2 < 0) {
+            } else if (buttonRect.x - tooltipActualWidth - fontSize / 2 < 0) {
                 tooltipRef.current.style.left = `${fontSize}px`;
             } else {
-                tooltipRef.current.left = `${buttonRect.left + buttonRect.width / 2 - tooltipActualWidth / 2}px`;
+                tooltipRef.current.style.left = `${buttonRect.x + buttonRect.width / 2 - tooltipActualWidth / 2}px`;
             }
 
             // Account for it going out the top.
-            if (buttonRect.top - tooltipRect.height - fontSize < 0) {
-                tooltipRef.current.style.top = `${buttonRect.bottom + fontSize * 0.5}px`;
+            if (buttonRect.y - tooltipActualHeight - fontSize < 0) {
+                tooltipRef.current.style.top = `${buttonRect.y + buttonRect.height + fontSize * 0.5}px`;
             } else {
-                tooltipRef.current.style.top = `${buttonRect.top - tooltipActualHeight - 0.5 * fontSize}px`;
+                tooltipRef.current.style.top = `${buttonRect.y - tooltipActualHeight - 0.5 * fontSize}px`;
             }
 
             // When the user makes an interaction with anything except the tooltip, hide it.
@@ -88,7 +89,7 @@ const Tooltip = ({message}) => {
             >
                 <TbInfoCircle />
             </button>
-            <AnimatePresence>
+            {createPortal(<AnimatePresence>
                 {
                     tooltipVisible &&
                     tooltipVisible &&
@@ -103,11 +104,11 @@ const Tooltip = ({message}) => {
                     >
                         <span>{message}</span>
                         <IconButton onClick={closeToolTip}>
-                            <TbX />
+                            <TbX/>
                         </IconButton>
                     </motion.div>
                 }
-            </AnimatePresence>
+            </AnimatePresence>, document.getElementById("app") ?? document.getElementById("root"))}
         </>
     );
 };
