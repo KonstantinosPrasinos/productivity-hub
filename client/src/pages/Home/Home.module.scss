@@ -1,3 +1,5 @@
+@use '@/styles/variables' as v;
+
 .container {
   display: flex;
   flex-direction: row;
@@ -10,4 +12,11 @@
 
 .rightSide {
   flex: 2;
+}
+
+@media (min-width: v.$phone-breakpoint) and (max-width: v.$desktop-breakpoint) {
+  .container {
+    justify-content: flex-start;
+    padding-top: 2em;
+  }
 }
