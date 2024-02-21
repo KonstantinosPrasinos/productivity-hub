@@ -1,4 +1,4 @@
-const server = require('../server');
+const server = require('../index');
 const request = require('supertest');
 const mongoose = require('mongoose');
 
