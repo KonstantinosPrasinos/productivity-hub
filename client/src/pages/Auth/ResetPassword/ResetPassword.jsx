@@ -2,7 +2,6 @@ import {useContext, useEffect, useState} from 'react';
 import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../../components/buttons/Button/Button";
 import {useNavigate} from "react-router-dom";
-import PasswordStrengthBar from "react-password-strength-bar";
 import {AlertsContext} from "../../../context/AlertsContext";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
@@ -10,6 +9,7 @@ import Modal from "../../../components/containers/Modal/Modal";
 import {UserContext} from "../../../context/UserContext";
 import {useResetPassword} from "../../../hooks/auth-hooks/useResetPassword";
 import {useQueryClient} from "react-query";
+import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
 
 const ResetPassword = () => {
     const user = useContext(UserContext);
@@ -20,7 +20,7 @@ const ResetPassword = () => {
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [reEnterPassword, setReEnterPassword] = useState('');
-    const [passwordScore, setPasswordScore] = useState();
+    const [passwordScore, setPasswordScore] = useState(0);
     const [verificationCode, setVerificationCode] = useState('');
 
     const {sendCode, verifyCode, setPassword} = useResetPassword();
@@ -113,10 +113,6 @@ const ResetPassword = () => {
         await sendCode(user.state?.id ? user.state?.email : email);
     }
 
-    const handlePasswordScore = (score) => {
-        setPasswordScore(score);
-    }
-
     const checkIfContinueActive = () => {
         switch (currentPage) {
             case 0:
@@ -205,7 +201,7 @@ const ResetPassword = () => {
                         setValue={setNewPassword}
                         invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
                     />
-                    <PasswordStrengthBar password={newPassword} onChangeScore={handlePasswordScore} style={{padding: '0 10px', marginTop: 0}} />
+                    <PasswordStrengthBar password={newPassword} setPasswordScore={setPasswordScore} />
                     <TextBoxInput
                         type={'password'}
                         width={'max'}

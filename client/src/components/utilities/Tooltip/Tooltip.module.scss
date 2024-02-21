@@ -1,0 +1,17 @@
+@use "@/styles/index";
+
+.container {
+  @extend .Horizontal-Flex-Container, .Space-Between, .Rounded-Container, .Has-Shadow;
+
+  width: 15em;
+  position: fixed;
+  top: -100vh;
+  left: -100vh;
+  z-index: 1000;
+}
+
+.tooltipButton {
+  flex-grow: 0;
+  width: min-content;
+  height: min-content;
+}

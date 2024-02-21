@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from "./TimeInput.module.scss";
 import {TbClock} from "react-icons/all";
 import IconButton from "@/components/buttons/IconButton/IconButton";
-import {debounce} from "lodash";
+import debounce from "lodash/debounce.js";
 import {createPortal} from "react-dom";
 
 const TimeInput = ({hour = "11", setHour, minute = "11", setMinute, isDisabled = false}) => {

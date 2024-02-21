@@ -23,6 +23,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import TextSwitchContainer from "../../components/containers/TextSwitchContainer/TextSwitchContainer";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
+import Tooltip from "@/components/utilities/Tooltip/Tooltip.jsx";
 
 const Playground = () => {
   const alertsContext = useContext(AlertsContext);
@@ -57,6 +58,7 @@ const Playground = () => {
 
   return (
     <div className={styles.container}>
+        <Tooltip message={"This is a messageThis is a messageThis is a messageThis is a messageThis is a message"} />
         <InputWrapper label={"Alerts"}>
             <Button
                 onClick={() => {
@@ -131,28 +133,6 @@ const Playground = () => {
             </InputWrapper>
         </InputWrapper>
 
-        {/*<InputWrapper label={"Color Input"}>*/}
-        {/*    <ColorInput />*/}
-        {/*</InputWrapper>*/}
-
-        {/*<InputWrapper label={"Drop Down Input"}>*/}
-        {/*    <DropDownInput options={["Option1", "Option2", "Option3"]}></DropDownInput>*/}
-        {/*</InputWrapper>*/}
-
-        {/*<InputWrapper label={"Time Period Input"}>*/}
-        {/*    <div className={styles.alignTopContainer}>*/}
-        {/*        <InputWrapper label={"In a week"}>*/}
-        {/*            <TimePeriodModal timePeriod={"Weeks"} />*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"In a month"}>*/}
-        {/*            <TimePeriodModal timePeriod={"Months"} />*/}
-        {/*        </InputWrapper>*/}
-        {/*        <InputWrapper label={"In a year"}>*/}
-        {/*            <TimePeriodModal timePeriod={"Years"} />*/}
-        {/*        </InputWrapper>*/}
-        {/*    </div>*/}
-        {/*</InputWrapper>*/}
-
         <InputWrapper label={"Normal Button Styles"}>
             <div className={styles.alignTopContainer}>
                 <InputWrapper label={"Default (size: medium, filled: true, type: round)"}>
@@ -213,6 +193,9 @@ const Playground = () => {
             <LoadingIndicator type={"dots"} indicatorSize={"large"} />
             <LoadingIndicator type={"dots"} invertColors={true} />
             <LoadingIndicator type={"dots"} size={"inline"} />
+        </InputWrapper>
+        <InputWrapper label={"Tooltip"}>
+            <Tooltip message={"This is a messageThis is a messageThis is a messageThis is a messageThis is a message"} />
         </InputWrapper>
 
       {/*<Button onClick={() => console.log("Clicked!")}>*/}

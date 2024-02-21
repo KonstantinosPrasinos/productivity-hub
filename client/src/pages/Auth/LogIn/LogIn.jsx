@@ -5,7 +5,6 @@ import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
 import CollapsibleContainer from "../../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import {useNavigate} from "react-router-dom";
 import {AlertsContext} from "../../../context/AlertsContext";
-import PasswordStrengthBar from "react-password-strength-bar";
 import SwitchContainer from "../../../components/containers/SwitchContainer/SwitchContainer";
 import {useVerify} from "../../../hooks/useVerify";
 import TextButton from "../../../components/buttons/TextButton/TextButton";
@@ -14,6 +13,7 @@ import {UserContext} from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
 import GoogleSignInButton from "../../../components/utilities/GoogleSignInButton/GoogleSignInButton";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
+import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -26,7 +26,7 @@ const LogIn = () => {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
 
-    const [passwordScore, setPasswordScore] = useState();
+    const [passwordScore, setPasswordScore] = useState(0);
     const alertsContext = useContext(AlertsContext);
     const user = useContext(UserContext).state;
     const navigate = useNavigate();
@@ -100,10 +100,6 @@ const LogIn = () => {
         }
     }
 
-    const handlePasswordScoreChange = (score) => {
-        setPasswordScore(score);
-    }
-
     const handleForgotPassword = () => {
         navigate('/reset-password')
     }
@@ -132,7 +128,7 @@ const LogIn = () => {
                         onKeydown={handleKeyDown}
                     />
                     <CollapsibleContainer isVisible={isSigningUp} hasBorder={false}>
-                        <PasswordStrengthBar password={password} onChangeScore={handlePasswordScoreChange} style={{padding: '0 10px', marginTop: 0}} />
+                        <PasswordStrengthBar password={password} setPasswordScore={setPasswordScore} />
                         <TextBoxInput
                             type={'password'}
                             width={'max'}

@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "react-query";
 import {useCallback, useContext, useRef} from "react";
-import {debounce} from "lodash";
+import debounce from "lodash/debounce.js";
 import {AlertsContext} from "../../context/AlertsContext";
 
 const postChangeEntryValue = async (data) => {

@@ -569,7 +569,7 @@ const NewCategory = ({index, length, id}) => {
                     </InputWrapper>
                     <HeaderExtendContainer
                         header={<div className={"Stack-Container"}>
-                            <InputWrapper label="Subdivisions" hasPadding={false}>
+                            <InputWrapper label="Subdivisions" hasPadding={false} tooltipMessage={"Required: repeat rate bigger than \"day\""}>
                                 <div className={styles.groupTitlesContainer} onWheel={translateVerticalScroll}>
                                     <Button filled={true} symmetrical={true} onClick={handleAddTimeGroup} size={"small"} disabled={timePeriod === "Days"}>
                                         Add new
