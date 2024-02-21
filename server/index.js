@@ -87,7 +87,7 @@ app.use((err, req, res, next) => {
 })
 
 // Connect to database
-mongoose.connect(process.env.MONG_URI)
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         if (process.env.NODE_ENV !== 'test') {
             app.listen(process.env.PORT, () => {
