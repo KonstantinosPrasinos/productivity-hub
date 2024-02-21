@@ -47,6 +47,10 @@ const corsOptions = {
     credentials: true,
 };
 
+app.get("/", (req, res) => {
+    res.json("Hello there")
+})
+
 app.use(cors(corsOptions));
 
 // Passport
