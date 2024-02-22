@@ -37,13 +37,21 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
+            secure: true,
             maxAge: 30 * 24 * 60 * 60 * 1000 // One month
-        }
+        },
+
+        // proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
+        // name: 'MyCoolWebAppCookieName', // This needs to be unique per-host.
+        // cookie: {
+        //     httpOnly: false,
+        //     sameSite: 'none'
+        // }
     })
 );
 
 const corsOptions = {
-    origin: ["https://productivity-hub-website.vercel.app"],
+    origin: ["https://productivity-hub-website.vercel.app", "http://localhost:5173"],
     methods: ["POST", "GET"],
     credentials: true,
 };
