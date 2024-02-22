@@ -43,7 +43,7 @@ app.use(
 );
 
 const corsOptions = {
-    origin: ["https://productivity-hub-website.vercel.app/"],
+    origin: ["https://productivity-hub-website.vercel.app"],
     methods: ["POST", "GET"],
     credentials: true,
 };
