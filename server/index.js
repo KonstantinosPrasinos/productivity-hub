@@ -86,6 +86,10 @@ app.use((err, req, res, next) => {
     next();
 })
 
+if (!process.env.MONGODB_URI) {
+    throw new Error("Please provide a MONGO_URI in the .env file");
+}
+
 // Connect to database
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
