@@ -47,7 +47,7 @@ const signupUser = (req, res) => {
 const loginUser = new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
     User.findOne({'local.email': email}, (err, user) =>{
         if (err) {return done(err)}
-        if (!user) {return done(null, false, {message: 'Incorrect email or password.'})}
+        if (!user || !user.local.password) {return done(null, false, {message: 'Incorrect email or password.'})}
         if (!bcrypt.compareSync(password, user.local.password)) {return done(null, false, { message: 'Incorrect email or password.' })}
 
         return done(null, user);
