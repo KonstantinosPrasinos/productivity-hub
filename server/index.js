@@ -24,7 +24,7 @@ const app = express();
 
 // Session store
 const sessionStore = new MongoDBStore({
-    uri: process.env.MONG_URI,
+    uri: process.env.MONGODB_URI,
     collection: 'sessions'
 })
 
@@ -87,7 +87,7 @@ app.use((err, req, res, next) => {
 })
 
 if (!process.env.MONGODB_URI) {
-    throw new Error("Please provide a MONGO_URI in the .env file");
+    throw new Error("Please provide a MONGODB_URI in the .env file");
 }
 
 // Connect to database
