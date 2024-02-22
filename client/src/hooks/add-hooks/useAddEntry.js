@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postEntry = async (entry) => {
-    const response = await fetch('http://localhost:5000/api/entry/create', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/entry/create`, {
         method: 'POST',
         body: JSON.stringify({...entry}),
         headers: {'Content-Type': 'application/json'},

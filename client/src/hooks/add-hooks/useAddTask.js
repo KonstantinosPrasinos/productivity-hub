@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {AlertsContext} from "@/context/AlertsContext.jsx";
 
 const postTask = async (task) => {
-    const response = await fetch('http://localhost:5000/api/task/create', {
+    const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/task/create`, {
         method: 'POST',
         body: JSON.stringify({task: {...task, currentEntryValue: undefined, streak: undefined}}),
         headers: {'Content-Type': 'application/json'},
