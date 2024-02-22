@@ -38,7 +38,9 @@ app.use(
         saveUninitialized: false,
         cookie: {
             secure: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000 // One month
+            maxAge: 30 * 24 * 60 * 60 * 1000, // One month,
+            httpOnly: false,
+            sameSite: 'none'
         },
 
         // proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
