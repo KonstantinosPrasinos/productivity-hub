@@ -63,7 +63,6 @@ export function useAuth() {
 
     const register = async (email, password) => {
         setIsLoading(true);
-        // Todo fix registration
 
         try {
             const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
@@ -81,6 +80,8 @@ export function useAuth() {
             }
         } catch (error) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: "Connection to server couldn't be made"}});
+            setIsLoading(false);
+            return false;
         }
 
 

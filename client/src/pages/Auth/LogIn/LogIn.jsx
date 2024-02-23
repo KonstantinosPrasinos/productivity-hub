@@ -102,9 +102,11 @@ const LogIn = () => {
                 await login(email, password);
             } else {
                 // Attempt sign up
-                if (passwordScore !== 0) {
+                if (passwordScore > 1) {
                     if (password === repeatPassword) {
                         const response = await register(email, password);
+
+                        console.log(response);
 
                         if (response) {
                             setSelectedTab(1);
