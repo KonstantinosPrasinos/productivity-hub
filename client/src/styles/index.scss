@@ -236,12 +236,12 @@ a {
 .Empty-Indicator-Container {
     @extend .Horizontal-Flex-Container, .Rounded-Container, .Has-Shadow, .Has-Hover;
     font-size: v.$font-m;
-    height: 2.5em;
-    width: 22.15em;
+    height: calc(2em + 20px);
+    width: 100%;
     padding: 10px;
     justify-content: center;
     align-items: center;
-    box-sizing: unset;
+    box-sizing: border-box;
     
     &.Clickable {
         cursor: pointer;

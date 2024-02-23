@@ -5,9 +5,9 @@
   width: 22.15em;
   min-width: 22.15em;
   max-width: 100%;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 10px;
-  scrollbar-color: red red;
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--background-color);
