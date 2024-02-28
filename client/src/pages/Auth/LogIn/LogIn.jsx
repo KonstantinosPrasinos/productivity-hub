@@ -15,11 +15,17 @@ import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIn
 import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
 
 
-const GoogleSignInButton = () => {
+const GoogleSignInButton = ({googleLoading, setGoogleLoading}) => {
     const divRef = useRef();
-    const {loginGoogle} = useAuth();
+    const {loginGoogle, isLoading} = useAuth();
 
     const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+
+    useEffect(() => {
+        if (isLoading !== googleLoading) {
+            setGoogleLoading(isLoading);
+        }
+    }, [isLoading]);
 
     useEffect(() => {
         const handleCredentialResponse = async (response) => {
@@ -60,6 +66,7 @@ const GoogleSignInButton = () => {
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
+    const [googleLoading, setGoogleLoading] = useState(false);
     const {verifyEmail, isLoading: isLoadingVerify, resendEmailCode} = useVerify();
 
     const [isSigningUp, setIsSigningUp] = useState(false);
@@ -105,8 +112,6 @@ const LogIn = () => {
                 if (passwordScore > 1) {
                     if (password === repeatPassword) {
                         const response = await register(email, password);
-
-                        console.log(response);
 
                         if (response) {
                             setSelectedTab(1);
@@ -188,10 +193,10 @@ const LogIn = () => {
                         <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>
-                        {!isLoading && (!isSigningUp ? 'Log in' : 'Register')}
-                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
+                        {!isLoading && !googleLoading && (!isSigningUp ? 'Log in' : 'Register')}
+                        {(isLoading || googleLoading) && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
                     </Button>
-                    <GoogleSignInButton />
+                    <GoogleSignInButton googleLoading={googleLoading} setGoogleLoading={setGoogleLoading} />
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>
