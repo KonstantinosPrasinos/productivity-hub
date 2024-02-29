@@ -12,16 +12,6 @@
     align-items: center;
     background-color: var(--surface-color);
     flex-shrink: 0;
-    transition: transform 0.2s;
-    transform-origin: center center;
-
-    &:hover {
-        transform: scale(1.1);
-    }
-
-    &:active {
-        transform: scale(1.0);
-    }
 }
 
 .outlineContainer {
@@ -43,6 +33,14 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+
+    &:hover > .numberButton {
+        transform: scale(1.1);
+    }
+
+    &:active > .numberButton {
+        transform: scale(1.0);
+    }
 }
 
 circle {
@@ -119,4 +117,9 @@ circle {
 
 .checkBoxContainer {
     font-size: 1.5em;
+}
+
+.numberButton {
+    transition: transform 0.2s ease-in-out;
+    transform-origin: center center;
 }

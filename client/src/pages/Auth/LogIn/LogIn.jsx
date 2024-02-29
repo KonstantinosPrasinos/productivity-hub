@@ -177,7 +177,7 @@ const LogIn = () => {
                         onKeydown={handleKeyDown}
                     />
                     <CollapsibleContainer isVisible={isSigningUp} hasBorder={false}>
-                        <PasswordStrengthBar password={password} setPasswordScore={setPasswordScore} />
+                        <PasswordStrengthBar password={password} passwordScore={passwordScore} setPasswordScore={setPasswordScore} />
                         <TextBoxInput
                             type={'password'}
                             width={'max'}

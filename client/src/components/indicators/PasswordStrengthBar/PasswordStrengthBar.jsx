@@ -1,14 +1,14 @@
 import React, {useMemo} from 'react';
 import styles from './PasswordStrengthBar.module.scss';
 
-const PasswordStrengthBar = ({password, setPasswordScore}) => {
+const PasswordStrengthBar = ({password, passwordScore, setPasswordScore}) => {
     const {score, message} = useMemo(() => {
         if (password.length === 0) {
-            setPasswordScore(0);
+            if (passwordScore !== 0) setPasswordScore(0)
             return {score: 0, message: "Password too short"}
         }
         if (password.length < 8) {
-            setPasswordScore(1);
+            if (passwordScore !== 1) setPasswordScore(1);
             return {score: 1, message: "Password too short"}
         }
 
@@ -57,17 +57,17 @@ const PasswordStrengthBar = ({password, setPasswordScore}) => {
         }
 
         if (diversity < 2) {
-            setPasswordScore(1);
+            // setPasswordScore(1);
             return {score: 1, message: `Password is too simple, try adding a${message}`}
         } else if (diversity < 4) {
-            setPasswordScore(score + diversity - 2);
+            // setPasswordScore(score + diversity - 2);
             return {score: score + diversity - 2, message: `Password is fine, try adding a${message}`}
         } else if (password.length < 12) {
-            setPasswordScore(score + diversity - 2);
+            // setPasswordScore(score + diversity - 2);
             return {score: score + diversity - 2, message: "Password is good, try making it longer"}
         }
 
-        setPasswordScore(score + diversity - 2);
+        // setPasswordScore(score + diversity - 2);
 
         return {score: score + diversity - 2, message: "Password is strong"}
     }, [password])

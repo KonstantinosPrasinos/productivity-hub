@@ -293,6 +293,7 @@ const CurrentProgress = ({task}) => {
                         color: entryColor,
                         fontSize: addValue.toString().length > 1 ? `calc(100% - ${(addValue.toString().length - 1) * 3}px)` : "16px"
                     }}
+                    className={styles.numberButton}
                     onContextMenu={handleNumberRightClick}
                     onTouchStart={handleNumberTouchStart}
                     onTouchEnd={handleNumberTouchEnd}

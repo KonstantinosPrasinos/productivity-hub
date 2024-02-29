@@ -201,7 +201,7 @@ const ResetPassword = () => {
                         setValue={setNewPassword}
                         invalid={newPassword.length === 0 ? null : (passwordScore === 0) }
                     />
-                    <PasswordStrengthBar password={newPassword} setPasswordScore={setPasswordScore} />
+                    <PasswordStrengthBar password={newPassword} passwordScore={passwordScore} setPasswordScore={setPasswordScore} />
                     <TextBoxInput
                         type={'password'}
                         width={'max'}
