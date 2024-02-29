@@ -27,6 +27,20 @@ export function useGetTasks() {
         staleTime: 30 * 60 * 60 * 1000,
         enabled: user.state?.id !== undefined,
         onSuccess: (data) => {
+            // Set current entry from acquired data
+            if (data?.currentEntries) {
+                for (const currentEntry of data.currentEntries) {
+                    queryClient.setQueryData(["task-entries", currentEntry.taskId, currentEntry._id], () => {
+                        return {entry: currentEntry}
+                    })
+                }
+            }
+
+            // Remove current entry from task
+            queryClient.setQueryData(["tasks"], () => {
+                return {tasks: data.tasks};
+            })
+
             // Update the priority lowest and highest used value
             queryClient.setQueryData(["settings"], (oldData) => {
                 const priorities = data.tasks.map(task => task.priority);

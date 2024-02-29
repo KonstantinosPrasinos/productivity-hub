@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useGetTasks} from "../get-hooks/useGetTasks";
 import {useGetGroups} from "../get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
@@ -96,7 +96,7 @@ export function useRenderTasks(usesTime = false) {
     const {isLoading: categoriesLoading, isError: categoriesError, data: categories} = useGetCategories();
     const {data: entries, isLoading: entriesLoading} = useGetTaskCurrentEntry(tasks);
 
-    const addCategoriesToArray = (groupedTasks) => {
+    const addCategoriesToArray = useCallback((groupedTasks) => {
         /*
         * Add tasks grouped by category and to the list
         * 1. Get the categories that repeat
@@ -149,7 +149,7 @@ export function useRenderTasks(usesTime = false) {
                         }
                         return !checkTaskCompleted(task, taskCurrentEntry);
                     })
-                    
+
                     if (taskIdsWithEntriesLoading.length) {
                         localGroupTasks = localGroupTasks.filter(task => taskIdsWithEntriesLoading.includes(task._id));
                     }
@@ -165,9 +165,9 @@ export function useRenderTasks(usesTime = false) {
                 }
             })
         });
-    }
+    }, [entries, tasks, categories, groups])
 
-    const addTasksToArray = (groupedTasks) => {
+    const addTasksToArray = useCallback((groupedTasks) => {
         tasks.forEach(task => {
             // Check if the task should be added to the list
             const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
@@ -206,19 +206,7 @@ export function useRenderTasks(usesTime = false) {
                 groupedTasks.push(task);
             }
         })
-    }
-
-    const getCurrentTasks = () => {
-        const groupedTasks = [];
-
-        addCategoriesToArray(groupedTasks);
-        addTasksToArray(groupedTasks);
-
-        // Sort the tasks to be rendered in increasing priority
-        groupedTasks.sort((a, b) => b.priority - a.priority);
-
-        return groupedTasks;
-    }
+    }, [entries, tasks, categories])
 
     const data = useMemo(() => {
         if (tasksError || groupsError || categoriesError) return false;
@@ -227,7 +215,14 @@ export function useRenderTasks(usesTime = false) {
         const now = new Date();
         now.setSeconds(0, 0);
 
-        const currentTasks = getCurrentTasks()
+        // Get tasks that should be rendered
+        const currentTasks = [];
+
+        addCategoriesToArray(currentTasks);
+        addTasksToArray(currentTasks);
+
+        // Sort the tasks to be rendered in increasing priority
+        currentTasks.sort((a, b) => b.priority - a.priority);
 
         // Clear previous timeout if it exists
         if (timeout) clearTimeout(timeout);

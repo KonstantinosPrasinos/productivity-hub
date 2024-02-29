@@ -162,19 +162,21 @@ const getTasksWithHistory = async (tasks, userId) => {
     currentDate.setUTCHours(0, 0, 0, 0);
 
     // Add current entry to tasks
-    let tasksWithCurrentEntry = [];
+    const tasksWithCurrentEntry = [];
+    const currentEntries = [];
 
     for (const task of tasks) {
-        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: currentDate});
+        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: task.repeats ? currentDate : undefined});
 
         if (!currentEntry) {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})
         }
 
+        currentEntries.push(currentEntry);
         tasksWithCurrentEntry.push({...task._doc, currentEntryId: currentEntry._id, forDeletion: undefined, hidden: false}) // Remove the for deletion property, add the hidden property
     }
 
-    return tasksWithCurrentEntry;
+    return {tasksWithCurrentEntry, currentEntries};
 }
 
 const getTasks = async (req, res) => {
@@ -182,9 +184,9 @@ const getTasks = async (req, res) => {
         Task.find({userId: req.user._id, forDeletion: false}, async (err, tasks) => {
             if (err) return res.status(404).json({message: 'Tasks not found.'});
 
-            const tasksWithHistory = await getTasksWithHistory(tasks, req.user._id)
+            const {tasksWithCurrentEntry, currentEntries} = await getTasksWithHistory(tasks, req.user._id)
 
-            if (tasks) {return res.status(200).json({tasks: tasksWithHistory})}
+            if (tasks) {return res.status(200).json({tasks: tasksWithCurrentEntry, currentEntries: currentEntries})}
 
             return res.status(404).json({message: 'Tasks not found.'});
         });
