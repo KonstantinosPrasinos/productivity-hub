@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import styles from './LogIn.module.scss';
 import Button from "../../../components/buttons/Button/Button";
 import TextBoxInput from "../../../components/inputs/TextBoxInput/TextBoxInput";
@@ -11,13 +11,62 @@ import TextButton from "../../../components/buttons/TextButton/TextButton";
 import {useAuth} from "../../../hooks/useAuth";
 import {UserContext} from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
-import GoogleSignInButton from "../../../components/utilities/GoogleSignInButton/GoogleSignInButton";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
+
+
+const GoogleSignInButton = ({googleLoading, setGoogleLoading}) => {
+    const divRef = useRef();
+    const {loginGoogle, isLoading} = useAuth();
+
+    const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+
+    useEffect(() => {
+        if (isLoading !== googleLoading) {
+            setGoogleLoading(isLoading);
+        }
+    }, [isLoading]);
+
+    useEffect(() => {
+        const handleCredentialResponse = async (response) => {
+            await loginGoogle(response);
+        }
+
+        const attemptRenderGoogle = () => {
+            if (window?.google) {
+                setIsGoogleLoaded(true);
+
+                window?.google?.accounts?.id?.initialize({
+                    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+
+                window.google.accounts.id.renderButton(divRef.current, {theme: 'outline', size: 'large', shape: 'pill'})
+
+                window.google.accounts.id.prompt();
+            } else {
+                // Sometimes it doesn't load instantly for some reason so try again after 200ms
+                setTimeout(attemptRenderGoogle, 200);
+            }
+        }
+
+        attemptRenderGoogle();
+
+        return () => clearTimeout(attemptRenderGoogle); // Clear the timeout on unmount
+    }, [])
+
+    return (
+        <div className={`${styles.googleContainer} ${isGoogleLoaded ? styles.googleVisible : ""}`}>
+            or
+            <div ref={divRef}></div>
+        </div>
+    );
+}
 
 const LogIn = () => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {login, register, isLoading} = useAuth();
+    const [googleLoading, setGoogleLoading] = useState(false);
     const {verifyEmail, isLoading: isLoadingVerify, resendEmailCode} = useVerify();
 
     const [isSigningUp, setIsSigningUp] = useState(false);
@@ -60,7 +109,7 @@ const LogIn = () => {
                 await login(email, password);
             } else {
                 // Attempt sign up
-                if (passwordScore !== 0) {
+                if (passwordScore > 1) {
                     if (password === repeatPassword) {
                         const response = await register(email, password);
 
@@ -144,13 +193,10 @@ const LogIn = () => {
                         <Button size={"small"} filled={false} onClick={handleForgotPassword}>Forgot password</Button>
                     </div>
                     <Button filled={true} width={'max'} size={'large'} onClick={handleContinue}>
-                        {!isLoading && (!isSigningUp ? 'Log in' : 'Register')}
-                        {isLoading && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
+                        {!isLoading && !googleLoading && (!isSigningUp ? 'Log in' : 'Register')}
+                        {(isLoading || googleLoading) && <LoadingIndicator size={"inline"} type={"dots"} invertColors={true} />}
                     </Button>
-                    {window?.google && <>
-                        <div>or</div>
-                        <GoogleSignInButton />
-                    </>}
+                    <GoogleSignInButton googleLoading={googleLoading} setGoogleLoading={setGoogleLoading} />
                 </div>
                 <div className={`${styles.container} ${styles.spaceBetween}`}>
                     <div className={'Display'}>We sent you a code</div>

@@ -20,7 +20,7 @@ import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer
 
 const RepeatCategoryContent = ({tasks, selection, category, groups}) => {
     const {data: entriesArray, isLoading: entriesLoading} = useGetTaskEntries(tasks.map(task => task._id));
-    const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks.map(task => task._id), tasks.map(task => task.currentEntryId));
+    const {data: currentEntriesArray, isLoading: currentEntriesLoading} = useGetTaskCurrentEntry(tasks);
     const {functionName, timeToAdd} = useMemo(() => getDateAddDetails(category.repeatRate.bigTimePeriod, category.repeatRate.number), [category]);
 
     const currentDate = new Date();

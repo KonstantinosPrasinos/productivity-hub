@@ -3,6 +3,15 @@ import {UserContext} from "../context/UserContext";
 import {AlertsContext} from "../context/AlertsContext";
 import {useQueryClient} from "react-query";
 
+const handleLogin = async (response, dispatch) => {
+    const data = await response.json();
+    const date = new Date();
+    date.setMonth(date.getMonth() + 1);
+    date.setHours(date.getHours() - 1);
+    dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
+    localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+}
+
 export function useAuth() {
     const {dispatch} = useContext(UserContext);
     const alertsContext = useContext(AlertsContext);
@@ -24,46 +33,40 @@ export function useAuth() {
             if (!response.ok) {
                 alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
             } else {
-                const data = await response.json();
-                const date = new Date();
-                date.setMonth(date.getMonth() + 1);
-                date.setHours(date.getHours() - 1);
-                dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
-                localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+                await handleLogin(response, dispatch);
             }
         } catch (error) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: "Connection to server couldn't be made"}});
         }
+
         setIsLoading(false);
     }
 
     const loginGoogle = async (data) => {
         setIsLoading(true);
 
-        const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/google`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data),
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/google`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+                credentials: 'include'
+            });
 
-        if (!response.ok) {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
-        } else {
-            const data = await response.json();
-            const date = new Date();
-
-            date.setMonth(date.getMonth() + 1);
-            date.setHours(date.getHours() - 1);
-            dispatch({type: "SET_USER", payload: {id: data.user?._id, email: data.user?.local.email, googleLinked: data.user?.googleLinked}});
-            localStorage.setItem('user', JSON.stringify({id: data.user?._id, email: data.user?.local.email, validUntil: date, googleLinked: data.user?.googleLinked}));
+            if (!response.ok) {
+                alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: (await response.json()).message}});
+            } else {
+                await handleLogin(response, dispatch);
+            }
+        } catch (error) {
+            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to log in", message: "Connection to server couldn't be made"}});
         }
+
         setIsLoading(false);
     }
 
     const register = async (email, password) => {
         setIsLoading(true);
-        // Todo fix registration
 
         try {
             const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/user/signup`, {
@@ -81,6 +84,8 @@ export function useAuth() {
             }
         } catch (error) {
             alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed to sign up", message: "Connection to server couldn't be made"}});
+            setIsLoading(false);
+            return false;
         }
 
 

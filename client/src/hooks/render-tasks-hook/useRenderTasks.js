@@ -1,8 +1,9 @@
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useGetTasks} from "../get-hooks/useGetTasks";
 import {useGetGroups} from "../get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
 import {findNextUpdateDate} from "@/hooks/render-tasks-hook/findNextUpdateDate";
+import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
 
 let tasksNextUpdate = null
 let timeout = null;
@@ -65,53 +66,120 @@ const checkTime = (task) => {
     return isCorrectDate && isCorrectTime;
 }
 
-const addCategoriesToArray = (groupedTasks, usesTime, tasks, groups, categories) => {
-    const repeatCategories = categories.filter(category => !isNaN(category.repeatRate?.number));
-
-    repeatCategories.forEach(category => {
-        const localTasks = tasks.filter(task => task.category === category._id && !task.hidden);
-
-        if (!localTasks.length) return;
-
-        const categoryOnlyTasks = localTasks.filter(task => task.group === undefined);
-        const groupTasks = localTasks.filter(task => task.group !== undefined);
-
-        const repeatGroups = groups.filter(group => [...new Set(groupTasks.map(task => task.group))].includes(group._id));
-
-        if (categoryOnlyTasks.length) {
-            if (!usesTime || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
-                groupedTasks.push({
-                    priority: category.priority,
-                    tasks: categoryOnlyTasks
-                })
+const checkTaskCompleted = (task, entry) => {
+    // Checks if a task is completed
+    // For checkbox return true when value is not zero
+    // For number if it has goal return false always
+    // Else look for if it completes goal
+    if (task.type === "Checkbox") {
+        return entry.value !== 0;
+    } else {
+        if (!task?.goal) {
+            return false;
+        } else {
+            switch (task.goal.limit) {
+                case "At least":
+                    return entry.value >= task.goal.number;
+                case "At most":
+                    return entry.value <= task.goal.number;
+                case "Exactly":
+                    return entry.value === task.goal.number;
             }
         }
-
-        // Then also check group also tasks
-        repeatGroups.forEach(group => {
-            const localGroupTasks = groupTasks.filter(task => task.group === group._id)
-
-            if (localGroupTasks.length) {
-                if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
-                    groupedTasks.push({
-                        priority: category.priority,
-                        tasks: localGroupTasks.sort((a, b) => b.priority - a.priority)
-                    })
-                }
-            }
-        })
-
-        // if (usesTime && !checkTime({...})) return;
-    });
+    }
 }
 
-const addTasksToArray = (groupedTasks, usesTime, tasks, categories) => {
-    tasks.forEach(task => {
-        // Check if the task should be rendered at the current time
-        // First checks if the component it will be rendered in even cares about time
-        // Then it checks if the task repeats
-        // And then it check if the task is in a time group
-        if (!task.hidden) {
+export function useRenderTasks(usesTime = false) {
+    const [shouldReRender, setShouldReRender] = useState(false); // Flip this when we want tasks to re-render
+    const {isLoading: tasksLoading, isError: tasksError, data: tasks} = useGetTasks();
+    const {isLoading: groupsLoading, isError: groupsError, data: groups} = useGetGroups();
+    const {isLoading: categoriesLoading, isError: categoriesError, data: categories} = useGetCategories();
+    const {data: entries, isLoading: entriesLoading} = useGetTaskCurrentEntry(tasks);
+
+    const addCategoriesToArray = useCallback((groupedTasks) => {
+        /*
+        * Add tasks grouped by category and to the list
+        * 1. Get the categories that repeat
+        * 2. Get the tasks for each category
+        * 3. Get the tasks for each category subgroup
+        * 4. For each of the two above add them to the list as one object when not all tasks are completed
+        */
+        const repeatCategories = categories.filter(category => !isNaN(category.repeatRate?.number));
+
+        repeatCategories.forEach(category => {
+            const localTasks = tasks.filter(task => task.category === category._id && !task.hidden);
+
+            if (!localTasks.length) return;
+
+            const categoryOnlyTasks = localTasks.filter(task => task.group === undefined);
+            const groupTasks = localTasks.filter(task => task.group !== undefined);
+
+            const repeatGroups = groups.filter(group => [...new Set(groupTasks.map(task => task.group))].includes(group._id));
+
+            if (categoryOnlyTasks.length) {
+                // Check if any of the tasks are not completed
+                const existsNotCompletedTask = !usesTime || categoryOnlyTasks.some((task) => {
+                    const taskCurrentEntry = entries.find(entry => entry._id === task.currentEntryId);
+                    if (!taskCurrentEntry) return false;
+                    return !checkTaskCompleted(task, taskCurrentEntry);
+                })
+
+                if (existsNotCompletedTask) {
+                    if (!usesTime || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
+                        groupedTasks.push({
+                            priority: category.priority,
+                            tasks: categoryOnlyTasks
+                        })
+                    }
+                }
+            }
+
+            // Then also check group also tasks
+            repeatGroups.forEach(group => {
+                let localGroupTasks = groupTasks.filter(task => task.group === group._id)
+                const taskIdsWithEntriesLoading = [];
+
+                if (localGroupTasks.length) {
+                    // Check if any of the tasks are not completed
+                    const existsNotCompletedTask = !usesTime || localGroupTasks.some((task) => {
+                        const taskCurrentEntry = entries.find(entry => entry._id === task.currentEntryId);
+                        if (!taskCurrentEntry) {
+                            taskIdsWithEntriesLoading.push(task._id);
+                            return false;
+                        }
+                        return !checkTaskCompleted(task, taskCurrentEntry);
+                    })
+
+                    if (taskIdsWithEntriesLoading.length) {
+                        localGroupTasks = localGroupTasks.filter(task => taskIdsWithEntriesLoading.includes(task._id));
+                    }
+
+                    if (existsNotCompletedTask) {
+                        if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
+                            groupedTasks.push({
+                                priority: category.priority,
+                                tasks: localGroupTasks.sort((a, b) => b.priority - a.priority)
+                            })
+                        }
+                    }
+                }
+            })
+        });
+    }, [entries, tasks, categories, groups])
+
+    const addTasksToArray = useCallback((groupedTasks) => {
+        tasks.forEach(task => {
+            // Check if the task should be added to the list
+            const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
+
+            // If current entry doesn't exist, it's loading so skip it
+            if (!taskCurrentEntry) return
+            if (task.hidden) return;
+            if (usesTime && checkTaskCompleted(task, taskCurrentEntry)) return;
+
+            // Check if the task should be rendered at the current date/time:
+            // Check if the task repeats
+            // And then it check if the task should be rendered in the current date/time
             if (task.repeats) {
                 if (task.category) {
                     const category = categories.find(cat => cat._id === task.category);
@@ -137,27 +205,8 @@ const addTasksToArray = (groupedTasks, usesTime, tasks, categories) => {
             } else {
                 groupedTasks.push(task);
             }
-        }
-    })
-}
-
-const getCurrentTasks = (usesTime, tasks, groups, categories) => {
-    const groupedTasks = [];
-
-    addCategoriesToArray(groupedTasks, usesTime, tasks, groups, categories);
-    addTasksToArray(groupedTasks, usesTime, tasks, categories);
-
-    // Sort the tasks to be rendered in increasing priority
-    groupedTasks.sort((a, b) => b.priority - a.priority);
-
-    return groupedTasks
-}
-
-export function useRenderTasks(usesTime = false) {
-    const [shouldReRender, setShouldReRender] = useState(false); // Flip this when we want tasks to re-render
-    const {isLoading: tasksLoading, isError: tasksError, data: tasks} = useGetTasks();
-    const {isLoading: groupsLoading, isError: groupsError, data: groups} = useGetGroups();
-    const {isLoading: categoriesLoading, isError: categoriesError, data: categories} = useGetCategories();
+        })
+    }, [entries, tasks, categories])
 
     const data = useMemo(() => {
         if (tasksError || groupsError || categoriesError) return false;
@@ -166,7 +215,14 @@ export function useRenderTasks(usesTime = false) {
         const now = new Date();
         now.setSeconds(0, 0);
 
-        const currentTasks = getCurrentTasks(usesTime, tasks, groups, categories)
+        // Get tasks that should be rendered
+        const currentTasks = [];
+
+        addCategoriesToArray(currentTasks);
+        addTasksToArray(currentTasks);
+
+        // Sort the tasks to be rendered in increasing priority
+        currentTasks.sort((a, b) => b.priority - a.priority);
 
         // Clear previous timeout if it exists
         if (timeout) clearTimeout(timeout);
@@ -180,7 +236,7 @@ export function useRenderTasks(usesTime = false) {
         tasksNextUpdate = null;
 
         return currentTasks;
-    }, [tasksLoading, groupsLoading, groups, tasks, shouldReRender]);
+    }, [tasksLoading, groupsLoading, groups, tasks, shouldReRender, entriesLoading, entries]);
 
     useEffect(() => {
         return () => {

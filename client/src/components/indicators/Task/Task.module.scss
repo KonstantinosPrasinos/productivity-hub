@@ -23,10 +23,11 @@
 
 .titleContainer {
   font-size: v.$font-m;
-  white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: 550;
+  text-wrap: wrap;
+  white-space: pre-wrap;
 }
 
 .infoContainer {
@@ -61,7 +62,7 @@
   @extend .Stack-Container;
   @include m.Label-Large;
   gap: 6px;
-  width: 100%;
+  max-width: calc(100% - 2.95em - 10px);
 }
 
 .repeatDetails {

@@ -1,3 +1,5 @@
+@use "@/styles/index" as i;
+
 .container {
   box-sizing: border-box;
   display: flex;
@@ -12,4 +14,15 @@
 
 .buttonContainer {
   width: 100%;
+}
+
+.googleContainer {
+  @extend .Stack-Container;
+  align-items: center;
+  height: 5em;
+  opacity: 0;
+
+  &.googleVisible {
+    opacity: 1;
+  }
 }
