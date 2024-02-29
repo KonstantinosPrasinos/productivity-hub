@@ -26,9 +26,9 @@ export function useGetTaskCurrentEntry(taskId, entryId) {
     if (Array.isArray(taskId)) {
         queries = [];
 
-        for (const index in taskId) {
+        for (const task of taskId) {
             queries.push({
-                queryKey: ["task-entries", taskId[index], entryId[index]],
+                queryKey: ["task-entries", task._id, task.currentEntryId],
                 queryFn: fetchTaskCurrentEntry,
                 staleTime: 30 * 60 * 60 * 1000,
                 onError: err => {
