@@ -162,11 +162,18 @@ const getTasksWithHistory = async (tasks, userId) => {
     currentDate.setUTCHours(0, 0, 0, 0);
 
     // Add current entry to tasks
+    // If task repeats then look for an entry with a specific date
+    // If no entry is found then create one
     const tasksWithCurrentEntry = [];
     const currentEntries = [];
 
     for (const task of tasks) {
-        let currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: task.repeats ? currentDate : undefined});
+        let currentEntry;
+        if (task.repeats) {
+            currentEntry = await Entry.findOne({userId: userId, taskId: task._id, date: currentDate});
+        } else {
+            currentEntry = await Entry.findOne({userId: userId, taskId: task._id});
+        }
 
         if (!currentEntry) {
             currentEntry = await Entry.create({userId: userId, taskId: task._id})

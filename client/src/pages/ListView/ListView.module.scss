@@ -87,6 +87,7 @@ $selection-height: 3.5em;
   width: 0.5em;
   height: 0.5em;
   border-radius: 0.5em;
+  flex-shrink: 0;
 }
 
 .selectionBar {
