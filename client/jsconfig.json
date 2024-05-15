@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".", // Ensures absolute paths are resolved from project root
+      "paths": {
+        "@/*": ["src/*"] // Maps '@' alias to 'src' directory
+      }
+    }
+  }

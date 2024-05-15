@@ -92,6 +92,10 @@ a {
         justify-content: space-around;
     }
 
+    &.Align-Left {
+        justify-content: start;
+    }
+
     &.Align-Right {
         justify-content: flex-end;
     }

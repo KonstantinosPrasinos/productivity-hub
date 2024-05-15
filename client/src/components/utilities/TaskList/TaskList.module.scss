@@ -1,4 +1,14 @@
 @use "@/styles/variables" as v;
+@use "@/styles/index";
+
+.container {
+  @extend .Stack-Container;
+  overflow: hidden;
+  padding-top: 0.5em;
+  width: calc(22.15em + 20px);
+  min-width: calc(22.15em + 20px);
+  padding-top: 0.5em;
+}
 
 .leftSide {
   align-items: center;
@@ -7,7 +17,8 @@
   max-width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0.5em 10px;
+  padding: 0 10px 0.5em 10px;
+  flex-grow: 1;
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--background-color);
@@ -23,4 +34,35 @@
     width: 100%;
     padding: 0.5em 4px 0.5em 4px;
   }
+}
+
+.categoryChipContainer {
+  @extend .Horizontal-Flex-Container, .Align-Left;
+  width: 100%;
+  overflow-x: auto;
+  height: min-content;
+  flex-shrink: 0;
+  padding: 4px 0;
+
+  & > :first-child {
+    margin-left: 4px;
+  }
+
+  & > :last-child {
+    margin-right: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--background-color);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--border-primary-color);
+  }
+}
+
+.categoryChipColor {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.5em;
 }
