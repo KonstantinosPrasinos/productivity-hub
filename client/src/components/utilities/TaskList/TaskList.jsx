@@ -81,9 +81,18 @@ const TaskList = ({ tasks = [] }) => {
   const filteredTasks = useMemo(() => {
     if (filter.length == 0) return tasks;
 
-    return tasks.filter((task) =>
-      filter.map((tempFilter) => tempFilter._id).includes(task.category)
-    );
+    return tasks.filter((task) => {
+      // Check for if the tasks is actually a group of tasks in a category
+      if (task.hasOwnProperty("tasks")) {
+        return filter
+          .map((tempFilter) => tempFilter._id)
+          .includes(task.tasks[0].category);
+      } else {
+        return filter
+          .map((tempFilter) => tempFilter._id)
+          .includes(task.category);
+      }
+    });
   }, [filter, tasks]);
 
   return (
@@ -114,13 +123,10 @@ const TaskList = ({ tasks = [] }) => {
           )}
           {filteredTasks.length > 0 &&
             filteredTasks.map((task) =>
-              !task.hasOwnProperty("filteredTasks") ? (
+              !task.hasOwnProperty("tasks") ? (
                 <Task key={task._id} tasks={[task]}></Task>
               ) : (
-                <Task
-                  key={task.filteredTasks[0]._id}
-                  tasks={task.filteredTasks}
-                ></Task>
+                <Task key={task.tasks[0]._id} tasks={task.tasks}></Task>
               )
             )}
         </AnimatePresence>
