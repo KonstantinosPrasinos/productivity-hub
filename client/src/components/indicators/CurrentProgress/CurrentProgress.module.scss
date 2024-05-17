@@ -2,124 +2,53 @@
 @use "@/styles/variables" as v;
 
 .container {
-    width: 2.6em;
-    height: 2.6em;
-    border-radius: 2.6em;
+    height: v.$font-xl;
+    width: v.$font-xl;
+    border: 2px solid var(--primary-color);
+    border-radius: v.$font-xl;
+    color: var(--primary-color);
+    opacity: 0.4;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     position: relative;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--surface-color);
-    flex-shrink: 0;
-}
 
-.outlineContainer {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.textContainer {
-    width: 2.2em;
-    height: 2.2em;
-    background-color: var(--primary-color);
-    color: var(--on-primary-color);
-    z-index: 1;
-    border-radius: 10em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-
-    &:hover > .numberButton {
-        transform: scale(1.1);
-    }
-
-    &:active > .numberButton {
-        transform: scale(1.0);
+    &:hover {
+        background-color: var(--border-primary-color);
     }
 }
 
-circle {
+.svg {
     stroke-width: 10px;
     stroke-linecap: round;
     fill: transparent;
-    transform: rotate(180deg);
-    transform-origin: center;
 }
 
-.overlayContainer {
-    position: fixed;
+.numberIndicatorContainer {
+    position: absolute;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 3;
-    background-color: transparent;
-    transform-origin: center center;
+
+    & > div {
+        position: relative;
+        width: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        & > div {
+            position: absolute;
+            top: -1.25em;
+        }
+    }
 }
 
-.overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.2em;
-    width: 2.2em;
-    position: fixed;
-    overflow: visible;
-}
-
-.overlayContent {
-    @extend .Stack-Container;
-
-    border-radius: 2.2em;
-    transition: box-shadow 0.2s;
-
-    background-color: var(--primary-color);
-    color: var(--on-primary-color);
-    box-shadow: v.$elevation-1;
-
-    height: 3em;
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    padding: 0;
-}
-
-.overlayContentNotMiddle {
-    display: none;
-    opacity: 0;
-}
-
-.overlayContentChild {
-    flex-shrink: 0;
-    text-align: center;
-    height: 24px;
-    line-height: 24px;
-    cursor: pointer;
-}
-
-.overlayTopEdge, .overlayBottomEdge {
-    opacity: 0;
-}
-
-.overlayContentTop, .overlayContentBottom {
-    // We added this in order for the scss class to not be undefined, because it's used for animations
-    opacity: 1;
-}
-
-.checkBoxContainer {
-    font-size: 1.5em;
-}
-
-.numberButton {
-    transition: transform 0.2s ease-in-out;
-    transform-origin: center center;
+.numberIsGreen {
+    transition: 0.2s color ease-in-out;
+    color: var(--success-color);
 }

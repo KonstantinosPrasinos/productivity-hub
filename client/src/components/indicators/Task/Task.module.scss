@@ -12,7 +12,11 @@
   gap: 6px;
   cursor: pointer;
   box-sizing: border-box;
-  opacity: 0;
+  opacity: 1;
+
+  order: 1;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .topLine {
@@ -22,7 +26,7 @@
 }
 
 .titleContainer {
-  font-size: v.$font-m;
+  font-size: v.$font-s;
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: 550;
@@ -46,10 +50,6 @@
 
 .streakContainer {
   display: inline-block;
-}
-
-.completed {
-  order: 1;
 }
 
 .task {

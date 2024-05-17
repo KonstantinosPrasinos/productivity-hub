@@ -99,14 +99,12 @@ export function useRenderTasks(usesTime = false) {
     const addCategoriesToArray = useCallback((groupedTasks) => {
         /*
         * Add tasks grouped by category and to the list
-        * 1. Get the categories that repeat
+        * 1. Get the categories
         * 2. Get the tasks for each category
         * 3. Get the tasks for each category subgroup
         * 4. For each of the two above add them to the list as one object when not all tasks are completed
         */
-        const repeatCategories = categories.filter(category => !isNaN(category.repeatRate?.number));
-
-        repeatCategories.forEach(category => {
+        categories.forEach(category => {
             const localTasks = tasks.filter(task => task.category === category._id && !task.hidden);
 
             if (!localTasks.length) return;
@@ -125,7 +123,7 @@ export function useRenderTasks(usesTime = false) {
                 })
 
                 if (existsNotCompletedTask) {
-                    if (!usesTime || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
+                    if (!usesTime || isNaN(category.repeatRate?.number) || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
                         groupedTasks.push({
                             priority: category.priority,
                             tasks: categoryOnlyTasks
@@ -169,6 +167,9 @@ export function useRenderTasks(usesTime = false) {
 
     const addTasksToArray = useCallback((groupedTasks) => {
         tasks.forEach(task => {
+            // Skip the task if it has a category
+            if (task.category) return;
+
             // Check if the task should be added to the list
             const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
 
