@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./CurrentProgress.module.scss";
 import { useChangeEntryValue } from "../../../hooks/change-hooks/useChangeEntryValue";
 import { useGetTaskCurrentEntry } from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
@@ -73,24 +73,34 @@ const CurrentProgress = ({ task }) => {
     task._id,
     task.currentEntryId
   );
-  const [isChecked, setIsChecked] = useState(entry?.value > 0);
+  const [isChecked, setIsChecked] = useState(entry?.value > 0 ? true : false);
   const { mutate: setTaskCurrentEntry } = useChangeEntryValue(task.title);
   const [numberIsGreen, setNumberIsGreen] = useState(false);
   const isGreenTimeout = useRef();
+  const saveChangesTimeout = useRef();
 
   const toggleIsChecked = (event) => {
     event.stopPropagation();
-    setIsChecked((current) => !current);
+    setIsChecked(!isChecked);
 
     if (isLoading) return;
     if (task.type === "Checkbox") {
-      const number = isChecked ? 0 : 1;
+      if (saveChangesTimeout.current) {
+        clearTimeout(saveChangesTimeout.current);
+        saveChangesTimeout.current = null;
+      }
 
-      setTaskCurrentEntry({
-        taskId: task._id,
-        entryId: entry?._id,
-        value: number,
-      });
+      saveChangesTimeout.current = setTimeout(() => {
+        const number = isChecked ? 0 : 1;
+
+        setTaskCurrentEntry({
+          taskId: task._id,
+          entryId: entry?._id,
+          value: number,
+        });
+
+        saveChangesTimeout.current = null;
+      }, 300);
     } else {
       setTaskCurrentEntry({
         taskId: task._id,
@@ -109,11 +119,15 @@ const CurrentProgress = ({ task }) => {
   };
 
   return (
-    <button onClick={toggleIsChecked} className={styles.container}>
-      <AnimatePresence initial={false}>
-        {task.type === "Number" && <LocalTbAdd isGreen={numberIsGreen} />}
-        {task.type === "Checkbox" && isChecked && <LocalTbCheck />}
-      </AnimatePresence>
+    <button
+      onClick={toggleIsChecked}
+      className={styles.container}
+      key={`current-progress-${task._id}`}
+    >
+      {task.type === "Number" && <LocalTbAdd isGreen={numberIsGreen} />}
+      {task.type === "Checkbox" && isChecked && (
+        <LocalTbCheck key={`checkbox-${task._id}`} />
+      )}
     </button>
   );
 };

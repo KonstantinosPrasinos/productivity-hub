@@ -75,7 +75,7 @@ const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
   );
 };
 
-const TaskList = ({ tasks = [] }) => {
+const TaskList = ({ tasks = [], usesTime = false }) => {
   const [filter, setFilter] = useState([]);
 
   const filteredTasks = useMemo(() => {
@@ -126,7 +126,11 @@ const TaskList = ({ tasks = [] }) => {
               !task.hasOwnProperty("tasks") ? (
                 <Task key={task._id} tasks={[task]}></Task>
               ) : (
-                <Task key={task.tasks[0]._id} tasks={task.tasks}></Task>
+                <Task
+                  key={task.tasks[0]._id}
+                  tasks={task.tasks}
+                  usesTime={usesTime}
+                ></Task>
               )
             )}
         </AnimatePresence>

@@ -1,13 +1,21 @@
 import styles from "./Task.module.scss";
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
-import { forwardRef, useContext, useMemo } from "react";
-import { motion } from "framer-motion";
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import { TbFlame, TbHash, TbTargetArrow } from "react-icons/all";
 import { useGetTaskCurrentEntry } from "@/hooks/get-hooks/useGetTaskCurrentEntry";
 import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
 import { TbCheck } from "react-icons/tb";
+import { checkTaskCompleted } from "@/functions/checkTaskCompleted";
 
 const RepeatDetails = ({ task }) => {
   const { data: entry, isLoading } = useGetTaskCurrentEntry(
@@ -65,28 +73,19 @@ const RepeatDetails = ({ task }) => {
   );
 };
 
-const Task = forwardRef(({ tasks }, ref) => {
+const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
   const miniPagesContext = useContext(MiniPagesContext);
+  const { data: entries } = useGetTaskCurrentEntry(tasks);
 
-  const checkIfCompleted = () => {
-    let isCompleted = false;
+  const filteredTasks = useMemo(() => {
+    if (!usesTime) return tasks;
 
-    // tasks.map(task => {
-    //     if (task.type === 'Checkbox') {
-    //         if (task.previousEntry !== 1) {
-    //             isCompleted = true;
-    //         }
-    //     } else {
-    //         if (task.goal.type === 'At least' && task.goal.number >= task.previousEntry) {
-    //             isCompleted = true;
-    //         }
-    //     }
-    // });
+    return tasks.filter((task) => {
+      const entry = entries.find((entry) => entry._id === task.currentEntryId);
 
-    return isCompleted || true;
-  };
-
-  const tasksIsCompleted = useMemo(() => checkIfCompleted(), [tasks]);
+      return !checkTaskCompleted(task, entry);
+    });
+  });
 
   const handleTaskClick = (taskId) => {
     miniPagesContext.dispatch({
@@ -98,16 +97,21 @@ const Task = forwardRef(({ tasks }, ref) => {
   const variants = {
     hidden: { opacity: 0, y: 50, scale: 0.8 },
     visible: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } },
+    exit: {
+      opacity: 0,
+      scale: 0.5,
+      transition: { duration: 0.2 },
+      transitionEnd: () => console.log("test"),
+    },
   };
 
   return (
     <motion.div
-      className={`${styles.container} ${
-        !tasksIsCompleted ? styles.completed : ""
-      }`}
+      className={styles.container}
       variants={variants}
-      layout
+      layout={"preserve-aspect"}
+      onAnimationEnd={(event) => console.log(event)}
+      onAnimationComplete={(event) => console.log(event)}
       ref={ref}
     >
       {tasks[0].category && (
@@ -117,19 +121,22 @@ const Task = forwardRef(({ tasks }, ref) => {
         />
       )}
       <div className={"Stack-Container"}>
-        {tasks.map((task, index) => (
-          <div
-            key={index}
-            className={styles.task}
-            onClick={() => handleTaskClick(task._id)}
-          >
-            <div className={styles.detailsList}>
-              <div className={styles.titleContainer}>{task.title}</div>
-              <RepeatDetails task={task} />
-            </div>
-            <CurrentProgress task={task} />
-          </div>
-        ))}
+        <AnimatePresence mode="popLayout">
+          {filteredTasks.map((task, index) => (
+            <motion.div
+              key={index}
+              className={styles.task}
+              onClick={() => handleTaskClick(task._id)}
+              // layout
+            >
+              <div className={styles.detailsList}>
+                <div className={styles.titleContainer}>{task.title}</div>
+                <RepeatDetails task={task} />
+              </div>
+              <CurrentProgress key={task._id} task={task} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

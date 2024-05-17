@@ -12,7 +12,11 @@
   gap: 6px;
   cursor: pointer;
   box-sizing: border-box;
-  opacity: 0;
+  opacity: 1;
+
+  order: 1;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .topLine {
@@ -46,10 +50,6 @@
 
 .streakContainer {
   display: inline-block;
-}
-
-.completed {
-  order: 1;
 }
 
 .task {
