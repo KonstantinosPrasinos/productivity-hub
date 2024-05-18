@@ -122,9 +122,9 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
         />
       )}
       <div className={"Stack-Container"}>
-        {filteredTasks.map((task, index) => (
+        {filteredTasks.map((task) => (
           <div
-            key={index}
+            key={task._id}
             className={styles.task}
             onClick={() => handleTaskClick(task._id)}
           >
