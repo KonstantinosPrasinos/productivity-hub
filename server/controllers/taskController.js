@@ -10,7 +10,7 @@ const taskSchema = Joi.object({
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(1).max(999)
     }),
-    description: Joi.string.max(120),
+    description: Joi.string().max(120),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
