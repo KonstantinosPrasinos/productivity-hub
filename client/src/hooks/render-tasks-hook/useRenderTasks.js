@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import {useGetTasks} from "../get-hooks/useGetTasks";
 import {useGetGroups} from "../get-hooks/useGetGroups";
 import {useGetCategories} from "@/hooks/get-hooks/useGetCategories";
-import {findNextUpdateDate} from "@/hooks/render-tasks-hook/findNextUpdateDate";
+import {findNextUpdateDate} from "@/functions/findNextUpdateDate";
 import {useGetTaskCurrentEntry} from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
 
 let tasksNextUpdate = null
@@ -124,8 +124,11 @@ export function useRenderTasks(usesTime = false) {
 
                 if (existsNotCompletedTask) {
                     if (!usesTime || isNaN(category.repeatRate?.number) || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
+                        // Sort the category tasks based on priority
+                        categoryOnlyTasks.sort((a, b) => b.priority - a.priority)
+                        
                         groupedTasks.push({
-                            priority: category.priority,
+                            priority: category.priority ?? 1,
                             tasks: categoryOnlyTasks
                         })
                     }
@@ -154,6 +157,8 @@ export function useRenderTasks(usesTime = false) {
 
                     if (existsNotCompletedTask) {
                         if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
+                            localGroupTasks.sort((a, b) => b.priority - a.priority);
+                            
                             groupedTasks.push({
                                 priority: category.priority,
                                 tasks: localGroupTasks.sort((a, b) => b.priority - a.priority)

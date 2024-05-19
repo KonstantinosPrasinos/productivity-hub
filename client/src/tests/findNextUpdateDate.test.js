@@ -1,4 +1,4 @@
-import {findNextUpdateDate} from "../hooks/render-tasks-hook/findNextUpdateDate.js";
+import {findNextUpdateDate} from "../functions/findNextUpdateDate.js/index.js";
 
 test("1 day different day, no smallTimePeriod", () => {
     const mockToday = new Date("2023-11-29T00:00:00.000Z")

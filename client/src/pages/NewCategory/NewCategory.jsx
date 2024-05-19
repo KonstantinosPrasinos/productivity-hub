@@ -151,7 +151,20 @@ const NewCategory = ({ index, length, id }) => {
           type: "error",
           title: "Category Title is Missing",
           message:
-            "Categories must have a title. Please enter a title to continue.",
+            "Categories must have a title. Please enter one to continue.",
+        },
+      });
+      return;
+    }
+
+    if (!priority) {
+      alertsContext.dispatch({
+        type: "ADD_ALERT",
+        payload: {
+          type: "error",
+          title: "Category Title is Missing",
+          message:
+            "Categories must have a priority. Please enter one to continue.",
         },
       });
       return;
@@ -202,7 +215,6 @@ const NewCategory = ({ index, length, id }) => {
       }
 
       repeatParameters = {
-        priority,
         repeatRate: {
           number: timePeriodNumber,
           bigTimePeriod: timePeriod,
@@ -225,6 +237,7 @@ const NewCategory = ({ index, length, id }) => {
       title,
       color,
       repeats,
+      priority,
       ...repeatParameters,
     };
 
@@ -582,6 +595,15 @@ const NewCategory = ({ index, length, id }) => {
         <InputWrapper label="Color">
           <ColorInput selected={color} setSelected={setColor} />
         </InputWrapper>
+        <InputWrapper label={"Priority"}>
+          <TextBoxInput
+            type="number"
+            placeholder="Number"
+            value={priority}
+            setValue={setPriority}
+          />
+          <PriorityIndicator />
+        </InputWrapper>
         <HeaderExtendContainer
           header={
             <div className={"Horizontal-Flex-Container Space-Between"}>
@@ -616,15 +638,6 @@ const NewCategory = ({ index, length, id }) => {
                 </button>
               ))}
             </DropDownInput>
-          </InputWrapper>
-          <InputWrapper label={"Priority"}>
-            <TextBoxInput
-              type="number"
-              placeholder="Number"
-              value={priority}
-              setValue={setPriority}
-            />
-            <PriorityIndicator />
           </InputWrapper>
           <InputWrapper label={"Has goal"}>
             <ToggleButton

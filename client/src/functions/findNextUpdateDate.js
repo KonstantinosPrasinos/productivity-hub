@@ -1,4 +1,4 @@
-import {getDateAddDetails} from "../../functions/getDateAddDetails.js";
+import {getDateAddDetails} from "./getDateAddDetails.js";
 
 export const findNextUpdateDate = (task, fakeCurrentDate) => {
     // In case something breaks in the back end
