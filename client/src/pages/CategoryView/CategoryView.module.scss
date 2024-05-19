@@ -33,12 +33,13 @@
   }
 
   & li {
-    height: 1em;
+    // height: 1em;
     line-height: 1;
     padding: 10px 10px 10px 0;
 
     & > button {
       font-size: inherit;
+      text-align: left;
     }
 
     &::marker {
