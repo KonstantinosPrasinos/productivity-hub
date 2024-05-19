@@ -639,10 +639,22 @@ const TaskView = ({ index, length, task }) => {
           )}
         </section>
         <section className={"Horizontal-Flex-Container"}>
-          <div className={"Label"}>{task.repeats && "Today's"} Value:</div>
-          <CurrentProgress task={task} />
-          {task.type === "Number" && entry.value}
+          <div className={"Label"}>{task.repeats && "Today's"}Value:</div>
+          {task.type === "Checkbox" && <CurrentProgress task={task} />}
+          {task.type === "Number" && (
+            <TextBoxInput
+              value={entry?.value ?? 0}
+              setValue={handleSetCurrentValueNumber}
+              type={"number"}
+            />
+          )}
         </section>
+        {task.type === "Number" && task.goal?.number && (
+          <section className="Horizontal-Flex-Container">
+            <div className="Label">Goal:</div>
+            <div>{task.goal?.number}</div>
+          </section>
+        )}
         {task.repeats && <StatSection task={task} />}
         {/*<section className={'Stack-Container'}>*/}
         {/*    <div className={'Horizontal-Flex-Container'}>*/}
