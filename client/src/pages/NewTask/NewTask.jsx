@@ -22,6 +22,7 @@ import styles from "./NewTask.module.scss";
 import Button from "@/components/buttons/Button/Button";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import CollapsibleContainer from "@/components/containers/CollapsibleContainer/CollapsibleContainer";
+import { color } from "framer-motion";
 
 const NewTask = ({ index, length, id }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
@@ -372,11 +373,14 @@ const NewTask = ({ index, length, id }) => {
             </button>
             {...nonRepeatCategories.map((tempCategory) => (
               <button
-                className={styles.dropDownOption}
+                className={styles.categoryOption}
                 key={tempCategory.title}
                 onClick={() => setCategory(tempCategory)}
               >
-                {tempCategory.title}
+                <div
+                  className={`${styles.categoryChipColor} ${tempCategory.color}`}
+                ></div>
+                <span>{tempCategory.title}</span>
               </button>
             ))}
             <button
