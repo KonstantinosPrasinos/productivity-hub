@@ -1,6 +1,7 @@
 @use "@/styles/variables" as v;
 
 .container {
+  position: relative;
   padding: v.$symmetrical-padding;
   &:first-child {
     white-space: pre-wrap;

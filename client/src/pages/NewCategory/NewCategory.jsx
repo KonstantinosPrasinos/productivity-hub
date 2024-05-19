@@ -51,7 +51,7 @@ const NewCategory = ({ index, length, id }) => {
   );
   const [timePeriod, setTimePeriod] = useState("Days");
   const [timePeriod2, setTimePeriod2] = useState([]);
-  const [priority, setPriority] = useState(0);
+  const [priority, setPriority] = useState(settings.defaults.priority);
   const [hasLongGoal, setHasLongGoal] = useState(false);
   const [longGoalLimit, setLongGoalLimit] = useState("At least");
   const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);

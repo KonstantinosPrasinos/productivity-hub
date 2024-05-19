@@ -17,3 +17,35 @@
     white-space: nowrap;
   }
 }
+
+.descriptionTextArea {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  resize: none;
+
+  padding: 10px 12px;
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-primary-color);
+    font-size: v.$font-m;
+    font-family: "Roboto", sans-serif;
+    color: var(--primary-color);
+
+    &:focus-visible {
+      outline: none;
+      border: 1px solid var(--border-primary-color);
+    }
+
+    &:focus + .descriptionLengthCounter {
+      opacity: v.$opacity-low;
+    }
+}
+
+.descriptionLengthCounter {
+  position: absolute;
+  bottom: -0.75em;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}

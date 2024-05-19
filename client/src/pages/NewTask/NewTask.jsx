@@ -22,7 +22,6 @@ import styles from "./NewTask.module.scss";
 import Button from "@/components/buttons/Button/Button";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import CollapsibleContainer from "@/components/containers/CollapsibleContainer/CollapsibleContainer";
-import { color } from "framer-motion";
 
 const NewTask = ({ index, length, id }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
@@ -43,6 +42,7 @@ const NewTask = ({ index, length, id }) => {
   const [isNumberTask, setIsNumberTask] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [step, setStep] = useState(settings.defaults.step);
   const [hasGoal, setHasGoal] = useState(false);
   const [goalLimit, setGoalLimit] = useState("At least");
@@ -115,6 +115,11 @@ const NewTask = ({ index, length, id }) => {
       const task = tasks.find((task) => task._id === id);
 
       setTitle(task.title);
+
+      // To add parity with older tasks
+      if (task.description) {
+        setDescription(task.description);
+      }
 
       if (task.type === "Number") {
         setIsNumberTask(true);
@@ -196,6 +201,18 @@ const NewTask = ({ index, length, id }) => {
           type: "error",
           title: "Task Title is Missing",
           message: "Tasks must have a title. Please enter a title to continue.",
+        },
+      });
+      return;
+    }
+
+    if (description.length > 120) {
+      alertsContext.dispatch({
+        type: "ADD_ALERT",
+        payload: {
+          type: "error",
+          title: "Description too big",
+          message: "The maximum length for the description is 120 characters.",
         },
       });
       return;
@@ -319,6 +336,7 @@ const NewTask = ({ index, length, id }) => {
       title,
       priority,
       repeats,
+      description: description.length > 0 ? description : undefined,
       category: category._id,
       ...typeParameters,
       ...repeatParameters,
@@ -337,6 +355,14 @@ const NewTask = ({ index, length, id }) => {
 
   const toggleDateModal = () => {
     setDateModalIsVisible((current) => !current);
+  };
+
+  const handleDescriptionChange = (event) => {
+    const textarea = event.target;
+    console.log(event);
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + 1.8 + "px";
+    setDescription(event.target.value);
   };
 
   return (
@@ -410,6 +436,20 @@ const NewTask = ({ index, length, id }) => {
             setValue={setPriority}
           />
           <PriorityIndicator />
+        </InputWrapper>
+        <InputWrapper label="Description">
+          <textarea
+            className={styles.descriptionTextArea}
+            wrap="hard"
+            maxLength={120}
+            value={description}
+            onChange={handleDescriptionChange}
+            rows={1}
+            placeholder="Add task description"
+          />
+          <div className={styles.descriptionLengthCounter}>
+            {description.length} / 120
+          </div>
         </InputWrapper>
         <HeaderExtendContainer
           header={

@@ -9,6 +9,10 @@ const Task = new mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        maxLength: 120
+    },
     type: {
         type: String,
         required: true
