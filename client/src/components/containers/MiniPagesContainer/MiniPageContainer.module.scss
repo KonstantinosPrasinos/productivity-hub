@@ -4,10 +4,9 @@
   .container {
     border-top: v.$base-border;
     width: 100%;
-    height: calc(100% - 4em - 12px);
-    bottom: calc(4em + 12px);
-    min-height: 25%;
-    max-height: calc(100% - 4em - 12px);
+    height: calc(100% - 4.5em);
+    bottom: 4.5em;
+    max-height: calc(100% - 4.5em);
     border-radius: 10px 10px 0 0;
   }
 }

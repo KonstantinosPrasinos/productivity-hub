@@ -1,14 +1,7 @@
 import styles from "./Task.module.scss";
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
-import {
-  forwardRef,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { forwardRef, useContext, useMemo } from "react";
+import { motion } from "framer-motion";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import { TbFlame, TbHash, TbTargetArrow } from "react-icons/all";
@@ -34,6 +27,7 @@ const RepeatDetails = ({ task }) => {
             {isLoading && "..."}
             {!isLoading && entry.value}
           </TextSwitchContainer>
+          {task.goal?.number && <>/ {task.goal?.number}</>}
         </div>
       )}
       {task.type === "Number" && task.goal?.number && (
@@ -122,9 +116,9 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
         />
       )}
       <div className={"Stack-Container"}>
-        {filteredTasks.map((task, index) => (
+        {filteredTasks.map((task) => (
           <div
-            key={index}
+            key={task._id}
             className={styles.task}
             onClick={() => handleTaskClick(task._id)}
           >

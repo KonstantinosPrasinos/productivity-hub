@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import React, { useRef, useState } from "react";
 import styles from "./CurrentProgress.module.scss";
 import { useChangeEntryValue } from "../../../hooks/change-hooks/useChangeEntryValue";
 import { useGetTaskCurrentEntry } from "../../../hooks/get-hooks/useGetTaskCurrentEntry";

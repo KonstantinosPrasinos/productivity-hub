@@ -1,27 +1,51 @@
 @use "@/styles/index";
 @use "@/styles/variables" as v;
 
-.titleMedium {
-  opacity: v.$opacity-very-low;
-  width: 100%;
-  display: grid;
-  grid-template-columns: calc(45% - 0.5em) 55%;
-  grid-template-rows: repeat(auto-fill, auto);
-  grid-row-gap: 0;
-  grid-column-gap: 0.5em;
+.categoryChipColor {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.5em;
+  flex-shrink: 0;
+}
 
-  > div {
+.categoryOption {
+  @extend .Horizontal-Flex-Container;
+
+  & > span {
     text-overflow: ellipsis;
     overflow-x: hidden;
     white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
   }
 }
 
-.headerLeftSide {
-  @extend .Stack-Container;
+.descriptionTextArea {
   width: 100%;
-  gap: 5px;
+  box-sizing: border-box;
+  overflow: hidden;
+  resize: none;
+
+  padding: 10px 12px;
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-primary-color);
+    font-size: v.$font-m;
+    font-family: "Roboto", sans-serif;
+    color: var(--primary-color);
+
+    &:focus-visible {
+      outline: none;
+      border: 1px solid var(--border-primary-color);
+    }
+
+    &:focus + .descriptionLengthCounter {
+      opacity: v.$opacity-low;
+    }
+}
+
+.descriptionLengthCounter {
+  position: absolute;
+  bottom: -0.75em;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
 }

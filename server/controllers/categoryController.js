@@ -11,7 +11,7 @@ const categorySchema = Joi.object({
     title: Joi.string().required(),
     color: Joi.string().required(),
     repeats: Joi.boolean().required(),
-    priority: Joi.number().integer().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}),
+    priority: Joi.number().integer().required(),
     goal: Joi.object().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}).keys({
         type: Joi.string().valid('Streak', 'Total completed', 'Total number'),
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
