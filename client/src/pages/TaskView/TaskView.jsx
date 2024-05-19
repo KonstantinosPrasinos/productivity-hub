@@ -655,6 +655,12 @@ const TaskView = ({ index, length, task }) => {
             <div>{task.goal?.number}</div>
           </section>
         )}
+        {task.description && (
+          <section className={"Horizontal-Flex-Container"}>
+            <div className="Label">Description:</div>
+            <span>{task.description}</span>
+          </section>
+        )}
         {task.repeats && <StatSection task={task} />}
         {/*<section className={'Stack-Container'}>*/}
         {/*    <div className={'Horizontal-Flex-Container'}>*/}
