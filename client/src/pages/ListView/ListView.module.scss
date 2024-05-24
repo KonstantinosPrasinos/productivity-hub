@@ -57,7 +57,7 @@ $selection-height: 3.5em;
   box-sizing: border-box;
 
   & > div {
-    padding: calc($selection-height - 4px - 0.5em) 4px 10px 4px;
+    padding: calc($selection-height - 4px - 0.5em) 0 10px 0;
     box-sizing: border-box;
     height: 100%;
     width: 100%;
@@ -193,8 +193,8 @@ $selection-height: 3.5em;
   }
 
   .smallScreenContainer {
-    width: 22.15em;
-    min-width: 22.15em;
+    // width: 25em;
+    // min-width: 25em;
     padding: 0 10px;
   }
 

@@ -359,9 +359,10 @@ const NewTask = ({ index, length, id }) => {
 
   const handleDescriptionChange = (event) => {
     const textarea = event.target;
-    console.log(event);
+
     textarea.style.height = "auto";
     textarea.style.height = textarea.scrollHeight + 1.8 + "px";
+
     setDescription(event.target.value);
   };
 

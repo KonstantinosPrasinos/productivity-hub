@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import styles from "./TaskList.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import Task from "@/components/indicators/Task/Task.jsx";
 import Chip from "@/components/buttons/Chip/Chip";
 import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
+import { TbPlus } from "react-icons/tb";
+import Button from "@/components/buttons/Button/Button";
+import { MiniPagesContext } from "@/context/MiniPagesContext";
 
 const variants = {
   hidden: { opacity: 0 },
@@ -22,6 +25,7 @@ const childVariants = {
 
 const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
   const { data: categories } = useGetCategories();
+  const miniPagesContext = useContext(MiniPagesContext);
 
   const toggleSelected = (category) => {
     if (categoryFilter.includes(category)) {
@@ -33,43 +37,64 @@ const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
     }
   };
 
+  const handleNewClick = () => {
+    miniPagesContext.dispatch({
+      type: "ADD_PAGE",
+      payload: { type: "new-category" },
+    });
+  };
+
   return (
     <>
       <div className={styles.categoryChipContainer}>
-        {categoryFilter.map((category) => (
+        {/* {categoryFilter.map((category) => (
           <Chip
             size={"small"}
             key={category._id}
             selected={category._id}
             value={category._id}
             setSelected={() => toggleSelected(category)}
+            hasShadow={true}
           >
-            <div className="Horizontal-Flex-Container">
+            <div className={styles.categoryContents}>
               <div
                 className={`${styles.categoryChipColor} ${category.color}`}
               ></div>
-              {category.title}
+              <span>{category.title}</span>
             </div>
           </Chip>
-        ))}
+        ))} */}
         {categories
-          .filter((category) => !categoryFilter.includes(category))
+          // .filter((category) => !categoryFilter.includes(category))
           .map((category) => (
             <Chip
               size={"small"}
               key={category._id}
-              selected={null}
-              value={category._id}
+              selected={categoryFilter.includes(category) ? category : null}
+              value={category}
               setSelected={() => toggleSelected(category)}
+              hasShadow={true}
             >
-              <div className="Horizontal-Flex-Container">
+              <div className={styles.categoryContents}>
                 <div
                   className={`${styles.categoryChipColor} ${category.color}`}
                 ></div>
-                {category.title}
+                <span>{category.title}</span>
               </div>
             </Chip>
           ))}
+        <Button
+          onClick={handleNewClick}
+          filled={false}
+          type={"square"}
+          hasShadow={true}
+          size="small"
+        >
+          <span className="Horizontal-Flex-Container">
+            Add new
+            <TbPlus />
+          </span>
+        </Button>
       </div>
     </>
   );
@@ -103,7 +128,6 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
       exit={"exit"}
       className={styles.container}
     >
-      <CategoryChips categoryFilter={filter} setCategoryFilter={setFilter} />
       <div className={`Stack-Container ${styles.leftSide}`}>
         {/*
                 Animate Presence is needed here to set initial to true.
@@ -135,6 +159,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
             )}
         </AnimatePresence>
       </div>
+      <CategoryChips categoryFilter={filter} setCategoryFilter={setFilter} />
     </motion.div>
   );
 };

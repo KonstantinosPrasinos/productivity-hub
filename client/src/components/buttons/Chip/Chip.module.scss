@@ -10,6 +10,12 @@
     padding: 0 !important;
     gap: 0 !important;
 
+    &.widthLimited {
+        max-width: 100%;
+        width: min-content;
+        justify-content: flex-start;
+    }
+
     &.selected {
         background-color: var(--primary-color);
         color: var(--on-primary-color);
@@ -23,6 +29,13 @@
         background-color: var(--primary-color);
         color: var(--on-primary-color);
         border: none;
+    }
+
+    .children {
+        overflow: hidden;
+        & > * {
+            flex-shrink: 0;
+        }
     }
 
     &:not(.small) {

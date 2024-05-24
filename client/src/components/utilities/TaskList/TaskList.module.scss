@@ -1,25 +1,67 @@
 @use "@/styles/variables" as v;
 @use "@/styles/index";
 
+@media (max-width: v.$phone-breakpoint) {
+  .categoryChipContainer {
+    flex-direction: row;
+    padding: 4px 0;
+    overflow-x: auto;
+    max-width: calc(100% - 20px);
+    margin: 0 10px;
+    box-sizing: border-box;
+
+    & > :first-child {
+      margin-left: 4px;
+    }
+  
+    & > :last-child {
+      margin-right: 4px;
+    }
+  }
+
+  .container {
+    flex-direction: column-reverse;
+    // width: calc(22.15em + 20px);
+    // min-width: calc(22.15em + 20px);
+  }
+
+  .leftSide {
+    width: 100%;
+    padding: 0.5em 4px 0.5em 10px;
+  }
+}
+
+@media (min-width: v.$phone-breakpoint) {
+  .categoryChipContainer {
+    padding: 4px;
+    overflow: hidden;
+    max-width: 12.5em;
+    max-height: 100%;
+  }
+
+  .leftSide {
+    height: 100%;
+    width: 25em;
+    min-width: 25em;
+    padding: 0 10px 0.5em 10px;
+  }
+}
+
 .container {
-  @extend .Stack-Container;
+  @extend .Horizontal-Flex-Container;
   overflow: hidden;
   padding-top: 0.5em;
-  width: calc(22.15em + 20px);
-  min-width: calc(22.15em + 20px);
   padding-top: 0.5em;
   gap: 0;
+  align-items: flex-start;
 }
 
 .leftSide {
-  align-items: center;
-  width: 22.15em;
-  min-width: 22.15em;
   max-width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 10px 0.5em 10px;
   flex-grow: 1;
+  box-sizing: border-box;
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--background-color);
@@ -28,30 +70,16 @@
   &:hover::-webkit-scrollbar-thumb {
     background-color: var(--border-primary-color);
   }
-}
 
-@media (max-width: v.$phone-breakpoint) {
-  .leftSide {
-    width: 100%;
-    padding: 0.5em 4px 0.5em 4px;
+  & > :last-child {
+    margin-bottom: 4px;
   }
 }
 
 .categoryChipContainer {
-  @extend .Horizontal-Flex-Container, .Align-Left;
-  width: 100%;
-  overflow-x: auto;
+  @extend .Stack-Container, .Align-Left;
   height: min-content;
   flex-shrink: 0;
-  padding: 4px 0;
-
-  & > :first-child {
-    margin-left: 4px;
-  }
-
-  & > :last-child {
-    margin-right: 4px;
-  }
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--background-color);
@@ -66,4 +94,14 @@
   width: 0.5em;
   height: 0.5em;
   border-radius: 0.5em;
+  flex-shrink: 0;
+}
+
+.categoryContents {
+  @extend .Horizontal-Flex-Container;
+  & > span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+  }
 }
