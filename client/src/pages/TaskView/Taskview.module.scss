@@ -1,4 +1,5 @@
 @use "@/styles/variables" as v;
+@use "@/styles/index";
 $base-size: 1.2em;
 
 .checkbox {
@@ -45,4 +46,9 @@ $base-size: 1.2em;
 .customSelectedDay {
   background-color: var(--primary-color) !important;
   color: var(--on-primary-color);
+}
+
+.descriptionContainer {
+  @extend .Horizontal-Flex-Container;
+  align-items: baseline;
 }

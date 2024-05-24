@@ -71,6 +71,7 @@ const NewTask = ({ index, length, id }) => {
   const [repeatType, setRepeatType] = useState("Custom Rules");
 
   const titleRef = useRef();
+  const descriptionRef = useRef();
 
   const { isLoading: groupsLoading, data: groups } = useGetGroups();
 
@@ -118,7 +119,7 @@ const NewTask = ({ index, length, id }) => {
 
       // To add parity with older tasks
       if (task.description) {
-        setDescription(task.description);
+        handleDescriptionChange({ target: { value: task.description } });
       }
 
       if (task.type === "Number") {
@@ -358,12 +359,14 @@ const NewTask = ({ index, length, id }) => {
   };
 
   const handleDescriptionChange = (event) => {
-    const textarea = event.target;
+    const textarea = descriptionRef.current;
+
+    setDescription(event.target.value);
+
+    textarea.value = event.target.value;
 
     textarea.style.height = "auto";
     textarea.style.height = textarea.scrollHeight + 1.8 + "px";
-
-    setDescription(event.target.value);
   };
 
   return (
@@ -447,6 +450,7 @@ const NewTask = ({ index, length, id }) => {
             onChange={handleDescriptionChange}
             rows={1}
             placeholder="Add task description"
+            ref={descriptionRef}
           />
           <div className={styles.descriptionLengthCounter}>
             {description.length} / 120
