@@ -207,13 +207,13 @@ const NewTask = ({ index, length, id }) => {
       return;
     }
 
-    if (description.length > 120) {
+    if (description.length > 500) {
       alertsContext.dispatch({
         type: "ADD_ALERT",
         payload: {
           type: "error",
           title: "Description too big",
-          message: "The maximum length for the description is 120 characters.",
+          message: "The maximum length for the description is 500 characters.",
         },
       });
       return;
@@ -445,7 +445,7 @@ const NewTask = ({ index, length, id }) => {
           <textarea
             className={styles.descriptionTextArea}
             wrap="hard"
-            maxLength={120}
+            maxLength={500}
             value={description}
             onChange={handleDescriptionChange}
             rows={1}
@@ -453,7 +453,7 @@ const NewTask = ({ index, length, id }) => {
             ref={descriptionRef}
           />
           <div className={styles.descriptionLengthCounter}>
-            {description.length} / 120
+            {description.length} / 500
           </div>
         </InputWrapper>
         <HeaderExtendContainer
