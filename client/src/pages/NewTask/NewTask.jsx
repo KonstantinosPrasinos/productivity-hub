@@ -23,24 +23,29 @@ import Button from "@/components/buttons/Button/Button";
 import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import CollapsibleContainer from "@/components/containers/CollapsibleContainer/CollapsibleContainer";
 
+// const causesOfExpiration = ['End of goal', 'Date', 'Never'];
+// const taskType = ['Checkbox', 'Number'];
+const goalLimits = ["At most", "Exactly", "At least"];
+const timePeriods = ["Days", "Weeks", "Months", "Years"];
+const repeatTypes = ["Custom Rules", "Repeatable Category"];
+const goalTypes = ["Streak", "Total"];
+
 const NewTask = ({ index, length, id }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
-
-  const repeatCategories = useMemo(() => {
-    return categories.filter((category) => !isNaN(category.repeatRate?.number));
-  }, [categories]);
-
-  const nonRepeatCategories = useMemo(() => {
-    return categories.filter((category) => isNaN(category.repeatRate?.number));
-  }, [categories]);
-
+  const { isLoading: groupsLoading, data: groups } = useGetGroups();
+  const { isLoading, data: tasks } = useGetTasks();
   const { data: settings } = useGetSettings();
 
   const { mutate: addTask } = useAddTask();
   const { mutate: changeTask } = useChangeTask();
 
-  const [isNumberTask, setIsNumberTask] = useState(false);
+  const alertsContext = useContext(AlertsContext);
+  const miniPagesContext = useContext(MiniPagesContext);
 
+  const titleRef = useRef();
+  const descriptionRef = useRef();
+
+  const [isNumberTask, setIsNumberTask] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [step, setStep] = useState(settings.defaults.step);
@@ -50,12 +55,10 @@ const NewTask = ({ index, length, id }) => {
   const [category, setCategory] = useState("None");
   const [priority, setPriority] = useState(settings.defaults.priority);
   const [repeats, setRepeats] = useState(false);
-
   const [hasLongGoal, setHasLongGoal] = useState(false);
   const [longGoalLimit, setLongGoalLimit] = useState("At least");
   const [longGoalNumber, setLongGoalNumber] = useState(settings.defaults.goal);
   const [longGoalType, setLongGoalType] = useState("Streak");
-
   // const [expiresAt, setExpiresAt] = useState('Never');
   const [timeGroup, setTimeGroup] = useState({ title: "None", _id: undefined });
   const [hasTime, setHasTime] = useState(false);
@@ -63,36 +66,37 @@ const NewTask = ({ index, length, id }) => {
   const [startMinute, setStartMinute] = useState("00");
   const [endHour, setEndHour] = useState("23");
   const [endMinute, setEndMinute] = useState("59");
-
   const [repeatNumber, setRepeatNumber] = useState(settings.defaults.priority);
   const [timePeriod, setTimePeriod] = useState("Weeks");
   const [timePeriod2, setTimePeriod2] = useState([]);
-
   const [repeatType, setRepeatType] = useState("Custom Rules");
-
-  const titleRef = useRef();
-  const descriptionRef = useRef();
-
-  const { isLoading: groupsLoading, data: groups } = useGetGroups();
-
-  const { isLoading, data: tasks } = useGetTasks();
-
-  const alertsContext = useContext(AlertsContext);
-  const miniPagesContext = useContext(MiniPagesContext);
   const [dateModalIsVisible, setDateModalIsVisible] = useState(false);
 
-  // const causesOfExpiration = ['End of goal', 'Date', 'Never'];
-  // const taskType = ['Checkbox', 'Number'];
-  const goalLimits = ["At most", "Exactly", "At least"];
-  const timePeriods = ["Days", "Weeks", "Months", "Years"];
-  const repeatTypes = ["Custom Rules", "Repeatable Category"];
-  const goalTypes = ["Streak", "Total"];
+  const repeatCategories = useMemo(() => {
+    if (categoriesLoading) return [];
+    return categories.filter((category) => !isNaN(category.repeatRate?.number));
+  }, [categories, categoriesLoading]);
+
+  const nonRepeatCategories = useMemo(() => {
+    if (categoriesLoading) return [];
+    return categories.filter((category) => isNaN(category.repeatRate?.number));
+  }, [categories]);
+
+  const categorySubcategories = useMemo(() => {
+    if (categoriesLoading || groupsLoading || !category?._id)
+      return [{ title: "None", _id: null }];
+    return groups.filter((group) => group.parent === category._id);
+  }, [category, groups, groupsLoading]);
 
   const handleKeyDown = (e) => {
     if (e.code === "Enter") {
       handleSave();
     }
   };
+
+  useEffect(() => {
+    setTimeGroup({ title: "None", _id: null });
+  }, [category]);
 
   const findMatchingGroups = () => {
     const tempGroups = [{ title: "None", _id: undefined }];
@@ -308,7 +312,6 @@ const NewTask = ({ index, length, id }) => {
         };
 
         if (timeGroup._id) {
-          repeatParameters.group = timeGroup._id;
           repeatParameters.repeatRate.smallTimePeriod =
             timeGroup.repeatRate.smallTimePeriod;
           repeatParameters.repeatRate.startingDate =
@@ -339,6 +342,7 @@ const NewTask = ({ index, length, id }) => {
       repeats,
       description: description.length > 0 ? description : undefined,
       category: category._id,
+      group: timeGroup?._id ? timeGroup._id : undefined,
       ...typeParameters,
       ...repeatParameters,
     };
@@ -386,8 +390,32 @@ const NewTask = ({ index, length, id }) => {
           onKeyDown={handleKeyDown}
           ref={titleRef}
         />
+        <InputWrapper label="Description">
+          <textarea
+            className={styles.descriptionTextArea}
+            wrap="hard"
+            maxLength={500}
+            value={description}
+            onChange={handleDescriptionChange}
+            rows={1}
+            placeholder="Add task description"
+            ref={descriptionRef}
+          />
+          <div className={styles.descriptionLengthCounter}>
+            {description.length} / 500
+          </div>
+        </InputWrapper>
+        <InputWrapper label="Priority">
+          <TextBoxInput
+            type="number"
+            placeholder="Priority"
+            value={priority}
+            setValue={setPriority}
+          />
+          <PriorityIndicator />
+        </InputWrapper>
         <InputWrapper
-          label={"Category"}
+          label={"Category / Subcategory"}
           tooltipMessage={"Only categories that don't repeat show up here"}
         >
           <DropDownInput
@@ -431,30 +459,33 @@ const NewTask = ({ index, length, id }) => {
               <TbPlus />
             </button>
           </DropDownInput>
-        </InputWrapper>
-        <InputWrapper label="Priority">
-          <TextBoxInput
-            type="number"
-            placeholder="Priority"
-            value={priority}
-            setValue={setPriority}
-          />
-          <PriorityIndicator />
-        </InputWrapper>
-        <InputWrapper label="Description">
-          <textarea
-            className={styles.descriptionTextArea}
-            wrap="hard"
-            maxLength={500}
-            value={description}
-            onChange={handleDescriptionChange}
-            rows={1}
-            placeholder="Add task description"
-            ref={descriptionRef}
-          />
-          <div className={styles.descriptionLengthCounter}>
-            {description.length} / 500
-          </div>
+          <DropDownInput
+            placeholder={"None"}
+            selected={timeGroup?.title}
+            isDisabled={
+              (repeats && repeatType === "Repeatable Category") ||
+              !category?._id
+            }
+          >
+            <button
+              onClick={() => setTimeGroup({ title: "None", _id: null })}
+              className={styles.dropDownOption}
+            >
+              None
+            </button>
+            {...categorySubcategories.map((tempSubcategory) => (
+              <button
+                className={styles.categoryOption}
+                key={tempSubcategory._id}
+                onClick={() => setTimeGroup(tempSubcategory)}
+              >
+                {/* <div
+                  className={`${styles.categoryChipColor} ${tempSubcategory.color}`}
+                ></div> */}
+                <span>{tempSubcategory.title}</span>
+              </button>
+            ))}
+          </DropDownInput>
         </InputWrapper>
         <HeaderExtendContainer
           header={

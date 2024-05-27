@@ -23,7 +23,7 @@ const taskSchema = Joi.object({
     //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
     //     timePeriod: Joi.string()
     // }),
-    group: Joi.string().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}),
+    group: Joi.string(),
     repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
