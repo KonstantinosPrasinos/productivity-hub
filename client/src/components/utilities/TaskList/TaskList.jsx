@@ -24,12 +24,7 @@ const childVariants = {
   exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } },
 };
 
-const CategoryChips = ({
-  categoryFilter,
-  setCategoryFilter,
-  subCategoryFilter,
-  setSubCategoryFilter,
-}) => {
+const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
   const { data: categories } = useGetCategories();
   const { data: subCategories } = useGetGroups();
   const miniPagesContext = useContext(MiniPagesContext);
@@ -43,12 +38,6 @@ const CategoryChips = ({
       setCategoryFilter((current) =>
         current.filter((tempCategory) => tempCategory._id != category._id)
       );
-
-      // setSubCategoryFilter((current) =>
-      //   current.filter(
-      //     (tempSubcategory) => tempSubcategory.parent !== category._id
-      //   )
-      // );
     } else {
       setCategoryFilter((current) => [
         ...current,
@@ -93,6 +82,19 @@ const CategoryChips = ({
     }
   };
 
+  const toggleNoCategory = () => {
+    if (categoryFilter.find((category) => category._id === "-1")) {
+      setCategoryFilter((current) =>
+        current.filter((tempCategory) => tempCategory._id != "-1")
+      );
+    } else {
+      setCategoryFilter((current) => [
+        ...current,
+        { _id: "-1", selectedSubcategories: [] },
+      ]);
+    }
+  };
+
   const handleNewClick = () => {
     miniPagesContext.dispatch({
       type: "ADD_PAGE",
@@ -120,6 +122,16 @@ const CategoryChips = ({
             </div>
           </Chip>
         ))} */}
+        <Chip
+          value={-1}
+          setSelected={() => toggleNoCategory()}
+          selected={
+            categoryFilter.find((category) => category._id === "-1") ? -1 : null
+          }
+          hasShadow={true}
+        >
+          No category
+        </Chip>
         {categories.map((category) => {
           const categorySubcategories = subCategories.filter(
             (subCategory) => subCategory.parent === category._id
@@ -216,7 +228,6 @@ const CategoryChips = ({
 
 const TaskList = ({ tasks = [], usesTime = false }) => {
   const [categoryFilter, setCategoryFilter] = useState([]);
-  const [subCategoryFilter, setSubCategoryFilter] = useState([]);
 
   const filteredTasks = useMemo(() => {
     if (categoryFilter.length == 0) return tasks;
@@ -236,9 +247,9 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
 
         return matchedCategory && matchesSubcategory;
       } else {
-        return categoryFilter
-          .map((tempFilter) => tempFilter._id)
-          .includes(task.category);
+        // _id of -1 is for when the "no category" option is selected. Then show all tasks with no category
+        if (categoryFilter.find((category) => category._id === "-1"))
+          return task;
       }
     });
   }, [categoryFilter, tasks]);
@@ -285,8 +296,6 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
       <CategoryChips
         categoryFilter={categoryFilter}
         setCategoryFilter={setCategoryFilter}
-        subCategoryFilter={subCategoryFilter}
-        setSubCategoryFilter={setSubCategoryFilter}
       />
     </motion.div>
   );
