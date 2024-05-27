@@ -117,7 +117,7 @@ export function useRenderTasks(usesTime = false) {
             if (categoryOnlyTasks.length) {
                 // Check if any of the tasks are not completed
                 const existsNotCompletedTask = !usesTime || categoryOnlyTasks.some((task) => {
-                    const taskCurrentEntry = entries.find(entry => entry._id === task.currentEntryId);
+                    const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
                     if (!taskCurrentEntry) return false;
                     return !checkTaskCompleted(task, taskCurrentEntry);
                 })
@@ -143,7 +143,7 @@ export function useRenderTasks(usesTime = false) {
                 if (localGroupTasks.length) {
                     // Check if any of the tasks are not completed
                     const existsNotCompletedTask = !usesTime || localGroupTasks.some((task) => {
-                        const taskCurrentEntry = entries.find(entry => entry._id === task.currentEntryId);
+                        const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
                         if (!taskCurrentEntry) {
                             taskIdsWithEntriesLoading.push(task._id);
                             return false;
@@ -156,7 +156,7 @@ export function useRenderTasks(usesTime = false) {
                     }
 
                     if (existsNotCompletedTask) {
-                        if (!usesTime || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
+                        if (!usesTime || isNaN(category.repeatRate?.number) || checkTime({repeatRate: {...category.repeatRate, ...group.repeatRate}, mostRecentProperDate: localGroupTasks[0].mostRecentProperDate})){
                             localGroupTasks.sort((a, b) => b.priority - a.priority);
                             
                             groupedTasks.push({

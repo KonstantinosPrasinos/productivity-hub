@@ -40,3 +40,16 @@
   padding: 4px;
   overflow-x: auto;
 }
+
+.textSeparator {
+  @extend .Horizontal-Flex-Container;
+  width: 100%;
+  color: var(--primary-color);
+  opacity: v.$opacity-very-low;
+
+  & > :first-child, & > :last-child {
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--primary-color);
+  }
+}

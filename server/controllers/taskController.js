@@ -10,7 +10,7 @@ const taskSchema = Joi.object({
         limit: Joi.string().valid('At most', 'Exactly', 'At least'),
         number: Joi.number().min(1).max(999)
     }),
-    description: Joi.string().max(120),
+    description: Joi.string().max(500),
     category: Joi.string(),
     priority: Joi.number().integer().required(),
     repeats: Joi.boolean().required(),
@@ -23,7 +23,7 @@ const taskSchema = Joi.object({
     //     type: Joi.string().valid('Never', 'Date', 'End of goal'),
     //     timePeriod: Joi.string()
     // }),
-    group: Joi.string().when('repeats', {is: true, then: Joi.optional(), otherwise: Joi.forbidden()}),
+    group: Joi.string(),
     repeatRate: Joi.object().when('repeats', {is: true, then: Joi.required(), otherwise: Joi.forbidden()}).keys({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),

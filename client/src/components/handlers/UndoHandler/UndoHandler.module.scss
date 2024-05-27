@@ -6,10 +6,16 @@
   border-radius: v.$button-border-radius;
   position: fixed;
   bottom: 2em;
-  right: 2em;
+  right: 0.5em;
   background-color: var(--primary-color);
   color: var(--on-primary-color);
   font-size: v.$font-l;
   padding: v.$base-padding;
   z-index: 2;
+}
+
+@media (max-width: v.$phone-breakpoint) {
+  .container {
+    bottom: 4.5em;
+  }
 }

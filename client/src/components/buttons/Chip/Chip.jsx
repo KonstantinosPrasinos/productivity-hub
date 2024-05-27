@@ -14,12 +14,17 @@ const Chip = ({
   size,
   disabled,
   deleteFunction,
+  hasShadow = false,
 }) => {
   return (
     <div
-      className={`${styles.container} Button ${styles[style]} ${
-        type === "select" && value === selected ? styles.filled : ""
-      } ${type === "icon"} ${styles[size]} ${disabled ? styles.disabled : ""}`}
+      className={`${styles.container} ${styles.widthLimited} Button ${
+        styles[style]
+      } ${type === "select" && value === selected ? styles.filled : ""} ${
+        type === "icon"
+      } ${styles[size]} ${disabled ? styles.disabled : ""} ${
+        hasShadow ? "Has-Shadow" : ""
+      }`}
     >
       <button
         className={styles.children}

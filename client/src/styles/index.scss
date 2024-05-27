@@ -231,10 +231,10 @@ a {
         transition: transform 0.2s ease-in-out;
         transform: scale(1.005) !important;
     }
+}
 
-    &.Has-Shadow {
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-    }
+.Has-Shadow {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .Empty-Indicator-Container {

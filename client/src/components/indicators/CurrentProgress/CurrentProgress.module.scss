@@ -52,3 +52,37 @@
     transition: 0.2s color ease-in-out;
     color: var(--success-color);
 }
+
+.boxIsNotChecked {
+    
+}
+
+@keyframes getChecked {
+    0% {
+        stroke-dashoffset: 1;
+        color: var(--success-color);
+    }
+    75% {
+        stroke-dashoffset: 0.25;
+        color: var(--success-color);
+    }
+    100% {
+        stroke-dashoffset: 0;
+        color: var(--primary-color);
+    }
+}
+
+.checkbox {
+    &.isChecked {
+        animation-name: getChecked;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in-out;
+    }
+
+    &.notChecked {
+        transition: 0.2s stroke-dashoffset ease-in-out, 0.2s opacity ease-in-out;
+        stroke-dashoffset: 1;
+        opacity: 0;
+        color: var(--primary-color);
+    }
+}

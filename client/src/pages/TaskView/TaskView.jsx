@@ -656,7 +656,7 @@ const TaskView = ({ index, length, task }) => {
           </section>
         )}
         {task.description && (
-          <section className={"Horizontal-Flex-Container"}>
+          <section className={styles.descriptionContainer}>
             <div className="Label">Description:</div>
             <span>{task.description}</span>
           </section>

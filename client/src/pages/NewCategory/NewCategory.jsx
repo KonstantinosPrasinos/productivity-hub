@@ -27,6 +27,16 @@ import TimeInput from "@/components/inputs/TimeInput/TimeInput";
 import PriorityIndicator from "@/components/indicators/PriorityIndicator/PriorityIndicator";
 import { translateVerticalScroll } from "@/functions/translateVerticalScroll.js";
 
+const SeparatorWithText = ({ children }) => {
+  return (
+    <div className={styles.textSeparator}>
+      <span></span>
+      <span>{children}</span>
+      <span></span>
+    </div>
+  );
+};
+
 const NewCategory = ({ index, length, id }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
   const { isLoading: groupsLoading, data: groups } = useGetGroups();
@@ -135,9 +145,9 @@ const NewCategory = ({ index, length, id }) => {
         type: "ADD_ALERT",
         payload: {
           type: "error",
-          title: "Unsaved Subdivision Changes",
+          title: "Unsaved Subcategory Changes",
           message:
-            "You have unsaved subdivision changes. Please save or cancel the changes to continue.",
+            "You have unsaved subcategory changes. Please save or cancel the changes to continue.",
         },
       });
       return;
@@ -149,7 +159,7 @@ const NewCategory = ({ index, length, id }) => {
         type: "ADD_ALERT",
         payload: {
           type: "error",
-          title: "Category Title is Missing",
+          title: "Category title is missing",
           message:
             "Categories must have a title. Please enter one to continue.",
         },
@@ -162,7 +172,7 @@ const NewCategory = ({ index, length, id }) => {
         type: "ADD_ALERT",
         payload: {
           type: "error",
-          title: "Category Title is Missing",
+          title: "Category priority is missing",
           message:
             "Categories must have a priority. Please enter one to continue.",
         },
@@ -345,9 +355,9 @@ const NewCategory = ({ index, length, id }) => {
         type: "ADD_ALERT",
         payload: {
           type: "error",
-          title: "Subdivision Title is Missing",
+          title: "Subcategory Title is Missing",
           message:
-            "Subdivisions must have a title. Please enter a title to continue.",
+            "Subcategorys must have a title. Please enter a title to continue.",
         },
       });
       return;
@@ -364,22 +374,9 @@ const NewCategory = ({ index, length, id }) => {
         type: "ADD_ALERT",
         payload: {
           type: "error",
-          title: "Duplicate Subdivision",
+          title: "Duplicate Subcategory",
           message:
-            "A subdivision with that title already exists in the category. Change the title to continue.",
-        },
-      });
-      return;
-    }
-
-    // At least one day must be selected
-    if (timePeriod !== "Days" && !timePeriod2) {
-      alertsContext.dispatch({
-        type: "ADD_ALERT",
-        payload: {
-          type: "error",
-          title: "No repeat days selected",
-          message: "You must select at least one day to repeat on",
+            "A subcategory with that title already exists in the category. Change the title to continue.",
         },
       });
       return;
@@ -387,19 +384,26 @@ const NewCategory = ({ index, length, id }) => {
 
     const newId = currentEditedGroup.current?._id ?? getGroupId();
 
-    const startingDates = findStartingDates(timePeriod, timePeriod2);
+    let startingDates;
+
+    if (repeats && timePeriod != "Days" && timePeriod2.length > 0) {
+      findStartingDates(timePeriod, timePeriod2);
+    }
 
     const timeGroup = {
       _id: newId,
       title: timeGroupTitle,
-      repeatRate: {
-        smallTimePeriod: timePeriod2,
-        startingDate: startingDates,
-      },
+      repeatRate:
+        repeats && timePeriod != "Days" && timePeriod2.length > 0
+          ? {
+              smallTimePeriod: timePeriod2,
+              startingDate: startingDates,
+            }
+          : undefined,
       initial: currentEditedGroup.current?.initial,
     };
 
-    if (hasTime) {
+    if (repeats && hasTime) {
       if (
         endHour !== "00" &&
         (parseInt(startHour) < parseInt(endHour) ||
@@ -415,8 +419,8 @@ const NewCategory = ({ index, length, id }) => {
           type: "ADD_ALERT",
           payload: {
             type: "error",
-            title: "Subdivision Time is Invalid",
-            message: "A subdivision can't end before it starts.",
+            title: "Subcategory Time is Invalid",
+            message: "A subcategory can't end before it starts.",
           },
         });
         return;
@@ -568,13 +572,6 @@ const NewCategory = ({ index, length, id }) => {
     }
   }, [categoriesLoading, groupsLoading]);
 
-  const disabledSaveGroupButton = useMemo(() => {
-    if (!timeGroupTitle) return true;
-    if (timePeriod !== "Days" && timePeriod2.length === 0) return true;
-
-    return false;
-  }, [timePeriod2, timeGroupTitle, priority, timePeriodNumber]);
-
   return (
     <>
       <MiniPageContainer
@@ -687,123 +684,126 @@ const NewCategory = ({ index, length, id }) => {
               minNumber={1}
             />
           </InputWrapper>
+        </HeaderExtendContainer>
+        <HeaderExtendContainer
+          header={
+            <div className={"Stack-Container"}>
+              <InputWrapper
+                label="Subcategories"
+                hasPadding={false}
+                // tooltipMessage={'Required: repeat rate bigger than "day"'}
+              >
+                <div
+                  className={styles.groupTitlesContainer}
+                  onWheel={translateVerticalScroll}
+                >
+                  <Button
+                    filled={true}
+                    symmetrical={true}
+                    onClick={handleAddTimeGroup}
+                    size={"small"}
+                  >
+                    Add new
+                    <TbPlus />
+                  </Button>
+                  <AnimatePresence mode={"popLayout"}>
+                    {timeGroupList[0]._id !== -1 &&
+                      timeGroupList.map((group) => (
+                        <motion.div
+                          layout
+                          key={group._id}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.8, opacity: 0 }}
+                        >
+                          <Chip
+                            type={"icon"}
+                            onClick={(e) => {
+                              handleGroupClick(e, group);
+                            }}
+                            hasDeleteButton={true}
+                            deleteFunction={() => handleDelete(group)}
+                            size={"small"}
+                          >
+                            {group.title}
+                          </Chip>
+                        </motion.div>
+                      ))}
+                  </AnimatePresence>
+                </div>
+              </InputWrapper>
+            </div>
+          }
+          extendedInherited={creatingTimeGroup}
+          setExtendedInherited={handleAddTimeGroup}
+          hasPointer={false}
+          extendOnClick={false}
+        >
+          <InputWrapper label={"Title"}>
+            <TextBoxInput
+              placeholder="Title"
+              value={timeGroupTitle}
+              setValue={setTimeGroupTitle}
+              ref={groupTitleRef}
+            />
+          </InputWrapper>
+          <SeparatorWithText>Require category to repeat</SeparatorWithText>
+          <InputWrapper label={"Visible on certain days"}>
+            <Button
+              onClick={toggleTimePeriodModal}
+              disabled={!repeats || timePeriod === "Days"}
+              size={"small"}
+            >
+              Select dates
+            </Button>
+          </InputWrapper>
           <HeaderExtendContainer
             header={
-              <div className={"Stack-Container"}>
-                <InputWrapper
-                  label="Subdivisions"
-                  hasPadding={false}
-                  tooltipMessage={'Required: repeat rate bigger than "day"'}
-                >
-                  <div
-                    className={styles.groupTitlesContainer}
-                    onWheel={translateVerticalScroll}
-                  >
-                    <Button
-                      filled={true}
-                      symmetrical={true}
-                      onClick={handleAddTimeGroup}
-                      size={"small"}
-                      disabled={timePeriod === "Days"}
-                    >
-                      Add new
-                      <TbPlus />
-                    </Button>
-                    <AnimatePresence mode={"popLayout"}>
-                      {timeGroupList[0]._id !== -1 &&
-                        timeGroupList.map((group) => (
-                          <motion.div
-                            layout
-                            key={group._id}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                          >
-                            <Chip
-                              type={"icon"}
-                              onClick={(e) => {
-                                handleGroupClick(e, group);
-                              }}
-                              hasDeleteButton={true}
-                              deleteFunction={() => handleDelete(group)}
-                              size={"small"}
-                            >
-                              {group.title}
-                            </Chip>
-                          </motion.div>
-                        ))}
-                    </AnimatePresence>
-                  </div>
-                </InputWrapper>
+              <div className={"Horizontal-Flex-Container Space-Between"}>
+                <div className={"Title-Small"}>Repeat time range</div>
+                <ToggleButton
+                  isToggled={hasTime}
+                  setIsToggled={setHasTime}
+                  disabled={!repeats || timePeriod === "Days"}
+                />
               </div>
             }
-            extendedInherited={creatingTimeGroup}
-            setExtendedInherited={handleAddTimeGroup}
-            hasPointer={false}
             extendOnClick={false}
+            extendedInherited={hasTime && repeats}
+            hasPointer={false}
             hasOutline={false}
+            isDisabled={!repeats}
           >
-            <InputWrapper label={"Title"}>
-              <TextBoxInput
-                placeholder="Title"
-                value={timeGroupTitle}
-                setValue={setTimeGroupTitle}
-                ref={groupTitleRef}
+            <InputWrapper>
+              <TimeInput
+                hour={startHour}
+                setHour={setStartHour}
+                minute={startMinute}
+                setMinute={setStartMinute}
+                isDisabled={!hasTime}
+              />
+              -
+              <TimeInput
+                hour={endHour}
+                setHour={setEndHour}
+                minute={endMinute}
+                setMinute={setEndMinute}
+                isDisabled={!hasTime}
               />
             </InputWrapper>
-            <InputWrapper label={"On"}>
-              <Button
-                onClick={toggleTimePeriodModal}
-                disabled={timePeriod === "Days"}
-                size={"small"}
-              >
-                Select dates
-              </Button>
-            </InputWrapper>
-            <HeaderExtendContainer
-              header={
-                <div className={"Horizontal-Flex-Container Space-Between"}>
-                  <div className={"Title-Small"}>Repeat time range</div>
-                  <ToggleButton isToggled={hasTime} setIsToggled={setHasTime} />
-                </div>
-              }
-              extendOnClick={false}
-              extendedInherited={hasTime && repeats}
-              hasPointer={false}
-              hasOutline={false}
-              isDisabled={!repeats}
-            >
-              <InputWrapper>
-                <TimeInput
-                  hour={startHour}
-                  setHour={setStartHour}
-                  minute={startMinute}
-                  setMinute={setStartMinute}
-                  isDisabled={!hasTime}
-                />
-                -
-                <TimeInput
-                  hour={endHour}
-                  setHour={setEndHour}
-                  minute={endMinute}
-                  setMinute={setEndMinute}
-                  isDisabled={!hasTime}
-                />
-              </InputWrapper>
-            </HeaderExtendContainer>
-            <div className={"Horizontal-Flex-Container"}>
-              <Button filled={false} width={"max"} onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button
-                width={"max"}
-                disabled={disabledSaveGroupButton}
-                onClick={handleTimeGroupSave}
-              >
-                Save Group
-              </Button>
-            </div>
           </HeaderExtendContainer>
+          <div className={"Horizontal-Flex-Container"}>
+            <Button filled={false} width={"max"} onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              width={"max"}
+              disabled={!timeGroupTitle}
+              onClick={handleTimeGroupSave}
+            >
+              Save subcategory
+            </Button>
+          </div>
         </HeaderExtendContainer>
       </MiniPageContainer>
       {confirmDeleteModalVisible && (

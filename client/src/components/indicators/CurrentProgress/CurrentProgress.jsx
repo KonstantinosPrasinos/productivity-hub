@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./CurrentProgress.module.scss";
 import { useChangeEntryValue } from "../../../hooks/change-hooks/useChangeEntryValue";
 import { useGetTaskCurrentEntry } from "../../../hooks/get-hooks/useGetTaskCurrentEntry";
 
-const LocalTbCheck = () => {
+const LocalTbCheck = ({ isChecked }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,28 +18,12 @@ const LocalTbCheck = () => {
       strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <motion.path
+      <path
         pathLength={1}
+        className={`${styles.checkbox} ${
+          isChecked ? styles.isChecked : styles.notChecked
+        }`}
         strokeLinecap="round"
-        initial={{ strokeDashoffset: 1, color: "var(--success-color)" }}
-        animate={{
-          strokeDashoffset: 0,
-          opacity: 1,
-          color: "var(--primary-color)",
-        }}
-        exit={{
-          strokeDashoffset: 1,
-          opacity: 0,
-        }}
-        transition={{
-          type: "spring",
-          duration: 0.3,
-          bounce: 0,
-          color: {
-            delay: 0.2,
-            duration: 0.1,
-          },
-        }}
         strokeDasharray={1}
         d="M5 12l5 5l10 -10"
       />
@@ -62,7 +46,7 @@ const LocalTbAdd = ({ isGreen }) => {
       className={isGreen ? styles.numberIsGreen : ""}
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <motion.path d="M12 5l0 14" />
+      <path d="M12 5l0 14" />
       <path d="M5 12l14 0" />
     </svg>
   );
@@ -79,6 +63,18 @@ const CurrentProgress = ({ task }) => {
   const isGreenTimeout = useRef();
   const saveChangesTimeout = useRef();
 
+  const saveChanges = () => {
+    const number = isChecked ? 0 : 1;
+
+    setTaskCurrentEntry({
+      taskId: task._id,
+      entryId: entry?._id,
+      value: number,
+    });
+
+    saveChangesTimeout.current = null;
+  };
+
   const toggleIsChecked = (event) => {
     event.stopPropagation();
     setIsChecked(!isChecked);
@@ -90,17 +86,7 @@ const CurrentProgress = ({ task }) => {
         saveChangesTimeout.current = null;
       }
 
-      saveChangesTimeout.current = setTimeout(() => {
-        const number = isChecked ? 0 : 1;
-
-        setTaskCurrentEntry({
-          taskId: task._id,
-          entryId: entry?._id,
-          value: number,
-        });
-
-        saveChangesTimeout.current = null;
-      }, 300);
+      saveChangesTimeout.current = setTimeout(saveChanges, 300);
     } else {
       setTaskCurrentEntry({
         taskId: task._id,
@@ -118,6 +104,15 @@ const CurrentProgress = ({ task }) => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (saveChangesTimeout.current) {
+        clearTimeout(isGreenTimeout.current);
+        saveChanges();
+      }
+    };
+  }, []);
+
   return (
     <button
       onClick={toggleIsChecked}
@@ -125,8 +120,8 @@ const CurrentProgress = ({ task }) => {
       key={`current-progress-${task._id}`}
     >
       {task.type === "Number" && <LocalTbAdd isGreen={numberIsGreen} />}
-      {task.type === "Checkbox" && isChecked && (
-        <LocalTbCheck key={`checkbox-${task._id}`} />
+      {task.type === "Checkbox" && (
+        <LocalTbCheck key={`checkbox-${task._id}`} isChecked={isChecked} />
       )}
     </button>
   );
