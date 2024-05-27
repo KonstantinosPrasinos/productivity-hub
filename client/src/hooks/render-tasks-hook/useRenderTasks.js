@@ -15,8 +15,6 @@ const checkTime = (task) => {
     currentDate.setHours(0, 0, 0, 0);
 
     const nextUpdate = findNextUpdateDate(task);
-    // console.log(nextUpdate)
-    // console.log(task)
     nextUpdate.setHours(0, 0, 0, 0); // Change to local time
 
     if (nextUpdate === false) {
@@ -125,7 +123,6 @@ export function useRenderTasks(usesTime = false) {
                 })
 
                 if (existsNotCompletedTask) {
-                    console.log(1)
                     if (!usesTime || isNaN(category.repeatRate?.number) || checkTime({repeatRate: category.repeatRate, mostRecentProperDate: categoryOnlyTasks[0].mostRecentProperDate})) {
                         // Sort the category tasks based on priority
                         categoryOnlyTasks.sort((a, b) => b.priority - a.priority)
@@ -195,7 +192,6 @@ export function useRenderTasks(usesTime = false) {
 
                     if (!category?.repeatRate?.number) {
                         if (usesTime) {
-                            console.log(1)
                             if (checkTime(task)) {
                                 groupedTasks.push(task);
                             }
@@ -205,7 +201,6 @@ export function useRenderTasks(usesTime = false) {
                     }
                 } else {
                     if (usesTime) {
-                        console.log(1)
                         if (checkTime(task)) {
                             groupedTasks.push(task);
                         }

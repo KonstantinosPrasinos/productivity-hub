@@ -105,3 +105,18 @@
     overflow-x: hidden;
   }
 }
+
+.subCategoryIndicator {
+  margin-left: v.$base-border-radius;
+  width: 0.5em;
+  height: 0.5em;
+  // border-left: v.$base-border;
+  // border-bottom: v.$base-border;
+  // border-color: var(--primary-color);
+  border-bottom-left-radius: 4px;
+}
+
+.subCategoryContainer {
+  @extend .Horizontal-Flex-Container;
+  // overflow: hidden;
+}
