@@ -4,10 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import Task from "@/components/indicators/Task/Task.jsx";
 import Chip from "@/components/buttons/Chip/Chip";
 import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
-import { TbPlus } from "react-icons/tb";
+import { TbAdjustments, TbPlus } from "react-icons/tb";
 import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
+import IconButton from "@/components/buttons/IconButton/IconButton";
 
 const variants = {
   hidden: { opacity: 0 },

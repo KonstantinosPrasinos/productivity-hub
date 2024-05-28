@@ -26,12 +26,13 @@
 }
 
 .titleContainer {
-  font-size: v.$font-s;
+  font-size: v.$font-m;
   text-overflow: ellipsis;
   overflow: hidden;
-  font-weight: 550;
   text-wrap: wrap;
   white-space: pre-wrap;
+  line-height: 1.25em;
+  opacity: 0.9;
 }
 
 .infoContainer {
@@ -91,3 +92,8 @@
   }
 }
 
+.tasksContainer {
+  @extend .Stack-Container;
+
+  gap: 12px;
+}

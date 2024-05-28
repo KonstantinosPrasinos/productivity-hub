@@ -115,7 +115,7 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
           groupId={tasks[0].group}
         />
       )}
-      <div className={"Stack-Container"}>
+      <div className={styles.tasksContainer}>
         {filteredTasks.map((task) => (
           <div
             key={task._id}
