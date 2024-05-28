@@ -105,23 +105,6 @@ const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
   return (
     <>
       <div className={styles.categoryChipContainer}>
-        {/* {categoryFilter.map((category) => (
-          <Chip
-            size={"small"}
-            key={category._id}
-            selected={category._id}
-            value={category._id}
-            setSelected={() => toggleSelected(category)}
-            hasShadow={true}
-          >
-            <div className={styles.categoryContents}>
-              <div
-                className={`${styles.categoryChipColor} ${category.color}`}
-              ></div>
-              <span>{category.title}</span>
-            </div>
-          </Chip>
-        ))} */}
         <Chip
           value={-1}
           setSelected={() => toggleNoCategory()}
@@ -129,6 +112,7 @@ const CategoryChips = ({ categoryFilter, setCategoryFilter }) => {
             categoryFilter.find((category) => category._id === "-1") ? -1 : null
           }
           hasShadow={true}
+          size={"small"}
         >
           No category
         </Chip>

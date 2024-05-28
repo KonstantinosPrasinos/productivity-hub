@@ -1,6 +1,8 @@
 @use "@/styles/variables" as v;
 
 .container {
+    @extend .Button, .Horizontal-Flex-Container;
+    
     border-radius: v.$button-border-radius;
     background-color: var(--primary-color);
     color: var(--on-primary-color);
@@ -9,7 +11,6 @@
 
     &.square {
         border-radius: v.$base-border-radius;
-        padding: 10px
     }
 
     &.outlined {
@@ -20,6 +21,7 @@
 
     &.small {
         font-size: v.$font-s;
+        padding: v.$small-button-padding;
     }
 
     &.large {
@@ -31,7 +33,7 @@
     }
 
     &.symmetrical {
-        padding: 11px;
+        padding: v.$symmetrical-padding;
     }
 
     &:disabled {

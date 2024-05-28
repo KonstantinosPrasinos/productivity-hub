@@ -52,14 +52,14 @@
         }
     }
 
-    &.small {
+    &.small > .children {
         font-size: v.$font-s;
 
-        & > .children:only-child {
-            padding: 8px 19px;
+        &:only-child {
+            padding: v.$small-button-padding;
         }
 
-        & > .children:not(:only-child) {
+        &:not(:only-child) {
             padding: 8px 5px 8px 19px;
 
             & ~ button {
