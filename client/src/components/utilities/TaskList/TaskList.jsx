@@ -125,6 +125,7 @@ const CategoryChips = ({
             </Chip>
             <AnimatePresence>
               {expandDirection !== "vertical" &&
+                categorySubcategories.length > 0 &&
                 categoryFilter
                   .map((tempCategory) => tempCategory._id)
                   .includes(category._id) && (
@@ -354,19 +355,26 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
   }, [categoryFilter, tasks]);
 
   const handleTouchStart = (event) => {
-    dragStartPosition.current = event.touches[0].clientY;
+    if (leftRef.current.scrollTop === 0) {
+      dragStartPosition.current = event.touches[0].clientY;
+    }
   };
 
   const handleTouchMove = (event) => {
     if (
       leftRef.current.scrollTop === 0 &&
+      dragStartPosition.current &&
       event.touches[0].clientY > dragStartPosition.current
     ) {
       if (!searchVisible) {
         setSearchVisible(true);
       }
 
-      if (searchBarRef.current && !searchExpanded) {
+      if (
+        searchBarRef.current &&
+        !searchExpanded &&
+        dragStartPosition.current
+      ) {
         if (
           event.touches[0].clientY - dragStartPosition.current <
           maxDragDistance
@@ -390,9 +398,9 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
     }
   };
 
-  const handleTouchEnd = (event) => {
-    // animateLeft(leftRef.current, { y: 1 });
-    if (!searchExpanded) {
+  const handleTouchEnd = () => {
+    dragStartPosition.current = null;
+    if (!searchExpanded && searchBarRef.current) {
       animateSearchBar(
         searchBarRef.current,
         {
@@ -450,6 +458,17 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
                 Animate Presence is needed here to set initial to true.
                 Otherwise, the stagger doesn't work on list view because of the switch container.
             */}
+        {screenSize === "small" && (
+          <button
+            className={styles.searchIndicatorBar}
+            onClick={toggleSearchVisibility}
+          >
+            <TbSearch />
+            <div className={styles.chevronContainer}>
+              <TbChevronCompactDown />
+            </div>
+          </button>
+        )}
         <AnimatePresence initial={true} mode="popLayout">
           {filteredTasks.length === 0 && (
             <motion.div
@@ -476,17 +495,6 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
             )}
         </AnimatePresence>
       </motion.div>
-      {screenSize === "small" && (
-        <button
-          className={styles.searchIndicatorBar}
-          onClick={toggleSearchVisibility}
-        >
-          <TbSearch />
-          <div className={styles.chevronContainer}>
-            <TbChevronCompactDown />
-          </div>
-        </button>
-      )}
       {screenSize !== "small" && (
         <BigScreenFilters
           categoryFilter={categoryFilter}
