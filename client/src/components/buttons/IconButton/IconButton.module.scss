@@ -47,6 +47,10 @@
       opacity: 1;
     }
   }
+
+  &.large {
+    font-size: v.$font-xl;
+  }
 }
 
 .icon {

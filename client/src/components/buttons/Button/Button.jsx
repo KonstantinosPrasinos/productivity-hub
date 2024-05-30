@@ -20,7 +20,7 @@ const Button = ({
   return (
     <motion.button
       onClick={onClick}
-      className={`Button Horizontal-Flex-Container
+      className={`
                 ${styles.container}
                   ${styles[size]}
                   ${type === "round" ? "" : styles.square}
