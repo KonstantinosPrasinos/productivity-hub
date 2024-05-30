@@ -4,7 +4,7 @@ import { forwardRef, useContext, useMemo } from "react";
 import { motion } from "framer-motion";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
-import { TbFlame, TbHash, TbTargetArrow } from "react-icons/all";
+import { TbFlame, TbHash, TbTargetArrow } from "react-icons/tb";
 import { useGetTaskCurrentEntry } from "@/hooks/get-hooks/useGetTaskCurrentEntry";
 import TextSwitchContainer from "@/components/containers/TextSwitchContainer/TextSwitchContainer";
 import { TbCheck } from "react-icons/tb";
