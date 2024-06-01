@@ -27,8 +27,6 @@
   }
 
   .leftSide {
-
-
     width: 100%;
     padding: 0.5em 10px 0.5em 10px;
   }
@@ -53,7 +51,6 @@
 .container {
   @extend .Horizontal-Flex-Container;
   overflow: hidden;
-  padding-top: 0.5em;
   gap: 0;
   align-items: flex-start;
 }
@@ -86,6 +83,10 @@
   @extend .Stack-Container, .Align-Left;
   height: min-content;
   flex-shrink: 0;
+
+  & > *:first-child {
+    margin-bottom: 4px;
+  }
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--background-color);
@@ -203,12 +204,6 @@
 
 .searchBar {
   @extend .Horizontal-Flex-Container;
-
-  background-color: var(--surface-color);
-  border: v.$base-border;
-  border-radius: v.$button-border-radius;
-  padding: v.$button-padding;
-  box-shadow: v.$elevation-1;
   font-size: v.$font-xl;
   width: 70%;
   
@@ -218,15 +213,35 @@
   // To animate later (maximum drag values)
   opacity: 0.99;
   top: 0.99em;
+}
+
+.searchInput {
+  @extend .Horizontal-Flex-Container;
+
+  background-color: var(--surface-color);
+  border: v.$base-border;
+  border-radius: v.$button-border-radius;
+  padding: 10px 12px;
+  box-shadow: v.$elevation-1;
+  font-size: v.$font-xl;
+
+  width: 100%;
 
   & > :first-child {
     opacity: v.$opacity-low;
+    flex-shrink: 0;
   }
 
   & > input {
     font-size: v.$font-m;
     flex-grow: 1;
     opacity: v.$opacity-medium;
+    width: 1em;
+  }
+
+  &.standalone {
+    width: 10em; // 12.5 * 0.8
+    box-sizing: border-box
   }
 }
 

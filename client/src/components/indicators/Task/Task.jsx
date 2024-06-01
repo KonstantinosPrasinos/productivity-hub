@@ -1,7 +1,7 @@
 import styles from "./Task.module.scss";
 import CategoryIndicator from "../CategoryIndicator/CategoryIndicator";
 import { forwardRef, useContext, useMemo } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import CurrentProgress from "../CurrentProgress/CurrentProgress";
 import { TbFlame, TbHash, TbTargetArrow } from "react-icons/tb";
@@ -71,20 +71,6 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
   const miniPagesContext = useContext(MiniPagesContext);
   const { data: entries, isLoading } = useGetTaskCurrentEntry(tasks);
 
-  const filteredTasks = useMemo(() => {
-    if (!usesTime) return tasks;
-
-    return tasks.filter((task) => {
-      const entry = entries?.find(
-        (entry) => entry?._id === task.currentEntryId
-      );
-
-      if (!entry) return;
-
-      return !checkTaskCompleted(task, entry);
-    });
-  }, [tasks, entries, isLoading]);
-
   const handleTaskClick = (taskId) => {
     miniPagesContext.dispatch({
       type: "ADD_PAGE",
@@ -98,13 +84,15 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
     exit: {
       opacity: 0,
       scale: 0.5,
-      transition: { duration: 0.2 },
     },
   };
 
   return (
     <motion.div
       className={styles.container}
+      initial={"hidden"}
+      animate={"visible"}
+      exit={"exit"}
       variants={variants}
       layout={"position"}
       ref={ref}
@@ -116,19 +104,22 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
         />
       )}
       <div className={styles.tasksContainer}>
-        {filteredTasks.map((task) => (
-          <div
-            key={task._id}
-            className={styles.task}
-            onClick={() => handleTaskClick(task._id)}
-          >
-            <div className={styles.detailsList}>
-              <div className={styles.titleContainer}>{task.title}</div>
-              <RepeatDetails task={task} />
-            </div>
-            <CurrentProgress key={task._id} task={task} />
-          </div>
-        ))}
+        <AnimatePresence>
+          {tasks.map((task) => (
+            <motion.div
+              key={task._id}
+              className={styles.task}
+              onClick={() => handleTaskClick(task._id)}
+              exit={{ opacity: 0, height: 0, margin: 0 }}
+            >
+              <div className={styles.detailsList}>
+                <div className={styles.titleContainer}>{task.title}</div>
+                <RepeatDetails task={task} />
+              </div>
+              <CurrentProgress key={task._id} task={task} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

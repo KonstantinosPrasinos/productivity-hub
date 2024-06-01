@@ -125,6 +125,7 @@ const CategoryChips = ({
             </Chip>
             <AnimatePresence>
               {expandDirection !== "vertical" &&
+                categorySubcategories.length > 0 &&
                 categoryFilter
                   .map((tempCategory) => tempCategory._id)
                   .includes(category._id) && (
@@ -208,6 +209,8 @@ const BigScreenFilters = ({
   subCategories,
   categoryFilter,
   setCategoryFilter,
+  searchFilter,
+  setSearchFilter,
 }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
@@ -234,6 +237,11 @@ const BigScreenFilters = ({
   return (
     <>
       <div className={styles.categoryChipContainer}>
+        <SearchBar
+          isStandalone={true}
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
+        />
         <Chip
           value={-1}
           setSelected={() => toggleNoCategory()}
@@ -268,6 +276,27 @@ const BigScreenFilters = ({
   );
 };
 
+const SearchBar = ({ isStandalone = false, searchFilter, setSearchFilter }) => {
+  const handleChange = (event) => {
+    setSearchFilter(event.target.value);
+  };
+
+  return (
+    <div
+      className={`${styles.searchInput} ${
+        isStandalone ? styles.standalone : ""
+      }`}
+    >
+      <TbSearch />
+      <input
+        placeholder="Search"
+        value={searchFilter}
+        onChange={handleChange}
+      ></input>
+    </div>
+  );
+};
+
 const SearchScreen = ({
   searchExpanded,
   searchBarRef,
@@ -276,6 +305,8 @@ const SearchScreen = ({
   categories,
   subCategories,
   toggleVisibility,
+  searchFilter,
+  setSearchFilter,
 }) => {
   return (
     <motion.div
@@ -284,9 +315,11 @@ const SearchScreen = ({
       }`}
       exit={{ opacity: 0 }}
     >
-      <div className={styles.searchBar} ref={searchBarRef}>
-        <TbSearch />
-        <input placeholder="Search"></input>
+      <div ref={searchBarRef} className={styles.searchBar}>
+        <SearchBar
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
+        />
       </div>
       {searchExpanded && (
         <motion.div
@@ -327,46 +360,85 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const { screenSize } = useScreenSize();
+  const [searchFilter, setSearchFilter] = useState("");
 
   const filteredTasks = useMemo(() => {
-    if (categoryFilter.length == 0) return tasks;
+    if (categoryFilter.length == 0 && searchFilter.length === 0) return tasks;
 
-    return tasks.filter((task) => {
-      // Check for if the tasks is actually a group of tasks in a category
-      if (task.hasOwnProperty("tasks")) {
-        const matchedCategory = categoryFilter.find(
-          (tempFilter) => tempFilter._id === task.tasks[0].category
-        );
+    return tasks.reduce((reducedTasks, currentTask) => {
+      if (currentTask.hasOwnProperty("tasks")) {
+        const matchesCategory =
+          categoryFilter.length === 0 ||
+          categoryFilter.find(
+            (tempFilter) => tempFilter._id === currentTask.tasks[0].category
+          );
 
         const matchesSubcategory =
-          matchedCategory?.selectedSubcategories?.length === 0 ||
-          matchedCategory?.selectedSubcategories
+          matchesCategory === true ||
+          matchesCategory?.selectedSubcategories?.length === 0 ||
+          matchesCategory?.selectedSubcategories
             .map((tempFilter) => tempFilter._id)
-            .includes(task.tasks[0].group);
+            .includes(currentTask.tasks[0].group);
 
-        return matchedCategory && matchesSubcategory;
+        if (matchesSubcategory && matchesCategory) {
+          let taskFilteredBySearch;
+
+          if (searchFilter.length === 0) {
+            taskFilteredBySearch = currentTask;
+          } else {
+            taskFilteredBySearch = {
+              ...currentTask,
+              tasks: currentTask.tasks.filter((tempTask) =>
+                tempTask.title
+                  .toLowerCase()
+                  .includes(searchFilter.toLowerCase())
+              ),
+            };
+          }
+
+          console.log(taskFilteredBySearch.tasks);
+
+          if (taskFilteredBySearch.tasks.length !== 0)
+            reducedTasks.push(taskFilteredBySearch);
+        }
       } else {
         // _id of -1 is for when the "no category" option is selected. Then show all tasks with no category
-        if (categoryFilter.find((category) => category._id === "-1"))
-          return task;
+        const showNoCategory =
+          categoryFilter.length === 0 ||
+          categoryFilter.some((category) => category._id === "-1");
+
+        const matchesSearch =
+          searchFilter.length === 0 ||
+          currentTask.title.toLowerCase().includes(searchFilter.toLowerCase());
+
+        if (showNoCategory && matchesSearch) reducedTasks.push(currentTask);
       }
-    });
-  }, [categoryFilter, tasks]);
+
+      return reducedTasks;
+    }, []);
+  }, [categoryFilter, tasks, searchFilter]);
 
   const handleTouchStart = (event) => {
-    dragStartPosition.current = event.touches[0].clientY;
+    if (leftRef.current.scrollTop === 0) {
+      dragStartPosition.current = event.touches[0].clientY;
+    }
   };
 
   const handleTouchMove = (event) => {
     if (
       leftRef.current.scrollTop === 0 &&
+      dragStartPosition.current &&
       event.touches[0].clientY > dragStartPosition.current
     ) {
       if (!searchVisible) {
         setSearchVisible(true);
       }
 
-      if (searchBarRef.current && !searchExpanded) {
+      if (
+        searchBarRef.current &&
+        !searchExpanded &&
+        dragStartPosition.current
+      ) {
         if (
           event.touches[0].clientY - dragStartPosition.current <
           maxDragDistance
@@ -390,9 +462,9 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
     }
   };
 
-  const handleTouchEnd = (event) => {
-    // animateLeft(leftRef.current, { y: 1 });
-    if (!searchExpanded) {
+  const handleTouchEnd = () => {
+    dragStartPosition.current = null;
+    if (!searchExpanded && searchBarRef.current) {
       animateSearchBar(
         searchBarRef.current,
         {
@@ -435,6 +507,8 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
               categories={categories}
               subCategories={subCategories}
               toggleVisibility={toggleSearchVisibility}
+              searchFilter={searchFilter}
+              setSearchFilter={setSearchFilter}
             />
           )}
         </AnimatePresence>
@@ -450,6 +524,17 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
                 Animate Presence is needed here to set initial to true.
                 Otherwise, the stagger doesn't work on list view because of the switch container.
             */}
+        {screenSize === "small" && (
+          <button
+            className={styles.searchIndicatorBar}
+            onClick={toggleSearchVisibility}
+          >
+            <TbSearch />
+            <div className={styles.chevronContainer}>
+              <TbChevronCompactDown />
+            </div>
+          </button>
+        )}
         <AnimatePresence initial={true} mode="popLayout">
           {filteredTasks.length === 0 && (
             <motion.div
@@ -468,7 +553,11 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
                 <Task key={task._id} tasks={[task]}></Task>
               ) : (
                 <Task
-                  key={task.tasks[0]._id}
+                  key={
+                    task.tasks[0].group
+                      ? `${task.tasks[0].category}-${task.tasks[0].group}`
+                      : task.tasks[0].category
+                  }
                   tasks={task.tasks}
                   usesTime={usesTime}
                 ></Task>
@@ -476,23 +565,14 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
             )}
         </AnimatePresence>
       </motion.div>
-      {screenSize === "small" && (
-        <button
-          className={styles.searchIndicatorBar}
-          onClick={toggleSearchVisibility}
-        >
-          <TbSearch />
-          <div className={styles.chevronContainer}>
-            <TbChevronCompactDown />
-          </div>
-        </button>
-      )}
       {screenSize !== "small" && (
         <BigScreenFilters
           categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
           categories={categories}
           subCategories={subCategories}
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
         />
       )}
     </motion.div>

@@ -448,7 +448,7 @@ const ConfirmDeleteModal = ({
 
   const handleContinue = async () => {
     if (neverShowAgain) {
-      changeSettingsFunction();
+      changeSettingsFunction(neverShowAgain);
     }
     dismountConfirmDeleteModal();
     deleteFunction();
@@ -525,8 +525,14 @@ const TaskView = ({ index, length, task }) => {
   //     setDate(newDate);
   // }
 
-  const updateSettings = async () => {
-    await setSettings({ ...settings, priorityBounds: undefined });
+  const updateSettings = async (confirmDelete) => {
+    if (settings.confirmDelete === confirmDelete) {
+      await setSettings({
+        ...settings,
+        confirmDelete: !confirmDelete,
+        priorityBounds: undefined,
+      });
+    }
   };
 
   const handleDelete = () => {
