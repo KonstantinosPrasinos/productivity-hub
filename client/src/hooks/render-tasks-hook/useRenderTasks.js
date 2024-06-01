@@ -105,7 +105,20 @@ export function useRenderTasks(usesTime = false) {
         * 4. For each of the two above add them to the list as one object when not all tasks are completed
         */
         categories.forEach(category => {
-            const localTasks = tasks.filter(task => task.category === category._id && !task.hidden);
+            const localTasks = tasks.filter(task => {
+                // task.category === category._id && !task.hidden
+                // Check if the task should be added to the list
+                if (task.hidden) return false;
+                if (task.category !== category._id) return false;
+
+                const taskCurrentEntry = entries.find(entry => entry?._id === task.currentEntryId);
+
+                // If current entry doesn't exist, it's loading so skip it
+                if (!taskCurrentEntry) return false;
+                if (usesTime && checkTaskCompleted(task, taskCurrentEntry)) return false;
+                
+                return true;
+            });
 
             if (!localTasks.length) return;
 
@@ -172,7 +185,8 @@ export function useRenderTasks(usesTime = false) {
 
     const addTasksToArray = useCallback((groupedTasks) => {
         tasks.forEach(task => {
-            // Skip the task if it has a category
+            // Skip the task if it has a category or if it is supposed to be hidden
+            if (task.hidden) return;
             if (task.category) return;
 
             // Check if the task should be added to the list
@@ -180,7 +194,6 @@ export function useRenderTasks(usesTime = false) {
 
             // If current entry doesn't exist, it's loading so skip it
             if (!taskCurrentEntry) return
-            if (task.hidden) return;
             if (usesTime && checkTaskCompleted(task, taskCurrentEntry)) return;
 
             // Check if the task should be rendered at the current date/time:

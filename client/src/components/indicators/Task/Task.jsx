@@ -71,20 +71,6 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
   const miniPagesContext = useContext(MiniPagesContext);
   const { data: entries, isLoading } = useGetTaskCurrentEntry(tasks);
 
-  const filteredTasks = useMemo(() => {
-    if (!usesTime) return tasks;
-
-    return tasks.filter((task) => {
-      const entry = entries?.find(
-        (entry) => entry?._id === task.currentEntryId
-      );
-
-      if (!entry) return;
-
-      return !checkTaskCompleted(task, entry);
-    });
-  }, [tasks, entries, isLoading]);
-
   const handleTaskClick = (taskId) => {
     miniPagesContext.dispatch({
       type: "ADD_PAGE",
@@ -119,7 +105,7 @@ const Task = forwardRef(({ tasks, usesTime = false }, ref) => {
       )}
       <div className={styles.tasksContainer}>
         <AnimatePresence>
-          {filteredTasks.map((task) => (
+          {tasks.map((task) => (
             <motion.div
               key={task._id}
               className={styles.task}

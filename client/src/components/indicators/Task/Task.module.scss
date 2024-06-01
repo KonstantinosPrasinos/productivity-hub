@@ -55,8 +55,21 @@
 
 .task {
   @extend .Horizontal-Flex-Container;
+
   justify-content: space-between;
   width: 100%;
+
+  &:not(:last-child):not(:first-child) {
+    margin: 6px 0;
+  }
+
+  &:first-child:not(:only-child) {
+    margin-bottom: 6px;
+  }
+
+  &:last-child:not(:only-child)  {
+    margin-top: 6px;
+  }
 }
 
 .detailsList {
@@ -96,16 +109,4 @@
   @extend .Stack-Container;
   
   gap: 0;
-
-  & > *:not(:last-child):not(:first-child) {
-    margin: 6px 0;
-  }
-
-  & > *:first-child:not(:only-child) {
-    margin-bottom: 6px;
-  }
-
-  & > *:last-child:not(:only-child)  {
-    margin-top: 6px;
-  }
 }
