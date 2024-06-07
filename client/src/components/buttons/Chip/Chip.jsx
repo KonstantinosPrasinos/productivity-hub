@@ -15,6 +15,7 @@ const Chip = ({
   disabled,
   deleteFunction,
   hasShadow = false,
+  onContextMenu = () => {},
 }) => {
   return (
     <div
@@ -28,6 +29,7 @@ const Chip = ({
     >
       <button
         className={styles.children}
+        onContextMenu={onContextMenu}
         onClick={(e) => {
           if (!disabled) {
             switch (type) {

@@ -34,6 +34,8 @@ const CategoryChips = ({
   setCategoryFilter,
   expandDirection = "vertical",
 }) => {
+  const miniPagesContext = useContext(MiniPagesContext);
+
   const toggleSelected = (category) => {
     if (
       categoryFilter
@@ -87,6 +89,14 @@ const CategoryChips = ({
     }
   };
 
+  const handleContextMenu = (event, category) => {
+    event.preventDefault();
+    miniPagesContext.dispatch({
+      type: "ADD_PAGE",
+      payload: { type: "category-view", id: category._id },
+    });
+  };
+
   return (
     <>
       {categories.map((category) => {
@@ -115,6 +125,7 @@ const CategoryChips = ({
               value={category}
               setSelected={() => toggleSelected(category)}
               hasShadow={expandDirection === "vertical"}
+              onContextMenu={(event) => handleContextMenu(event, category)}
             >
               <div className={styles.categoryContents}>
                 <div
@@ -308,6 +319,29 @@ const SearchScreen = ({
   searchFilter,
   setSearchFilter,
 }) => {
+  const miniPagesContext = useContext(MiniPagesContext);
+
+  const toggleNoCategory = () => {
+    if (categoryFilter.find((category) => category._id === "-1")) {
+      setCategoryFilter((current) =>
+        current.filter((tempCategory) => tempCategory._id != "-1")
+      );
+    } else {
+      setCategoryFilter((current) => [
+        ...current,
+        { _id: "-1", selectedSubcategories: [] },
+      ]);
+    }
+  };
+
+  const handleNewClick = () => {
+    toggleVisibility();
+    miniPagesContext.dispatch({
+      type: "ADD_PAGE",
+      payload: { type: "new-category" },
+    });
+  };
+
   return (
     <motion.div
       className={`${styles.searchContainer} ${
@@ -330,6 +364,18 @@ const SearchScreen = ({
           <div className={styles.filterContainer}>
             <div className={styles.filterLabel}>Categories:</div>
             <div className={styles.categoryFilters}>
+              <Chip
+                value={-1}
+                setSelected={() => toggleNoCategory()}
+                selected={
+                  categoryFilter.find((category) => category._id === "-1")
+                    ? -1
+                    : null
+                }
+                size={"small"}
+              >
+                No category
+              </Chip>
               <CategoryChips
                 categories={categories}
                 subCategories={subCategories}
@@ -337,6 +383,17 @@ const SearchScreen = ({
                 setCategoryFilter={setCategoryFilter}
                 expandDirection={"horizontal"}
               />
+              <Button
+                onClick={handleNewClick}
+                filled={false}
+                type={"square"}
+                size="small"
+              >
+                <span className="Horizontal-Flex-Container">
+                  Add new
+                  <TbPlus />
+                </span>
+              </Button>
             </div>
           </div>
           <IconButton size="large" onClick={toggleVisibility}>
