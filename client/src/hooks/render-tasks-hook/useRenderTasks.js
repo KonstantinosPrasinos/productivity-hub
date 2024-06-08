@@ -13,13 +13,15 @@ const checkTime = (task) => {
     const currentHours = currentDate.getHours();
     const currentMinutes = currentDate.getMinutes();
     currentDate.setHours(0, 0, 0, 0);
+    console.log(task);
 
     const nextUpdate = findNextUpdateDate(task);
-    nextUpdate.setHours(0, 0, 0, 0); // Change to local time
-
+    
     if (nextUpdate === false) {
         return false;
     }
+
+    nextUpdate.setHours(0, 0, 0, 0); // Change to local time
 
     const isCorrectDate = nextUpdate.getTime() === currentDate.getTime();
     let isCorrectTime = true;

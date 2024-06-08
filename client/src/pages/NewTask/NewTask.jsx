@@ -94,10 +94,6 @@ const NewTask = ({ index, length, id }) => {
     }
   };
 
-  useEffect(() => {
-    setTimeGroup({ title: "None", _id: null });
-  }, [category]);
-
   const findMatchingGroups = () => {
     const tempGroups = [{ title: "None", _id: undefined }];
 
@@ -140,6 +136,11 @@ const NewTask = ({ index, length, id }) => {
         setCategory(
           categories.find((tempCategory) => tempCategory._id === task.category)
         );
+
+        if (task.group) {
+          const group = groups.find((group) => group._id === task.group);
+          console.log(group);
+        }
       }
 
       setPriority(task.priority);
@@ -373,6 +374,13 @@ const NewTask = ({ index, length, id }) => {
     textarea.style.height = textarea.scrollHeight + 1.8 + "px";
   };
 
+  const handleSetCategory = (tempCategory) => {
+    if (tempCategory !== category) {
+      setCategory(tempCategory);
+      setTimeGroup({ title: "None", _id: null });
+    }
+  };
+
   return (
     <>
       <MiniPageContainer
@@ -424,7 +432,7 @@ const NewTask = ({ index, length, id }) => {
             isDisabled={repeats && repeatType === "Repeatable Category"}
           >
             <button
-              onClick={() => setCategory("None")}
+              onClick={() => handleSetCategory("None")}
               className={styles.dropDownOption}
             >
               None
@@ -433,7 +441,7 @@ const NewTask = ({ index, length, id }) => {
               <button
                 className={styles.categoryOption}
                 key={tempCategory.title}
-                onClick={() => setCategory(tempCategory)}
+                onClick={() => handleSetCategory(tempCategory)}
               >
                 <div
                   className={`${styles.categoryChipColor} ${tempCategory.color}`}
@@ -715,10 +723,10 @@ const NewTask = ({ index, length, id }) => {
             hasBorder={false}
             isVisible={repeatType === "Repeatable Category"}
           >
-            <InputWrapper label={"Repeatable Category"}>
+            <InputWrapper label={"Repeatable Category / Subcategory"}>
               <DropDownInput placeholder={"None"} selected={category?.title}>
                 <button
-                  onClick={() => setCategory("None")}
+                  onClick={() => handleSetCategory("None")}
                   className={styles.dropDownOption}
                 >
                   None
@@ -727,7 +735,7 @@ const NewTask = ({ index, length, id }) => {
                   <button
                     className={styles.dropDownOption}
                     key={tempCategory.title}
-                    onClick={() => setCategory(tempCategory)}
+                    onClick={() => handleSetCategory(tempCategory)}
                   >
                     {tempCategory.title}
                   </button>
@@ -750,8 +758,6 @@ const NewTask = ({ index, length, id }) => {
                   <TbPlus />
                 </button>
               </DropDownInput>
-            </InputWrapper>
-            <InputWrapper label={"Category subdivision"}>
               <DropDownInput
                 placeholder={"None"}
                 isDisabled={

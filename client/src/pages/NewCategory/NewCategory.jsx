@@ -384,12 +384,6 @@ const NewCategory = ({ index, length, id }) => {
 
     const newId = currentEditedGroup.current?._id ?? getGroupId();
 
-    let startingDates;
-
-    if (repeats && timePeriod != "Days" && timePeriod2.length > 0) {
-      findStartingDates(timePeriod, timePeriod2);
-    }
-
     const timeGroup = {
       _id: newId,
       title: timeGroupTitle,
@@ -397,7 +391,7 @@ const NewCategory = ({ index, length, id }) => {
         repeats && timePeriod != "Days" && timePeriod2.length > 0
           ? {
               smallTimePeriod: timePeriod2,
-              startingDate: startingDates,
+              startingDate: findStartingDates(timePeriod, timePeriod2),
             }
           : undefined,
       initial: currentEditedGroup.current?.initial,
