@@ -3,20 +3,26 @@
 @use '@/styles/mixins' as m;
 
 .container {
-  @extend .Rounded-Container, .Stack-Container, .Has-Shadow;
-
   display: inline-flex;
   position: relative;
   width: 100%;
+  flex-shrink: 0;
+}
+
+.subContainer {
+  @extend .Rounded-Container, .Stack-Container, .Has-Shadow;
+  width: 100%;
+
   padding: v.$symmetrical-padding;
   gap: 6px;
   cursor: pointer;
   box-sizing: border-box;
   opacity: 1;
+  height: min-content;
 
   order: 1;
   overflow: hidden;
-  flex-shrink: 0;
+  max-height: 100%;
 }
 
 .topLine {
@@ -59,12 +65,12 @@
   justify-content: space-between;
   width: 100%;
 
-  &:not(:last-child):not(:first-child) {
-    margin: 6px 0;
+  &:only-child {
+    margin-top: 6px;
   }
 
-  &:first-child:not(:only-child) {
-    margin-bottom: 6px;
+  &:not(:last-child) {
+    margin: 6px 0;
   }
 
   &:last-child:not(:only-child)  {
@@ -109,4 +115,15 @@
   @extend .Stack-Container;
   
   gap: 0;
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+  opacity: v.$opacity-low;
+}
+
+.expandButtonUpsideDown {
+  transform: rotate(180deg);
 }

@@ -10,6 +10,7 @@ const IconButton = ({
   disabled,
   onContextMenu,
   size = "medium",
+  hasPadding = true,
 }) => {
   return (
     <button
@@ -29,6 +30,7 @@ const IconButton = ({
                 ${border ? styles.border : ""}
                 ${styles[color]}
                 ${styles[size]}
+                ${hasPadding ? "" : styles.noPadding}
             `}
       disabled={disabled}
     >
