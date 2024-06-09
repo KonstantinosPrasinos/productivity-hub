@@ -453,8 +453,6 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
             };
           }
 
-          console.log(taskFilteredBySearch.tasks);
-
           if (taskFilteredBySearch.tasks.length !== 0)
             reducedTasks.push(taskFilteredBySearch);
         }

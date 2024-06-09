@@ -13,8 +13,6 @@ const checkTime = (task) => {
     const currentHours = currentDate.getHours();
     const currentMinutes = currentDate.getMinutes();
     currentDate.setHours(0, 0, 0, 0);
-    console.log(task);
-
     const nextUpdate = findNextUpdateDate(task);
     
     if (nextUpdate === false) {

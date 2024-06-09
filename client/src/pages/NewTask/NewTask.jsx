@@ -139,7 +139,6 @@ const NewTask = ({ index, length, id }) => {
 
         if (task.group) {
           const group = groups.find((group) => group._id === task.group);
-          console.log(group);
         }
       }
 

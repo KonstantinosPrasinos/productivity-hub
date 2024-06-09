@@ -18,6 +18,13 @@
   min-height: 1.5em;
   padding: 0;
 
+  &.noPadding {
+    width: auto;
+    height: auto;
+    min-width: unset;
+    min-height: unset;
+  }
+
   &.selected {
     opacity: 1;
   }
