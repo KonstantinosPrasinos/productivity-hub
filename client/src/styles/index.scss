@@ -193,6 +193,10 @@ a {
     @include m.Title-Large;
 }
 
+.Title-Medium {
+    @include m.Title-Medium;
+}
+
 .Title-Small {
     @include m.Title-Small;
 }

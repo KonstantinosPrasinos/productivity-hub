@@ -2,136 +2,299 @@
 @use '@/styles/mixins' as m;
 @use '@/styles/index';
 
+@media (min-width: v.$phone-breakpoint) {
+    .container {
+        width: 600px;
+    }
+    .saveSettingsContainer {
+        left: calc(3rem + 600px);
+    }
+}
+
 @media (max-width: v.$phone-breakpoint) {
     .container {
         width: 100%;
-        height: auto;
-        border: none !important;
-        border-radius: 0 !important;
-        padding-right: 0 !important;
+    }
+    .saveSettingsContainer {
+        right: 1em;
     }
 }
 
-@media (min-width: v.$phone-breakpoint) {
-    .container {
-        min-width: 600px;
-        height: calc(100% - 4em);
-        padding: 20px !important;
-        padding-right: 12px !important;
-    }
+.emptyChip {
+    padding: 6px 12px;
+    border: v.$base-border;
+    border-radius: v.$base-border-radius;
+    font-weight: 400;
+    flex-grow: 0;
+    width: min-content;
+    justify-self: flex-end;
 }
 
 .container {
-    position: relative;
-    overflow-y: auto;
-    scroll-padding-right: 10px;
-}
-
-.subContainer {
-    overflow-y: auto;
-    padding-right: 20px;
-    padding-left: 10px;
-}
-
-.middleContainer {
-    width: 100%;
+    @extend .Stack-Container;
+    gap: v.$big-gap;
     height: 100%;
-    overflow-y: auto;
+    overflow: auto;
+    padding: 10px;
+    box-sizing: border-box;
+
+    // -ms-overflow-style: none;
+    // &::-webkit-scrollbar {
+    //     display: none;
+    // }
 }
 
-.header {
-    width: 100%;
-    padding-bottom: v.$symmetrical-padding;
-    border-bottom: v.$base-border;
-    font-weight: 500;
-    background-color: var(--surface-color);
-    //z-index: 1;
-}
-
-.redirectContainer {
-    width: min-content;
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    border-right: v.$base-border;
-    border-width: 2px;
-    padding: 1em;
-}
-
-.email {
-    font-size: v.$font-s;
-}
-
-.accountContainer {
-    justify-content: flex-start !important;
-}
-
-.segment {
+.settingsGroup {
     display: flex;
     flex-direction: column;
-    gap: 1.5em;
-    width: 100%;
+    gap: 8px;
 }
 
-.emailLeftSide {
+.tileGroupTitle {
+    @extend .Title-Medium;
+}
+
+.tileGroup {
     display: flex;
+    flex-direction: column;
+}
+
+.tile {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
+    box-sizing: border-box;
+    
 
-    &:hover {
-        text-decoration: underline;
+    padding: 0 10px;
+    height: 3.25rem;
+    background-color: var(--surface-color);
+    width: 100%;
+    border: v.$base-border;
+    border-radius: v.$base-border-radius;
+
+    &:first-child:not(:only-child) {
+        border-radius: 10px 10px 0 0;
+        border-bottom: none;
+    }
+
+    &:not(:first-child):not(:last-child):not(:only-child) {
+        border-radius: 0;
+        border-bottom: none;
+    }
+
+    &:last-child:not(:only-child) {
+        border-radius: 0 0 10px 10px;
+    }
+
+    &.isWarning {
+        color: var(--error-color);
     }
 }
 
-.emailWrapper {
+.tileText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.tileTitle {
+    @extend .Title-Small;
+}
+
+.tileDescription {
+    @extend .Body-Small;
+    opacity: v.$opacity-low;
+}
+
+.tileAction {
+    min-height: 1em;
+    display: flex;
+    align-items: center;
+}
+
+.themeSelector {
+    width: 100%;
+    border: v.$base-border;
+    background-color: var(--surface-color);
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.themeButton {
+    width: 33%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    & > *  {
+        flex-shrink: 0;
+    }
+}
+
+.themeButtonDecoration {
+    height: 4em;
+    border-radius: 8px;
+    background-color: var(--background-color);
+    border: 2px var(--border-primary-color) solid;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    &.lightMode {
+        background-color: v.$light-mode-background;
+        & > .themeDecorationContainer {
+            background-color: v.$light-mode-surface;
+            border-color: v.$light-mode-border-primary;
+            box-shadow: v.$elevation-1;
+
+            & > .themeDecorationText {
+                background-color: v.$light-mode-border-primary;
+            }
+
+            & > .themeDecorationCheckbox {
+                border-color: v.$light-mode-border-primary;
+            }
+        }
+    }
+
+    &.darkMode {
+        background-color: v.$dark-mode-background;
+        & > .themeDecorationContainer {
+            background-color: v.$dark-mode-surface;
+            border-color: v.$dark-mode-border-primary;
+            box-shadow: v.$elevation-1;
+
+            & > .themeDecorationText {
+                background-color: v.$dark-mode-border-primary;
+            }
+
+            & > .themeDecorationCheckbox {
+                border-color: v.$dark-mode-border-primary;
+            }
+        }
+    }
+}
+
+.deviceThemeDecoration {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.deviceThemeLight {
+        background-color: v.$light-mode-background;
+        clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+        & > .themeDecorationContainer {
+            background-color: v.$light-mode-surface;
+            border-color: v.$light-mode-border-primary;
+            box-shadow: v.$elevation-1;
+
+            & > .themeDecorationText {
+                background-color: v.$light-mode-border-primary;
+            }
+
+            & > .themeDecorationCheckbox {
+                border-color: v.$light-mode-border-primary;
+            }
+        }
+    }
+
+    &.deviceThemeDark {
+        background-color: v.$dark-mode-background;
+        clip-path: polygon(102.5% 0%, 100% 100%, -2.5% 100%);
+        & > .themeDecorationContainer {
+            background-color: v.$dark-mode-surface;
+            border-color: v.$dark-mode-border-primary;
+            box-shadow: v.$elevation-1;
+
+            & > .themeDecorationText {
+                background-color: v.$dark-mode-border-primary;
+            }
+
+            & > .themeDecorationCheckbox {
+                border-color: v.$dark-mode-border-primary;
+            }
+        }
+    }
+}
+
+.themeButtonLabel {
+    opacity: v.$opacity-low;
+    padding: 4px 10px;
+    border-radius: v.$button-border-radius;
+    transition: 0.1s background-color ease-in-out, 0.1s color ease-in-out, 0.1s opacity ease-in-out;
+
+    &.selected {
+        opacity: 1;
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+    }
+}
+
+.themeDecorationContainer {
+    width: 80%;
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    align-items: center;
-    flex-wrap: wrap;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.themeDecorationText {
+    width: 70%;
+    height: 1em;
+    border-radius: 2px;
+}
+
+.themeDecorationCheckbox {
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+    border: 2px solid;
+    box-sizing: border-box;
+}
+
+.themeButtonRadio {
+    width: 0.9rem;
+    height: 0.9rem;
+    outline: 2px solid;
+    outline-color: var(--border-primary-color);
+    border: 3px solid var(--surface-color);
+    border-radius: 1em;
+    background-color: var(--surface-color);
+    box-sizing: border-box;
+
+    &.selected {
+        background-color: var(--primary-color);
+        outline-color: var(--primary-color);
+    }
+}
+
+.githubLink {
+    font-size: v.$font-xl;
+    height: 1em;
+    display: inline-block;
 }
 
 .saveSettingsContainer {
     position: absolute;
-    bottom: 2em;
-    right: 2em;
-}
-
-.subSection {
-    border: 1px solid var(--border-primary-color);
-    border-radius: v.$base-border-radius;
-    padding: 20px;
-}
-
-.description {
-    flex-grow: 1;
-    width: calc(100% - 120px);
-}
-
-.firstSection {
-    padding-top: 20px;
-}
-
-.keyBindsContainer {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-auto-rows: auto;
-    row-gap: 10px;
-    align-items: center;
-
-    & .emptyChip {
-        padding: 6px 12px;
-        border: v.$base-border;
-        border-radius: v.$base-border-radius;
-        font-weight: 400;
-        flex-grow: 0;
-        width: min-content;
-        justify-self: flex-end;
-    }
-}
-
-.keyBindsComboContainer {
-    @extend .Horizontal-Flex-Container, .Small-Gap;
-    justify-self: flex-end;
+    bottom: 1em;
 }
