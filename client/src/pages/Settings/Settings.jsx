@@ -1,476 +1,590 @@
 import styles from "./Settings.module.scss";
-import React, {useContext, useState} from "react";
-import Chip from "../../components/buttons/Chip/Chip";
+import React, { memo, useCallback, useContext, useState } from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
-import IconButton from "../../components/buttons/IconButton/IconButton";
-import {UserContext} from "../../context/UserContext";
-import {useAuth} from "../../hooks/useAuth";
-import {useGetSettings} from "../../hooks/get-hooks/useGetSettings";
-import {useChangeSettings} from "../../hooks/change-hooks/useChangeSettings";
-import {AnimatePresence, motion} from "framer-motion";
-import {useResetAccount} from "../../hooks/auth-hooks/useResetAccount";
-import {useDeleteAccount} from "../../hooks/auth-hooks/useDeleteAccount";
-import {useNavigate} from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
+import { useAuth } from "../../hooks/useAuth";
+import { useGetSettings } from "../../hooks/get-hooks/useGetSettings";
+import { useChangeSettings } from "../../hooks/change-hooks/useChangeSettings";
+import { AnimatePresence, motion } from "framer-motion";
+import { useResetAccount } from "../../hooks/auth-hooks/useResetAccount";
+import { useDeleteAccount } from "../../hooks/auth-hooks/useDeleteAccount";
+import { useNavigate } from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
-import {TbBrandGithub, TbBrandTwitter, TbMail, TbBrandLinkedin, TbBrandGoogle} from "react-icons/tb";
+import {
+  TbBrandGithub,
+  TbBrandLinkedin,
+  TbChevronRight,
+  TbLogout,
+  TbDeviceFloppy,
+} from "react-icons/tb";
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
-import Divider from "@/components/utilities/Divider/Divider";
+
+const SettingsTile = memo(
+  ({ onClick, title, description, children, isWarning = false }) => {
+    if (onClick)
+      return (
+        <button
+          onClick={onClick}
+          className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}
+        >
+          <div className={styles.tileText}>
+            <span className={styles.tileTitle}>{title}</span>
+            <span className={styles.tileDescription}>{description}</span>
+          </div>
+          <div className={styles.tileAction}>{children}</div>
+        </button>
+      );
+    return (
+      <div className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}>
+        <div className={styles.tileText}>
+          <span className={styles.tileTitle}>{title}</span>
+          <span className={styles.tileDescription}>{description}</span>
+        </div>
+        <div className={styles.tileAction}>{children}</div>
+      </div>
+    );
+  }
+);
+
+const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
+  const setLightTheme = useCallback(() => {
+    setSelectedTheme("Light");
+  }, [setSelectedTheme]);
+
+  const setDarkTheme = useCallback(() => {
+    setSelectedTheme("Dark");
+  }, [setSelectedTheme]);
+
+  const setDeviceTheme = useCallback(() => {
+    setSelectedTheme("Device");
+  }, [setSelectedTheme]);
+
+  return (
+    <div className={styles.themeSelector}>
+      <button className={styles.themeButton} onClick={setDeviceTheme}>
+        <div className={`${styles.themeButtonDecoration}`}>
+          <div
+            className={`${styles.deviceThemeDecoration} ${styles.deviceThemeLight}`}
+          >
+            <div className={styles.themeDecorationContainer}>
+              <div className={styles.themeDecorationText}></div>
+              <div className={styles.themeDecorationCheckbox}></div>
+            </div>
+          </div>
+          <div
+            className={`${styles.deviceThemeDecoration} ${styles.deviceThemeDark}`}
+          >
+            <div className={styles.themeDecorationContainer}>
+              <div className={styles.themeDecorationText}></div>
+              <div className={styles.themeDecorationCheckbox}></div>
+            </div>
+          </div>
+        </div>
+        <div
+          className={`${styles.themeButtonLabel} ${
+            selectedTheme === "Device" ? styles.selected : ""
+          }`}
+        >
+          Device
+        </div>
+      </button>
+      <button className={styles.themeButton} onClick={setLightTheme}>
+        <div className={`${styles.themeButtonDecoration} ${styles.lightMode}`}>
+          <div className={styles.themeDecorationContainer}>
+            <div className={styles.themeDecorationText}></div>
+            <div className={styles.themeDecorationCheckbox}></div>
+          </div>
+        </div>
+        <div
+          className={`${styles.themeButtonLabel} ${
+            selectedTheme === "Light" ? styles.selected : ""
+          }`}
+        >
+          Light
+        </div>
+      </button>
+      <button className={styles.themeButton} onClick={setDarkTheme}>
+        <div className={`${styles.themeButtonDecoration} ${styles.darkMode}`}>
+          <div className={styles.themeDecorationContainer}>
+            <div className={styles.themeDecorationText}></div>
+            <div className={styles.themeDecorationCheckbox}></div>
+          </div>
+        </div>
+        <div
+          className={`${styles.themeButtonLabel} ${
+            selectedTheme === "Dark" ? styles.selected : ""
+          }`}
+        >
+          Dark
+        </div>
+      </button>
+    </div>
+  );
+});
+
+const deleteTimeGroupActions = [
+  { display: "Keep repeat", actual: "Keep their repeat details" },
+  { display: "Remove repeat", actual: "Remove their repeat details" },
+  { display: "Delete them", actual: "Delete them" },
+];
 
 const Settings = () => {
-    const deleteTimeGroupActions = [
-        {display: "Keep repeat", actual: 'Keep their repeat details'},
-        {display: "Remove repeat", actual: 'Remove their repeat details'},
-        {display: "Delete them", actual: 'Delete them'}
-    ]
+  const { data: settings } = useGetSettings();
 
-    const getDeleteActionDefault = () => {
-        for (const action of deleteTimeGroupActions) {
-            if (action.actual === settings.defaults.deleteGroupAction) return action;
-        }
-
-        return deleteTimeGroupActions[0];
+  const getDeleteActionDefault = useCallback(() => {
+    for (const action of deleteTimeGroupActions) {
+      if (action.actual === settings.defaults.deleteGroupAction) return action;
     }
 
-    const {data: settings} = useGetSettings();
-    const {email, googleLinked} = useContext(UserContext).state;
-    const {mutateAsync: setSettings, isError: isErrorSetSettings} = useChangeSettings();
-    const {mutateAsync: resetAccount, isLoading: resetAccountLoading, isError: resetAccountError} = useResetAccount();
-    const {mutateAsync: deleteAccount, isLoading: deleteAccountLoading, isError: deleteAccountError} = useDeleteAccount();
+    return deleteTimeGroupActions[0];
+  }, [settings]);
 
-    const [selectedTheme, setSelectedTheme] = useState(settings.theme);
-    const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
-    const [deleteAction, setDeleteAction] = useState(getDeleteActionDefault());
-    const [priority, setPriority] = useState(settings.defaults.priority)
-    const [goal, setGoal] = useState(settings.defaults.goal);
-    const [step, setStep] = useState(settings.defaults.step);
+  const { email, googleLinked } = useContext(UserContext).state;
+  const { mutateAsync: setSettings, isError: isErrorSetSettings } =
+    useChangeSettings();
+  const {
+    mutateAsync: resetAccount,
+    isLoading: resetAccountLoading,
+    isError: resetAccountError,
+  } = useResetAccount();
+  const {
+    mutateAsync: deleteAccount,
+    isLoading: deleteAccountLoading,
+    isError: deleteAccountError,
+  } = useDeleteAccount();
 
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [settingsChanges, setSettingsChanges] = useState({});
+  const [selectedTheme, setSelectedTheme] = useState(settings.theme);
+  const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
+  const [deleteAction, setDeleteAction] = useState(getDeleteActionDefault());
+  const [priority, setPriority] = useState(settings.defaults.priority);
+  const [goal, setGoal] = useState(settings.defaults.goal);
+  const [step, setStep] = useState(settings.defaults.step);
 
-    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-    const [resetModalVisible, setResetModalVisible] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [settingsChanges, setSettingsChanges] = useState({});
 
-    const {logout} = useAuth();
-    const navigate = useNavigate();
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [resetModalVisible, setResetModalVisible] = useState(false);
 
-    const themeChips = ['Device', 'Light', 'Dark']; // Add black
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSaveChanges = async () => {
-        if (!isErrorSetSettings) {
-            let tempDeleteAction;
+  const handleSaveChanges = useCallback(async () => {
+    if (!isErrorSetSettings) {
+      let tempDeleteAction;
 
-            if (typeof deleteAction === "string") {
-                tempDeleteAction = deleteAction
-            } else {
-                tempDeleteAction = deleteAction.actual
-            }
+      if (typeof deleteAction === "string") {
+        tempDeleteAction = deleteAction;
+      } else {
+        tempDeleteAction = deleteAction.actual;
+      }
 
-            await setSettings({theme: selectedTheme, confirmDelete, defaults: {step, goal, priority, deleteGroupAction: tempDeleteAction}});
-            setSettingsChanges({});
-        }
+      await setSettings({
+        theme: selectedTheme,
+        confirmDelete,
+        defaults: { step, goal, priority, deleteGroupAction: tempDeleteAction },
+      });
+      setSettingsChanges({});
+    }
+  }, [
+    isErrorSetSettings,
+    deleteAction,
+    setSettings,
+    selectedTheme,
+    confirmDelete,
+    step,
+    goal,
+    priority,
+    setSettingsChanges,
+  ]);
+
+  const handleSetTheme = useCallback(
+    (e) => {
+      if (selectedTheme !== e) {
+        setSelectedTheme(e);
+      }
+      if (settings.theme !== e) {
+        setSettingsChanges({ ...settingsChanges, theme: e });
+      } else {
+        setSettingsChanges((current) => {
+          const { theme, ...rest } = current;
+
+          return rest;
+        });
+      }
+    },
+    [selectedTheme, setSelectedTheme, setSettingsChanges, settings]
+  );
+
+  const handleSetConfirmDelete = useCallback(() => {
+    if (settings.confirmDelete !== !confirmDelete) {
+      setSettingsChanges({ ...settingsChanges, confirmDelete: !confirmDelete });
+    } else {
+      setSettingsChanges((current) => {
+        const { confirmDelete, ...rest } = current;
+
+        return rest;
+      });
     }
 
-    const handleLogOut = async () => {
-        await logout();
+    setConfirmDelete(!confirmDelete);
+  }, [settings, confirmDelete, setSettingsChanges]);
+
+  const handleSetDeleteAction = useCallback(
+    (action) => {
+      if (settings.defaults.deleteGroupAction !== action.actual) {
+        setSettingsChanges({
+          ...settingsChanges,
+          deleteGroupAction: action.actual,
+        });
+      } else {
+        setSettingsChanges((current) => {
+          const { deleteGroupAction, ...rest } = current;
+
+          return rest;
+        });
+      }
+      setDeleteAction(action);
+    },
+    [setSettingsChanges, setDeleteAction, settings]
+  );
+
+  const handleSetPriority = useCallback(
+    (e) => {
+      setPriority(e);
+      if (e != settings.defaults.priority) {
+        setSettingsChanges({ ...settingsChanges, priority: e });
+      } else {
+        setSettingsChanges((current) => {
+          const { priority, ...rest } = current;
+
+          return rest;
+        });
+      }
+    },
+    [setPriority, setSettingsChanges, settings]
+  );
+
+  const handleSetStep = useCallback(
+    (e) => {
+      setStep(e);
+      if (e != settings.defaults.step) {
+        setSettingsChanges({ ...settingsChanges, step: e });
+      } else {
+        setSettingsChanges((current) => {
+          const { step, ...rest } = current;
+
+          return rest;
+        });
+      }
+    },
+    [setStep, setSettingsChanges, settings]
+  );
+
+  const handleSetGoal = useCallback(
+    (e) => {
+      setGoal(e);
+      if (e != settings.defaults.goal) {
+        setSettingsChanges({ ...settingsChanges, goal: e });
+      } else {
+        setSettingsChanges((current) => {
+          const { goal, ...rest } = current;
+
+          return rest;
+        });
+      }
+    },
+    [setGoal, setSettingsChanges, settings]
+  );
+
+  const handleChangeEmail = useCallback(() => {
+    navigate("/change-email");
+  }, [navigate]);
+
+  const toggleDeleteAccountModal = useCallback(() => {
+    setDeleteModalVisible((current) => !current);
+  }, [setDeleteModalVisible]);
+
+  const toggleResetAccountModal = useCallback(() => {
+    setResetModalVisible((current) => !current);
+  }, [setResetModalVisible]);
+
+  const handleChangePasswordClick = useCallback(() => {
+    navigate("/reset-password");
+  }, [navigate]);
+
+  const handleResetCancel = useCallback(() => {
+    setCurrentPassword("");
+    setResetModalVisible(false);
+  }, [setCurrentPassword, setResetModalVisible]);
+
+  const handleResetContinue = useCallback(async () => {
+    await resetAccount(currentPassword);
+    if (!resetAccountLoading && !resetAccountError) {
+      handleResetCancel();
+      await logout();
     }
+  }, [
+    handleResetCancel,
+    resetAccount,
+    logout,
+    resetAccountLoading,
+    resetAccountError,
+  ]);
 
-    const handleSetTheme = (e) => {
-        if (selectedTheme !== e) {
-            setSelectedTheme(e);
-        }
-        if (settings.theme !== e) {
-            setSettingsChanges({...settingsChanges, theme: e});
-        } else {
-            setSettingsChanges((current) => {
-                const {theme, ...rest} = current;
+  const handleDeleteCancel = useCallback(() => {
+    setCurrentPassword("");
+    setDeleteModalVisible(false);
+  }, [setCurrentPassword, setDeleteModalVisible]);
 
-                return rest;
-            });
-        }
+  const handleDeleteContinue = useCallback(async () => {
+    await deleteAccount(currentPassword);
+    if (!deleteAccountLoading && !deleteAccountError) {
+      await logout();
     }
+  }, [
+    deleteAccount,
+    currentPassword,
+    deleteAccountLoading,
+    deleteAccountError,
+    logout,
+  ]);
 
-    const handleSetConfirmDelete = () => {
-        if (settings.confirmDelete !== !confirmDelete) {
-            setSettingsChanges({...settingsChanges, confirmDelete: !confirmDelete});
-        } else {
-            setSettingsChanges((current) => {
-                const {confirmDelete, ...rest} = current;
-
-                return rest;
-            });
-        }
-
-        setConfirmDelete(!confirmDelete);
-    }
-
-    const handleSetDeleteAction = (action) => {
-        if (settings.defaults.deleteGroupAction !== action.actual) {
-            setSettingsChanges({...settingsChanges, deleteGroupAction: action.actual})
-        } else {
-            setSettingsChanges((current) => {
-                const {deleteGroupAction, ...rest} = current;
-
-                return rest;
-            });
-        }
-        setDeleteAction(action);
-    }
-
-    const handleSetPriority = (e) => {
-        setPriority(e);
-        if (e != settings.defaults.priority) {
-            setSettingsChanges({...settingsChanges, priority: e});
-        } else {
-            setSettingsChanges((current) => {
-                const {priority, ...rest} = current;
-
-                return rest;
-            });
-        }
-    }
-
-    const handleSetStep = (e) => {
-        setStep(e);
-        if (e != settings.defaults.step) {
-            setSettingsChanges({...settingsChanges, step: e});
-        } else {
-            setSettingsChanges((current) => {
-                const {step, ...rest} = current;
-
-                return rest;
-            });
-        }
-    }
-
-    const handleSetGoal = (e) => {
-        setGoal(e);
-        if (e != settings.defaults.goal) {
-            setSettingsChanges({...settingsChanges, goal: e});
-        } else {
-            setSettingsChanges((current) => {
-                const {goal, ...rest} = current;
-
-                return rest;
-            });
-        }
-    }
-
-    const handleChangeEmail = () => {
-        navigate('/change-email')
-    }
-
-    const handleGithubClick = () => {
-        window.open('https://github.com/KonstantinosPrasinos/');
-    }
-
-    const handleLinkedInClick = () => {
-        window.open('https://www.linkedin.com/in/konstantinos-prasinos-ab2a201bb/')
-    }
-
-    const handleTwitterClick = () => {
-        window.open('https://twitter.com/ConstantDeenos');
-    }
-
-    const toggleDeleteAccountModal = () => {
-        setDeleteModalVisible(current => !current);
-    }
-    const toggleResetAccountModal = () => {
-        setResetModalVisible(current => !current);
-    }
-
-    const handleChangePasswordClick = () => {
-        navigate('/reset-password');
-    }
-
-    const handleResetCancel = () => {
-        setCurrentPassword('');
-        setResetModalVisible(false);
-    }
-    const handleResetContinue = async () => {
-        await resetAccount(currentPassword);
-        if (!resetAccountLoading && !resetAccountError) {
-            handleResetCancel();
-            await handleLogOut();
-        }
-    }
-
-
-    const handleDeleteCancel = () => {
-        setCurrentPassword('');
-        setDeleteModalVisible(false);
-    }
-    const handleDeleteContinue = async () => {
-        await deleteAccount(currentPassword);
-        if (!deleteAccountLoading && !deleteAccountError) {
-            await handleLogOut();
-        }
-    }
-
-    const checkIfContinueActive = () => {
-        return currentPassword.length <= 0;
-    }
-
-    return (
-        <motion.div
-            className={`Rounded-Container ${styles.container} Has-Shadow`}
-            initial={{opacity: 0}}
-            animate={{opacity: 1}}
-            exit={{opacity: 0}}
-        >
-            <div className={`Stack-Container To-Edge ${styles.subContainer} Huge-Gap`}>
-                <section className={`Stack-Container Big-Gap ${styles.firstSection}`}>
-                    <div className={`Headline-Large`}>Profile</div>
-                    <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Stack-Container'}>
-                            <div className={'Title-Small'}>Logout</div>
-                            <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Disconnect your account from this device.</div>
-                                <Button filled={false} size={'small'} onClick={handleLogOut}>Logout</Button>
-                            </div>
-                        </div>
-                        <div className={'Title-Large'}>Account Details</div>
-                        <section className={`Stack-Container`}>
-                            {googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container Title-Small'}><TbBrandGoogle/>Google Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
-                                        You are connected using a Google Account with the following email address:
-                                        <br />
-                                        {email}
-                                    </div>
-                                </div>
-                            </div>}
-                            {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Horizontal-Flex-Container Title-Small'}><TbMail/>Email</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
-                                        {email}
-                                        <br/>
-                                        Note: if you change your email, you will be logged out.
-                                    </div>
-                                    <Button filled={false} size={'small'} onClick={handleChangeEmail}>Change</Button>
-                                </div>
-                            </div>}
-                            {!googleLinked && <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Change Password</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
-                                        Change the password you use when logging in using your email.
-                                        <br/>
-                                        Note: this action will log you out.
-                                    </div>
-                                    <Button filled={false} size={'small'} onClick={handleChangePasswordClick}>Change</Button>
-                                </div>
-                            </div>}
-                        </section>
-                        <div className={'Title-Large'}>Danger Zone</div>
-                        <section className={`Stack-Container`}>
-                            <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Delete Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Delete all the data of your account.</div>
-                                    <Button filled={false} size={'small'} onClick={toggleDeleteAccountModal} isWarning={true}>Delete</Button>
-                                </div>
-                            </div>
-                            <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Reset Account</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>Keep your account but delete all the task data and reset settings.</div>
-                                    <Button filled={false} size={'small'} onClick={toggleResetAccountModal} isWarning={true}>Reset</Button>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </section>
-                <Divider />
-                <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Headline-Large`}>General</div>
-                    <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Title-Small'}>App Theme</div>
-                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The color theme the app uses.</div>
-                            <div className={'Horizontal-Flex-Container'}>{themeChips.map(theme =>
-                                <Chip key={theme} value={theme} selected={selectedTheme} setSelected={handleSetTheme}>{theme}</Chip>)}
-                            </div>
-                        </div>
-
-                        <div className={'Title-Small'}>Show confirm prompt on delete</div>
-                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody} `}>
-                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
-                                Show a prompt to confirm your action when deleting a task or category.
-                                <br />
-                                Note: regardless of this option, an undo button appears for 10 seconds after deletion.
-                            </div>
-                            <div className={'Horizontal-Flex-Container'}>
-                                <ToggleButton isToggled={confirmDelete} setIsToggled={handleSetConfirmDelete} />
-                            </div>
-                        </div>
-                        <div className={'Title-Small'}>Delete time-group action</div>
-                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                            <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>
-                                What happens to tasks whose time group parent is deleted
-                            </div>
-                            <div className={'Horizontal-Flex-Container'}>
-                                <DropDownInput placeholder={"Keep repeat"} selected={deleteAction.display}>
-                                    {deleteTimeGroupActions.map(action => (
-                                        <button key={action.display} className={"DropDownOption"} onClick={() => handleSetDeleteAction(action)}>
-                                            {action.display}
-                                        </button>
-                                    ))}
-                                </DropDownInput>
-                            </div>
-                        </div>
-                        <div className={'Title-Large'}>Input Fields Default Values</div>
-                        <section className={`Stack-Container`}>
-                            <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Priority</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value all fields labeled priority are filled by default.</div>
-                                    <TextBoxInput type={'number'} value={priority} setValue={handleSetPriority}></TextBoxInput>
-                                </div>
-                            </div>
-                            <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Number Task Step</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value the step field in a “number” task is filled by default.</div>
-                                    <TextBoxInput type={'number'} value={step} setValue={handleSetStep}></TextBoxInput>
-                                </div>
-                            </div>
-                            <div className={'Stack-Container'}>
-                                <div className={'Title-Small'}>Goal Number</div>
-                                <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                                    <div className={`Body-Small ${styles.description} Opacity-Very-Low`}>The value the goal fields are filled by default. </div>
-                                    <TextBoxInput type={'number'} value={goal} setValue={handleSetGoal}></TextBoxInput>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </section>
-                <Divider />
-                <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Headline-Large`}>Keyboard Shortcuts</div>
-                    <div className={styles.keyBindsContainer}>
-                        <div>Create new task</div>
-                        <div className={"Horizontal-Flex-Container Small-Gap"}>
-                            <div className={styles.emptyChip}>Ctrl</div>
-                            <div className={styles.emptyChip}>Enter</div>
-                        </div>
-
-                        <div>Create new category</div>
-                        <div className={styles.keyBindsComboContainer}>
-                            <div className={styles.emptyChip}>Ctrl</div>
-                            <div className={styles.emptyChip}>\</div>
-                        </div>
-
-                        <div>Close all pages</div>
-                        <div className={styles.emptyChip}>Esc</div>
-                    </div>
-                </section>
-                <Divider />
-                <section className={'Stack-Container Big-Gap'}>
-                    <div className={`Headline-Large`}>About</div>
-                    <div className={'Title-Small'}>App Version<div className={'Body-Small Opacity-Very-Low'}>1.0</div></div>
-                    <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Title-Small'}>App Details</div>
-                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                            <div className={'Body-Small Opacity-Very-Low'}>
-                                Available as a Web App, on Android and on Windows.
-                                You can view the source code for this
-                                app <a href={"https://github.com/KonstantinosPrasinos/productivity-hub"} target="_blank">on github</a>.
-                            </div>
-                        </div>
-                    </div>
-                    <div className={'Stack-Container Big-Gap'}>
-                        <div className={'Title-Small'}>About the App Creator</div>
-                        <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                            <div className={'Body-Small Opacity-Very-Low'}>This app was created by Konstantinos Prasinos in order to create a more in depth task tracking experience.</div>
-                        </div>
-                        <div className={'Horizontal-Flex-Container'}>
-                            <IconButton onClick={handleGithubClick}><TbBrandGithub/></IconButton>
-                            <IconButton onClick={handleLinkedInClick}><TbBrandLinkedin/></IconButton>
-                            <IconButton onClick={handleTwitterClick}><TbBrandTwitter/></IconButton>
-                        </div>
-                    </div>
-                </section>
-                {/* Modal for password confirmation in order to delete account*/}
-                {deleteModalVisible && <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
-                    <div className={'Stack-Container Big-Gap'} >
-                        <div className={'Display'}>Confirm your password</div>
-                        <div className={'label'}>In order to delete your account you need to confirm your password.</div>
-                        <TextBoxInput
-                            type={'password'}
-                            width={'max'}
-                            size={'large'}
-                            placeholder={'Password'}
-                            value={currentPassword}
-                            setValue={setCurrentPassword}
-                        />
-                    </div>
-                    <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                        <Button
-                            size={'large'}
-                            filled={false}
-                            onClick={handleDeleteCancel}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            size={'large'}
-                            filled={!checkIfContinueActive()}
-                            onClick={handleDeleteContinue}
-                            disabled={checkIfContinueActive()}
-                        >
-                            Continue
-                        </Button>
-                    </div>
-                </Modal>}
-
-                {/* Modal for password confirmation in order to reset account*/}
-                {resetModalVisible && <Modal isOverlay={true} dismountFunction={handleResetCancel}>
-                    <div className={'Stack-Container'} >
-                        <div className={'Display'}>Confirm your password</div>
-                        <div className={'label'}>In order to reset your account you need to confirm your password.</div>
-                        <TextBoxInput
-                            type={'password'}
-                            width={'max'}
-                            size={'large'}
-                            placeholder={'Password'}
-                            value={currentPassword}
-                            setValue={setCurrentPassword}
-                        />
-                    </div>
-                    <div className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}>
-                        <Button
-                            size={'large'}
-                            filled={false}
-                            onClick={handleResetCancel}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            size={'large'}
-                            filled={!checkIfContinueActive()}
-                            onClick={handleResetContinue}
-                            disabled={checkIfContinueActive()}
-                        >
-                            Continue
-                        </Button>
-                    </div>
-                </Modal>}
+  return (
+    <div className={styles.container}>
+      <div className={styles.settingsGroup}>
+        <span className={styles.tileGroupTitle}>Account</span>
+        <div className={styles.tileGroup}>
+          <SettingsTile title={"Logout"} onClick={logout}>
+            <TbLogout />
+          </SettingsTile>
+          {!googleLinked && (
+            <>
+              <SettingsTile
+                title={"Change email"}
+                description={email}
+                onClick={handleChangeEmail}
+              >
+                <TbChevronRight />
+              </SettingsTile>
+              <SettingsTile
+                title={"Change password"}
+                onClick={handleChangePasswordClick}
+              >
+                <TbChevronRight />
+              </SettingsTile>
+            </>
+          )}
+          {googleLinked && (
+            <SettingsTile
+              title={"Google account email"}
+              description={"email"}
+            ></SettingsTile>
+          )}
+        </div>
+        <div className={styles.tileGroup}>
+          <SettingsTile
+            title={"Reset account"}
+            isWarning={true}
+            onClick={toggleResetAccountModal}
+          >
+            <TbChevronRight />
+          </SettingsTile>
+          <SettingsTile
+            title={"Delete account"}
+            isWarning={true}
+            onClick={toggleDeleteAccountModal}
+          >
+            <TbChevronRight />
+          </SettingsTile>
+        </div>
+      </div>
+      <div className={styles.settingsGroup}>
+        <span className={styles.tileGroupTitle}>General</span>
+        <div className={styles.tileGroup}>
+          <ThemeTile
+            selectedTheme={selectedTheme}
+            setSelectedTheme={handleSetTheme}
+          />
+        </div>
+        <div className={styles.tileGroup}>
+          <SettingsTile title={"Confirm delete"}>
+            <ToggleButton
+              isToggled={confirmDelete}
+              setIsToggled={handleSetConfirmDelete}
+            />
+          </SettingsTile>
+          <SettingsTile title={"Category delete action"}>
+            <DropDownInput
+              placeholder={"Keep repeat"}
+              selected={deleteAction.display}
+            >
+              {deleteTimeGroupActions.map((action) => (
+                <button
+                  key={action.display}
+                  className={"DropDownOption"}
+                  onClick={() => handleSetDeleteAction(action)}
+                >
+                  {action.display}
+                </button>
+              ))}
+            </DropDownInput>
+          </SettingsTile>
+        </div>
+        <div className={styles.tileGroup}>
+          <SettingsTile title={"Priority default value"}>
+            <TextBoxInput
+              type={"number"}
+              value={priority}
+              setValue={handleSetPriority}
+            />
+          </SettingsTile>
+          <SettingsTile title={"Number task default step"}>
+            <TextBoxInput
+              type={"number"}
+              value={step}
+              setValue={handleSetStep}
+            />
+          </SettingsTile>
+          <SettingsTile title={"Default goal value"}>
+            <TextBoxInput
+              type={"number"}
+              value={goal}
+              setValue={handleSetGoal}
+            />
+          </SettingsTile>
+        </div>
+      </div>
+      <div className={styles.settingsGroup}>
+        <span className={styles.tileGroupTitle}>Keyboard shortcuts</span>
+        <div className={styles.tileGroup}>
+          <SettingsTile title={"Create new task"}>
+            <div className={"Horizontal-Flex-Container Small-Gap"}>
+              <div className={styles.emptyChip}>Ctrl</div>
+              <div className={styles.emptyChip}>Enter</div>
             </div>
+          </SettingsTile>
+          <SettingsTile title={"Create new category"}>
+            <div className={"Horizontal-Flex-Container Small-Gap"}>
+              <div className={styles.emptyChip}>Ctrl</div>
+              <div className={styles.emptyChip}>\</div>
+            </div>
+          </SettingsTile>
+          <SettingsTile title={"Close all pages"}>
+            <div className={styles.emptyChip}>Esc</div>
+          </SettingsTile>
+        </div>
+      </div>
+      <div className={styles.settingsGroup}>
+        <span className={styles.tileGroupTitle}>About</span>
+        <div className={styles.tileGroup}>
+          <SettingsTile title={"App version"}>1.0</SettingsTile>
+          <SettingsTile title={"View the source code for this app on GitHub"}>
+            <a
+              href={"https://github.com/KonstantinosPrasinos/productivity-hub"}
+              target="_blank"
+              className={styles.githubLink}
+            >
+              <TbBrandGithub />
+            </a>
+          </SettingsTile>
+          <SettingsTile title={"Created by Konstantinos Prasinos"}>
+            <a
+              href={"https://github.com/KonstantinosPrasinos/"}
+              target="_blank"
+              className={styles.githubLink}
+            >
+              <TbBrandLinkedin />
+            </a>
+          </SettingsTile>
+        </div>
+      </div>
+      {deleteModalVisible && (
+        <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
+          <div className={"Stack-Container Big-Gap"}>
+            <div className={"Display"}>Confirm your password</div>
+            <div className={"label"}>
+              In order to delete your account you need to confirm your password.
+            </div>
+            <TextBoxInput
+              type={"password"}
+              width={"max"}
+              size={"large"}
+              placeholder={"Password"}
+              value={currentPassword}
+              setValue={setCurrentPassword}
+            />
+          </div>
+          <div
+            className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
+          >
+            <Button size={"large"} filled={false} onClick={handleDeleteCancel}>
+              Cancel
+            </Button>
+            <Button
+              size={"large"}
+              filled={!(currentPassword.length <= 0)}
+              onClick={handleDeleteContinue}
+              disabled={currentPassword.length <= 0}
+            >
+              Continue
+            </Button>
+          </div>
+        </Modal>
+      )}
 
-            {/* If any changes have been made render save changes button */}
-            <AnimatePresence>
-                {Object.keys(settingsChanges).length > 0 &&
-                    <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className={styles.saveSettingsContainer}>
-                        <Button onClick={handleSaveChanges}>Save changes</Button>
-                    </motion.div>
-                }
-            </AnimatePresence>
-        </motion.div>
-    );
+      {/* Modal for password confirmation in order to reset account*/}
+      {resetModalVisible && (
+        <Modal isOverlay={true} dismountFunction={handleResetCancel}>
+          <div className={"Stack-Container"}>
+            <div className={"Display"}>Confirm your password</div>
+            <div className={"label"}>
+              In order to reset your account you need to confirm your password.
+            </div>
+            <TextBoxInput
+              type={"password"}
+              width={"max"}
+              size={"large"}
+              placeholder={"Password"}
+              value={currentPassword}
+              setValue={setCurrentPassword}
+            />
+          </div>
+          <div
+            className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
+          >
+            <Button size={"large"} filled={false} onClick={handleResetCancel}>
+              Cancel
+            </Button>
+            <Button
+              size={"large"}
+              filled={!(currentPassword.length <= 0)}
+              onClick={handleResetContinue}
+              disabled={currentPassword.length <= 0}
+            >
+              Continue
+            </Button>
+          </div>
+        </Modal>
+      )}
+      <AnimatePresence>
+        {Object.keys(settingsChanges).length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={styles.saveSettingsContainer}
+          >
+            <Button onClick={handleSaveChanges} symmetrical>
+              <TbDeviceFloppy />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default Settings;
