@@ -1,6 +1,13 @@
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ColorInput from "../../components/inputs/ColorInput/ColorInput";
 import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
 import { AlertsContext } from "../../context/AlertsContext";
@@ -37,15 +44,16 @@ const SeparatorWithText = ({ children }) => {
   );
 };
 
-const NewCategory = ({ index, length, id }) => {
+const timePeriods = ["Days", "Weeks", "Months", "Years"];
+const goalTypes = ["Streak", "Total"];
+const goalLimits = ["At most", "Exactly", "At least"];
+
+const NewCategory = ({ index, length, id, groupId }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
   const { isLoading: groupsLoading, data: groups } = useGetGroups();
   const { data: settings } = useGetSettings();
   const alertsContext = useContext(AlertsContext);
   const miniPagesContext = useContext(MiniPagesContext);
-  const timePeriods = ["Days", "Weeks", "Months", "Years"];
-  const goalTypes = ["Streak", "Total"];
-  const goalLimits = ["At most", "Exactly", "At least"];
 
   const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
   const currentEditedGroup = useRef();
@@ -100,7 +108,7 @@ const NewCategory = ({ index, length, id }) => {
     return timeGroups.filter((group) => group?.deleted !== true);
   }, [timeGroups]);
 
-  const getGroupTitlesForDeletion = () => {
+  const groupTitlesForDeletion = useMemo(() => {
     const groupsForDeletion = [];
 
     for (const group of timeGroups) {
@@ -110,11 +118,11 @@ const NewCategory = ({ index, length, id }) => {
     }
 
     return groupsForDeletion;
-  };
+  }, [timeGroups]);
 
-  const handleAddTimeGroup = () => {
+  const handleAddTimeGroup = useCallback(() => {
     setCreatingTimeGroup((current) => !current);
-  };
+  }, [setCreatingTimeGroup]);
 
   useEffect(() => {
     if (!creatingTimeGroup) return;
@@ -323,7 +331,7 @@ const NewCategory = ({ index, length, id }) => {
     }
   };
 
-  const resetTimeGroupInputs = () => {
+  const resetTimeGroupInputs = useCallback(() => {
     setTimeGroupTitle("");
 
     setTimePeriod2([]);
@@ -333,21 +341,29 @@ const NewCategory = ({ index, length, id }) => {
     setStartMinute("00");
     setEndHour("23");
     setEndMinute("59");
-  };
-
-  const getGroupId = () => {
-    if (timeGroups.length === 0) {
-      return 0;
-    }
-
-    for (let i = 0; i <= timeGroups.length; i++) {
-      if (!timeGroups.find((group) => group._id === i)) {
-        return i;
-      }
-    }
-  };
+  }, [
+    setTimeGroupTitle,
+    setTimePeriod2,
+    setHasTime,
+    setStartHour,
+    setStartMinute,
+    setEndHour,
+    setEndMinute,
+  ]);
 
   const handleTimeGroupSave = () => {
+    const getGroupId = () => {
+      if (timeGroups.length === 0) {
+        return 0;
+      }
+
+      for (let i = 0; i <= timeGroups.length; i++) {
+        if (!timeGroups.find((group) => group._id === i)) {
+          return i;
+        }
+      }
+    };
+
     // Restrictions based on title
     // Has title
     if (!timeGroupTitle) {
@@ -444,43 +460,65 @@ const NewCategory = ({ index, length, id }) => {
     setCreatingTimeGroup(false);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.code === "Enter") {
-      handleSave();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.code === "Enter") {
+        handleSave();
+      }
+    },
+    [handleSave]
+  );
 
-  const handleGroupClick = (e, group) => {
-    // If target is icon then stop the event
-    if (e.target !== e.currentTarget) {
-      e.stopPropagation();
-      return;
-    }
+  const focusGroup = useCallback(
+    (group) => {
+      // Show time group inputs
+      setCreatingTimeGroup(true);
 
-    // Show time group inputs
-    setCreatingTimeGroup(true);
+      // Populate time group inputs
+      setTimeGroupTitle(group.title);
+      setTimePeriod2(group.repeatRate.smallTimePeriod);
 
-    // Populate time group inputs
-    setTimeGroupTitle(group.title);
-    setTimePeriod2(group.repeatRate.smallTimePeriod);
+      if (group.repeatRate?.time) {
+        setHasTime(true);
+        setStartHour(group.repeatRate.time.start.substring(0, 2));
+        setStartMinute(group.repeatRate.time.start.substring(2, 4));
+        setEndHour(group.repeatRate.time.end.substring(0, 2));
+        setEndMinute(group.repeatRate.time.end.substring(2, 4));
+      } else {
+        // Default values
+        setHasTime(false);
+        setStartHour("00");
+        setStartMinute("00");
+        setEndHour("23");
+        setEndMinute("59");
+      }
 
-    if (group.repeatRate?.time) {
-      setHasTime(true);
-      setStartHour(group.repeatRate.time.start.substring(0, 2));
-      setStartMinute(group.repeatRate.time.start.substring(2, 4));
-      setEndHour(group.repeatRate.time.end.substring(0, 2));
-      setEndMinute(group.repeatRate.time.end.substring(2, 4));
-    } else {
-      // Default values
-      setHasTime(false);
-      setStartHour("00");
-      setStartMinute("00");
-      setEndHour("23");
-      setEndMinute("59");
-    }
+      currentEditedGroup.current = group;
+    },
+    [
+      setCreatingTimeGroup,
+      setTimeGroupTitle,
+      setTimePeriod2,
+      setHasTime,
+      setStartHour,
+      setStartMinute,
+      setEndHour,
+      setEndMinute,
+    ]
+  );
 
-    currentEditedGroup.current = group;
-  };
+  const handleGroupClick = useCallback(
+    (e, group) => {
+      // If target is icon then stop the event
+      if (e.target !== e.currentTarget) {
+        e.stopPropagation();
+        return;
+      }
+
+      focusGroup();
+    },
+    [focusGroup]
+  );
 
   const handleDelete = (group) => {
     if (group._id === currentEditedGroup.current?._id) {
@@ -505,28 +543,31 @@ const NewCategory = ({ index, length, id }) => {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     resetTimeGroupInputs();
     currentEditedGroup.current = null;
     setCreatingTimeGroup(false);
-  };
+  }, [resetTimeGroupInputs, setCreatingTimeGroup]);
 
-  const toggleConfirmModal = () => {
+  const toggleConfirmModal = useCallback(() => {
     setConfirmDeleteModalVisible((current) => !current);
-  };
+  }, [setConfirmDeleteModalVisible]);
 
-  const toggleTimePeriodModal = () => {
+  const toggleTimePeriodModal = useCallback(() => {
     setVisibleTimePeriodModal((current) => !current);
-  };
+  }, [setVisibleTimePeriodModal]);
 
-  const handleTimePeriodInput = (tempTimePeriod) => {
-    // Time period resets time period 2
-    if (tempTimePeriod !== timePeriod) {
-      setTimePeriod2([]);
-    }
+  const handleTimePeriodInput = useCallback(
+    (tempTimePeriod) => {
+      // Time period resets time period 2
+      if (tempTimePeriod !== timePeriod) {
+        setTimePeriod2([]);
+      }
 
-    setTimePeriod(tempTimePeriod);
-  };
+      setTimePeriod(tempTimePeriod);
+    },
+    [timePeriod, setTimePeriod2, setTimePeriod]
+  );
 
   useEffect(() => {
     if (!categoriesLoading && !groupsLoading && id) {
@@ -559,6 +600,10 @@ const NewCategory = ({ index, length, id }) => {
           })
       );
       initialCategoryValues.current = category;
+
+      if (groupId) {
+        focusGroup(groups.find((tempGroup) => tempGroup._id === groupId));
+      }
     }
 
     if (titleRef.current) {
@@ -804,7 +849,7 @@ const NewCategory = ({ index, length, id }) => {
         <ConfirmDeleteGroupModal
           dismountModal={toggleConfirmModal}
           continueFunction={continueAfterModalFunctionRef.current}
-          groupTitles={getGroupTitlesForDeletion()}
+          groupTitles={groupTitlesForDeletion}
         />
       )}
       {visibleTimePeriodModal && (

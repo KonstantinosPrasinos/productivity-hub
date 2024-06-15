@@ -494,6 +494,23 @@ const NewTask = ({ index, length, id }) => {
                 <span>{tempSubcategory.title}</span>
               </button>
             ))}
+            <button
+              className={styles.dropDownOption}
+              onClick={() =>
+                miniPagesContext.dispatch({
+                  type: "ADD_PAGE",
+                  payload: { type: "new-category", id: category._id },
+                })
+              }
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              Add new
+              <TbPlus />
+            </button>
           </DropDownInput>
         </InputWrapper>
         <HeaderExtendContainer
