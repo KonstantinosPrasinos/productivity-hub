@@ -1,5 +1,12 @@
 @use "@/styles/variables" as v;
 
+@media (min-width: v.$phone-breakpoint) {
+    .container:hover:not(.disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+}
+
 .container {
     background-color: var(--surface-color);
     color: var(--on-surface-color);
@@ -71,11 +78,6 @@
     &.disabled {
         cursor: not-allowed;
         opacity: v.$opacity-low;
-    }
-
-    &:hover:not(.disabled) {
-        transform: translateY(-1px);
-        box-shadow: v.$elevation-1;
     }
 
     &:active:not(.disabled) {

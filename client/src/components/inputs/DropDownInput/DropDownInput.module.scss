@@ -1,5 +1,25 @@
 @use "@/styles/variables" as v;
 
+@media (min-width: v.$phone-breakpoint) {
+    .inputContainer:hover:not(.disabled) {
+        transform: translateY(-1px);
+        box-shadow: v.$elevation-1;
+    }
+    .option > *:hover::after {
+        content: '';
+        content: '';
+        background-color: var(--on-surface-color);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0.05;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+}
+
 .container {
     width: 10em;
     position: relative;
@@ -26,11 +46,6 @@
         > * {
             opacity: v.$opacity-very-low;
         }
-    }
-
-    &:hover:not(.disabled) {
-        transform: translateY(-1px);
-        box-shadow: v.$elevation-1;
     }
 
     &:active:not(.disabled) {
@@ -122,21 +137,6 @@
         text-overflow: ellipsis;
         overflow-x: hidden;
         white-space: nowrap;
-
-        &:hover {
-            &::after {
-                content: '';
-                background-color: var(--on-surface-color);
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                top: 0;
-                left: 0;
-                opacity: 0.05;
-                border-radius: 8px;
-                pointer-events: none;
-            }
-        }
     }
 
     &.optionSelected {
