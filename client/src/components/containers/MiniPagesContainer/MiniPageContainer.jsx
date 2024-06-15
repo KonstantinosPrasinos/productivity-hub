@@ -1,11 +1,18 @@
 import styles from "./MiniPageContainer.module.scss";
-import { useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
 import Button from "../../buttons/Button/Button";
 import IconButton from "../../buttons/IconButton/IconButton";
 import { MiniPagesContext } from "../../../context/MiniPagesContext";
 import { useScreenSize } from "../../../hooks/useScreenSize";
 import { TbX } from "react-icons/tb";
+
+const animationVariants = {
+  mobileExtended: { y: 0 },
+  mobileCollapsed: { y: "100%" },
+  desktopCollapsed: { x: "100%" },
+  desktopExtended: { x: 0 },
+};
 
 const MiniPageContainer = ({
   children,
@@ -21,6 +28,8 @@ const MiniPageContainer = ({
 
   const { screenSize } = useScreenSize();
   const miniPagesContext = useContext(MiniPagesContext);
+
+  const isCollapsed = useRef(false);
 
   let startY;
 
@@ -42,6 +51,7 @@ const MiniPageContainer = ({
   const makeFullHeight = () => {
     animationControls.set({ height: containerRef.current.offsetHeight });
     animationControls.start({ height: `calc(100% - 4.5em)` });
+    isCollapsed.current = false;
   };
 
   const makeHalfHeight = () => {
@@ -67,6 +77,8 @@ const MiniPageContainer = ({
     } else {
       animationControls.start({ height: `calc(50% - 4.53em)` });
     }
+
+    isCollapsed.current = true;
   };
 
   const handleEnd = (e) => {
@@ -75,7 +87,20 @@ const MiniPageContainer = ({
     if (e.target.nodeName === "DIV") {
       if (startY) {
         if (containerRef.current.offsetHeight < startY) {
-          makeHalfHeight();
+          // This is needed to close the page when swiped down while collapsed
+          if (isCollapsed.current) {
+            if (containerRef.current.offsetHeight < startY * 0.25) {
+              // This is needed to not snap back to the collapsed state before exiting
+              animationControls.set({
+                height: containerRef.current.offsetHeight,
+              });
+              closeMinipage();
+            } else {
+              makeHalfHeight();
+            }
+          } else {
+            makeHalfHeight();
+          }
         } else {
           makeFullHeight();
         }
@@ -100,13 +125,6 @@ const MiniPageContainer = ({
     }
   }, [length, index]);
 
-  const animationVariants = {
-    mobileExtended: { y: 0 },
-    mobileCollapsed: { y: "100%" },
-    desktopCollapsed: { x: "100%" },
-    desktopExtended: { x: 0 },
-  };
-
   useEffect(() => {
     animationControls.start(
       screenSize === "small" ? "mobileExtended" : "desktopExtended"
@@ -126,6 +144,10 @@ const MiniPageContainer = ({
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  const closeMinipage = useCallback(() => {
+    miniPagesContext.dispatch({ type: "REMOVE_PAGE", payload: "" });
+  }, [miniPagesContext]);
 
   return (
     <motion.div
@@ -150,11 +172,7 @@ const MiniPageContainer = ({
         )}
 
         <div className={styles.actionButtonsContainer}>
-          <IconButton
-            onClick={() => {
-              miniPagesContext.dispatch({ type: "REMOVE_PAGE", payload: "" });
-            }}
-          >
+          <IconButton onClick={closeMinipage}>
             <TbX />
           </IconButton>
           {showSaveButton && <Button onClick={onClickSave}>Save</Button>}

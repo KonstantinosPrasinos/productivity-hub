@@ -1,5 +1,5 @@
 import styles from "./Settings.module.scss";
-import React, { memo, useCallback, useContext, useState } from "react";
+import React, { memo, useCallback, useContext, useState, useMemo } from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import { UserContext } from "../../context/UserContext";
@@ -125,15 +125,14 @@ const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
 });
 
 const deleteTimeGroupActions = [
-  { display: "Keep repeat", actual: "Keep their repeat details" },
-  { display: "Remove repeat", actual: "Remove their repeat details" },
-  { display: "Delete them", actual: "Delete them" },
+  { display: "Keep tasks", actual: "Keep their repeat details" },
+  { display: "Delete tasks", actual: "Delete them" },
 ];
 
 const Settings = () => {
   const { data: settings } = useGetSettings();
 
-  const getDeleteActionDefault = useCallback(() => {
+  const deleteActionDefault = useMemo(() => {
     for (const action of deleteTimeGroupActions) {
       if (action.actual === settings.defaults.deleteGroupAction) return action;
     }
@@ -157,7 +156,7 @@ const Settings = () => {
 
   const [selectedTheme, setSelectedTheme] = useState(settings.theme);
   const [confirmDelete, setConfirmDelete] = useState(settings.confirmDelete);
-  const [deleteAction, setDeleteAction] = useState(getDeleteActionDefault());
+  const [deleteAction, setDeleteAction] = useState(deleteActionDefault);
   const [priority, setPriority] = useState(settings.defaults.priority);
   const [goal, setGoal] = useState(settings.defaults.goal);
   const [step, setStep] = useState(settings.defaults.step);
