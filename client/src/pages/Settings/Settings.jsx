@@ -380,7 +380,7 @@ const Settings = () => {
           {googleLinked && (
             <SettingsTile
               title={"Google account email"}
-              description={"email"}
+              description={email}
             ></SettingsTile>
           )}
         </div>
