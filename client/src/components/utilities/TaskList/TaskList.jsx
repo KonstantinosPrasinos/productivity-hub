@@ -9,7 +9,6 @@ import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
 import IconButton from "@/components/buttons/IconButton/IconButton";
-import Divider from "../Divider/Divider";
 import { useScreenSize } from "@/hooks/useScreenSize";
 
 const variants = {
@@ -275,9 +274,9 @@ const BigScreenFilters = ({
           filled={false}
           type={"square"}
           hasShadow={true}
-          size="small"
+          size='small'
         >
-          <span className="Horizontal-Flex-Container">
+          <span className='Horizontal-Flex-Container'>
             Add new
             <TbPlus />
           </span>
@@ -300,7 +299,7 @@ const SearchBar = ({ isStandalone = false, searchFilter, setSearchFilter }) => {
     >
       <TbSearch />
       <input
-        placeholder="Search"
+        placeholder='Search'
         value={searchFilter}
         onChange={handleChange}
       ></input>
@@ -387,16 +386,16 @@ const SearchScreen = ({
                 onClick={handleNewClick}
                 filled={false}
                 type={"square"}
-                size="small"
+                size='small'
               >
-                <span className="Horizontal-Flex-Container">
+                <span className='Horizontal-Flex-Container'>
                   Add new
                   <TbPlus />
                 </span>
               </Button>
             </div>
           </div>
-          <IconButton size="large" onClick={toggleVisibility}>
+          <IconButton size='large' onClick={toggleVisibility}>
             <TbX />
           </IconButton>
         </motion.div>
@@ -590,7 +589,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
             </div>
           </button>
         )}
-        <AnimatePresence initial={true} mode="popLayout">
+        <AnimatePresence initial={true} mode='popLayout'>
           {filteredTasks.length === 0 && (
             <motion.div
               initial={"hidden"}

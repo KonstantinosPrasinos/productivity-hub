@@ -33,7 +33,8 @@ const goalTypes = ["Streak", "Total"];
 const NewTask = ({ index, length, id }) => {
   const { isLoading: categoriesLoading, data: categories } = useGetCategories();
   const { isLoading: groupsLoading, data: groups } = useGetGroups();
-  const { isLoading, data: tasks } = useGetTasks();
+  // const { isLoading, data: tasks } = useGetTasks();
+  const isLoading = false;
   const { data: settings } = useGetSettings();
 
   const { mutate: addTask } = useAddTask();
@@ -113,7 +114,7 @@ const NewTask = ({ index, length, id }) => {
   useEffect(() => {
     // Fill in all the fields if editing task
     if (id && !isLoading) {
-      const task = tasks.find((task) => task._id === id);
+      const task = null;
 
       setTitle(task.title);
 
@@ -391,33 +392,33 @@ const NewTask = ({ index, length, id }) => {
         collapsedFocusedElement={titleRef}
       >
         <input
-          type="text"
-          className="Title-Large"
-          placeholder="Add task title"
+          type='text'
+          className='Title-Large'
+          placeholder='Add task title'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={handleKeyDown}
           ref={titleRef}
         />
-        <InputWrapper label="Description">
+        <InputWrapper label='Description'>
           <textarea
             className={styles.descriptionTextArea}
-            wrap="hard"
+            wrap='hard'
             maxLength={500}
             value={description}
             onChange={handleDescriptionChange}
             rows={1}
-            placeholder="Add task description"
+            placeholder='Add task description'
             ref={descriptionRef}
           />
           <div className={styles.descriptionLengthCounter}>
             {description.length} / 500
           </div>
         </InputWrapper>
-        <InputWrapper label="Priority">
+        <InputWrapper label='Priority'>
           <TextBoxInput
-            type="number"
-            placeholder="Priority"
+            type='number'
+            placeholder='Priority'
             value={priority}
             setValue={setPriority}
           />
@@ -528,12 +529,12 @@ const NewTask = ({ index, length, id }) => {
           hasPointer={false}
         >
           <InputWrapper
-            label="Step"
+            label='Step'
             tooltipMessage={"How much the number increases every time"}
           >
             <TextBoxInput
-              type="number"
-              placeholder="Step"
+              type='number'
+              placeholder='Step'
               value={step}
               setValue={setStep}
               minNumber={1}
@@ -570,8 +571,8 @@ const NewTask = ({ index, length, id }) => {
                 ))}
               </DropDownInput>
               <TextBoxInput
-                type="number"
-                placeholder="Number"
+                type='number'
+                placeholder='Number'
                 value={goalNumber}
                 setValue={setGoalNumber}
                 isDisabled={!hasGoal}
@@ -612,8 +613,8 @@ const NewTask = ({ index, length, id }) => {
           >
             <InputWrapper label={"Repeat every"}>
               <TextBoxInput
-                type="number"
-                placeholder="Number"
+                type='number'
+                placeholder='Number'
                 value={repeatNumber}
                 setValue={setRepeatNumber}
                 minNumber={1}
@@ -727,8 +728,8 @@ const NewTask = ({ index, length, id }) => {
                   ))}
                 </DropDownInput>
                 <TextBoxInput
-                  type="number"
-                  placeholder="Number"
+                  type='number'
+                  placeholder='Number'
                   value={longGoalNumber}
                   setValue={setLongGoalNumber}
                   isDisabled={!hasLongGoal}

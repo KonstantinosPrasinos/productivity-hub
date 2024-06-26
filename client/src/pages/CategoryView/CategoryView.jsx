@@ -443,7 +443,8 @@ const CategoryView = ({ index, length, category }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
   const { data: unfilteredGroups } = useGetGroups();
-  const { data: tasks } = useGetTasks();
+  // const { data: tasks } = useGetTasks();
+  const tasks = [];
 
   const groups = unfilteredGroups?.filter(
     (group) => group.parent === category._id
