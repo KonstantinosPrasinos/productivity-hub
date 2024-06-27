@@ -217,6 +217,38 @@ const getTasksFromDB = async () => {
     });
 };
 
+const addTaskToDB = async (task) => {
+    const db = await openDatabase();
+
+    const tempTask = {
+        ...task,
+        currentEntryId: null,
+        mustSync: true,
+    };
+
+    const taskId = await db.add("tasks", task);
+
+    tempTask.currentEntryId = taskId;
+    tempTask._id = taskId;
+
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const entry = {
+        _id: taskId,
+        taskId,
+        value: 0,
+        date: currentDate.toISOString(),
+        forDeletion: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+
+    await db.add("entries", entry);
+
+    return {task: tempTask, entry};
+};
+
 const messageClient = async (sw, type) => {
     // Let client know that it should update react-query
     const clients = await sw.clients.matchAll();
@@ -226,6 +258,29 @@ const messageClient = async (sw, type) => {
             type,
         });
     });
+}
+
+const addTaskToServer = async (event, savedData) => {
+    const response = await fetch(event.request);
+
+    if (!response.ok) {
+        return;
+    }
+
+    const data = await response.json();
+
+    // Replace temporary task and entry with real ones
+    const db = await openDatabase();
+    const transaction = db.transaction(["tasks", "entries"], "readwrite");
+
+    await transaction.objectStore("tasks").delete(savedData.task._id);
+    await transaction.objectStore("tasks").put(data.task);
+
+    await transaction.objectStore("entries").delete(savedData.entry._id);
+    await transaction.objectStore("entries").put(data.entry);
+
+    // Message client to update the query cache
+    await messageClient(self, "UPDATE_TASKS");
 }
 
 self.addEventListener('fetch', async (event) => {
@@ -242,13 +297,39 @@ self.addEventListener('fetch', async (event) => {
                     if (!response.ok) {
                         return;
                     }
+
                     const data = await response.json();
 
                     await setTasksInDatabase(data.tasks);
-                    await setEntriesInDatabase(data.current_entries);
+                    await setEntriesInDatabase(data.currentEntries);
 
                     await messageClient(self, "UPDATE_TASKS");
                     break;
+            }
+        } else if (event.request.method === "POST") {
+            switch (requestUrl) {
+                case "/task/create":
+
+                    event.respondWith((async () => {
+                        try {
+                            const requestClone = event.request.clone();
+                            const requestBody = await requestClone.json();
+
+                            const savedData = await addTaskToDB(requestBody.task);
+
+                            await addTaskToServer(event, savedData);
+
+                            return new Response(JSON.stringify(savedData), {
+                                headers: {'Content-Type': 'application/json'}
+                            });
+                        } catch (error) {
+                            console.error('Error processing request:', error);
+                            return new Response(JSON.stringify({error: 'Failed to process request'}), {
+                                headers: {'Content-Type': 'application/json'}
+                            });
+                        }
+                    })());
+
             }
         }
     }
