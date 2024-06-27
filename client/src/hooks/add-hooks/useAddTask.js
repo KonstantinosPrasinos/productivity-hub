@@ -74,7 +74,7 @@ const addTaskToServer = async (task, queryClient, updateSettingsLowAndHigh) => {
       ? {
           tasks: [
             ...oldData.tasks.filter((task) => task !== tempTask),
-            data.task,
+            { ...data.task, tempId: tempTask._id },
           ],
         }
       : oldData;
