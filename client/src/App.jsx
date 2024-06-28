@@ -61,6 +61,18 @@ const syncTasks = async (queryClient) => {
     }
 }
 
+const syncCategories = async (queryClient) => {
+    const db = await openDatabase();
+
+    const categories = await db.transaction("categories").objectStore("categories").getAll();
+
+    queryClient.setQueryData(["categories"], () => {
+        return {
+            categories
+        }
+    })
+}
+
 const NavLayout = () => {
     // Server state
     const {isLoading: settingsLoading} = useGetSettings();
@@ -124,7 +136,8 @@ const NavLayout = () => {
                             case "UPDATE_TASKS":
                                 syncTasks(queryClient);
                                 break;
-
+                            case "UPDATE_CATEGORIES":
+                                syncCategories(queryClient);
                         }
                     });
                 });

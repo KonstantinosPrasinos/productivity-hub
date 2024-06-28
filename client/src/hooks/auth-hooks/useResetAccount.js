@@ -31,6 +31,7 @@ export function useResetAccount() {
             })
         },
         onSettled: async () => {
+            // Todo move all this logic to logout function
             queryClient.invalidateQueries({queryKey: ["tasks"]});
             queryClient.invalidateQueries({queryKey: ["groups"]});
             queryClient.invalidateQueries({queryKey: ["categories"]});
@@ -38,13 +39,16 @@ export function useResetAccount() {
 
             const db = await openDatabase();
 
-            const transaction = db.transaction(["tasks", "entries"], "readwrite");
+            const transaction = db.transaction(["tasks", "entries", "categories"], "readwrite");
 
             const entryStore = transaction.objectStore("entries");
             entryStore.clear();
 
             const taskStore = transaction.objectStore("tasks");
             taskStore.clear();
+
+            const categoryStore = transaction.objectStore("categories");
+            categoryStore.clear();
         }
     })
 }

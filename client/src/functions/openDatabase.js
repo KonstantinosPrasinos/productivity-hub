@@ -1,7 +1,7 @@
 import {openDB} from "idb";
 
 export const openDatabase = () => {
-    return openDB("productivity-hub-db", 1, {
+    return openDB("productivity-hub-db", 2, {
         upgrade(db) {
             // Checks if the object store exists:
             if (!db.objectStoreNames.contains("tasks")) {
@@ -58,9 +58,41 @@ export const openDatabase = () => {
                     unique: false,
                 });
             }
+
+            if (!db.objectStoreNames.contains("categories")) {
+                const categoryObjectStore = db.createObjectStore("categories", {
+                    keyPath: "_id",
+                    autoIncrement: true
+                });
+
+                categoryObjectStore.createIndex('title', 'title', {unique: false});
+                categoryObjectStore.createIndex('color', 'color', {unique: false});
+                categoryObjectStore.createIndex('repeats', 'repeats', {unique: false});
+                categoryObjectStore.createIndex('priority', 'priority', {unique: false});
+                categoryObjectStore.createIndex('goal.type', 'goal.type', {unique: false});
+                categoryObjectStore.createIndex('goal.limit', 'goal.limit', {unique: false});
+                categoryObjectStore.createIndex('goal.number', 'goal.number', {unique: false});
+                categoryObjectStore.createIndex('repeatRate.number', 'repeatRate.number', {unique: false});
+                categoryObjectStore.createIndex('repeatRate.bigTimePeriod', 'repeatRate.bigTimePeriod', {unique: false});
+                categoryObjectStore.createIndex('repeatRate.startingDate', 'repeatRate.startingDate', {
+                    unique: false,
+                    multiEntry: true
+                });
+            }
         },
     });
 };
+
+export const addToStoreInDatabase = async (tempData = [], storeType = "") => {
+    const db = await openDatabase();
+
+    const transaction = db.transaction([storeType], "readwrite");
+    const store = transaction.objectStore(storeType);
+
+    for (const data of tempData) {
+        await store.put({...data, mustSync: false});
+    }
+}
 
 export const setTasksInDatabase = async (tempTasks = []) => {
     const db = await openDatabase();

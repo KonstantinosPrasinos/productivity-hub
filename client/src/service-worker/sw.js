@@ -1,5 +1,7 @@
 import {openDatabase, setEntriesInDatabase, setTasksInDatabase} from "@/functions/openDatabase";
 import {BackgroundSyncPlugin} from "workbox-background-sync";
+import {addTaskToServer, getTasksFromDB} from "@/service-worker/functions/taskFunctions.js";
+import {addCategoryToServer, getCategoriesFromDB} from "@/service-worker/functions/categoryFunctions.js";
 
 let isSyncing = false;
 
@@ -163,59 +165,13 @@ self.addEventListener("message", (event) => {
     }
 });
 
-const getTasksFromDB = async () => {
+const addCategoryToDB = async (category) => {
     const db = await openDatabase();
 
-    const tasks = await db.transaction("tasks").objectStore("tasks").getAll();
-    const entries = await db
-        .transaction("entries")
-        .objectStore("entries")
-        .getAll();
+    const categoryId = await db.add("categories", category);
 
-    // Check if there is an entry for each of the tasks.
-    // If there isn't one, create a mock one.
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const newEntries = [];
-    const existingEntries = [];
-
-    tasks.forEach((task) => {
-        let todayEntry = entries.find(
-            (entry) => entry.taskId === task._id && entry.date === today.toISOString()
-        );
-
-        if (!todayEntry) {
-            todayEntry = {
-                _id: `${task._id}-${today.toISOString()}`,
-                userId: task.userId,
-                taskId: task._id,
-                value: 0,
-                date: today.toISOString(),
-                forDeletion: false,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                mustSync: true,
-                isTemporary: true,
-            };
-
-            newEntries.push(todayEntry);
-        } else {
-            existingEntries.push(todayEntry);
-        }
-
-        task.currentEntryId = todayEntry._id;
-    });
-
-    // Add all the new entries to the db
-    for (const entry of newEntries) {
-        await db.add("entries", entry);
-    }
-
-    return new Response(JSON.stringify({tasks, currentEntries: [...existingEntries, ...newEntries]}), {
-        headers: {'Content-Type': 'application/json'}
-    });
-};
+    return {newCategory: {...category, _id: categoryId}};
+}
 
 const addTaskToDB = async (task) => {
     const db = await openDatabase();
@@ -260,29 +216,6 @@ const messageClient = async (sw, type) => {
     });
 }
 
-const addTaskToServer = async (event, savedData) => {
-    const response = await fetch(event.request);
-
-    if (!response.ok) {
-        return;
-    }
-
-    const data = await response.json();
-
-    // Replace temporary task and entry with real ones
-    const db = await openDatabase();
-    const transaction = db.transaction(["tasks", "entries"], "readwrite");
-
-    await transaction.objectStore("tasks").delete(savedData.task._id);
-    await transaction.objectStore("tasks").put(data.task);
-
-    await transaction.objectStore("entries").delete(savedData.entry._id);
-    await transaction.objectStore("entries").put(data.entry);
-
-    // Message client to update the query cache
-    await messageClient(self, "UPDATE_TASKS");
-}
-
 self.addEventListener('fetch', async (event) => {
     if (event.request.url.includes('/api/')) {
         const requestUrl = event.request.url.substring(event.request.url.indexOf("/api/") + 4);
@@ -305,11 +238,24 @@ self.addEventListener('fetch', async (event) => {
 
                     await messageClient(self, "UPDATE_TASKS");
                     break;
+                case "/category":
+                    event.respondWith(getCategoriesFromDB());
+
+                // const categoryResponse = await fetch(event.request);
+
+                // if (!categoryResponse.ok) {
+                //     return;
+                // }
+                //
+                // const categoryData = await categoryResponse.json();
+                //
+                // await addToStoreInDatabase(categoryData, "categories");
+                //
+                // await messageClient(self, "UPDATE_CATEGORIES");
             }
         } else if (event.request.method === "POST") {
             switch (requestUrl) {
                 case "/task/create":
-
                     event.respondWith((async () => {
                         try {
                             const requestClone = event.request.clone();
@@ -318,6 +264,9 @@ self.addEventListener('fetch', async (event) => {
                             const savedData = await addTaskToDB(requestBody.task);
 
                             await addTaskToServer(event, savedData);
+
+                            // Message client to update the query cache
+                            await messageClient(self, "UPDATE_TASKS");
 
                             return new Response(JSON.stringify(savedData), {
                                 headers: {'Content-Type': 'application/json'}
@@ -329,7 +278,30 @@ self.addEventListener('fetch', async (event) => {
                             });
                         }
                     })());
+                    break;
+                case "/category/create":
+                    event.respondWith((async () => {
+                        try {
+                            const requestClone = event.request.clone();
+                            const requestBody = await requestClone.json();
 
+                            const savedData = await addCategoryToDB(requestBody.category);
+
+                            await addCategoryToServer(event, savedData);
+
+                            await messageClient(self, "UPDATE_CATEGORIES")
+
+                            return new Response(JSON.stringify(savedData), {
+                                headers: {'Content-Type': 'application/json'}
+                            })
+                        } catch (error) {
+                            console.error('Error processing request:', error);
+                            return new Response(JSON.stringify({error: 'Failed to process request'}), {
+                                headers: {'Content-Type': 'application/json'}
+                            });
+                        }
+                    })());
+                    break;
             }
         }
     }
