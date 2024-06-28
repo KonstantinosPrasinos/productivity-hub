@@ -20,9 +20,19 @@ export const addCategoryToServer = async (event, savedData) => {
     const data = await response.json();
 
     const db = await openDatabase();
-    const transaction = db.transaction(["categories"], "readwrite");
+    const transaction = db.transaction(["categories", "groups"], "readwrite");
 
     // todo change all new categories to categories
     await transaction.objectStore("categories").delete(savedData.newCategory._id);
     await transaction.objectStore("categories").put(data.newCategory);
+
+    for (const group of savedData.newGroups) {
+        await transaction.objectStore("groups").delete(group._id);
+    }
+
+    if (data.newGroups?.length > 0) {
+        for (const group of data.newGroups) {
+            await transaction.objectStore("groups").put(group);
+        }
+    }
 }

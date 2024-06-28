@@ -1,7 +1,8 @@
-import {openDatabase, setEntriesInDatabase, setTasksInDatabase} from "@/functions/openDatabase";
+import {addToStoreInDatabase, openDatabase, setEntriesInDatabase, setTasksInDatabase} from "@/functions/openDatabase";
 import {BackgroundSyncPlugin} from "workbox-background-sync";
 import {addTaskToServer, getTasksFromDB} from "@/service-worker/functions/taskFunctions.js";
 import {addCategoryToServer, getCategoriesFromDB} from "@/service-worker/functions/categoryFunctions.js";
+import {getGroupsFromDB} from "@/service-worker/functions/groupFunctions.js";
 
 let isSyncing = false;
 
@@ -173,6 +174,22 @@ const addCategoryToDB = async (category) => {
     return {newCategory: {...category, _id: categoryId}};
 }
 
+const addGroupsToDB = async (groups, categoryId) => {
+    const db = await openDatabase();
+
+    const addedGroups = [];
+
+    for (const group of groups) {
+        const groupId = await db.add("groups", {...group, parent: categoryId});
+
+        addedGroups.push({...group, _id: groupId, parent: categoryId});
+    }
+
+    console.log(addedGroups);
+
+    return {newGroups: addedGroups};
+}
+
 const addTaskToDB = async (task) => {
     const db = await openDatabase();
 
@@ -241,17 +258,33 @@ self.addEventListener('fetch', async (event) => {
                 case "/category":
                     event.respondWith(getCategoriesFromDB());
 
-                // const categoryResponse = await fetch(event.request);
+                    const categoryResponse = await fetch(event.request);
 
-                // if (!categoryResponse.ok) {
-                //     return;
-                // }
-                //
-                // const categoryData = await categoryResponse.json();
-                //
-                // await addToStoreInDatabase(categoryData, "categories");
-                //
-                // await messageClient(self, "UPDATE_CATEGORIES");
+                    if (!categoryResponse.ok) {
+                        return;
+                    }
+
+                    const categoryData = await categoryResponse.json();
+
+                    await addToStoreInDatabase(categoryData.categories, "categories");
+
+                    await messageClient(self, "UPDATE_CATEGORIES");
+                    break;
+                case "/groups":
+                    event.respondWith(getGroupsFromDB());
+
+                    const groupResponse = await fetch(event.request);
+
+                    if (!groupResponse.ok) {
+                        return;
+                    }
+
+                    const groupData = await groupResponse.json();
+
+                    await addToStoreInDatabase(groupData.categories, "groups");
+
+                    await messageClient(self, "UPDATE_GROUPS");
+                    break;
             }
         } else if (event.request.method === "POST") {
             switch (requestUrl) {
@@ -285,7 +318,10 @@ self.addEventListener('fetch', async (event) => {
                             const requestClone = event.request.clone();
                             const requestBody = await requestClone.json();
 
-                            const savedData = await addCategoryToDB(requestBody.category);
+                            const savedCategory = await addCategoryToDB(requestBody.category);
+                            const savedGroups = requestBody.groups.length > 0 ? await addGroupsToDB(requestBody.groups, savedCategory.newCategory._id) : {newGroups: []};
+
+                            const savedData = {...savedCategory, ...savedGroups};
 
                             await addCategoryToServer(event, savedData);
 

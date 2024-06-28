@@ -39,7 +39,7 @@ export function useResetAccount() {
 
             const db = await openDatabase();
 
-            const transaction = db.transaction(["tasks", "entries", "categories"], "readwrite");
+            const transaction = db.transaction(["tasks", "entries", "categories", "groups"], "readwrite");
 
             const entryStore = transaction.objectStore("entries");
             entryStore.clear();
@@ -49,6 +49,9 @@ export function useResetAccount() {
 
             const categoryStore = transaction.objectStore("categories");
             categoryStore.clear();
+
+            const groupStore = transaction.objectStore("groups");
+            groupStore.clear();
         }
     })
 }

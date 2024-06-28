@@ -1,7 +1,7 @@
 import {openDB} from "idb";
 
 export const openDatabase = () => {
-    return openDB("productivity-hub-db", 2, {
+    return openDB("productivity-hub-db", 3, {
         upgrade(db) {
             // Checks if the object store exists:
             if (!db.objectStoreNames.contains("tasks")) {
@@ -78,6 +78,25 @@ export const openDatabase = () => {
                     unique: false,
                     multiEntry: true
                 });
+            }
+
+            if (!db.objectStoreNames.contains("groups")) {
+                const groupObjectStore = db.createObjectStore("groups", {
+                    keyPath: "_id",
+                    autoIncrement: true
+                });
+
+                groupObjectStore.createIndex('title', 'title', {unique: false});
+                groupObjectStore.createIndex('repeatRate.smallTimePeriod', 'repeatRate.smallTimePeriod', {
+                    unique: false,
+                    multiEntry: true
+                });
+                groupObjectStore.createIndex('repeatRate.startingDate', 'repeatRate.startingDate', {
+                    unique: false,
+                    multiEntry: true
+                });
+                groupObjectStore.createIndex('repeatRate.time.start', 'repeatRate.time.start', {unique: false});
+                groupObjectStore.createIndex('repeatRate.time.end', 'repeatRate.time.end', {unique: false});
             }
         },
     });
