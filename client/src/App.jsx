@@ -42,12 +42,6 @@ const syncTasks = async (queryClient) => {
     const tasks = await db.transaction("tasks").objectStore("tasks").getAll();
     const entries = await db.transaction("entries").objectStore("entries").getAll();
 
-    queryClient.setQueryData(["tasks"], () => {
-        return {
-            tasks,
-        };
-    });
-
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0)
     const currentDateString = currentDate.toISOString();
@@ -59,6 +53,12 @@ const syncTasks = async (queryClient) => {
             return {entry}
         })
     }
+
+    queryClient.setQueryData(["tasks"], () => {
+        return {
+            tasks,
+        };
+    });
 }
 
 const syncCategories = async (queryClient) => {
@@ -143,7 +143,9 @@ const NavLayout = () => {
 
                         switch (type) {
                             case "SYNC_COMPLETED":
-                                // handleSync(queryClient);
+                                syncCategories(queryClient);
+                                syncGroups(queryClient);
+                                syncTasks(queryClient);
                                 break;
                             case "UPDATE_TASKS":
                                 syncTasks(queryClient);

@@ -26,3 +26,17 @@ export const getGroupsFromDB = async () => {
 //     await transaction.objectStore("groups").delete(savedData.._id);
 //     await transaction.objectStore("categories").put(data.newCategory);
 // }
+
+export const addGroupsToDB = async (groups, categoryId) => {
+    const db = await openDatabase();
+
+    const addedGroups = [];
+
+    for (const group of groups) {
+        const groupId = await db.add("groups", {...group, parent: categoryId, isNew: true, mustSync: true});
+
+        addedGroups.push({...group, _id: groupId, parent: categoryId, mustSync: true, isNew: true});
+    }
+
+    return {newGroups: addedGroups};
+}

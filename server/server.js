@@ -17,6 +17,7 @@ const groupRoutes = require('./routes/groupRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const securityRoutes = require('./routes/securityRoutes');
 const taskHistoryRoutes = require('./routes/entryRoutes');
+const syncRoutes = require("./routes/syncRoutes")
 // const {Strategy: GoogleStrategy} = require("passport-google-oauth20");
 
 // Express app
@@ -57,11 +58,11 @@ app.use(cors(corsOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user._id);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
     User.findById(user, (err, user) => {
         done(null, user);
     })
@@ -78,6 +79,7 @@ app.use('/api/group', groupRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/entry', taskHistoryRoutes);
+app.use('/api/sync', syncRoutes);
 
 app.use((err, req, res, next) => {
     if (err.message) {

@@ -1,4 +1,12 @@
 const Entry = require('../models/entrySchema');
+const Joi = require("joi");
+
+const entrySchema = Joi.object({
+    taskId: Joi.string().required(),
+    value: Joi.number().required(),
+    data: Joi.date(),
+    userId: Joi.string()
+})
 
 const checkIfDate = (date) => {
     return (new Date(date) !== "Invalid Date") && isNaN(date)
@@ -8,7 +16,7 @@ const getRecentEntries = async (req, res) => {
     if (req.user) {
         const {taskId} = req.body;
 
-        const entries = await Entry.find({userId: req.user._id, taskId: taskId}).sort({ $natural: -1 }).limit(7);
+        const entries = await Entry.find({userId: req.user._id, taskId: taskId}).sort({$natural: -1}).limit(7);
 
         res.status(200).json({entries});
     } else {
@@ -25,8 +33,14 @@ const getTaskEntries = (req, res) => {
         const endDay = new Date();
         endDay.setHours(23, 59, 59, 999);
 
-        Entry.find({userId: req.user._id, taskId: taskId, date: {$not: {$gte: startDay, $lte: endDay}}}, (err, entries) => {
-            if (entries) {return res.status(200).json({entries})}
+        Entry.find({
+            userId: req.user._id,
+            taskId: taskId,
+            date: {$not: {$gte: startDay, $lte: endDay}}
+        }, (err, entries) => {
+            if (entries) {
+                return res.status(200).json({entries})
+            }
 
             return res.status(404).json({message: 'Past entries not found.'});
         });
@@ -78,7 +92,11 @@ const setEntry = async (req, res) => {
         }
 
         try {
-            const entry = await Entry.findOneAndUpdate({userId: req.user._id, _id: entryId, taskId}, {$set: changes}, {returnDocument: 'after'});
+            const entry = await Entry.findOneAndUpdate({
+                userId: req.user._id,
+                _id: entryId,
+                taskId
+            }, {$set: changes}, {returnDocument: 'after'});
             return res.status(200).json(entry);
         } catch (error) {
             res.status(500).json({message: error.message});
@@ -134,4 +152,14 @@ const addEntry = async (req, res) => {
     }
 }
 
-module.exports = {getRecentEntries, getTaskEntries, setEntryValue, deleteEntry, deleteTaskEntries, getTaskEntryById, addEntry, setEntry};
+module.exports = {
+    getRecentEntries,
+    getTaskEntries,
+    setEntryValue,
+    deleteEntry,
+    deleteTaskEntries,
+    getTaskEntryById,
+    addEntry,
+    setEntry,
+    entrySchema
+};

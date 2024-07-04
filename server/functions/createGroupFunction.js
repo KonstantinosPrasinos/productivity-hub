@@ -11,6 +11,7 @@ const groupSchema = Joi.object({
             end: Joi.string()
         })
     }),
+    parent: Joi.string()
 });
 
 async function createGroupFunction(group, userId, parentId) {

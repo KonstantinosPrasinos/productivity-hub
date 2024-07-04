@@ -6,6 +6,7 @@ const {deleteGroupTasks} = require("../functions/deleteGroupTasks");
 const {deleteGroups} = require("../functions/deleteGroups");
 const {editGroups} = require("../functions/editGroups");
 const {createGroupFunction, groupSchema} = require("../functions/createGroupFunction");
+const CustomError = require("../models/CustomError");
 
 const categorySchema = Joi.object({
     title: Joi.string().required(),
@@ -21,13 +22,16 @@ const categorySchema = Joi.object({
         number: Joi.number().integer().min(1),
         bigTimePeriod: Joi.string().valid('Days', 'Weeks', 'Months', 'Years'),
         startingDate: Joi.array().items(Joi.date())
-    })
+    }),
+    _id: Joi.string()
 })
 
 const getCategories = (req, res) => {
     if (req.user) {
         Category.find({userId: req.user._id}, (err, categories) => {
-            if (categories) {return res.status(200).json({categories})}
+            if (categories) {
+                return res.status(200).json({categories})
+            }
 
             return res.status(404).json({message: 'Categories not found.'});
         })
@@ -36,49 +40,58 @@ const getCategories = (req, res) => {
     }
 }
 
+const handleCreateCategory = async (category, groups, userId) => {
+    const validatedCategory = categorySchema.validate(category);
+
+    if (validatedCategory.error) {
+        throw new CustomError(validatedCategory.error, 400);
+    }
+
+    let validatedGroups = [];
+
+    if (groups.length) {
+        for (const group of groups) {
+            const validatedGroup = groupSchema.validate(group);
+            if (validatedGroup.error) throw new CustomError(validatedGroup.error, 400);
+
+            validatedGroup.value.userId = userId;
+
+            validatedGroups.push(validatedGroup.value);
+        }
+    }
+
+    try {
+        const newCategory = await Category.create({
+            ...validatedCategory.value,
+            userId: userId
+        });
+
+        let newGroups = undefined;
+
+        if (validatedGroups.length) {
+            newGroups = await Group.create(validatedGroups.map(group => {
+                return {...group, parent: newCategory._id}
+            }));
+        }
+
+        return {newCategory, newGroups};
+    } catch (error) {
+        throw new CustomError(error.message, 500);
+    }
+}
+
 const createCategory = async (req, res) => {
     if (req.user) {
-        const {category, groups}  = req.body;
+        const {category, groups} = req.body;
 
         if (!category) return res.status(400).json({message: "No category provided."});
 
-        const validatedCategory = categorySchema.validate(category);
-
-        if (validatedCategory.error) {
-            return res.status(400).json({message: validatedCategory.error});
-        }
-
-        let validatedGroups = [];
-
-        if (groups.length) {
-            for (const group of groups) {
-                const validatedGroup = groupSchema.validate(group);
-
-                if (validatedGroup.error) return res.status(400).json({message: validatedGroup.error});
-
-                validatedGroup.value.userId = req.user._id;
-
-                validatedGroups.push(validatedGroup.value);
-            }
-        }
-
         try {
-            const newCategory = await Category.create({
-                ...validatedCategory.value,
-                userId: req.user._id
-            });
+            const response = await handleCreateCategory(category, groups, req.user._id);
 
-            let newGroups = undefined;
-
-            if (validatedGroups.length) {
-                newGroups = await Group.create(validatedGroups.map(group => {
-                    return {...group, parent: newCategory._id}
-                }));
-            }
-
-            res.status(200).json({newCategory, newGroups});
+            return res.status(200).json(response);
         } catch (error) {
-            res.status(500).json({message: error.message});
+            res.status(error.code).send({message: error.message});
         }
     } else {
         res.status(401).send({message: "Not authorized."});
@@ -104,7 +117,12 @@ const deleteCategory = async (req, res) => {
                 if (deleteTasks) {
                     await deleteGroupTasks(req.user._id, categoryId)
                 } else {
-                    await Task.updateMany({userId: req.user._id, category: categoryId}, {$set: {group: null, category: null}});
+                    await Task.updateMany({userId: req.user._id, category: categoryId}, {
+                        $set: {
+                            group: null,
+                            category: null
+                        }
+                    });
                 }
             }
         } catch (error) {
@@ -119,7 +137,7 @@ const deleteCategory = async (req, res) => {
 
 const setCategory = async (req, res) => {
     if (req.user) {
-        const {category, groupsForDeletion, groupsForEdit, action, newGroups, parentId}  = req.body;
+        const {category, groupsForDeletion, groupsForEdit, action, newGroups, parentId} = req.body;
         const responseObject = {};
 
         // For category
@@ -199,4 +217,11 @@ const setCategory = async (req, res) => {
     }
 }
 
-module.exports = {getCategories, createCategory, deleteCategory, setCategory};
+module.exports = {
+    getCategories,
+    createCategory,
+    deleteCategory,
+    setCategory,
+    categorySchema,
+    handleCreateCategory
+};

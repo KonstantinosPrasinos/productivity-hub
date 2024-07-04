@@ -1,7 +1,7 @@
 import {openDB} from "idb";
 
 export const openDatabase = () => {
-    return openDB("productivity-hub-db", 3, {
+    return openDB("productivity-hub-db", 7, {
         upgrade(db) {
             // Checks if the object store exists:
             if (!db.objectStoreNames.contains("tasks")) {
@@ -37,6 +37,7 @@ export const openDatabase = () => {
                     unique: false,
                 });
                 taskObjectStore.createIndex("mustSync", "mustSync", {unique: false});
+                taskObjectStore.createIndex("isNew", "isNew", {unique: false});
             }
 
             if (!db.objectStoreNames.contains("entries")) {
@@ -57,6 +58,8 @@ export const openDatabase = () => {
                 entryObjectStore.createIndex("updatedAt", "updatedAt", {
                     unique: false,
                 });
+                entryObjectStore.createIndex("mustSync", "mustSync", {unique: false});
+                entryObjectStore.createIndex("isNew", "isNew", {unique: false});
             }
 
             if (!db.objectStoreNames.contains("categories")) {
@@ -78,6 +81,8 @@ export const openDatabase = () => {
                     unique: false,
                     multiEntry: true
                 });
+                categoryObjectStore.createIndex("mustSync", "mustSync", {unique: false});
+                categoryObjectStore.createIndex("isNew", "isNew", {unique: false});
             }
 
             if (!db.objectStoreNames.contains("groups")) {
@@ -97,6 +102,23 @@ export const openDatabase = () => {
                 });
                 groupObjectStore.createIndex('repeatRate.time.start', 'repeatRate.time.start', {unique: false});
                 groupObjectStore.createIndex('repeatRate.time.end', 'repeatRate.time.end', {unique: false});
+                groupObjectStore.createIndex("mustSync", "mustSync", {unique: false});
+                groupObjectStore.createIndex("isNew", "isNew", {unique: false});
+            }
+
+            if (!db.objectStoreNames.contains("settings")) {
+                const settingsObjectStore = db.createObjectStore("settings", {
+                    keyPath: "theme"
+                });
+
+                settingsObjectStore.createIndex('theme', 'theme', {unique: false});
+                settingsObjectStore.createIndex('confirmDelete', 'confirmDelete', {unique: false});
+                settingsObjectStore.createIndex('defaults.step', 'defaults.step', {unique: false});
+                settingsObjectStore.createIndex('defaults.priority', 'defaults.priority', {unique: false});
+                settingsObjectStore.createIndex('defaults.goal', 'defaults.goal', {unique: false});
+                settingsObjectStore.createIndex('defaults.deleteGroupAction', 'defaults.deleteGroupAction', {unique: false});
+                settingsObjectStore.createIndex("mustSync", "mustSync", {unique: false});
+                settingsObjectStore.createIndex("isNew", "isNew", {unique: false});
             }
         },
     });
@@ -108,9 +130,33 @@ export const addToStoreInDatabase = async (tempData = [], storeType = "") => {
     const transaction = db.transaction([storeType], "readwrite");
     const store = transaction.objectStore(storeType);
 
-    for (const data of tempData) {
-        await store.put({...data, mustSync: false});
+    if (Array.isArray(tempData)) {
+        for (const data of tempData) {
+            await store.put({...data, mustSync: false});
+        }
+    } else {
+        await store.put({...tempData, mustSync: false});
     }
+}
+
+export const getFromStoreInDatabase = async (storeType = "") => {
+    const db = await openDatabase();
+
+    const data = await db.transaction(storeType).objectStore(storeType).getAll();
+
+    return new Response(JSON.stringify({[storeType]: data}), {
+        headers: {'Content-Type': 'application/json'}
+    });
+}
+
+export const getSettingsFromDB = async () => {
+    const db = await openDatabase();
+
+    const settings = await db.transaction("settings").objectStore("settings").getAll();
+
+    return new Response(JSON.stringify(settings[0]), {
+        headers: {'Content-Type': 'application/json'}
+    });
 }
 
 export const setTasksInDatabase = async (tempTasks = []) => {
@@ -134,3 +180,13 @@ export const setEntriesInDatabase = async (tempEntries = []) => {
         await entryStore.put({...entry, mustSync: false});
     }
 };
+
+
+export const clearObjectStore = async (objectStore = "") => {
+    const db = await openDatabase();
+
+    const transaction = db.transaction([objectStore], "readwrite");
+    const store = transaction.objectStore(objectStore);
+
+    await store.clear()
+}

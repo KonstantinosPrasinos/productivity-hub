@@ -1,4 +1,5 @@
 import {openDatabase} from "@/functions/openDatabase.js";
+import {messageClient} from "@/service-worker/sw.js";
 
 export const getTasksFromDB = async () => {
     const db = await openDatabase();
@@ -33,7 +34,7 @@ export const getTasksFromDB = async () => {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 mustSync: true,
-                isTemporary: true,
+                isNew: true
             };
 
             newEntries.push(todayEntry);
@@ -54,7 +55,7 @@ export const getTasksFromDB = async () => {
     });
 };
 
-export const addTaskToServer = async (event, savedData) => {
+export const addTaskToServer = async (event, savedData, sw) => {
     const response = await fetch(event.request);
 
     if (!response.ok) {
@@ -72,4 +73,41 @@ export const addTaskToServer = async (event, savedData) => {
 
     await transaction.objectStore("entries").delete(savedData.entry._id);
     await transaction.objectStore("entries").put(data.entry);
+
+    await messageClient(sw, "UPDATE_TASKS");
 }
+
+export const addTaskToDB = async (task) => {
+    const db = await openDatabase();
+
+    const tempTask = {
+        ...task,
+        currentEntryId: null,
+        mustSync: true,
+        isNew: true
+    };
+
+    const taskId = await db.add("tasks", tempTask);
+
+    tempTask.currentEntryId = taskId;
+    tempTask._id = taskId;
+
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const entry = {
+        _id: taskId,
+        taskId,
+        value: 0,
+        date: currentDate.toISOString(),
+        forDeletion: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isNew: true,
+        mustSync: true
+    };
+
+    await db.add("entries", entry);
+
+    return {task: tempTask, entry};
+};

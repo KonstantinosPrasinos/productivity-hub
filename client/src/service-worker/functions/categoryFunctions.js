@@ -1,4 +1,5 @@
 import {openDatabase} from "@/functions/openDatabase.js";
+import {messageClient} from "@/service-worker/sw.js";
 
 export const getCategoriesFromDB = async () => {
     const db = await openDatabase();
@@ -35,4 +36,14 @@ export const addCategoryToServer = async (event, savedData) => {
             await transaction.objectStore("groups").put(group);
         }
     }
+
+    await messageClient(self, "UPDATE_CATEGORIES")
+}
+
+export const addCategoryToDB = async (category) => {
+    const db = await openDatabase();
+
+    const categoryId = await db.add("categories", {...category, mustSync: true, isNew: true});
+
+    return {newCategory: {...category, _id: categoryId, mustSync: true, isNew: true}};
 }
