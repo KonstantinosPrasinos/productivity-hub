@@ -10,6 +10,7 @@ import {
     getCategoriesFromDB
 } from "@/service-worker/functions/categoryFunctions.js";
 import {addGroupsToDB, getGroupsFromDB} from "@/service-worker/functions/groupFunctions.js";
+import {addSettingsToDB, addSettingsToServer} from "@/service-worker/functions/settingsFunctions.js";
 
 let mustSync = true;
 
@@ -72,12 +73,12 @@ const handleResponse = async (response, oldIds) => {
     for (const entry of data.entries) {
         await entryStore.put(entry);
     }
-    //
-    // if (settingsToSync) {
-    //     await settingsStore.delete(settingsToSync.theme);
-    //     await settingsStore.put(data.settings);
-    // }
-    //
+
+    if (data.settings) {
+        await settingsStore.clear();
+        await settingsStore.put(data.settings);
+    }
+
     // Let client know that it should update react-query
     await messageClient(self, "SYNC_COMPLETED");
 }
@@ -287,7 +288,6 @@ export const messageClient = async (sw, type) => {
 
 self.addEventListener('fetch', async (event) => {
     if (event.request.url.includes('/api/')) {
-        if (mustSync) handleSync();
         const requestUrl = event.request.url.substring(event.request.url.indexOf("/api/") + 4);
 
         if (event.request.method === "GET") {
@@ -404,7 +404,29 @@ self.addEventListener('fetch', async (event) => {
                         }
                     })());
                     break;
+                case "/settings/update":
+                    event.respondWith((async () => {
+                        try {
+                            const requestClone = event.request.clone();
+                            const requestBody = await requestClone.json();
+
+                            await addSettingsToDB(requestBody);
+
+                            addSettingsToServer(event)
+
+                            return new Response(JSON.stringify(requestBody.settings), {
+                                headers: {'Content-Type': 'application/json'}
+                            })
+                        } catch (error) {
+                            console.error('Error processing request:', error);
+                            return new Response(JSON.stringify({error: 'Failed to process request'}), {
+                                headers: {'Content-Type': 'application/json'}
+                            });
+                        }
+                    })())
             }
         }
+
+        if (mustSync) handleSync();
     }
 })

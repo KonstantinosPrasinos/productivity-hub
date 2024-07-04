@@ -6,6 +6,8 @@ const Category = require("../models/categorySchema");
 const {createGroupFunction} = require("../functions/createGroupFunction");
 const {editGroup} = require("../functions/editGroups");
 const {entrySchema} = require("./entryController");
+const {settingsSchema} = require("./settingsController");
+const Settings = require("../models/settingsSchema");
 
 const handleSync = async (req, res) => {
     if (req.user) {
@@ -17,7 +19,8 @@ const handleSync = async (req, res) => {
             newGroups,
             editedGroups,
             newEntries,
-            editedEntries
+            editedEntries,
+            settingsToSync
         } = req.body;
 
         const errors = {
@@ -28,7 +31,8 @@ const handleSync = async (req, res) => {
             groupCreationErrors: [],
             groupEditErrors: [],
             entryCreationErrors: [],
-            entryEditErrors: []
+            entryEditErrors: [],
+            settingsEditErrors: []
         };
 
         const tasksResponse = [];
@@ -223,11 +227,38 @@ const handleSync = async (req, res) => {
             }
         }
 
+        // todo add edited entries
+
+        let settingsResponse = undefined;
+
+        if (settingsToSync) {
+            const validatedSettings = settingsSchema.validate(settingsToSync);
+
+            if (!validatedSettings.error) {
+                try {
+                    const newSettings = await Settings.findOneAndUpdate(
+                        {userId: req.user._id},
+                        {$set: validatedSettings.value},
+                        {returnDocument: "after"}
+                    );
+
+                    settingsResponse = newSettings._doc;
+                } catch (error) {
+                    errors.settingsEditErrors.push(error.message)
+                }
+            } else {
+                errors.settingsEditErrors.push(validatedSettings.error)
+            }
+        }
+
+        // todo add response object only for new stuff or for when an error occurs (minimises unneeded data transport)
+
         return res.status(200).json({
             tasks: tasksResponse,
             categories: categoriesResponse,
             groups: groupsResponse,
             entries: entriesResponse,
+            settings: settingsResponse,
             errors
         })
     } else {

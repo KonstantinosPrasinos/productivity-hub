@@ -23,18 +23,15 @@ export function useChangeSettings() {
 
     return useMutation({
         mutationFn: postChangeSettings,
-        onMutate: async (newSettings) => {
-            // Cancel pending queries
-            await queryClient.cancelQueries({queryKey: ["settings"]});
-
+        onMutate: async () => {
             // Get previous settings
             const previousSettings = queryClient.getQueryData(["settings"]);
 
-            // Change settings optimistically, keep previous priorityBounds
-            queryClient.setQueryData(["settings"], {...newSettings, priorityBounds: previousSettings.priorityBounds});
-
             // Return previous settings as context to revert to in case of error
             return {previousSettings};
+        },
+        onSuccess: (newSettings, _, context) => {
+            queryClient.setQueryData(["settings"], {...newSettings, priorityBounds: context.priorityBounds});
         },
         onError: (error, newSettings, context) => {
             // On error revert to previous settings

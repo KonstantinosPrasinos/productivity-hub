@@ -85,6 +85,18 @@ const syncGroups = async (queryClient) => {
     })
 }
 
+const syncSettings = async (queryClient) => {
+    const db = await openDatabase();
+    const settings = await db.transaction("settings").objectStore("settings").getAll();
+
+    queryClient.setQueryData(["settings"], (oldData) => {
+        return {
+            ...settings[0],
+            priorityBounds: oldData.priorityBounds
+        }
+    })
+}
+
 const NavLayout = () => {
     // Server state
     const {isLoading: settingsLoading} = useGetSettings();
@@ -153,6 +165,9 @@ const NavLayout = () => {
                             case "UPDATE_CATEGORIES":
                                 syncCategories(queryClient);
                                 syncGroups(queryClient);
+                                break;
+                            case "UPDATE_SETTINGS":
+                                syncSettings(queryClient);
                                 break;
                         }
                     });
