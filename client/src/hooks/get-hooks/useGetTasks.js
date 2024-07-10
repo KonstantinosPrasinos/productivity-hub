@@ -35,11 +35,6 @@ export function useGetTasks() {
                 }
             }
 
-            // Remove current entry from task
-            queryClient.setQueryData(["tasks"], () => {
-                return {tasks: data.tasks};
-            })
-
             // Update the priority lowest and highest used value
             queryClient.setQueryData(["settings"], (oldData) => {
                 const priorities = data.tasks.map(task => task.priority);

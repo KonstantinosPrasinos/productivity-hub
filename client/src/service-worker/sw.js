@@ -4,7 +4,13 @@ import {
     getSettingsFromDB,
     openDatabase, setEntriesInDatabase, setTasksInDatabase,
 } from "@/functions/openDatabase";
-import {addTaskToDB, addTaskToServer, getTasksFromDB} from "@/service-worker/functions/taskFunctions.js";
+import {
+    addTaskToDB,
+    addTaskToServer,
+    editTaskInDB,
+    editTaskInServer,
+    getTasksFromDB
+} from "@/service-worker/functions/taskFunctions.js";
 import {
     addCategoryToDB, addCategoryToServer,
     getCategoriesFromDB
@@ -224,6 +230,18 @@ const handleSync = async (event) => {
         return;
     }
 
+    console.log({
+        newTasks,
+        editedTasks,
+        newCategories,
+        editedCategories,
+        newGroups,
+        editedGroups,
+        settingsToSync,
+        editedEntries,
+        newEntries
+    })
+
     const response = await fetch(`${import.meta.env.VITE_BACK_END_IP}/api/sync`, {
         method: "POST",
         body: JSON.stringify({
@@ -424,6 +442,30 @@ self.addEventListener('fetch', async (event) => {
                             });
                         }
                     })())
+                    break;
+                case "/task/set":
+                    event.respondWith((async () => {
+                        try {
+                            const requestClone = event.request.clone();
+                            const requestBody = await requestClone.json();
+
+                            console.log(requestBody.task)
+
+                            await editTaskInDB(requestBody.task);
+
+                            editTaskInServer(event);
+
+                            return new Response(JSON.stringify(requestBody.task), {
+                                headers: {'Content-Type': 'application/json'}
+                            })
+                        } catch (error) {
+                            console.error('Error processing request:', error);
+                            return new Response(JSON.stringify({error: 'Failed to process request'}), {
+                                headers: {'Content-Type': 'application/json'}
+                            });
+                        }
+                    })())
+                    break;
             }
         }
 

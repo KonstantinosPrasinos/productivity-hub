@@ -22,7 +22,7 @@ export default defineConfig({
         visualizer(),
         VitePWA({
             filename: "sw.js",
-            // registerType: 'autoUpdate',
+            registerType: 'autoUpdate',
             devOptions: {
                 enabled: true,
                 type: "module"

@@ -77,6 +77,21 @@ export const addTaskToServer = async (event, savedData, sw) => {
     await messageClient(sw, "UPDATE_TASKS");
 }
 
+export const editTaskInServer = async (event, sw) => {
+    const response = await fetch(event.request);
+
+    if (!response.ok) {
+        return;
+    }
+
+    const data = await response.json();
+
+    const db = await openDatabase();
+    const objectStore = db.transaction(["tasks"], "readwrite").objectStore("tasks");
+
+    await objectStore.put(data);
+}
+
 export const addTaskToDB = async (task) => {
     const db = await openDatabase();
 
@@ -111,3 +126,10 @@ export const addTaskToDB = async (task) => {
 
     return {task: tempTask, entry};
 };
+
+export const editTaskInDB = async (task) => {
+    const db = await openDatabase();
+    const transaction = db.transaction(["tasks"], "readwrite");
+
+    await transaction.objectStore("tasks").put({...task, mustSync: true});
+}
