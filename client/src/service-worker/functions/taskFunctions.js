@@ -1,135 +1,205 @@
-import {openDatabase} from "@/functions/openDatabase.js";
-import {messageClient} from "@/service-worker/sw.js";
+import {
+  openDatabase,
+  setEntriesInDatabase,
+  setTasksInDatabase,
+} from "@/functions/openDatabase.js";
+import { messageClient } from "@/service-worker/sw.js";
 
 export const getTasksFromDB = async () => {
-    const db = await openDatabase();
+  const db = await openDatabase();
 
-    const tasks = await db.transaction("tasks").objectStore("tasks").getAll();
-    const entries = await db
-        .transaction("entries")
-        .objectStore("entries")
-        .getAll();
+  const tasks = await db.transaction("tasks").objectStore("tasks").getAll();
+  const entries = await db
+    .transaction("entries")
+    .objectStore("entries")
+    .getAll();
 
-    // Check if there is an entry for each of the tasks.
-    // If there isn't one, create a mock one.
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+  const filteredTasks = tasks.filter((task) => task?.toDelete !== true);
 
-    const newEntries = [];
-    const existingEntries = [];
+  // Check if there is an entry for each of the tasks.
+  // If there isn't one, create a mock one.
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
 
-    tasks.forEach((task) => {
-        let todayEntry = entries.find(
-            (entry) => entry.taskId === task._id && entry.date === today.toISOString()
-        );
+  const newEntries = [];
+  const existingEntries = [];
 
-        if (!todayEntry) {
-            todayEntry = {
-                _id: `${task._id}-${today.toISOString()}`,
-                userId: task.userId,
-                taskId: task._id,
-                value: 0,
-                date: today.toISOString(),
-                forDeletion: false,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                mustSync: true,
-                isNew: true
-            };
+  filteredTasks.forEach((task) => {
+    let todayEntry = entries.find(
+      (entry) =>
+        entry.taskId === task._id && entry.date === today.toISOString(),
+    );
 
-            newEntries.push(todayEntry);
-        } else {
-            existingEntries.push(todayEntry);
-        }
+    if (!todayEntry) {
+      todayEntry = {
+        _id: `${task._id}-${today.toISOString()}`,
+        userId: task.userId,
+        taskId: task._id,
+        value: 0,
+        date: today.toISOString(),
+        forDeletion: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        mustSync: true,
+        isNew: true,
+      };
 
-        task.currentEntryId = todayEntry._id;
-    });
-
-    // Add all the new entries to the db
-    for (const entry of newEntries) {
-        await db.add("entries", entry);
+      newEntries.push(todayEntry);
+    } else {
+      existingEntries.push(todayEntry);
     }
 
-    return new Response(JSON.stringify({tasks, currentEntries: [...existingEntries, ...newEntries]}), {
-        headers: {'Content-Type': 'application/json'}
-    });
+    task.currentEntryId = todayEntry._id;
+  });
+
+  // Add all the new entries to the db
+  for (const entry of newEntries) {
+    await db.add("entries", entry);
+  }
+
+  return new Response(
+    JSON.stringify({
+      tasks: filteredTasks,
+      currentEntries: [...existingEntries, ...newEntries],
+    }),
+    {
+      headers: { "Content-Type": "application/json" },
+    },
+  );
 };
 
 export const addTaskToServer = async (event, savedData, sw) => {
-    const response = await fetch(event.request);
+  const response = await fetch(event.request);
 
-    if (!response.ok) {
-        return;
-    }
+  if (!response.ok) {
+    self.mustSync = true;
+    self.requestEventQueue.push({ ...event, savedData });
+  }
 
-    const data = await response.json();
+  const data = await response.json();
 
-    // Replace temporary task and entry with real ones
-    const db = await openDatabase();
-    const transaction = db.transaction(["tasks", "entries"], "readwrite");
+  // Replace temporary task and entry with real ones
+  const db = await openDatabase();
+  const transaction = db.transaction(["tasks", "entries"], "readwrite");
 
-    await transaction.objectStore("tasks").delete(savedData.task._id);
-    await transaction.objectStore("tasks").put(data.task);
+  await transaction.objectStore("tasks").delete(savedData.task._id);
+  await transaction.objectStore("tasks").put(data.task);
 
-    await transaction.objectStore("entries").delete(savedData.entry._id);
-    await transaction.objectStore("entries").put(data.entry);
+  await transaction.objectStore("entries").delete(savedData.entry._id);
+  await transaction.objectStore("entries").put(data.entry);
 
-    await messageClient(sw, "UPDATE_TASKS");
-}
+  await messageClient(sw, "UPDATE_TASKS");
+};
 
-export const editTaskInServer = async (event, sw) => {
-    const response = await fetch(event.request);
+export const editTaskInServer = async (event) => {
+  const response = await fetch(event.request);
 
-    if (!response.ok) {
-        return;
-    }
+  if (!response.ok) {
+    self.mustSync = true;
+    self.requestEventQueue.push(event);
+  }
 
-    const data = await response.json();
+  const data = await response.json();
 
-    const db = await openDatabase();
-    const objectStore = db.transaction(["tasks"], "readwrite").objectStore("tasks");
+  const db = await openDatabase();
+  const objectStore = db
+    .transaction(["tasks"], "readwrite")
+    .objectStore("tasks");
 
-    await objectStore.put(data);
-}
+  await objectStore.put(data);
+};
 
 export const addTaskToDB = async (task) => {
-    const db = await openDatabase();
+  const db = await openDatabase();
 
-    const tempTask = {
-        ...task,
-        currentEntryId: null,
-        mustSync: true,
-        isNew: true
-    };
+  const tempTask = {
+    ...task,
+    currentEntryId: null,
+    mustSync: true,
+    isNew: true,
+  };
 
-    const taskId = await db.add("tasks", tempTask);
+  const taskId = await db.add("tasks", tempTask);
 
-    tempTask.currentEntryId = taskId;
-    tempTask._id = taskId;
+  tempTask.currentEntryId = taskId;
+  tempTask._id = taskId;
 
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
+  const currentDate = new Date();
+  currentDate.setUTCHours(0, 0, 0, 0);
 
-    const entry = {
-        _id: taskId,
-        taskId,
-        value: 0,
-        date: currentDate.toISOString(),
-        forDeletion: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isNew: true,
-        mustSync: true
-    };
+  const entry = {
+    _id: taskId,
+    taskId,
+    value: 0,
+    date: currentDate.toISOString(),
+    forDeletion: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isNew: true,
+    mustSync: true,
+  };
 
-    await db.add("entries", entry);
+  await db.add("entries", entry);
 
-    return {task: tempTask, entry};
+  return { task: tempTask, entry };
 };
 
 export const editTaskInDB = async (task) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(["tasks"], "readwrite");
+
+  await transaction.objectStore("tasks").put({ ...task, mustSync: true });
+};
+
+export const deleteTaskInDB = async (taskId) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(["tasks"], "readwrite");
+  const objectStore = transaction.objectStore("tasks");
+
+  const taskToDelete = await objectStore.get(taskId);
+
+  await objectStore.put({ ...taskToDelete, toDelete: true, mustSync: true });
+
+  return !!taskToDelete.isNew;
+};
+
+export const deleteTaskInServer = async (event) => {
+  try {
+    const requestClone = event.request.clone();
+    const requestBody = await requestClone.json();
+
+    const response = await fetch(event.request);
+
+    if (!response.ok) {
+      self.mustSync = true;
+      self.requestEventQueue.push(event);
+    }
+
     const db = await openDatabase();
     const transaction = db.transaction(["tasks"], "readwrite");
+    const objectStore = transaction.objectStore("tasks");
 
-    await transaction.objectStore("tasks").put({...task, mustSync: true});
-}
+    const taskToDelete = await objectStore.get(requestBody.taskId);
+
+    await objectStore.put({ ...taskToDelete, mustSync: false });
+  } catch (_) {
+    self.mustSync = true;
+    self.requestEventQueue.push(event);
+  }
+};
+
+export const handleTaskGetRequest = async (request, sw) => {
+  const response = await fetch(request);
+
+  if (!response.ok) {
+    // todo add error handling
+    return;
+  }
+
+  const data = await response.json();
+
+  await setTasksInDatabase(data.tasks);
+  await setEntriesInDatabase(data.currentEntries);
+
+  await messageClient(sw, "UPDATE_TASKS");
+};

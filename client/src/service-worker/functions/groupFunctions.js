@@ -1,4 +1,5 @@
-import {openDatabase} from "@/functions/openDatabase.js";
+import {addToStoreInDatabase, openDatabase} from "@/functions/openDatabase.js";
+import {messageClient} from "@/service-worker/sw.js";
 
 export const getGroupsFromDB = async () => {
     const db = await openDatabase();
@@ -39,4 +40,18 @@ export const addGroupsToDB = async (groups, categoryId) => {
     }
 
     return {newGroups: addedGroups};
+}
+
+export const handleGroupGetRequest = async (request, sw) => {
+    const groupResponse = await fetch(request);
+
+    if (!groupResponse.ok) {
+        return;
+    }
+
+    const groupData = await groupResponse.json();
+
+    await addToStoreInDatabase(groupData.categories, "groups");
+
+    await messageClient(sw, "UPDATE_GROUPS");
 }
