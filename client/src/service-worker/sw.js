@@ -25,28 +25,34 @@ import {
   addSettingsToServer,
   handleSettingsGetRequest,
 } from "@/service-worker/functions/settingsFunctions.js";
+import {
+  setEntryValueInDB,
+  setEntryValueInServer,
+} from "@/service-worker/functions/entryFunctions.js";
 
 self.mustSync = true;
 self.isSyncing = false;
 self.requestEventQueue = [];
+self.timeoutExists = false;
 
 const resetState = () => {
   self.mustSync = true;
   self.isSyncing = false;
   self.requestEventQueue = [];
+  self.timeoutExists = false;
 };
 
-const executeTaskIn5Minutes = () => {
-  return new Promise((resolve) => {
+const executeSyncIn5Minutes = () => {
+  if (!self.timeoutExists) {
+    self.timeoutExists = true;
     setTimeout(
       () => {
-        // Your task to be executed after 5 minutes
-        console.log("Task executed after 5 minutes");
-        resolve();
+        self.timeoutExists = false;
+        handleSync();
       },
       5 * 60 * 1000,
     );
-  });
+  }
 };
 
 const handleResponse = async (response, oldIds) => {
@@ -138,7 +144,7 @@ const handleCleanup = async () => {
 
   // Remove all deleted tasks (and their entries) from the db
   for (const task of tasks) {
-    if (!task.mustSync && task?.toDelete) {
+    if ((task?.isNew && task?.toDelete) || (!task.mustSync && task?.toDelete)) {
       await taskStore.delete(task._id);
       for (const entry1 of entries.filter(
         (entry) => entry.taskId === task._id,
@@ -259,10 +265,25 @@ const handleSync = async (event) => {
     if (entry.mustSync) {
       if (entry.isNew) {
         if (entry.value > 0 && entry.date !== todayISO) {
-          newEntries.push({ ...entry, mustSync: undefined, isNew: undefined });
+          newEntries.push({
+            ...entry,
+            mustSync: undefined,
+            isNew: undefined,
+            forDeletion: undefined,
+            createdAt: undefined,
+            updatedAt: undefined,
+            __v: undefined,
+          });
         }
       } else {
-        editedEntries.push({ ...entry, mustSync: undefined });
+        editedEntries.push({
+          ...entry,
+          mustSync: undefined,
+          forDeletion: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+          __v: undefined,
+        });
       }
     }
   }
@@ -364,7 +385,7 @@ const handleSync = async (event) => {
       );
 
       if (!response.ok) {
-        event.waitUntil(executeTaskIn5Minutes());
+        executeSyncIn5Minutes();
         self.mustSync = true;
         requestSuccessful = false;
       } else {
@@ -379,12 +400,11 @@ const handleSync = async (event) => {
     } catch (_) {
       self.mustSync = true;
       requestSuccessful = false;
-      event.waitUntil(executeTaskIn5Minutes());
+      executeSyncIn5Minutes();
     }
   }
 
   // Fetch stored requests
-  console.log(self.requestEventQueue);
   while (self.requestEventQueue.length > 0) {
     const eventObj = self.requestEventQueue.shift();
 
@@ -424,6 +444,9 @@ const handleSync = async (event) => {
             break;
           case "/task/delete":
             await deleteTaskInServer(event);
+            break;
+          case "/entry/set-value":
+            await setEntryValueInServer(event);
             break;
         }
       }
@@ -686,6 +709,37 @@ self.addEventListener("fetch", async (event) => {
                     headers: { "Content-Type": "application/json" },
                   },
                 );
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
+        case "/entry/set-value":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const entry = await setEntryValueInDB(requestBody);
+
+                if (self.mustSync) {
+                  self.requestEventQueue.push(event);
+                  handleSync();
+                } else {
+                  setEntryValueInServer(event);
+                }
+
+                return new Response(JSON.stringify({ entry }), {
+                  headers: { "Content-Type": "application/json" },
+                });
               } catch (error) {
                 console.error("Error processing request:", error);
                 return new Response(

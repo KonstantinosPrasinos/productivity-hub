@@ -198,6 +198,25 @@ export const handleTaskGetRequest = async (request, sw) => {
 
   const data = await response.json();
 
+  // Delete all today temporary entries
+  const db = await openDatabase();
+
+  const transaction = db.transaction(["entries"], "readwrite");
+  const entryStore = transaction.objectStore("entries");
+
+  const entries = await entryStore.getAll();
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const filteredEntries = entries.filter(
+    (entry) => entry?.date === today.toISOString(),
+  );
+
+  for (const entry1 of filteredEntries) {
+    await entryStore.delete(entry1._id);
+  }
+
   await setTasksInDatabase(data.tasks);
   await setEntriesInDatabase(data.currentEntries);
 

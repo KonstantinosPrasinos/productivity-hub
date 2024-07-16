@@ -152,6 +152,7 @@ const handleSync = async (req, res) => {
 
         entriesResponse.push(newEntry);
       } catch (error) {
+        console.log(error);
         errors.entryEditErrors.push(error.message);
       }
     }
