@@ -148,7 +148,11 @@ export const editTaskInDB = async (task) => {
   const db = await openDatabase();
   const transaction = db.transaction(["tasks"], "readwrite");
 
-  await transaction.objectStore("tasks").put({ ...task, mustSync: true });
+  const taskToEdit = await transaction.objectStore("tasks").get(task._id);
+
+  const editedTask = { ...taskToEdit, ...task };
+
+  await transaction.objectStore("tasks").put({ ...editedTask, mustSync: true });
 };
 
 export const deleteTaskInDB = async (taskId) => {
