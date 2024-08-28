@@ -93,6 +93,7 @@ export const setEntryInServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+    // todo add error throwing (to all !response.ok)
   }
 
   const data = await response.json();
@@ -102,9 +103,9 @@ export const setEntryInServer = async (event) => {
     .transaction(["entries"], "readwrite")
     .objectStore("entries");
 
-  await objectStore.put(data.entry);
+  await objectStore.put(data);
 
-  // todo message client
+  await messageClient(self, `UPDATE_ENTRIES_${data.taskId}`);
 };
 
 export const getAllEntriesFromDB = async (taskId) => {

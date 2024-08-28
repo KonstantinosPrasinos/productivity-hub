@@ -820,7 +820,7 @@ self.addEventListener("fetch", async (event) => {
                 const requestClone = event.request.clone();
                 const requestBody = await requestClone.json();
 
-                const entry = await setEntryInDB(requestBody);
+                await setEntryInDB(requestBody);
 
                 if (self.mustSync) {
                   // todo make this not break (turn into custom object instead
@@ -830,7 +830,7 @@ self.addEventListener("fetch", async (event) => {
                   setEntryInServer(event);
                 }
 
-                return new Response(JSON.stringify({ entry }), {
+                return new Response(JSON.stringify(requestBody), {
                   headers: { "Content-Type": "application/json" },
                 });
               } catch (error) {

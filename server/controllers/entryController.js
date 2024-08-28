@@ -96,7 +96,7 @@ const setEntryValue = (req, res) => {
 
 const setEntry = async (req, res) => {
   if (req.user) {
-    const { entryId, taskId, value, date } = req.body;
+    const { _id, taskId, value, date } = req.body;
 
     let changes = {};
 
@@ -112,7 +112,7 @@ const setEntry = async (req, res) => {
       const entry = await Entry.findOneAndUpdate(
         {
           userId: req.user._id,
-          _id: entryId,
+          _id,
           taskId,
         },
         { $set: changes },

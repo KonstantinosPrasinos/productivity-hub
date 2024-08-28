@@ -303,7 +303,7 @@ const EntryModal = ({
 
         await changeEntry({
           taskId: task._id,
-          entryId: editedEntry._id,
+          _id: editedEntry._id,
           value,
           date: newDate,
         });
