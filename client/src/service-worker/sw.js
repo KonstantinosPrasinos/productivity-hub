@@ -26,6 +26,12 @@ import {
   handleSettingsGetRequest,
 } from "@/service-worker/functions/settingsFunctions.js";
 import {
+  addEntryToDB,
+  addEntryToServer,
+  getAllEntriesFromDB,
+  handleAllEntriesGetRequest,
+  setEntryInDB,
+  setEntryInServer,
   setEntryValueInDB,
   setEntryValueInServer,
 } from "@/service-worker/functions/entryFunctions.js";
@@ -273,7 +279,11 @@ const handleSync = async (event) => {
             createdAt: undefined,
             updatedAt: undefined,
             __v: undefined,
+            currentEntryId: undefined,
+            _id: undefined,
           });
+
+          oldEntryIds.push(entry._id);
         }
       } else {
         editedEntries.push({
@@ -448,6 +458,9 @@ const handleSync = async (event) => {
           case "/entry/set-value":
             await setEntryValueInServer(event);
             break;
+          case "/entry/set":
+            await setEntryInServer(event);
+            break;
         }
       }
     } catch (error) {
@@ -455,8 +468,10 @@ const handleSync = async (event) => {
     }
   }
 
-  // Let client know that it should update react-query
-  await messageClient(self, "SYNC_COMPLETED");
+  if (requestSuccessful) {
+    // Let client know that it should update react-query
+    await messageClient(self, "SYNC_COMPLETED");
+  }
 
   self.isSyncing = false;
   self.mustSync = !requestSuccessful;
@@ -545,6 +560,19 @@ self.addEventListener("fetch", async (event) => {
             await handleSettingsGetRequest(event.request, self);
           }
           break;
+        default:
+          if (/\/entry\/all\/*/.test(requestUrl)) {
+            event.respondWith(
+              getAllEntriesFromDB(requestUrl.split("/entry/all/")[1]),
+            );
+
+            if (self.mustSync) {
+              self.requestEventQueue.push(event);
+              handleSync();
+            } else {
+              await handleAllEntriesGetRequest(event.request, self);
+            }
+          }
       }
     } else if (event.request.method === "POST") {
       switch (requestUrl) {
@@ -631,6 +659,7 @@ self.addEventListener("fetch", async (event) => {
                 await addSettingsToDB(requestBody);
 
                 if (self.mustSync) {
+                  // todo why does this even need to happen. the whole event queue?
                   self.requestEventQueue.push(event);
                   handleSync();
                 } else {
@@ -721,6 +750,38 @@ self.addEventListener("fetch", async (event) => {
             })(),
           );
           break;
+        case "/entry/create":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const entry = await addEntryToDB(requestBody);
+
+                if (self.mustSync) {
+                  self.requestEventQueue.push(event);
+                  handleSync();
+                } else {
+                  // todo doesn't just adding the entry to the server duplicate the entry? created once for the db and once for the server
+                  addEntryToServer(event, entry, self);
+                }
+
+                return new Response(JSON.stringify(entry), {
+                  headers: { "Content-Type": "application/json" },
+                });
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
         case "/entry/set-value":
           event.respondWith(
             (async () => {
@@ -735,6 +796,38 @@ self.addEventListener("fetch", async (event) => {
                   handleSync();
                 } else {
                   setEntryValueInServer(event);
+                }
+
+                return new Response(JSON.stringify({ entry }), {
+                  headers: { "Content-Type": "application/json" },
+                });
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
+        case "/entry/set":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const entry = await setEntryInDB(requestBody);
+
+                if (self.mustSync) {
+                  // todo make this not break (turn into custom object instead
+                  self.requestEventQueue.push(event);
+                  handleSync();
+                } else {
+                  setEntryInServer(event);
                 }
 
                 return new Response(JSON.stringify({ entry }), {

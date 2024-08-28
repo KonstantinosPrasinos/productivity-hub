@@ -601,14 +601,6 @@ const TaskView = ({ index, length, task }) => {
     }
   };
 
-  const handleSetCurrentValueCheckbox = () => {
-    setTaskCurrentEntry({
-      taskId: task?._id,
-      entryId: entry?._id,
-      value: entry?.value === 0 ? 1 : 0,
-    });
-  };
-
   const handleSetCurrentValueNumber = (e) => {
     const eventNumber = parseInt(e);
 
@@ -680,7 +672,7 @@ const TaskView = ({ index, length, task }) => {
           )}
         </section>
         <section className={"Horizontal-Flex-Container"}>
-          <div className={"Label"}>{task.repeats && "Today's"}Value:</div>
+          <div className={"Label"}>{task.repeats && "Today's "}Value:</div>
           {task.type === "Checkbox" && <CurrentProgress task={task} />}
           {task.type === "Number" && (
             <TextBoxInput

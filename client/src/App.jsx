@@ -108,6 +108,31 @@ const syncSettings = async (queryClient) => {
   });
 };
 
+const syncTaskEntries = async (queryClient, taskId) => {
+  const db = await openDatabase();
+
+  const entries = await db
+    .transaction("entries")
+    .objectStore("entries")
+    .getAll();
+
+  const entriesThatMatchTaskId = entries.filter(
+    (entry) => entry.taskId.toString() === taskId,
+  );
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const todayString = today.toISOString();
+
+  const entriesThatArentToday = entriesThatMatchTaskId.filter(
+    (entry) => entry.date !== todayString,
+  );
+
+  queryClient.setQueryData(["task-entries", taskId], () => {
+    return { entries: entriesThatArentToday };
+  });
+};
+
 const NavLayout = () => {
   // Server state
   const { isLoading: settingsLoading } = useGetSettings();
@@ -179,6 +204,14 @@ const NavLayout = () => {
                 break;
               case "UPDATE_SETTINGS":
                 syncSettings(queryClient);
+                break;
+              default:
+                if (/UPDATE_ENTRIES_*/.test(type)) {
+                  syncTaskEntries(
+                    queryClient,
+                    type.split("UPDATE_ENTRIES_")[1],
+                  );
+                }
                 break;
             }
           });

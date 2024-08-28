@@ -152,7 +152,6 @@ const handleSync = async (req, res) => {
 
         entriesResponse.push(newEntry);
       } catch (error) {
-        console.log(error);
         errors.entryEditErrors.push(error.message);
       }
     }
@@ -235,7 +234,10 @@ const handleSync = async (req, res) => {
           errors.entryCreationErrors.push(validatedEntry.error);
         }
 
-        const newEntry = await Entry.create(validatedEntry.value);
+        const newEntry = await Entry.create({
+          ...validatedEntry.value,
+          userId: req.user._id,
+        });
 
         entriesResponse.push(newEntry);
       } catch (error) {
