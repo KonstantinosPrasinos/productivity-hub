@@ -70,7 +70,79 @@ export const handleCategoryGetRequest = async (request, sw) => {
 
   const categoryData = await categoryResponse.json();
 
+  // todo replace add with set so that the deleted tasks get deleted as well
   await addToStoreInDatabase(categoryData.categories, "categories");
 
   await messageClient(sw, "UPDATE_CATEGORIES");
+};
+
+export const deleteCategoryInDB = async (requestBody) => {
+  const { categoryId, deleteTasks } = requestBody;
+
+  const db = await openDatabase();
+  const transaction = db.transaction(
+    ["categories", "tasks", "entries", "groups"],
+    "readwrite",
+  );
+
+  const categoryStore = transaction.objectStore("categories");
+  const taskStore = transaction.objectStore("tasks");
+
+  const categoryToDelete = await categoryStore.get(categoryId);
+
+  await categoryStore.put({
+    ...categoryToDelete,
+    toDelete: true,
+    mustSync: true,
+    deleteTasks,
+  });
+
+  // No need to mark groups, they are handled when the category is deleted
+  if (deleteTasks) {
+    // Mark to be deleted. Don't need to actively delete them because they get cleared on next reload
+    for (const task of (await taskStore.getAll()).filter(
+      (task1) => task1.category === categoryId,
+    )) {
+      await taskStore.put({ ...task, toDelete: true });
+    }
+  } else {
+    for (const task of (await taskStore.getAll()).filter(
+      (task1) => task1.category === categoryId,
+    )) {
+      await taskStore.put({ ...task, category: null, group: null, test: 2 });
+    }
+  }
+
+  return !!categoryToDelete?.isNew;
+};
+
+export const deleteCategoryInServer = async (event) => {
+  try {
+    const requestClone = event.request.clone();
+    const requestBody = await requestClone.json();
+
+    const response = await fetch(event.request);
+
+    if (!response.ok) {
+      self.mustSync = true;
+      self.requestEventQueue.push(event);
+    }
+
+    const transaction = db.transaction(["categories", "groups"], "readwrite");
+
+    const categoryStore = transaction.objectStore("categories");
+    const groupStore = transaction.objectStore("groups");
+    const groups = await groupStore.getAll();
+
+    for (const group of groups) {
+      if (group?.parent === requestBody?.categoryId) {
+        await groupStore.delete(group._id);
+      }
+    }
+
+    await categoryStore.delete(requestBody?.categoryId);
+  } catch (error) {
+    self.mustSync = true;
+    self.requestEventQueue.push(event);
+  }
 };

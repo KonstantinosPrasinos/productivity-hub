@@ -12,6 +12,8 @@ import {
 import {
   addCategoryToDB,
   addCategoryToServer,
+  deleteCategoryInDB,
+  deleteCategoryInServer,
   getCategoriesFromDB,
   handleCategoryGetRequest,
 } from "@/service-worker/functions/categoryFunctions.js";
@@ -63,8 +65,14 @@ const executeSyncIn5Minutes = () => {
 
 const handleResponse = async (response, oldIds) => {
   // Set the updated task and entry data in the
-  const { oldEntryIds, oldTaskIds, oldCategoryIds, oldGroupIds, deletedTasks } =
-    oldIds;
+  const {
+    oldEntryIds,
+    oldTaskIds,
+    oldCategoryIds,
+    oldGroupIds,
+    deletedTasks,
+    deletedCategories,
+  } = oldIds;
 
   const data = await response.json();
 
@@ -132,6 +140,18 @@ const handleResponse = async (response, oldIds) => {
     }
   }
 
+  const groups = await groupStore.getAll();
+
+  for (const category of deletedCategories) {
+    await categoryStore.delete(category._id);
+
+    for (const group of groups.filter(
+      (group1) => group1.parent === category._id,
+    )) {
+      await groupStore.delete(group._id);
+    }
+  }
+
   // Todo remove mustSync from editedTask
 };
 
@@ -144,9 +164,13 @@ const handleCleanup = async () => {
 
   const taskStore = transaction.objectStore("tasks");
   const entryStore = transaction.objectStore("entries");
+  const categoryStore = transaction.objectStore("categories");
+  const groupStore = transaction.objectStore("groups");
 
-  const tasks = await taskStore.getAll();
-  const entries = await entryStore.getAll();
+  let tasks = await taskStore.getAll();
+  let entries = await entryStore.getAll();
+  const categories = await categoryStore.getAll();
+  const groups = await groupStore.getAll();
 
   // Remove all deleted tasks (and their entries) from the db
   for (const task of tasks) {
@@ -157,6 +181,40 @@ const handleCleanup = async () => {
       )) {
         await entryStore.delete(entry1._id);
       }
+    }
+  }
+
+  tasks = await taskStore.getAll();
+  entries = await entryStore.getAll();
+
+  // Remove all deleted categories from the db
+  for (const category of categories) {
+    if (
+      (category?.isNew && category?.toDelete) ||
+      (!category.mustSync && category?.toDelete)
+    ) {
+      if (category?.deleteTasks) {
+        // Delete all tasks associated with category
+        for (const task of tasks) {
+          if (task?.category === category._id) {
+            for (const entry1 of entries.filter(
+              (entry) => entry.taskId === task._id,
+            )) {
+              await entryStore.delete(entry1._id);
+            }
+
+            await taskStore.delete(task._id);
+          }
+        }
+      }
+
+      for (const group of groups) {
+        if (group?.parent === category._id) {
+          await groupStore.delete(group._id);
+        }
+      }
+
+      await categoryStore.delete(category._id);
     }
   }
 };
@@ -321,33 +379,48 @@ const handleSync = async (event) => {
   const editedCategories = [];
   const newCategories = [];
   const oldCategoryIds = [];
+  const deletedCategories = [];
 
   for (const category of categories) {
     if (category.mustSync) {
-      if (category.isNew) {
-        const tempCategory = {
-          ...category,
-          mustSync: undefined,
-          isNew: undefined,
-          groups: [],
-          _id: undefined,
-        };
-
-        // Move new groups for new categories to inside the category
-        for (const group of newGroups) {
-          if (group.parent === category._id) {
-            tempCategory.groups.push({ ...group, parent: undefined });
-          }
+      if (category.toDelete) {
+        if (!category.isNew) {
+          deletedCategories.push({
+            ...category,
+            mustSync: undefined,
+            isNew: undefined,
+            groups: [],
+            toDelete: undefined,
+          });
         }
-
-        for (const group of tempCategory.groups) {
-          newGroups.splice(newGroups.findIndex((obj) => obj._id === group._id));
-        }
-
-        newCategories.push(tempCategory);
-        oldCategoryIds.push(category._id);
       } else {
-        editedCategories.push({ ...category, mustSync: undefined });
+        if (category.isNew) {
+          const tempCategory = {
+            ...category,
+            mustSync: undefined,
+            isNew: undefined,
+            groups: [],
+            _id: undefined,
+          };
+
+          // Move new groups for new categories to inside the category
+          for (const group of newGroups) {
+            if (group.parent === category._id) {
+              tempCategory.groups.push({ ...group, parent: undefined });
+            }
+          }
+
+          for (const group of tempCategory.groups) {
+            newGroups.splice(
+              newGroups.findIndex((obj) => obj._id === group._id),
+            );
+          }
+
+          newCategories.push(tempCategory);
+          oldCategoryIds.push(category._id);
+        } else {
+          editedCategories.push({ ...category, mustSync: undefined });
+        }
       }
     }
   }
@@ -370,7 +443,8 @@ const handleSync = async (event) => {
     editedGroups.length ||
     newEntries.length ||
     editedEntries.length ||
-    deletedTasks.length
+    deletedTasks.length ||
+    deletedCategories.length
   ) {
     try {
       const response = await fetch(
@@ -388,6 +462,7 @@ const handleSync = async (event) => {
             editedEntries,
             newEntries,
             deletedTasks,
+            deletedCategories,
           }),
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -405,6 +480,7 @@ const handleSync = async (event) => {
           oldCategoryIds,
           oldGroupIds,
           deletedTasks,
+          deletedCategories,
         });
       }
     } catch (_) {
@@ -833,6 +909,44 @@ self.addEventListener("fetch", async (event) => {
                 return new Response(JSON.stringify(requestBody), {
                   headers: { "Content-Type": "application/json" },
                 });
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
+        case "/category/delete":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const isNew = await deleteCategoryInDB(requestBody);
+
+                if (!isNew) {
+                  if (self.mustSync) {
+                    self.requestEventQueue.push(event);
+                    handleSync();
+                  } else {
+                    deleteCategoryInServer(event);
+                  }
+                }
+
+                return new Response(
+                  JSON.stringify({
+                    message: "Category deleted",
+                  }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
               } catch (error) {
                 console.error("Error processing request:", error);
                 return new Response(

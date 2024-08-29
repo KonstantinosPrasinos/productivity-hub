@@ -11,6 +11,8 @@ const { editGroup } = require("../functions/editGroups");
 const { entrySchema } = require("./entryController");
 const { settingsSchema } = require("./settingsController");
 const Settings = require("../models/settingsSchema");
+const { deleteGroupTasks } = require("../functions/deleteGroupTasks");
+const Group = require("../models/groupSchema");
 
 const handleSync = async (req, res) => {
   if (req.user) {
@@ -20,6 +22,7 @@ const handleSync = async (req, res) => {
       deletedTasks,
       newCategories,
       editedCategories,
+      deletedCategories,
       newGroups,
       editedGroups,
       newEntries,
@@ -38,6 +41,7 @@ const handleSync = async (req, res) => {
       entryCreationErrors: [],
       entryEditErrors: [],
       settingsEditErrors: [],
+      categoryDeleteErrors: [],
     };
 
     const tasksResponse = [];
@@ -282,6 +286,35 @@ const handleSync = async (req, res) => {
         );
       } catch (error) {
         errors.taskDeleteErrors.push(error.message);
+      }
+    }
+
+    for (const category of deletedCategories) {
+      try {
+        if (category?.deleteTasks) {
+          await deleteGroupTasks(req.user._id, category._id);
+        } else {
+          await Task.updateMany(
+            { userId: req.user._id, category: category._id },
+            {
+              $set: {
+                group: null,
+                category: null,
+              },
+            },
+          );
+        }
+
+        await Category.deleteOne({
+          userId: req.user._id,
+          _id: category._id,
+        });
+        await Group.deleteMany({
+          userId: req.user._id,
+          parent: category._id,
+        });
+      } catch (error) {
+        errors.categoryDeleteErrors.push(error.message);
       }
     }
 

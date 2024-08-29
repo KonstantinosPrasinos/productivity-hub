@@ -205,6 +205,11 @@ const NavLayout = () => {
               case "UPDATE_SETTINGS":
                 syncSettings(queryClient);
                 break;
+              case "UPDATE_CATEGORIES_DELETE":
+                syncCategories(queryClient);
+                syncGroups(queryClient);
+                syncTasks(queryClient);
+                break;
               default:
                 if (/UPDATE_ENTRIES_*/.test(type)) {
                   syncTaskEntries(
