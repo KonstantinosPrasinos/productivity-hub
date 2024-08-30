@@ -17,6 +17,7 @@ import {
 } from "@/service-worker/functions/settingsFunctions.js";
 import {
   addEntryToDB,
+  deleteEntryInServer,
   handleAllEntriesGetRequest,
   setEntryInServer,
   setEntryValueInServer,
@@ -119,6 +120,7 @@ export const prepareSyncData = async () => {
 
   const newEntries = [];
   const editedEntries = [];
+  const deletedEntries = [];
 
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
@@ -126,9 +128,9 @@ export const prepareSyncData = async () => {
 
   for (const entry of entries) {
     if (entry.mustSync) {
-      if (entry.isNew) {
-        if (entry.value > 0 && entry.date !== todayISO) {
-          newEntries.push({
+      if (entry?.toDelete) {
+        if (!entry.isNew) {
+          deletedEntries.push({
             ...entry,
             mustSync: undefined,
             isNew: undefined,
@@ -136,21 +138,35 @@ export const prepareSyncData = async () => {
             createdAt: undefined,
             updatedAt: undefined,
             __v: undefined,
-            currentEntryId: undefined,
-            _id: undefined,
           });
-
-          oldEntryIds.push(entry._id);
         }
       } else {
-        editedEntries.push({
-          ...entry,
-          mustSync: undefined,
-          forDeletion: undefined,
-          createdAt: undefined,
-          updatedAt: undefined,
-          __v: undefined,
-        });
+        if (entry.isNew) {
+          if (entry.value > 0 && entry.date !== todayISO) {
+            newEntries.push({
+              ...entry,
+              mustSync: undefined,
+              isNew: undefined,
+              forDeletion: undefined,
+              createdAt: undefined,
+              updatedAt: undefined,
+              __v: undefined,
+              currentEntryId: undefined,
+              _id: undefined,
+            });
+
+            oldEntryIds.push(entry._id);
+          }
+        } else {
+          editedEntries.push({
+            ...entry,
+            mustSync: undefined,
+            forDeletion: undefined,
+            createdAt: undefined,
+            updatedAt: undefined,
+            __v: undefined,
+          });
+        }
       }
     }
   }
@@ -244,6 +260,7 @@ export const prepareSyncData = async () => {
       newEntries,
       deletedTasks,
       deletedCategories,
+      deletedEntries,
     },
     oldData: {
       oldEntryIds,
@@ -252,6 +269,7 @@ export const prepareSyncData = async () => {
       oldGroupIds,
       deletedTasks,
       deletedCategories,
+      deletedEntries,
     },
   };
 
@@ -266,7 +284,8 @@ export const prepareSyncData = async () => {
     newEntries.length ||
     editedEntries.length ||
     deletedTasks.length ||
-    deletedCategories.length
+    deletedCategories.length ||
+    deletedEntries.length
   ) {
     returnObject.shouldSync = true;
   }
@@ -298,6 +317,7 @@ const handleResponse = async (response, oldIds) => {
     oldGroupIds,
     deletedTasks,
     deletedCategories,
+    deletedEntries,
   } = oldIds;
 
   const data = await response.json();
@@ -366,6 +386,7 @@ const handleResponse = async (response, oldIds) => {
     }
   }
 
+  // Handle category deletion
   const groups = await groupStore.getAll();
 
   for (const category of deletedCategories) {
@@ -376,6 +397,11 @@ const handleResponse = async (response, oldIds) => {
     )) {
       await groupStore.delete(group._id);
     }
+  }
+
+  // Handle entry deletion
+  for (const entry of deletedEntries) {
+    await entryStore.delete(entry._id);
   }
 
   // Todo remove mustSync from editedTask
@@ -443,6 +469,17 @@ const handleCleanup = async () => {
       await categoryStore.delete(category._id);
     }
   }
+
+  // Entry cleanup
+  entries = await entryStore.getAll();
+
+  for (const entry of entries) {
+    if (
+      (entry?.isNew && entry?.toDelete) ||
+      (!entry.mustSync && entry?.toDelete)
+    ) {
+    }
+  }
 };
 
 const handleRemainingRequests = async () => {
@@ -501,6 +538,9 @@ const handleRemainingRequests = async () => {
             break;
           case "/category/delete":
             await deleteCategoryInServer(eventObj);
+            break;
+          case "/entry/delete-single":
+            await deleteEntryInServer(eventObj);
             break;
         }
       }

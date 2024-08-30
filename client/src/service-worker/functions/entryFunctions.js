@@ -148,3 +148,34 @@ export const handleAllEntriesGetRequest = async (request, sw) => {
   await setEntriesInDatabase(data.entries);
   await messageClient(sw, `UPDATE_ENTRIES_${data.entries[0].taskId}`);
 };
+
+export const deleteEntryInDB = async (requestBody) => {
+  const { entryId } = requestBody;
+
+  const db = await openDatabase();
+  const transaction = db.transaction(["entries"], "readwrite");
+  const objectStore = transaction.objectStore("entries");
+
+  const entryToDelete = await objectStore.get(entryId);
+
+  await objectStore.put({ ...entryToDelete, toDelete: true, mustSync: true });
+
+  return !!entryToDelete?.isNew;
+};
+
+export const deleteEntryInServer = async (event) => {
+  const requestClone = event.request.clone();
+  const requestBody = await requestClone.json();
+
+  const response = await fetch(event.request);
+
+  if (!response.ok) {
+    self.mustSync = true;
+    self.requestEventQueue.push(event);
+  }
+
+  const db = await openDatabase();
+  const transaction = db.transaction(["entries"], "readwrite");
+
+  await transaction.objectStore("entries").delete(requestBody?.entryId);
+};

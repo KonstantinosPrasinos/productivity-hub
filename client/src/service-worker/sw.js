@@ -30,6 +30,8 @@ import {
 import {
   addEntryToDB,
   addEntryToServer,
+  deleteEntryInDB,
+  deleteEntryInServer,
   getAllEntriesFromDB,
   handleAllEntriesGetRequest,
   setEntryInDB,
@@ -475,6 +477,46 @@ self.addEventListener("fetch", async (event) => {
                 return new Response(
                   JSON.stringify({
                     message: "Category deleted",
+                  }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
+        case "/entry/delete-single":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const isNew = await deleteEntryInDB(requestBody);
+
+                if (!isNew) {
+                  if (self.mustSync) {
+                    self.requestEventQueue.push({
+                      request: event.request.clone(),
+                    });
+                    handleSync();
+                  } else {
+                    deleteEntryInServer(event);
+                  }
+                }
+
+                return new Response(
+                  JSON.stringify({
+                    message: "Entry deleted successfully",
                   }),
                   {
                     headers: { "Content-Type": "application/json" },

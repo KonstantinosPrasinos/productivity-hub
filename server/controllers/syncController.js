@@ -28,6 +28,7 @@ const handleSync = async (req, res) => {
       newEntries,
       editedEntries,
       settingsToSync,
+      deletedEntries,
     } = req.body;
 
     const errors = {
@@ -42,6 +43,7 @@ const handleSync = async (req, res) => {
       entryEditErrors: [],
       settingsEditErrors: [],
       categoryDeleteErrors: [],
+      entryDeleteErrors: [],
     };
 
     const tasksResponse = [];
@@ -315,6 +317,14 @@ const handleSync = async (req, res) => {
         });
       } catch (error) {
         errors.categoryDeleteErrors.push(error.message);
+      }
+    }
+
+    for (const entry of deletedEntries) {
+      try {
+        await Entry.deleteOne({ userId: req.user._id, _id: entry._id });
+      } catch (error) {
+        errors.entryDeleteErrors.push(error.message);
       }
     }
 
