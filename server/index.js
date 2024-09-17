@@ -25,7 +25,7 @@ const app = express();
 
 // Session store
 const sessionStore = new MongoDBStore({
-    uri: process.env.MONG_URI,
+    uri: process.env.MONGODB_URI,
     collection: 'sessions'
 })
 
@@ -37,14 +37,27 @@ app.use(
         secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
+        proxy: true,
+        name: 'ProductivityHubCookie',
         cookie: {
-            maxAge: 30 * 24 * 60 * 60 * 1000 // One month
-        }
+            secure: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000, // One month,
+            httpOnly: false,
+            sameSite: 'none'
+        },
+
+        // proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
+        // name: 'MyCoolWebAppCookieName', // This needs to be unique per-host.
+        // cookie: {
+        //     httpOnly: false,
+        //     sameSite: 'none'
+        // }
     })
 );
 
 const corsOptions = {
-    origin: true,
+    origin: ["https://productivity-hub-website.vercel.app", "http://localhost:5173"],
+    methods: ["POST", "GET"],
     credentials: true,
 };
 
@@ -88,8 +101,12 @@ app.use((err, req, res, next) => {
     next();
 })
 
+if (!process.env.MONGODB_URI) {
+    throw new Error("Please provide a MONGODB_URI in the .env file");
+}
+
 // Connect to database
-mongoose.connect(process.env.MONG_URI)
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         if (process.env.NODE_ENV !== 'test') {
             app.listen(process.env.PORT, () => {
