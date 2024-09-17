@@ -57,6 +57,7 @@ const getCategories = (req, res) => {
 
 const handleCreateCategory = async (category, groups, userId) => {
   const validatedCategory = categorySchema.validate(category);
+  const newGroupIdMap = {};
 
   if (validatedCategory.error) {
     throw new CustomError(validatedCategory.error, 400);
@@ -67,6 +68,7 @@ const handleCreateCategory = async (category, groups, userId) => {
   if (groups.length) {
     for (const group of groups) {
       const validatedGroup = groupSchema.validate(group);
+
       if (validatedGroup.error)
         throw new CustomError(validatedGroup.error, 400);
 
@@ -82,17 +84,23 @@ const handleCreateCategory = async (category, groups, userId) => {
       userId: userId,
     });
 
-    let newGroups = undefined;
+    let newGroups = [];
 
     if (validatedGroups.length) {
-      newGroups = await Group.create(
-        validatedGroups.map((group) => {
-          return { ...group, parent: newCategory._id };
-        }),
-      );
+      for (const group of validatedGroups) {
+        const newGroup = await Group.create({
+          ...group,
+          parent: newCategory._id,
+          _id: undefined,
+        });
+
+        newGroups.push(newGroup);
+
+        newGroupIdMap[group._id] = newGroup._id;
+      }
     }
 
-    return { newCategory, newGroups };
+    return { newCategory, newGroups, newGroupIdMap };
   } catch (error) {
     throw new CustomError(error.message, 500);
   }
@@ -136,7 +144,19 @@ const deleteCategory = async (req, res) => {
 
     // Delete category
     try {
-      await Category.deleteOne({ userId: req.user._id, _id: categoryId });
+      const category = await Category.findOne({
+        userId: req.user._id,
+        _id: categoryId,
+      });
+      const groups = await Group.find({
+        userId: req.user._id,
+        parent: categoryId,
+      });
+
+      await Category.deleteOne({
+        userId: req.user._id,
+        _id: categoryId,
+      });
       await Group.deleteMany({
         userId: req.user._id,
         parent: categoryId,
@@ -145,15 +165,34 @@ const deleteCategory = async (req, res) => {
       if (deleteTasks) {
         await deleteGroupTasks(req.user._id, categoryId);
       } else {
-        await Task.updateMany(
-          { userId: req.user._id, category: categoryId },
-          {
-            $set: {
-              group: null,
-              category: null,
+        const categoryTasks = await Task.find({
+          userId: req.user._id,
+          category: categoryId,
+        });
+
+        for (const task of categoryTasks) {
+          const taskGroup = task?.group
+            ? groups.find((group) => group._id === task.group)
+            : null;
+          let repeatRate = category?.repeatRate;
+
+          if (taskGroup) {
+            repeatRate = { ...repeatRate, ...taskGroup?.repeatRate };
+          }
+
+          await Task.findOneAndUpdate(
+            { userId: req.user._id, category: categoryId },
+            {
+              $set: {
+                group: null,
+                category: null,
+                repeatRate: repeatRate,
+                longGoal: category?.goal,
+              },
             },
-          },
-        );
+            {},
+          );
+        }
       }
     } catch (error) {
       return res.status(400).json({ message: error });

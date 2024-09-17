@@ -72,8 +72,10 @@ export const addTaskToServer = async (event, savedData, sw) => {
   const response = await fetch(event.request);
 
   if (!response.ok) {
+    // todo this doesn't check for server errors like 400
     self.mustSync = true;
     self.requestEventQueue.push({ ...event, savedData });
+    return;
   }
 
   const data = await response.json();
@@ -83,7 +85,7 @@ export const addTaskToServer = async (event, savedData, sw) => {
   const transaction = db.transaction(["tasks", "entries"], "readwrite");
 
   await transaction.objectStore("tasks").delete(savedData.task._id);
-  await transaction.objectStore("tasks").put(data.task);
+  await transaction.objectStore("tasks").put({ ...data.task });
 
   await transaction.objectStore("entries").delete(savedData.entry._id);
   await transaction.objectStore("entries").put(data.entry);

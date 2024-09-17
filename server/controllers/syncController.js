@@ -29,6 +29,7 @@ const handleSync = async (req, res) => {
       editedEntries,
       settingsToSync,
       deletedEntries,
+      deletedGroups,
     } = req.body;
 
     const errors = {
@@ -39,6 +40,7 @@ const handleSync = async (req, res) => {
       categoryEditErrors: [],
       groupCreationErrors: [],
       groupEditErrors: [],
+      groupDeleteErrors: [],
       entryCreationErrors: [],
       entryEditErrors: [],
       settingsEditErrors: [],
@@ -52,10 +54,147 @@ const handleSync = async (req, res) => {
     const currentDate = new Date();
     currentDate.setUTCHours(0, 0, 0, 0);
 
+    for (const task of editedTasks) {
+      const validatedTask = taskSchema.validate(task);
+
+      if (validatedTask.error) {
+        errors.taskEditErrors.push(validatedTask.error);
+        continue;
+      }
+
+      delete validatedTask.value._id;
+
+      try {
+        const newTask = await Task.findOneAndUpdate(
+          { _id: task._id, userId: req.user._id },
+          validatedTask.value,
+          { returnDocument: "after" },
+        );
+
+        tasksResponse.push(newTask);
+      } catch (error) {
+        errors.taskEditErrors.push(error.message);
+      }
+    }
+
+    for (const entry of editedEntries) {
+      const validatedEntry = entrySchema.validate(entry);
+
+      if (validatedEntry.error) {
+        errors.entryEditErrors.push(validatedEntry.error);
+        continue;
+      }
+
+      delete validatedEntry.value._id;
+
+      try {
+        const newEntry = await Entry.findOneAndUpdate(
+          {
+            _id: entry._id,
+            userId: req.user._id,
+          },
+          validatedEntry.value,
+          { returnDocument: "after" },
+        );
+
+        entriesResponse.push(newEntry);
+      } catch (error) {
+        errors.entryEditErrors.push(error.message);
+      }
+    }
+
+    const categoriesResponse = [];
+    const groupsResponse = [];
+
+    // This property is to change temporary category ids to the new ids before adding new tasks
+    const newCategoryIdMap = {};
+    let newGroupIdMap = {};
+
+    for (const category of newCategories) {
+      try {
+        const tempCategory = { ...category };
+        delete tempCategory.groups;
+        delete tempCategory._id;
+
+        const {
+          newCategory,
+          newGroups,
+          newGroupIdMap: tempNewGroupIdMap,
+        } = await handleCreateCategory(
+          tempCategory,
+          category.groups,
+          req.user._id,
+        );
+
+        newGroupIdMap = { ...newGroupIdMap, ...tempNewGroupIdMap };
+
+        categoriesResponse.push(newCategory);
+
+        newCategoryIdMap[category._id] = newCategory._id;
+
+        if (newGroups) {
+          for (const group of newGroups) {
+            groupsResponse.push(group);
+          }
+        }
+      } catch (error) {
+        errors.taskEditErrors.push(error.message);
+      }
+    }
+
+    for (const category of editedCategories) {
+      const validatedCategory = categorySchema.validate(category);
+
+      if (validatedCategory.error) {
+        errors.categoryEditErrors.push(validatedCategory.error);
+      }
+
+      try {
+        const newCategory = await Category.findOneAndUpdate(
+          { _id: category._id, userId: req.user._id },
+          validatedCategory.value,
+          { returnDocument: "after" },
+        );
+
+        categoriesResponse.push(newCategory);
+      } catch (error) {
+        errors.categoryEditErrors.push(error.message);
+      }
+    }
+
+    for (const group of newGroups) {
+      const createGroupResponse = await createGroupFunction(
+        { ...group, _id: undefined },
+        req.user._id,
+        group.parent,
+      );
+
+      if (createGroupResponse?.message) {
+        errors.groupCreationErrors.push(createGroupResponse.message);
+      } else {
+        groupsResponse.push(createGroupResponse.newGroup);
+
+        newGroupIdMap[group._id] = createGroupResponse.newGroup?._id;
+      }
+    }
+
     for (const task of newTasks) {
       try {
         const tempTask = { ...task };
         delete tempTask.entries;
+
+        if (task?.category) {
+          if (newCategoryIdMap.hasOwnProperty(task?.category)) {
+            tempTask.category = newCategoryIdMap[task?.category].toString();
+          }
+        }
+
+        if (task?.group) {
+          if (newGroupIdMap.hasOwnProperty(task?.group)) {
+            tempTask.group = newGroupIdMap[task?.group].toString();
+          }
+        }
+
         const validatedTask = taskSchema.validate(tempTask);
 
         if (validatedTask.error) {
@@ -113,115 +252,6 @@ const handleSync = async (req, res) => {
       }
     }
 
-    for (const task of editedTasks) {
-      const validatedTask = taskSchema.validate(task);
-
-      if (validatedTask.error) {
-        errors.taskEditErrors.push(validatedTask.error);
-        continue;
-      }
-
-      delete validatedTask.value._id;
-
-      try {
-        const newTask = await Task.findOneAndUpdate(
-          { _id: task._id, userId: req.user._id },
-          validatedTask.value,
-          { returnDocument: "after" },
-        );
-
-        tasksResponse.push(newTask);
-      } catch (error) {
-        errors.taskEditErrors.push(error.message);
-      }
-    }
-
-    for (const entry of editedEntries) {
-      const validatedEntry = entrySchema.validate(entry);
-
-      if (validatedEntry.error) {
-        errors.entryEditErrors.push(validatedEntry.error);
-        continue;
-      }
-
-      delete validatedEntry.value._id;
-
-      try {
-        const newEntry = await Entry.findOneAndUpdate(
-          {
-            _id: entry._id,
-            userId: req.user._id,
-          },
-          validatedEntry.value,
-          { returnDocument: "after" },
-        );
-
-        entriesResponse.push(newEntry);
-      } catch (error) {
-        errors.entryEditErrors.push(error.message);
-      }
-    }
-
-    const categoriesResponse = [];
-    const groupsResponse = [];
-
-    for (const category of newCategories) {
-      try {
-        const tempCategory = { ...category };
-        delete tempCategory.groups;
-
-        const { newCategory, newGroups } = await handleCreateCategory(
-          tempCategory,
-          category.groups,
-          req.user._id,
-        );
-
-        categoriesResponse.push(newCategory);
-
-        if (newGroups) {
-          for (const group of newGroups) {
-            groupsResponse.push(group);
-          }
-        }
-      } catch (error) {
-        errors.taskEditErrors.push(error.message);
-      }
-    }
-
-    for (const category of editedCategories) {
-      const validatedCategory = categorySchema.validate(category);
-
-      if (validatedCategory.error) {
-        errors.categoryEditErrors.push(validatedCategory.error);
-      }
-
-      try {
-        const newCategory = await Category.findOneAndUpdate(
-          { _id: category._id, userId: req.user._id },
-          validatedCategory.value,
-          { returnDocument: "after" },
-        );
-
-        categoriesResponse.push(newCategory);
-      } catch (error) {
-        errors.categoryEditErrors.push(error.message);
-      }
-    }
-
-    for (const group of newGroups) {
-      const createGroupResponse = await createGroupFunction(
-        group,
-        req.user._id,
-        group.parent,
-      );
-
-      if (createGroupResponse?.message) {
-        errors.groupCreationErrors.push(createGroupResponse.message);
-      } else {
-        groupsResponse.push(createGroupResponse.newGroup);
-      }
-    }
-
     for (const group of editedGroups) {
       try {
         const editGroupResponse = await editGroup(group, req.user._id);
@@ -229,6 +259,17 @@ const handleSync = async (req, res) => {
         groupsResponse.push(editGroupResponse.group);
       } catch (error) {
         errors.groupEditErrors.push(error.message);
+      }
+    }
+
+    for (const group of deletedGroups) {
+      try {
+        await Task.updateMany(
+          { userId: req.user._id, _id: group._id },
+          { $set: { forDeletion: true } },
+        );
+      } catch (error) {
+        errors.groupDeleteErrors.push(error.message);
       }
     }
 
@@ -295,16 +336,6 @@ const handleSync = async (req, res) => {
       try {
         if (category?.deleteTasks) {
           await deleteGroupTasks(req.user._id, category._id);
-        } else {
-          await Task.updateMany(
-            { userId: req.user._id, category: category._id },
-            {
-              $set: {
-                group: null,
-                category: null,
-              },
-            },
-          );
         }
 
         await Category.deleteOne({

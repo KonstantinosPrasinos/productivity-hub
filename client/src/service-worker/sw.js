@@ -14,6 +14,8 @@ import {
   addCategoryToServer,
   deleteCategoryInDB,
   deleteCategoryInServer,
+  editCategoryInDB,
+  editCategoryInServer,
   getCategoriesFromDB,
   handleCategoryGetRequest,
 } from "@/service-worker/functions/categoryFunctions.js";
@@ -173,8 +175,6 @@ self.addEventListener("fetch", async (event) => {
                 const requestBody = await requestClone.json();
 
                 const savedData = await addTaskToDB(requestBody.task);
-
-                console.log(self.mustSync);
 
                 if (self.mustSync) {
                   self.requestEventQueue.push({
@@ -354,6 +354,7 @@ self.addEventListener("fetch", async (event) => {
           );
           break;
         case "/entry/create":
+          //todo add this to requestEventQueue
           event.respondWith(
             (async () => {
               try {
@@ -482,6 +483,41 @@ self.addEventListener("fetch", async (event) => {
                     headers: { "Content-Type": "application/json" },
                   },
                 );
+              } catch (error) {
+                console.error("Error processing request:", error);
+                return new Response(
+                  JSON.stringify({ error: "Failed to process request" }),
+                  {
+                    headers: { "Content-Type": "application/json" },
+                  },
+                );
+              }
+            })(),
+          );
+          break;
+        case "/category/set":
+          event.respondWith(
+            (async () => {
+              try {
+                const requestClone = event.request.clone();
+                const requestBody = await requestClone.json();
+
+                const responseObject = await editCategoryInDB(requestBody);
+
+                if (self.mustSync) {
+                  //todo add this to requestEventQueue
+                  self.requestEventQueue.push({
+                    request: event.request.clone(),
+                    responseObject,
+                  });
+                  handleSync();
+                } else {
+                  editCategoryInServer(event, responseObject);
+                }
+
+                return new Response(JSON.stringify(responseObject), {
+                  headers: { "Content-Type": "application/json" },
+                });
               } catch (error) {
                 console.error("Error processing request:", error);
                 return new Response(

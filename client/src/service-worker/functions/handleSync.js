@@ -105,6 +105,12 @@ export const prepareSyncData = async () => {
             streak: undefined,
             currentEntryId: undefined,
             mustSync: undefined,
+            userId: undefined,
+            mostRecentProperDate: undefined,
+            hidden: undefined,
+            createdAt: undefined,
+            updatedAt: undefined,
+            __v: undefined,
           });
         }
       }
@@ -174,19 +180,30 @@ export const prepareSyncData = async () => {
   const editedGroups = [];
   const newGroups = [];
   const oldGroupIds = [];
+  const deletedGroups = [];
 
   for (const group of groups) {
-    if (group.mustSync) {
-      if (group.isNew) {
-        newGroups.push({
-          ...group,
-          mustSync: undefined,
-          isNew: undefined,
-          _id: undefined,
-        });
-        oldGroupIds.push(group._id);
+    if (group?.mustSync) {
+      if (group.toDelete) {
+        if (!group.isNew) {
+          deletedGroups.push({
+            ...group,
+            mustSync: undefined,
+            isNew: undefined,
+            toDelete: undefined,
+          });
+        }
       } else {
-        editedGroups.push({ ...group, mustSync: undefined });
+        if (group.isNew) {
+          newGroups.push({
+            ...group,
+            mustSync: undefined,
+            isNew: undefined,
+          });
+          oldGroupIds.push(group._id);
+        } else {
+          editedGroups.push({ ...group, mustSync: undefined });
+        }
       }
     }
   }
@@ -215,7 +232,7 @@ export const prepareSyncData = async () => {
             mustSync: undefined,
             isNew: undefined,
             groups: [],
-            _id: undefined,
+            // _id: undefined,
           };
 
           // Move new groups for new categories to inside the category
@@ -235,6 +252,7 @@ export const prepareSyncData = async () => {
           oldCategoryIds.push(category._id);
         } else {
           editedCategories.push({ ...category, mustSync: undefined });
+          // Todo check all tasks in backend if they have a category or group and change the temp ids to the normal ones
         }
       }
     }
@@ -261,6 +279,7 @@ export const prepareSyncData = async () => {
       deletedTasks,
       deletedCategories,
       deletedEntries,
+      deletedGroups,
     },
     oldData: {
       oldEntryIds,
@@ -270,6 +289,7 @@ export const prepareSyncData = async () => {
       deletedTasks,
       deletedCategories,
       deletedEntries,
+      deletedGroups,
     },
   };
 
@@ -285,7 +305,8 @@ export const prepareSyncData = async () => {
     editedEntries.length ||
     deletedTasks.length ||
     deletedCategories.length ||
-    deletedEntries.length
+    deletedEntries.length ||
+    deletedGroups.length
   ) {
     returnObject.shouldSync = true;
   }
@@ -318,6 +339,7 @@ const handleResponse = async (response, oldIds) => {
     deletedTasks,
     deletedCategories,
     deletedEntries,
+    deletedGroups,
   } = oldIds;
 
   const data = await response.json();
@@ -404,10 +426,15 @@ const handleResponse = async (response, oldIds) => {
     await entryStore.delete(entry._id);
   }
 
+  for (const group of deletedGroups) {
+    await groupStore.delete(group._id);
+  }
+
   // Todo remove mustSync from editedTask
 };
 
 const handleCleanup = async () => {
+  // Add must clean up flag or remove the need for this entirely. Because this runs every time it must sync, which is every time if offline.
   const db = await openDatabase();
   const transaction = db.transaction(
     ["tasks", "entries", "categories", "groups", "settings"],
@@ -422,7 +449,7 @@ const handleCleanup = async () => {
   let tasks = await taskStore.getAll();
   let entries = await entryStore.getAll();
   const categories = await categoryStore.getAll();
-  const groups = await groupStore.getAll();
+  let groups = await groupStore.getAll();
 
   // Remove all deleted tasks (and their entries) from the db
   for (const task of tasks) {
@@ -467,6 +494,18 @@ const handleCleanup = async () => {
       }
 
       await categoryStore.delete(category._id);
+    }
+  }
+
+  // Group cleanup
+  groups = await groupStore.getAll();
+
+  for (const group of groups) {
+    if (
+      (group?.isNew && group?.toDelete) ||
+      (!group?.mustSync && group?.toDelete)
+    ) {
+      await groupStore.delete(group?._id);
     }
   }
 
@@ -546,6 +585,7 @@ const handleRemainingRequests = async () => {
       }
     } catch (error) {
       console.error("Error processing backlog request:", error);
+      throw new Error("Error processing backlog request");
     }
   }
 };

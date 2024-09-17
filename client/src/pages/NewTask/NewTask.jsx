@@ -304,23 +304,6 @@ const NewTask = ({ index, length, id }) => {
           });
           return;
         }
-
-        // For some reason if I do repeatRate: category.repeatRate and then change something on the repeatRate, the category mutates ㄟ( ▔, ▔ )ㄏ
-        repeatParameters = {
-          repeatRate: {
-            startingDate: [...category.repeatRate.startingDate],
-            number: category.repeatRate.number,
-            bigTimePeriod: category.repeatRate.bigTimePeriod,
-          },
-          longGoal: category.goal,
-        };
-
-        if (timeGroup._id) {
-          repeatParameters.repeatRate.smallTimePeriod =
-            timeGroup.repeatRate.smallTimePeriod;
-          repeatParameters.repeatRate.startingDate =
-            timeGroup.repeatRate.startingDate;
-        }
       }
     }
 

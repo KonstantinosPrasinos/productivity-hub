@@ -1,15 +1,20 @@
-import {addToStoreInDatabase, openDatabase} from "@/functions/openDatabase.js";
-import {messageClient} from "@/service-worker/sw.js";
+import {
+  addToStoreInDatabase,
+  openDatabase,
+} from "@/functions/openDatabase.js";
+import { messageClient } from "@/service-worker/sw.js";
 
 export const getGroupsFromDB = async () => {
-    const db = await openDatabase();
+  const db = await openDatabase();
 
-    const groups = await db.transaction("groups").objectStore("groups").getAll();
+  const groups = await db.transaction("groups").objectStore("groups").getAll();
 
-    return new Response(JSON.stringify({groups}), {
-        headers: {'Content-Type': 'application/json'}
-    });
-}
+  const filteredGroups = groups.filter((group) => group?.toDelete !== true);
+
+  return new Response(JSON.stringify({ groups: filteredGroups }), {
+    headers: { "Content-Type": "application/json" },
+  });
+};
 
 // export const addGroupToServer = async (event, savedData) => {
 //     const response = await fetch(event.request);
@@ -29,29 +34,40 @@ export const getGroupsFromDB = async () => {
 // }
 
 export const addGroupsToDB = async (groups, categoryId) => {
-    const db = await openDatabase();
+  const db = await openDatabase();
 
-    const addedGroups = [];
+  const addedGroups = [];
 
-    for (const group of groups) {
-        const groupId = await db.add("groups", {...group, parent: categoryId, isNew: true, mustSync: true});
+  for (const group of groups) {
+    const groupId = await db.add("groups", {
+      ...group,
+      parent: categoryId,
+      isNew: true,
+      mustSync: true,
+    });
 
-        addedGroups.push({...group, _id: groupId, parent: categoryId, mustSync: true, isNew: true});
-    }
+    addedGroups.push({
+      ...group,
+      _id: groupId,
+      parent: categoryId,
+      mustSync: true,
+      isNew: true,
+    });
+  }
 
-    return {newGroups: addedGroups};
-}
+  return { newGroups: addedGroups };
+};
 
 export const handleGroupGetRequest = async (request, sw) => {
-    const groupResponse = await fetch(request);
+  const groupResponse = await fetch(request);
 
-    if (!groupResponse.ok) {
-        return;
-    }
+  if (!groupResponse.ok) {
+    return;
+  }
 
-    const groupData = await groupResponse.json();
+  const groupData = await groupResponse.json();
 
-    await addToStoreInDatabase(groupData.categories, "groups");
+  await addToStoreInDatabase(groupData.categories, "groups");
 
-    await messageClient(sw, "UPDATE_GROUPS");
-}
+  await messageClient(sw, "UPDATE_GROUPS");
+};
