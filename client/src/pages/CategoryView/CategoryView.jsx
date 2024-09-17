@@ -9,7 +9,6 @@ import { useGetGroups } from "../../hooks/get-hooks/useGetGroups";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import { useDeleteCategory } from "../../hooks/delete-hooks/useDeleteCategory";
-import { useGetTasks } from "../../hooks/get-hooks/useGetTasks";
 import { TbChevronDown, TbEdit, TbTrash } from "react-icons/tb";
 import { useGetTaskEntries } from "@/hooks/get-hooks/useGetTaskEntries.js";
 import { useGetTaskCurrentEntry } from "@/hooks/get-hooks/useGetTaskCurrentEntry.js";
@@ -20,7 +19,7 @@ import HeaderExtendContainer from "@/components/containers/HeaderExtendContainer
 
 const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
   const { data: entriesArray, isLoading: entriesLoading } = useGetTaskEntries(
-    tasks.map((task) => task._id)
+    tasks.map((task) => task._id),
   );
   const { data: currentEntriesArray, isLoading: currentEntriesLoading } =
     useGetTaskCurrentEntry(tasks);
@@ -28,11 +27,10 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
     () =>
       getDateAddDetails(
         category.repeatRate.bigTimePeriod,
-        category.repeatRate.number
+        category.repeatRate.number,
       ),
-    [category]
+    [category],
   );
-  const collapsedFocusedElement = useRef();
 
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0);
@@ -60,6 +58,8 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
       // This means show tasks for all groups of the category.
       // Loop through every date from starting date to today for each group
       groups.forEach((group) => {
+        // todo fix for no repeating
+        return;
         const date = new Date(group.repeatRate.startingDate);
 
         // Maximum time should be next end date from today
@@ -83,7 +83,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
             (entry) =>
               entry.value > 0 &&
               groupTasksIds.includes(entry.taskId) &&
-              new Date(entry.date).getTime() === date.getTime()
+              new Date(entry.date).getTime() === date.getTime(),
           );
 
           // Add per date total tasks
@@ -143,7 +143,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
       const dateRangeTotalTasks = {};
 
       nextDate[`set${functionName}`](
-        nextDate[`get${functionName}`]() + timeToAdd
+        nextDate[`get${functionName}`]() + timeToAdd,
       );
 
       while (date.getTime() <= today.getTime()) {
@@ -189,7 +189,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
         }
 
         nextDate[`set${functionName}`](
-          nextDate[`get${functionName}`]() + timeToAdd
+          nextDate[`get${functionName}`]() + timeToAdd,
         );
         date[`set${functionName}`](date[`get${functionName}`]() + timeToAdd);
       }
@@ -206,7 +206,8 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
       while (date.getTime() <= today.getTime()) {
         const dateEntries = allEntries.filter(
           (entry) =>
-            entry.value > 0 && new Date(entry.date).getTime() === date.getTime()
+            entry.value > 0 &&
+            new Date(entry.date).getTime() === date.getTime(),
         );
 
         // Almost the same code block as above
@@ -328,7 +329,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
         maxStreak = currentStreak;
         if (selection === "All") {
           maxStreakEndDate = entry.date.substring(
-            entry.date.lastIndexOf(" ") + 1
+            entry.date.lastIndexOf(" ") + 1,
           );
         } else {
           maxStreakEndDate = entry.date;
@@ -342,7 +343,10 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
 
     if (selection === "All" && currentStreakStartDate) {
       currentStreakStartDate = new Date(
-        currentStreakStartDate.substring(0, currentStreakStartDate.indexOf(" "))
+        currentStreakStartDate.substring(
+          0,
+          currentStreakStartDate.indexOf(" "),
+        ),
       );
     }
 
@@ -373,7 +377,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
 
   if (selection !== "All") {
     const latestEntry = entriesWithIsProper.find(
-      (entry) => new Date(entry.date).getTime() === groupLatestEntry.getTime()
+      (entry) => new Date(entry.date).getTime() === groupLatestEntry.getTime(),
     );
 
     if (latestEntry && latestEntry.value === "100 %") {
@@ -392,7 +396,7 @@ const RepeatCategoryContent = ({ tasks, selection, category, groups }) => {
           <div className={"Label"}>
             {currentStreakStartDate
               ? `Since: ${new Date(
-                  currentStreakStartDate
+                  currentStreakStartDate,
                 ).toLocaleDateString()}`
               : ""}
           </div>
@@ -443,10 +447,11 @@ const CategoryView = ({ index, length, category }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
   const { data: unfilteredGroups } = useGetGroups();
-  const { data: tasks } = useGetTasks();
+  // const { data: tasks } = useGetTasks();
+  const tasks = [];
 
   const groups = unfilteredGroups?.filter(
-    (group) => group.parent === category._id
+    (group) => group.parent === category._id,
   );
 
   const [selectedGroup, setSelectedGroup] = useState("All");
@@ -464,7 +469,7 @@ const CategoryView = ({ index, length, category }) => {
     // Selection is a group
     return tasks.filter(
       (task) =>
-        task.category === category._id && task.group === selectedGroup._id
+        task.category === category._id && task.group === selectedGroup._id,
     );
   }, [selectedGroup, groups, tasks]);
 

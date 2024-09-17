@@ -65,7 +65,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
   // Inputs for repeatable category
   const [timePeriodNumber, setTimePeriodNumber] = useState(
-    settings.defaults.priority
+    settings.defaults.priority,
   );
   const [timePeriod, setTimePeriod] = useState("Days");
   const [timePeriod2, setTimePeriod2] = useState([]);
@@ -217,7 +217,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
       switch (timePeriod) {
         case "Weeks":
           startingDate.setDate(
-            startingDate.getDate() - (startingDate.getDay() - 1)
+            startingDate.getDate() - (startingDate.getDay() - 1),
           );
           break;
         case "Months":
@@ -280,7 +280,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
       }
 
       const continueAfterModalFunction = async (
-        action = settings.defaults.deleteGroupAction
+        action = settings.defaults.deleteGroupAction,
       ) => {
         const requestObject = { action };
 
@@ -299,7 +299,9 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
         if (
           initialCategoryValues.current?.title !== category.title ||
-          initialCategoryValues.current?.color !== category.color
+          initialCategoryValues.current?.color !== category.color ||
+          initialCategoryValues.current?.repeatRate !== category?.repeatRate ||
+          initialCategoryValues.current?.goal !== category?.goal
         ) {
           requestObject.category = { ...category, _id: id };
         }
@@ -383,7 +385,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
     if (
       timeGroupTitle !== currentEditedGroup.current?.title &&
       timeGroups.find(
-        (group) => group.title === timeGroupTitle && !group?.deleted
+        (group) => group.title === timeGroupTitle && !group?.deleted,
       )
     ) {
       alertsContext.dispatch({
@@ -446,7 +448,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
           } else {
             return group;
           }
-        })
+        }),
       );
     } else {
       if (id) {
@@ -466,7 +468,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
         handleSave();
       }
     },
-    [handleSave]
+    [handleSave],
   );
 
   const focusGroup = useCallback(
@@ -504,7 +506,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
       setStartMinute,
       setEndHour,
       setEndMinute,
-    ]
+    ],
   );
 
   const handleGroupClick = useCallback(
@@ -517,7 +519,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
       focusGroup();
     },
-    [focusGroup]
+    [focusGroup],
   );
 
   const handleDelete = (group) => {
@@ -529,7 +531,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
     if (!id) {
       setTimeGroups((current) =>
-        current.filter((filterGroup) => filterGroup._id !== group._id)
+        current.filter((filterGroup) => filterGroup._id !== group._id),
       );
     } else {
       setTimeGroups(
@@ -538,7 +540,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
             return { ...tempGroup, deleted: true };
           }
           return tempGroup;
-        })
+        }),
       );
     }
   };
@@ -566,7 +568,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
       setTimePeriod(tempTimePeriod);
     },
-    [timePeriod, setTimePeriod2, setTimePeriod]
+    [timePeriod, setTimePeriod2, setTimePeriod],
   );
 
   useEffect(() => {
@@ -589,7 +591,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
         setLongGoalLimit(category.goal.limit);
         setLongGoalNumber(category.goal.number);
-        setLongGoalType(category.goal.number);
+        setLongGoalType(category.goal.type);
       }
 
       setTimeGroups(
@@ -597,7 +599,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
           ?.filter((group) => group.parent === category._id)
           ?.map((group) => {
             return { ...group, initial: true };
-          })
+          }),
       );
       initialCategoryValues.current = category;
 

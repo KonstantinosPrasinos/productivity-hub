@@ -20,7 +20,7 @@ import IconButton from "@/components/buttons/IconButton/IconButton";
 const RepeatDetails = memo(({ task }) => {
   const { data: entry, isLoading } = useGetTaskCurrentEntry(
     task._id,
-    task.currentEntryId
+    task.currentEntryId,
   );
 
   if (!task.repeats && task.type !== "Number") return null;
@@ -75,9 +75,9 @@ const RepeatDetails = memo(({ task }) => {
 });
 
 const variants = {
-  hidden: { opacity: 0, y: 50, scale: 0.8 },
-  expanded: { opacity: 1, y: 0, scale: 1, height: "auto" },
-  collapsed: { opacity: 1, y: 0, scale: 1, height: 14 * 1.2 + 8 + 20 },
+  hidden: { opacity: 0, y: 50 /*scale: 0.8, */ },
+  expanded: { opacity: 1, y: 0, /*scale: 1, */ height: "auto" },
+  collapsed: { opacity: 1, y: 0, /*scale: 1, */ height: 14 * 1.2 + 8 + 20 },
   exit: {
     opacity: 0,
     scale: 0.5,
@@ -157,7 +157,7 @@ const Task = memo(
         </div>
       </motion.div>
     );
-  })
+  }),
 );
 
 export default Task;

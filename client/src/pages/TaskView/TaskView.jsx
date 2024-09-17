@@ -16,7 +16,7 @@ import pickerStyles from "react-day-picker/dist/style.module.css";
 import InputWrapper from "../../components/utilities/InputWrapper/InputWrapper";
 import CollapsibleContainer from "../../components/containers/CollapsibleContainer/CollapsibleContainer";
 import { useAddEntry } from "../../hooks/add-hooks/useAddEntry";
-import { TbCheck, TbEdit, TbPlus, TbRefresh, TbTrash } from "react-icons/tb";
+import { TbEdit, TbPlus, TbRefresh, TbTrash } from "react-icons/tb";
 import { useDeleteEntry } from "../../hooks/delete-hooks/useDeleteEntry";
 import TextButton from "../../components/buttons/TextButton/TextButton";
 import { useChangeEntry } from "../../hooks/change-hooks/useChangeEntry";
@@ -29,6 +29,40 @@ import { dateIsProper } from "@/functions/dateIsProper.js";
 import { getDateAddDetails } from "@/functions/getDateAddDetails.js";
 import CurrentProgress from "@/components/indicators/CurrentProgress/CurrentProgress";
 
+const TaskTableWrapper = ({
+  task,
+  handleEditEntry,
+  setIsVisibleNewEntryModal,
+}) => {
+  const { data: entries, isLoading: entriesLoading } = useGetTaskEntries(
+    task._id,
+  );
+
+  const { data: entry } = useGetTaskCurrentEntry(task._id, task.currentEntryId);
+
+  const entriesWithIsProper = useMemo(() => {
+    if (entriesLoading || !task.repeats) return;
+
+    const allEntries = entries ? [...entries, entry] : [entry];
+
+    return allEntries.map((entry) => {
+      const entryDate = new Date(entry.date);
+      entryDate.setUTCHours(0, 0, 0, 0);
+
+      return { ...entry, isProperDate: dateIsProper(entryDate, task) };
+    });
+  }, [entries, entry, entriesLoading]);
+
+  return (
+    <Table
+      entries={entriesWithIsProper}
+      entriesLoading={entriesLoading}
+      setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
+      handleEditEntry={handleEditEntry}
+    />
+  );
+};
+
 const StatSection = ({ task }) => {
   const { data: entries, isLoading } = useGetTaskEntries(task._id);
 
@@ -36,7 +70,7 @@ const StatSection = ({ task }) => {
   const { functionName, timeToAdd } = useMemo(
     () =>
       getDateAddDetails(task.repeatRate.bigTimePeriod, task.repeatRate.number),
-    [task]
+    [task],
   );
 
   const {
@@ -81,7 +115,7 @@ const StatSection = ({ task }) => {
       const streakEntry = allEntries.find(
         (entry) =>
           entry.value > 0 &&
-          new Date(entry.date).getTime() === streakDate.getTime()
+          new Date(entry.date).getTime() === streakDate.getTime(),
       );
 
       if (streakEntry) {
@@ -120,13 +154,13 @@ const StatSection = ({ task }) => {
       }
 
       streakDate[`set${functionName}`](
-        streakDate[`get${functionName}`]() + timeToAdd
+        streakDate[`get${functionName}`]() + timeToAdd,
       );
     }
 
     // If end date is today and current streak is not 0 then the longest streak is ongoing
     streakDate[`set${functionName}`](
-      streakDate[`get${functionName}`]() - timeToAdd
+      streakDate[`get${functionName}`]() - timeToAdd,
     );
     if (
       longestStreakEndDate &&
@@ -203,14 +237,14 @@ const StatSection = ({ task }) => {
 
 const EntryModal = ({
   dismountNewEntryModal,
-  taskId,
+  // taskId,
   editedEntry = null,
-  entryDates,
+  // entryDates,
   task,
 }) => {
   const [value, setValue] = useState(editedEntry ? editedEntry.value : "0");
   const [date, setDate] = useState(
-    editedEntry ? new Date(editedEntry.date) : ""
+    editedEntry ? new Date(editedEntry.date) : "",
   );
   const [isVisibleCalendar, setIsVisibleCalendar] = useState(false);
   const { mutateAsync: addEntry, isLoading, isError } = useAddEntry();
@@ -224,6 +258,20 @@ const EntryModal = ({
     isLoading: isLoadingDelete,
     isError: isErrorDelete,
   } = useDeleteEntry();
+
+  const { data: entry } = useGetTaskCurrentEntry(
+    task?._id,
+    task?.currentEntryId,
+  );
+  const { data: entries, isLoading: entriesLoading } = useGetTaskEntries(
+    task?._id,
+    task?.currentEntryId,
+  );
+
+  const entryDates = useMemo(() => {
+    if (entriesLoading) return [new Date(entry.date)];
+    return [...entries, entry].map((tempEntry) => new Date(tempEntry.date));
+  }, [entry, entries, entriesLoading]);
 
   const checkIsToday = (dateString) => {
     const currentDate = new Date();
@@ -254,8 +302,8 @@ const EntryModal = ({
         newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60);
 
         await changeEntry({
-          taskId,
-          entryId: editedEntry._id,
+          taskId: task._id,
+          _id: editedEntry._id,
           value,
           date: newDate,
         });
@@ -267,7 +315,7 @@ const EntryModal = ({
       const newDate = new Date(date);
       newDate.setHours(newDate.getHours() - newDate.getTimezoneOffset() / 60);
 
-      await addEntry({ date: newDate, value, taskId });
+      await addEntry({ date: newDate, value, taskId: task._id });
       if (!isError) {
         dismountNewEntryModal();
       }
@@ -284,13 +332,17 @@ const EntryModal = ({
   const handleDeleteClick = async () => {
     if (editedEntry) {
       if (isToday) {
-        await changeEntry({ taskId, entryId: editedEntry._id, value: 0 });
+        await changeEntry({
+          taskId: task._id,
+          entryId: editedEntry._id,
+          value: 0,
+        });
 
         if (!isErrorChange) {
           dismountNewEntryModal();
         }
       } else {
-        await deleteEntry({ taskId, entryId: editedEntry._id });
+        await deleteEntry({ taskId: task._id, entryId: editedEntry._id });
 
         if (!isErrorDelete) {
           dismountNewEntryModal();
@@ -321,8 +373,8 @@ const EntryModal = ({
 
       datesToDisable.push(
         ...entryDates.filter(
-          (date) => editedEntryDate.getTime() !== date.getTime()
-        )
+          (date) => editedEntryDate.getTime() !== date.getTime(),
+        ),
       );
     } else {
       datesToDisable.push(...entryDates);
@@ -497,13 +549,9 @@ const TaskView = ({ index, length, task }) => {
   const { mutate: setTaskCurrentEntry } = useChangeEntryValue(task?.title);
   const { mutate: setSettings } = useChangeSettings();
 
-  const { data: entries, isLoading: entriesLoading } = useGetTaskEntries(
-    task?._id,
-    task?.currentEntryId
-  );
   const { data: entry } = useGetTaskCurrentEntry(
     task?._id,
-    task?.currentEntryId
+    task?.currentEntryId,
   );
   const { data: settings } = useGetSettings();
 
@@ -553,14 +601,6 @@ const TaskView = ({ index, length, task }) => {
     }
   };
 
-  const handleSetCurrentValueCheckbox = () => {
-    setTaskCurrentEntry({
-      taskId: task?._id,
-      entryId: entry?._id,
-      value: entry?.value === 0 ? 1 : 0,
-    });
-  };
-
   const handleSetCurrentValueNumber = (e) => {
     const eventNumber = parseInt(e);
 
@@ -585,19 +625,6 @@ const TaskView = ({ index, length, task }) => {
   const dismountConfirmDeleteModal = () => {
     setIsVisibleConfirmDeleteModal(false);
   };
-
-  const entriesWithIsProper = useMemo(() => {
-    if (entriesLoading) return;
-
-    const allEntries = entries ? [...entries, entry] : [entry];
-
-    return allEntries.map((entry) => {
-      const entryDate = new Date(entry.date);
-      entryDate.setUTCHours(0, 0, 0, 0);
-
-      return { ...entry, isProperDate: dateIsProper(entryDate, task) };
-    });
-  }, [entries, entry, entriesLoading]);
 
   const handleEditEntry = (entry) => {
     setEditedEntry(entry);
@@ -645,7 +672,7 @@ const TaskView = ({ index, length, task }) => {
           )}
         </section>
         <section className={"Horizontal-Flex-Container"}>
-          <div className={"Label"}>{task.repeats && "Today's"}Value:</div>
+          <div className={"Label"}>{task.repeats && "Today's "}Value:</div>
           {task.type === "Checkbox" && <CurrentProgress task={task} />}
           {task.type === "Number" && (
             <TextBoxInput
@@ -695,12 +722,11 @@ const TaskView = ({ index, length, task }) => {
         {/*</section>*/}
         {task.repeats && (
           <section>
-            <Table
-              entries={entriesWithIsProper}
-              entriesLoading={entriesLoading}
+            <TaskTableWrapper
+              task={task}
               setIsVisibleNewEntryModal={setIsVisibleNewEntryModal}
               handleEditEntry={handleEditEntry}
-            />
+            ></TaskTableWrapper>
           </section>
         )}
         <section className={"Horizontal-Flex-Container Space-Between"}>
@@ -718,13 +744,14 @@ const TaskView = ({ index, length, task }) => {
       {isVisibleNewEntryModal && (
         <EntryModal
           dismountNewEntryModal={dismountNewEntryModal}
-          taskId={task?._id}
+          // taskId={task?._id}
+          // taskCurrentEntryId={task?.currentEntryId}
           editedEntry={editedEntry}
-          entryDates={
-            !entriesLoading
-              ? [...entries, entry].map((tempEntry) => new Date(tempEntry.date))
-              : [new Date(entry.date)]
-          }
+          // entryDates={
+          //     !entriesLoading
+          //         ? [...entries, entry].map((tempEntry) => new Date(tempEntry.date))
+          //         : [new Date(entry.date)]
+          // }
           task={task}
         />
       )}

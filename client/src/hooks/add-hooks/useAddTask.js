@@ -18,7 +18,6 @@ const postTask = async (task) => {
 }
 
 
-
 export function useAddTask() {
     const queryClient = useQueryClient();
     const alertsContext = useContext(AlertsContext);
@@ -45,12 +44,19 @@ export function useAddTask() {
             queryClient.setQueryData(["tasks"], (oldData) => {
                 updateSettingsLowAndHigh(data);
                 return oldData ? {
-                    tasks: [...oldData.tasks, {...data, hidden: false}]
+                    tasks: [...oldData.tasks, {...data.task, hidden: false}]
                 } : oldData
             });
+
+            queryClient.setQueryData(["task-entries", data.entry.taskId, data.entry._id], () => {
+                return {entry: data.entry}
+            })
         },
         onError: err => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to create task"}})
+            alertsContext.dispatch({
+                type: "ADD_ALERT",
+                payload: {type: "error", message: err.message, title: "Failed to create task"}
+            })
         }
     })
 }

@@ -17,7 +17,6 @@ const fetchTasks = async () => {
     return response.json();
 }
 
-
 export function useGetTasks() {
     const queryClient = useQueryClient();
     const user = useContext(UserContext);
@@ -36,11 +35,6 @@ export function useGetTasks() {
                 }
             }
 
-            // Remove current entry from task
-            queryClient.setQueryData(["tasks"], () => {
-                return {tasks: data.tasks};
-            })
-
             // Update the priority lowest and highest used value
             queryClient.setQueryData(["settings"], (oldData) => {
                 const priorities = data.tasks.map(task => task.priority);
@@ -55,7 +49,10 @@ export function useGetTasks() {
             });
         },
         onError: err => {
-            alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", message: err.message, title: "Failed to get tasks"}})
+            alertsContext.dispatch({
+                type: "ADD_ALERT",
+                payload: {type: "error", message: err.message, title: "Failed to get tasks"}
+            })
         }
     });
 

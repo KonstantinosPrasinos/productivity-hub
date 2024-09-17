@@ -134,7 +134,7 @@ const NewTask = ({ index, length, id }) => {
 
       if (task.category) {
         setCategory(
-          categories.find((tempCategory) => tempCategory._id === task.category)
+          categories.find((tempCategory) => tempCategory._id === task.category),
         );
 
         if (task.group) {
@@ -255,14 +255,16 @@ const NewTask = ({ index, length, id }) => {
         }
 
         repeatParameters = {
-          number: repeatNumber,
-          bigTimePeriod: timePeriod,
-          smallTimePeriod: timePeriod2,
-          startingDate: findStartingDates(timePeriod, timePeriod2),
+          repeatRate: {
+            number: repeatNumber,
+            bigTimePeriod: timePeriod,
+            smallTimePeriod: timePeriod2,
+            startingDate: findStartingDates(timePeriod, timePeriod2),
+          },
         };
 
         if (hasTime) {
-          repeatParameters.time = {
+          repeatParameters.repeatRate.time = {
             start: startHour.concat(startMinute),
             end: endHour.concat(endMinute),
           };
@@ -301,23 +303,6 @@ const NewTask = ({ index, length, id }) => {
             },
           });
           return;
-        }
-
-        // For some reason if I do repeatRate: category.repeatRate and then change something on the repeatRate, the category mutates ㄟ( ▔, ▔ )ㄏ
-        repeatParameters = {
-          repeatRate: {
-            startingDate: [...category.repeatRate.startingDate],
-            number: category.repeatRate.number,
-            bigTimePeriod: category.repeatRate.bigTimePeriod,
-          },
-          longGoal: category.goal,
-        };
-
-        if (timeGroup._id) {
-          repeatParameters.repeatRate.smallTimePeriod =
-            timeGroup.repeatRate.smallTimePeriod;
-          repeatParameters.repeatRate.startingDate =
-            timeGroup.repeatRate.startingDate;
         }
       }
     }

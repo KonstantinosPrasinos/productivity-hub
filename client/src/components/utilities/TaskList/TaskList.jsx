@@ -9,7 +9,6 @@ import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
 import IconButton from "@/components/buttons/IconButton/IconButton";
-import Divider from "../Divider/Divider";
 import { useScreenSize } from "@/hooks/useScreenSize";
 
 const variants = {
@@ -43,7 +42,7 @@ const CategoryChips = ({
         .includes(category._id)
     ) {
       setCategoryFilter((current) =>
-        current.filter((tempCategory) => tempCategory._id != category._id)
+        current.filter((tempCategory) => tempCategory._id != category._id),
       );
     } else {
       setCategoryFilter((current) => [
@@ -55,7 +54,7 @@ const CategoryChips = ({
 
   const toggleSubcategorySelected = (subcategory) => {
     const subcategoryParent = categoryFilter.find(
-      (tempSubcategory) => tempSubcategory._id === subcategory.parent
+      (tempSubcategory) => tempSubcategory._id === subcategory.parent,
     );
 
     if (subcategoryParent.selectedSubcategories.includes(subcategory)) {
@@ -67,10 +66,11 @@ const CategoryChips = ({
                 ...tempCategory,
                 selectedSubcategories:
                   tempCategory.selectedSubcategories.filter(
-                    (tempSubcategory) => tempSubcategory._id !== subcategory._id
+                    (tempSubcategory) =>
+                      tempSubcategory._id !== subcategory._id,
                   ),
-              }
-        )
+              },
+        ),
       );
     } else {
       setCategoryFilter((current) =>
@@ -83,8 +83,8 @@ const CategoryChips = ({
                   ...tempCategory.selectedSubcategories,
                   subcategory,
                 ],
-              }
-        )
+              },
+        ),
       );
     }
   };
@@ -101,7 +101,7 @@ const CategoryChips = ({
     <>
       {categories.map((category) => {
         const categorySubcategories = subCategories.filter(
-          (subCategory) => subCategory.parent === category._id
+          (subCategory) => subCategory.parent === category._id,
         );
 
         return (
@@ -190,7 +190,7 @@ const CategoryChips = ({
                           categoryFilter
                             .find(
                               (tempCategory) =>
-                                tempCategory._id === category._id
+                                tempCategory._id === category._id,
                             )
                             .selectedSubcategories.includes(subCategory)
                             ? subCategory
@@ -228,7 +228,7 @@ const BigScreenFilters = ({
   const toggleNoCategory = () => {
     if (categoryFilter.find((category) => category._id === "-1")) {
       setCategoryFilter((current) =>
-        current.filter((tempCategory) => tempCategory._id != "-1")
+        current.filter((tempCategory) => tempCategory._id != "-1"),
       );
     } else {
       setCategoryFilter((current) => [
@@ -324,7 +324,7 @@ const SearchScreen = ({
   const toggleNoCategory = () => {
     if (categoryFilter.find((category) => category._id === "-1")) {
       setCategoryFilter((current) =>
-        current.filter((tempCategory) => tempCategory._id != "-1")
+        current.filter((tempCategory) => tempCategory._id != "-1"),
       );
     } else {
       setCategoryFilter((current) => [
@@ -427,7 +427,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
         const matchesCategory =
           categoryFilter.length === 0 ||
           categoryFilter.find(
-            (tempFilter) => tempFilter._id === currentTask.tasks[0].category
+            (tempFilter) => tempFilter._id === currentTask.tasks[0].category,
           );
 
         const matchesSubcategory =
@@ -448,7 +448,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
               tasks: currentTask.tasks.filter((tempTask) =>
                 tempTask.title
                   .toLowerCase()
-                  .includes(searchFilter.toLowerCase())
+                  .includes(searchFilter.toLowerCase()),
               ),
             };
           }
@@ -528,7 +528,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
         },
         {
           onComplete: () => toggleSearchVisibility(),
-        }
+        },
       );
     }
   };
@@ -616,7 +616,7 @@ const TaskList = ({ tasks = [], usesTime = false }) => {
                   tasks={task.tasks}
                   usesTime={usesTime}
                 ></Task>
-              )
+              ),
             )}
         </AnimatePresence>
       </motion.div>
