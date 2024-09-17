@@ -30,6 +30,9 @@ export default defineConfig({
       srcDir: "src/service-worker",
       swDest: "dist/service-worker.js",
       strategies: "injectManifest",
+      injectManifest: {
+        injectionPoint: undefined,
+      },
     }),
   ],
 });
