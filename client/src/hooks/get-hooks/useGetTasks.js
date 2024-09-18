@@ -26,6 +26,7 @@ export function useGetTasks() {
     staleTime: 30 * 60 * 60 * 1000,
     enabled: user.state?.id !== undefined,
     onSuccess: (data) => {
+      console.log(data);
       // Set current entry from acquired data
       if (data?.currentEntries) {
         for (const currentEntry of data.currentEntries) {

@@ -11,7 +11,7 @@ const fetchTaskCurrentEntry = async ({ queryKey }) => {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-    }
+    },
   );
 
   if (!response.ok) {
@@ -82,6 +82,8 @@ export function useGetTaskCurrentEntry(taskId, entryId) {
       isLoading,
     };
   }
+
+  console.log(queryObject[0]?.data?.entry);
 
   return { ...queryObject[0], data: queryObject[0]?.data?.entry };
 }
