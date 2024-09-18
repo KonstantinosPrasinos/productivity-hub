@@ -20,19 +20,19 @@ export default defineConfig({
     }),
     react(),
     visualizer(),
-    // VitePWA({
-    //   filename: "sw.js",
-    //   registerType: "autoUpdate",
-    //   devOptions: {
-    //     enabled: true,
-    //     type: "module",
-    //   },
-    //   srcDir: "src/service-worker",
-    //   swDest: "dist/service-worker.js",
-    //   strategies: "injectManifest",
-    //   injectManifest: {
-    //     injectionPoint: undefined,
-    //   },
-    // }),
+    VitePWA({
+      filename: "sw.js",
+      registerType: "autoUpdate",
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
+      srcDir: "src/service-worker",
+      swDest: "dist/service-worker.js",
+      strategies: "injectManifest",
+      injectManifest: {
+        injectionPoint: undefined,
+      },
+    }),
   ],
 });

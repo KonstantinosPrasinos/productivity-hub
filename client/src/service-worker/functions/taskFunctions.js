@@ -195,7 +195,11 @@ export const deleteTaskInServer = async (event) => {
 };
 
 export const handleTaskGetRequest = async (request, sw) => {
-  const response = await fetch(request);
+  console.log(request);
+  const response = await fetch(request, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
   if (!response.ok) {
     // todo add error handling

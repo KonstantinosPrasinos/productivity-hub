@@ -134,7 +134,10 @@ export const getAllEntriesFromDB = async (taskId) => {
 };
 
 export const handleAllEntriesGetRequest = async (request, sw) => {
-  const response = await fetch(request);
+  const response = await fetch(request, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
   if (!response.ok) {
     // todo add error handling

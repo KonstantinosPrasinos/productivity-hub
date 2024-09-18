@@ -59,7 +59,10 @@ export const addGroupsToDB = async (groups, categoryId) => {
 };
 
 export const handleGroupGetRequest = async (request, sw) => {
-  const groupResponse = await fetch(request);
+  const groupResponse = await fetch(request, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
   if (!groupResponse.ok) {
     return;

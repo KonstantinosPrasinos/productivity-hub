@@ -62,7 +62,10 @@ export const addCategoryToDB = async (category) => {
 };
 
 export const handleCategoryGetRequest = async (request, sw) => {
-  const categoryResponse = await fetch(request);
+  const categoryResponse = await fetch(request, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
   if (!categoryResponse.ok) {
     return;

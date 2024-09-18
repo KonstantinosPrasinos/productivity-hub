@@ -32,7 +32,10 @@ export const addSettingsToServer = async (event) => {
 };
 
 export const handleSettingsGetRequest = async (request, sw) => {
-  const settingsResponse = await fetch(request);
+  const settingsResponse = await fetch(request, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
   if (!settingsResponse.ok) {
     return;
