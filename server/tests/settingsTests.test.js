@@ -1,5 +1,5 @@
 const request = require("supertest");
-const server = require("../index");
+const server = require("../server");
 const mongoose = require('mongoose')
 const Settings = require('../models/settingsSchema');
 

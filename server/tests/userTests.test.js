@@ -1,4 +1,4 @@
-const server = require('../index');
+const server = require('../server');
 const request = require('supertest');
 const User = require("../models/userSchema");
 const Settings = require('../models/settingsSchema');
