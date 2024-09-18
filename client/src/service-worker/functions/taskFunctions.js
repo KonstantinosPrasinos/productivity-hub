@@ -197,8 +197,14 @@ export const deleteTaskInServer = async (event) => {
 export const handleTaskGetRequest = async (request, sw) => {
   console.log(request);
   const response = await fetch(request, {
-    headers: { "Content-Type": "application/json" },
+    mode: "cors",
     credentials: "include",
+    headers: {
+      "Access-Control-Allow-Origin":
+        "https://productivity-hub-website.vercel.app",
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
   });
 
   if (!response.ok) {
