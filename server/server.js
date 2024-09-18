@@ -17,7 +17,6 @@ const groupRoutes = require("./routes/groupRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const securityRoutes = require("./routes/securityRoutes");
 const taskHistoryRoutes = require("./routes/entryRoutes");
-const syncRoutes = require("./routes/syncRoutes");
 // const {Strategy: GoogleStrategy} = require("passport-google-oauth20");
 
 // Express app
@@ -25,7 +24,7 @@ const app = express();
 
 // Session store
 const sessionStore = new MongoDBStore({
-  uri: process.env.MONG_URI,
+  uri: process.env.MONGODB_URI,
   collection: "sessions",
 });
 
@@ -85,7 +84,6 @@ app.use("/api/group", groupRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/security", securityRoutes);
 app.use("/api/entry", taskHistoryRoutes);
-app.use("/api/sync", syncRoutes);
 
 app.use((err, req, res, next) => {
   if (err.message) {
@@ -94,9 +92,13 @@ app.use((err, req, res, next) => {
   next();
 });
 
+if (!process.env.MONGODB_URI) {
+  throw new Error("Please provide a MONGODB_URI in the .env file");
+}
+
 // Connect to database
 mongoose
-  .connect(process.env.MONG_URI)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     if (process.env.NODE_ENV !== "test") {
       app.listen(process.env.PORT, () => {
