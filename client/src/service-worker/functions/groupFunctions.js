@@ -70,6 +70,8 @@ export const handleGroupGetRequest = async (request, sw) => {
 
   const groupData = await groupResponse.json();
 
+  console.log(`groupData: ${groupData}`);
+
   await addToStoreInDatabase(groupData.groups, "groups");
 
   await messageClient(sw, "UPDATE_GROUPS");

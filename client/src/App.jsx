@@ -52,7 +52,6 @@ const syncTasks = async (queryClient) => {
   const currentDateString = currentDate.toISOString();
 
   for (const entry of entries) {
-    console.log(entry.date !== currentDateString);
     // if (entry.date !== currentDateString) continue;
 
     queryClient.setQueryData(["task-entries", entry.taskId, entry._id], () => {

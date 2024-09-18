@@ -30,7 +30,6 @@ export function useGetTasks() {
       // Set current entry from acquired data
       if (data?.currentEntries) {
         for (const currentEntry of data.currentEntries) {
-          console.log(currentEntry.taskId, currentEntry._id);
           queryClient.setQueryData(
             ["task-entries", currentEntry.taskId, currentEntry._id],
             () => {

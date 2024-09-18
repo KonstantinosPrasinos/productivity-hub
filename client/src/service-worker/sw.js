@@ -164,7 +164,7 @@ self.addEventListener("fetch", async (event) => {
               await handleAllEntriesGetRequest(event.request, self);
             }
           } else if (/\/entry\/*/.test(requestUrl)) {
-            console.log(requestUrl);
+            // todo fix this
             event.respondWith(getSettingsFromDB());
           }
       }

@@ -83,7 +83,5 @@ export function useGetTaskCurrentEntry(taskId, entryId) {
     };
   }
 
-  console.log(queryObject[0]?.data?.entry);
-
   return { ...queryObject[0], data: queryObject[0]?.data?.entry };
 }

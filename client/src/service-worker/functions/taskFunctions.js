@@ -27,7 +27,8 @@ export const getTasksFromDB = async () => {
   filteredTasks.forEach((task) => {
     let todayEntry = entries.find(
       (entry) =>
-        entry.taskId === task._id && entry.date === today.toISOString(),
+        entry.taskId === task._id &&
+        (task?.repeats ? entry.date === today.toISOString() : true),
     );
 
     if (!todayEntry) {
@@ -195,7 +196,6 @@ export const deleteTaskInServer = async (event) => {
 };
 
 export const handleTaskGetRequest = async (request, sw) => {
-  console.log(request);
   const response = await fetch(request, {
     mode: "cors",
     credentials: "include",
