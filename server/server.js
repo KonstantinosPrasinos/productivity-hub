@@ -52,11 +52,13 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
+
 app.get("/", (req, res) => {
   res.json("Hello there");
 });
-
-app.use(cors(corsOptions));
 
 // Passport
 app.use(passport.initialize());
