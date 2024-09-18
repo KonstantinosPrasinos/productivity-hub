@@ -36,21 +36,9 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-    proxy: true,
-    name: "ProductivityHubCookie",
     cookie: {
-      secure: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // One month,
-      httpOnly: false,
-      sameSite: "none",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // One month
     },
-
-    // proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
-    // name: 'MyCoolWebAppCookieName', // This needs to be unique per-host.
-    // cookie: {
-    //     httpOnly: false,
-    //     sameSite: 'none'
-    // }
   }),
 );
 
