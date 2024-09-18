@@ -163,6 +163,8 @@ self.addEventListener("fetch", async (event) => {
             } else {
               await handleAllEntriesGetRequest(event.request, self);
             }
+          } else if (/\/entry\/*/.test(requestUrl)) {
+            event.respondWith(getSettingsFromDB());
           }
       }
     } else if (event.request.method === "POST") {
