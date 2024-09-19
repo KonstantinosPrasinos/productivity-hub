@@ -23,6 +23,9 @@ export const addCategoryToServer = async (event, savedData) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push({ ...event, savedData });
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -68,7 +71,11 @@ export const handleCategoryGetRequest = async (request, sw) => {
   });
 
   if (!categoryResponse.ok) {
-    return;
+    self.mustSync = true;
+    self.requestEventQueue.push(request);
+
+    const data = await categoryResponse.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const categoryData = await categoryResponse.json();
@@ -140,48 +147,45 @@ export const deleteCategoryInDB = async (requestBody) => {
 };
 
 export const deleteCategoryInServer = async (event) => {
-  try {
-    const db = await openDatabase();
-    const requestClone = event.request.clone();
-    const requestBody = await requestClone.json();
+  const db = await openDatabase();
+  const requestClone = event.request.clone();
+  const requestBody = await requestClone.json();
 
-    const response = await fetch(event.request);
+  const response = await fetch(event.request);
 
-    if (!response.ok) {
-      self.mustSync = true;
-      self.requestEventQueue.push(event);
-      return;
-    }
-
-    const transaction = db.transaction(
-      ["categories", "groups", "tasks"],
-      "readwrite",
-    );
-
-    const categoryStore = transaction.objectStore("categories");
-    const groupStore = transaction.objectStore("groups");
-    const taskStore = transaction.objectStore("tasks");
-
-    const groups = await groupStore.getAll();
-
-    for (const group of groups) {
-      if (group?.parent === requestBody?.categoryId) {
-        await groupStore.delete(group._id);
-      }
-    }
-
-    await categoryStore.delete(requestBody?.categoryId);
-
-    const tasks = await taskStore.getAll();
-
-    for (const task of tasks.filter(
-      (task) => !task?.isNew && task?.category === requestBody?.categoryId,
-    )) {
-      await taskStore.put({ ...task, mustSync: false });
-    }
-  } catch (error) {
+  if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
+  }
+
+  const transaction = db.transaction(
+    ["categories", "groups", "tasks"],
+    "readwrite",
+  );
+
+  const categoryStore = transaction.objectStore("categories");
+  const groupStore = transaction.objectStore("groups");
+  const taskStore = transaction.objectStore("tasks");
+
+  const groups = await groupStore.getAll();
+
+  for (const group of groups) {
+    if (group?.parent === requestBody?.categoryId) {
+      await groupStore.delete(group._id);
+    }
+  }
+
+  await categoryStore.delete(requestBody?.categoryId);
+
+  const tasks = await taskStore.getAll();
+
+  for (const task of tasks.filter(
+    (task) => !task?.isNew && task?.category === requestBody?.categoryId,
+  )) {
+    await taskStore.put({ ...task, mustSync: false });
   }
 };
 
@@ -331,7 +335,10 @@ export const editCategoryInServer = async (event, tempData) => {
 
   if (!response.ok) {
     self.mustSync = true;
-    self.requestEventQueue.push(event);
+    self.requestEventQueue.push({ ...event, tempData });
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();

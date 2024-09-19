@@ -102,9 +102,6 @@ export const messageClient = async (sw, type) => {
 
 self.addEventListener("fetch", async (event) => {
   if (event.request.url.includes("/api/")) {
-    const customHeader = event.request.headers;
-    console.log(customHeader, event.request.url);
-
     const requestUrl = event.request.url.substring(
       event.request.url.indexOf("/api/") + 4,
     );
@@ -134,11 +131,8 @@ self.addEventListener("fetch", async (event) => {
         case "/group":
           event.respondWith(getGroupsFromDB());
 
-          console.log(`group thing: ${self.mustSync}`);
-
           if (self.mustSync) {
             self.requestEventQueue.push({ request: event.request.clone() });
-            console.log(self.requestEventQueue);
             handleSync();
           } else {
             await handleGroupGetRequest(event.request, self);

@@ -74,10 +74,11 @@ export const addTaskToServer = async (event, savedData, sw) => {
   const response = await fetch(event.request);
 
   if (!response.ok) {
-    // todo this doesn't check for server errors like 400
     self.mustSync = true;
     self.requestEventQueue.push({ ...event, savedData });
-    return;
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -101,6 +102,9 @@ export const editTaskInServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -172,28 +176,26 @@ export const deleteTaskInDB = async (taskId) => {
 };
 
 export const deleteTaskInServer = async (event) => {
-  try {
-    const requestClone = event.request.clone();
-    const requestBody = await requestClone.json();
+  const requestClone = event.request.clone();
+  const requestBody = await requestClone.json();
 
-    const response = await fetch(event.request);
+  const response = await fetch(event.request);
 
-    if (!response.ok) {
-      self.mustSync = true;
-      self.requestEventQueue.push(event);
-    }
-
-    const db = await openDatabase();
-    const transaction = db.transaction(["tasks"], "readwrite");
-    const objectStore = transaction.objectStore("tasks");
-
-    const taskToDelete = await objectStore.get(requestBody.taskId);
-
-    await objectStore.put({ ...taskToDelete, mustSync: false });
-  } catch (_) {
+  if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
+
+  const db = await openDatabase();
+  const transaction = db.transaction(["tasks"], "readwrite");
+  const objectStore = transaction.objectStore("tasks");
+
+  const taskToDelete = await objectStore.get(requestBody.taskId);
+
+  await objectStore.put({ ...taskToDelete, mustSync: false });
 };
 
 export const handleTaskGetRequest = async (request, sw) => {
@@ -209,8 +211,11 @@ export const handleTaskGetRequest = async (request, sw) => {
   });
 
   if (!response.ok) {
-    // todo add error handling
-    return;
+    self.mustSync = true;
+    self.requestEventQueue.push(request);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();

@@ -187,7 +187,6 @@ export const addToStoreInDatabase = async (tempData = [], storeType = "") => {
   const store = transaction.objectStore(storeType);
 
   if (Array.isArray(tempData)) {
-    console.log(tempData, storeType);
     for (const data of tempData) {
       await store.put({ ...data, mustSync: false });
     }

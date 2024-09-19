@@ -323,7 +323,10 @@ const makeSyncRequest = async (requestData) => {
   });
 
   if (!response.ok) {
-    // executeSyncIn5Minutes();
+    self.mustSync = true;
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   return response;
@@ -530,7 +533,6 @@ const handleRemainingRequests = async () => {
     );
 
     try {
-      console.log(requestUrl);
       if (eventObj.request.method === "GET") {
         switch (requestUrl) {
           case "/task":
@@ -585,8 +587,10 @@ const handleRemainingRequests = async () => {
         }
       }
     } catch (error) {
-      console.error("Error processing backlog request:", error);
-      throw new Error("Error processing backlog request");
+      console.error(
+        `Error processing backlog request to ${requestUrl}:`,
+        error,
+      );
     }
   }
 };
@@ -599,9 +603,6 @@ export const handleSync = async () => {
     await handleCleanup();
 
     const syncData = await prepareSyncData();
-
-    console.log("attempting to sync");
-    console.log(syncData);
 
     if (!syncData.shouldSync) {
       self.mustSync = false;

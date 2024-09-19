@@ -27,7 +27,10 @@ export const addEntryToServer = async (event, savedData, sw) => {
 
   if (!response.ok) {
     self.mustSync = true;
-    self.requestEventQueue.push(event);
+    self.requestEventQueue.push({ ...event, savedData });
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -61,6 +64,9 @@ export const setEntryValueInServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -93,7 +99,9 @@ export const setEntryInServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
-    // todo add error throwing (to all !response.ok)
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -140,8 +148,11 @@ export const handleAllEntriesGetRequest = async (request, sw) => {
   });
 
   if (!response.ok) {
-    // todo add error handling
-    return;
+    self.mustSync = true;
+    self.requestEventQueue.push(request);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -175,6 +186,9 @@ export const deleteEntryInServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const db = await openDatabase();

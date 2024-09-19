@@ -20,6 +20,9 @@ export const addSettingsToServer = async (event) => {
   if (!response.ok) {
     self.mustSync = true;
     self.requestEventQueue.push(event);
+
+    const data = await response.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const data = await response.json();
@@ -38,7 +41,11 @@ export const handleSettingsGetRequest = async (request, sw) => {
   });
 
   if (!settingsResponse.ok) {
-    return;
+    self.mustSync = true;
+    self.requestEventQueue.push(request);
+
+    const data = await settingsResponse.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const settingsData = await settingsResponse.json();

@@ -59,20 +59,20 @@ export const addGroupsToDB = async (groups, categoryId) => {
 };
 
 export const handleGroupGetRequest = async (request, sw) => {
-  console.log("getting groups");
   const groupResponse = await fetch(request, {
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
 
   if (!groupResponse.ok) {
-    return;
+    self.mustSync = true;
+    self.requestEventQueue.push(request);
+
+    const data = await groupResponse.json();
+    throw new Error(data.message || "Unknown error");
   }
 
   const groupData = await groupResponse.json();
-
-  console.log("got groups");
-  console.log(groupData);
 
   await addToStoreInDatabase(groupData.groups, "groups");
 
