@@ -1,5 +1,6 @@
 {
- "name": "App",
+ "name": "Taskflow",
+ "short_name": "Taskflow",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
