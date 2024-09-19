@@ -522,7 +522,7 @@ const handleCleanup = async () => {
 };
 
 const handleRemainingRequests = async () => {
-  console.log(requestEventQueue);
+  console.log(requestEventQueue.length);
   while (self.requestEventQueue.length > 0) {
     const eventObj = self.requestEventQueue.shift();
 
@@ -605,11 +605,11 @@ export const handleSync = async () => {
     console.log(syncData);
 
     if (!syncData.shouldSync) {
-      await handleRemainingRequests();
-      await messageClient(self, "SYNC_COMPLETED");
-
       self.mustSync = false;
       self.isSyncing = false;
+
+      await handleRemainingRequests();
+      await messageClient(self, "SYNC_COMPLETED");
       return;
     }
 
