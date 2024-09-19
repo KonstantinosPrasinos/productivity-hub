@@ -202,6 +202,9 @@ const NavLayout = () => {
                 syncCategories(queryClient);
                 syncGroups(queryClient);
                 break;
+              case "UPDATE_GROUPS":
+                syncGroups(queryClient);
+                break;
               case "UPDATE_SETTINGS":
                 syncSettings(queryClient);
                 break;

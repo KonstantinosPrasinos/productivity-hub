@@ -70,7 +70,8 @@ export const handleGroupGetRequest = async (request, sw) => {
 
   const groupData = await groupResponse.json();
 
-  console.log(`groupData: ${groupData}`);
+  console.log("gettings groups");
+  console.log(groupData);
 
   await addToStoreInDatabase(groupData.groups, "groups");
 

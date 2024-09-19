@@ -25,6 +25,7 @@ export const getTasksFromDB = async () => {
   const existingEntries = [];
 
   filteredTasks.forEach((task) => {
+    // todo fix this
     let todayEntry = entries.find(
       (entry) =>
         entry.taskId === task._id &&

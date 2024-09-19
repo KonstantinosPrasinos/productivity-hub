@@ -530,6 +530,7 @@ const handleRemainingRequests = async () => {
     );
 
     try {
+      console.log(requestUrl);
       if (eventObj.request.method === "GET") {
         switch (requestUrl) {
           case "/task":
@@ -599,12 +600,16 @@ export const handleSync = async () => {
 
     const syncData = await prepareSyncData();
 
+    console.log("attempting to sync");
+    console.log(syncData);
+
     if (!syncData.shouldSync) {
       await handleRemainingRequests();
       await messageClient(self, "SYNC_COMPLETED");
 
       self.mustSync = false;
       self.isSyncing = false;
+      return;
     }
 
     const requestData = await makeSyncRequest(syncData.data);

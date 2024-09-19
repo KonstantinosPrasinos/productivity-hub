@@ -4,7 +4,6 @@ import { UserContext } from "@/context/UserContext";
 import { AlertsContext } from "@/context/AlertsContext.jsx";
 
 const fetchGroups = async () => {
-  console.log("fetching groups");
   const response = await fetch(
     `${import.meta.env.VITE_BACK_END_IP}/api/group`,
     {
