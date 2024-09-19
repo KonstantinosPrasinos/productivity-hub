@@ -131,6 +131,8 @@ self.addEventListener("fetch", async (event) => {
         case "/group":
           event.respondWith(getGroupsFromDB());
 
+          console.log(`group thing: ${self.mustSync}`);
+
           if (self.mustSync) {
             self.requestEventQueue.push({ request: event.request.clone() });
             handleSync();
