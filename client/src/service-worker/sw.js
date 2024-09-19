@@ -101,13 +101,10 @@ export const messageClient = async (sw, type) => {
 };
 
 self.addEventListener("fetch", async (event) => {
-  console.log(event.request.url, self.location.origin);
-  if (event.request.url.startsWith(self.location.origin)) {
-    console.log("it's from self");
-    return;
-  }
-
   if (event.request.url.includes("/api/")) {
+    const customHeader = event.request.headers;
+    console.log(customHeader, event.request.url);
+
     const requestUrl = event.request.url.substring(
       event.request.url.indexOf("/api/") + 4,
     );
@@ -150,8 +147,6 @@ self.addEventListener("fetch", async (event) => {
         case "/settings":
           // Settings is the first request made by the app
           // assume this means the app window has been reset and reset the service worker state
-          console.log("resetting state");
-          resetState();
           event.respondWith(getSettingsFromDB());
 
           if (self.mustSync) {
