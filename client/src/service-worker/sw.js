@@ -135,6 +135,7 @@ self.addEventListener("fetch", async (event) => {
 
           if (self.mustSync) {
             self.requestEventQueue.push({ request: event.request.clone() });
+            console.log(self.requestEventQueue);
             handleSync();
           } else {
             await handleGroupGetRequest(event.request, self);

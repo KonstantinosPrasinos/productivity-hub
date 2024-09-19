@@ -522,6 +522,7 @@ const handleCleanup = async () => {
 };
 
 const handleRemainingRequests = async () => {
+  console.log(requestEventQueue);
   while (self.requestEventQueue.length > 0) {
     const eventObj = self.requestEventQueue.shift();
 
