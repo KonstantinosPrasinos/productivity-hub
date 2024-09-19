@@ -524,6 +524,7 @@ const handleCleanup = async () => {
 const handleRemainingRequests = async () => {
   console.log(requestEventQueue.length);
   while (self.requestEventQueue.length > 0) {
+    console.log(self.requestEventQueue.length);
     const eventObj = self.requestEventQueue.shift();
 
     const requestUrl = eventObj.request.url.substring(
