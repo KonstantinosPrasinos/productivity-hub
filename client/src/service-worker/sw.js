@@ -101,6 +101,12 @@ export const messageClient = async (sw, type) => {
 };
 
 self.addEventListener("fetch", async (event) => {
+  console.log(event.request.url, self.location.origin);
+  if (event.request.url.startsWith(self.location.origin)) {
+    console.log("it's from self");
+    return;
+  }
+
   if (event.request.url.includes("/api/")) {
     const requestUrl = event.request.url.substring(
       event.request.url.indexOf("/api/") + 4,
