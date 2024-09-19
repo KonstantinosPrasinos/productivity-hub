@@ -1,0 +1,43 @@
+@use "@/styles/variables" as v;
+@use "@/styles/index";
+
+@media (min-width: v.$phone-breakpoint) {
+  .container {
+    bottom: 1em;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: v.$phone-breakpoint) {
+  .container {
+    right: 0.5em;
+    top: 6.5px;
+  }
+}
+
+.container {
+  @extend .Horizontal-Flex-Container;
+  position: fixed;
+  font-size: v.$font-xl;
+}
+
+.offlineBadge {
+  display: inline-block;
+  height: 1em;
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.syncingBadge {
+  display: inline-block;
+  height: 1em;
+  animation: spin 1.5s linear infinite;
+}

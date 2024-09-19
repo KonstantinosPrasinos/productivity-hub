@@ -599,6 +599,8 @@ export const handleSync = async () => {
   if (self.isSyncing) return;
   self.isSyncing = true;
 
+  await messageClient(self, "SYNCING_STARTED");
+
   try {
     await handleCleanup();
 

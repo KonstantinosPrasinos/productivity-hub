@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { MiniPagesContext } from "../../../context/MiniPagesContext";
 import { motion } from "framer-motion";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import OfflineBadge from "@/components/utilities/OfflineBadge/OfflineBadge";
+import ConnectionBadges from "@/components/utilities/ConnectionBadges/ConnectionBadges";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ const NavBar = () => {
         >
           <TbPlus />
         </Button>
-        <OfflineBadge />
+        <ConnectionBadges />
       </div>
     </motion.div>
   );

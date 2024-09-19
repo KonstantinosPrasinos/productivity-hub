@@ -139,8 +139,6 @@ self.addEventListener("fetch", async (event) => {
           }
           break;
         case "/settings":
-          // Settings is the first request made by the app
-          // assume this means the app window has been reset and reset the service worker state
           event.respondWith(getSettingsFromDB());
 
           if (self.mustSync) {

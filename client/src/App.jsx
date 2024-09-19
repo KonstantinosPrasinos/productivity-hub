@@ -30,11 +30,11 @@ import UndoHandler from "./components/handlers/UndoHandler/UndoHandler";
 import { useGetTasks } from "@/hooks/get-hooks/useGetTasks";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
 import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
-import { ReactQueryDevtools } from "react-query/devtools";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 import { MiniPagesContext } from "@/context/MiniPagesContext.jsx";
 import { useQueryClient } from "react-query";
 import { openDatabase } from "./functions/openDatabase";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 const syncTasks = async (queryClient) => {
   const db = await openDatabase();
