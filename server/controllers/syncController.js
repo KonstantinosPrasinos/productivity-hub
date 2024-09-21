@@ -97,7 +97,11 @@ const handleSync = async (req, res) => {
           { returnDocument: "after" },
         );
 
-        entriesResponse.push(newEntry);
+        if (newEntry) {
+          // todo handle all stuff like this because it may help with editing something that has been deleted.
+          // if false here then tell the user an edit was attempted to be made to something that was deleted
+          entriesResponse.push(newEntry);
+        }
       } catch (error) {
         errors.entryEditErrors.push(error.message);
       }

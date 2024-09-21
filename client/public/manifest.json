@@ -1,6 +1,7 @@
 {
  "name": "Taskflow",
  "short_name": "Taskflow",
+ "display": "standalone",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",

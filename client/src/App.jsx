@@ -47,16 +47,17 @@ const syncTasks = async (queryClient) => {
 
   const filteredTasks = tasks.filter((task) => task?.toDelete !== true);
 
-  const currentDate = new Date();
-  currentDate.setUTCHours(0, 0, 0, 0);
-  const currentDateString = currentDate.toISOString();
+  for (const task of filteredTasks) {
+    const taskEntry = entries.find(
+      (entry) => entry._id === task.currentEntryId,
+    );
 
-  for (const entry of entries) {
-    // if (entry.date !== currentDateString) continue;
-
-    queryClient.setQueryData(["task-entries", entry.taskId, entry._id], () => {
-      return { entry };
-    });
+    queryClient.setQueryData(
+      ["task-entries", taskEntry.taskId, taskEntry._id],
+      () => {
+        return { entry: taskEntry };
+      },
+    );
   }
 
   queryClient.setQueryData(["tasks"], () => {

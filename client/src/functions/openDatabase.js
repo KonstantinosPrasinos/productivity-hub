@@ -219,10 +219,19 @@ export const getSettingsFromDB = async () => {
 };
 
 export const setTasksInDatabase = async (tempTasks = []) => {
+  // todo delete all the tasks that do not have "mustSync" set to false, this makes sure that edits are always being synced
   const db = await openDatabase();
 
   const transaction = db.transaction(["tasks"], "readwrite");
   const taskStore = transaction.objectStore("tasks");
+
+  const tasks = await taskStore.getAll();
+
+  for (const task of tasks) {
+    if (!task?.mustSync) {
+      await taskStore.delete(task._id);
+    }
+  }
 
   for (const task of tempTasks) {
     await taskStore.put({ ...task, mustSync: false });
