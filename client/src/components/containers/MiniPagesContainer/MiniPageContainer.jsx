@@ -21,6 +21,7 @@ const MiniPageContainer = ({
   index,
   showSaveButton = true,
   collapsedFocusedElement,
+  actionButtons = [],
 }) => {
   const containerRef = useRef();
   const handleRef = useRef();
@@ -63,7 +64,7 @@ const MiniPageContainer = ({
       const { height: focusedElementHeight } =
         collapsedFocusedElement.current.getBoundingClientRect();
       const { marginTop, marginBottom } = window.getComputedStyle(
-        collapsedFocusedElement.current
+        collapsedFocusedElement.current,
       );
 
       animationControls.start({
@@ -116,18 +117,18 @@ const MiniPageContainer = ({
   useEffect(() => {
     if (index !== length - 1) {
       animationControls.start(
-        screenSize === "small" ? "mobileCollapsed" : "desktopCollapsed"
+        screenSize === "small" ? "mobileCollapsed" : "desktopCollapsed",
       );
     } else {
       animationControls.start(
-        screenSize === "small" ? "mobileExtended" : "desktopExtended"
+        screenSize === "small" ? "mobileExtended" : "desktopExtended",
       );
     }
   }, [length, index]);
 
   useEffect(() => {
     animationControls.start(
-      screenSize === "small" ? "mobileExtended" : "desktopExtended"
+      screenSize === "small" ? "mobileExtended" : "desktopExtended",
     );
   }, []);
 
@@ -175,6 +176,7 @@ const MiniPageContainer = ({
           <IconButton onClick={closeMinipage}>
             <TbX />
           </IconButton>
+          <div className={"Horizontal-Flex-Container"}>{...actionButtons}</div>
           {showSaveButton && <Button onClick={onClickSave}>Save</Button>}
         </div>
       </div>

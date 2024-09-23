@@ -638,27 +638,42 @@ const TaskView = ({ index, length, task }) => {
         length={length}
         showSaveButton={false}
         collapsedFocusedElement={collapsedFocusedElement}
+        actionButtons={[
+          <IconButton
+            onClick={() =>
+              miniPagesContext.dispatch({
+                type: "ADD_PAGE",
+                payload: { type: "new-task", id: task?._id },
+              })
+            }
+          >
+            <TbEdit />
+          </IconButton>,
+          <IconButton onClick={handleDeleteClick}>
+            <TbTrash />
+          </IconButton>,
+        ]}
       >
         <section
           className={`Horizontal-Flex-Container Space-Between`}
           ref={collapsedFocusedElement}
         >
           <div className={"Title"}>{task?.title}</div>
-          <div className={`Horizontal-Flex-Container ${styles.editIcons}`}>
-            <IconButton
-              onClick={() =>
-                miniPagesContext.dispatch({
-                  type: "ADD_PAGE",
-                  payload: { type: "new-task", id: task?._id },
-                })
-              }
-            >
-              <TbEdit />
-            </IconButton>
-            <IconButton onClick={handleDeleteClick}>
-              <TbTrash />
-            </IconButton>
-          </div>
+          {/*<div className={`Horizontal-Flex-Container ${styles.editIcons}`}>*/}
+          {/*  <IconButton*/}
+          {/*    onClick={() =>*/}
+          {/*      miniPagesContext.dispatch({*/}
+          {/*        type: "ADD_PAGE",*/}
+          {/*        payload: { type: "new-task", id: task?._id },*/}
+          {/*      })*/}
+          {/*    }*/}
+          {/*  >*/}
+          {/*    <TbEdit />*/}
+          {/*  </IconButton>*/}
+          {/*  <IconButton onClick={handleDeleteClick}>*/}
+          {/*    <TbTrash />*/}
+          {/*  </IconButton>*/}
+          {/*</div>*/}
         </section>
         <section className={"Horizontal-Flex-Container"}>
           <div className={"Label"}>Category:</div>

@@ -526,6 +526,21 @@ const CategoryView = ({ index, length, category }) => {
       length={length}
       showSaveButton={false}
       collapsedFocusedElement={collapsedFocusedElement}
+      actionButtons={[
+        <IconButton
+          onClick={() =>
+            miniPagesContext.dispatch({
+              type: "ADD_PAGE",
+              payload: { type: "new-category", id: category._id },
+            })
+          }
+        >
+          <TbEdit />
+        </IconButton>,
+        <IconButton onClick={handleDeleteButton}>
+          <TbTrash />
+        </IconButton>,
+      ]}
     >
       <section
         className={`Horizontal-Flex-Container Space-Between`}
@@ -534,21 +549,6 @@ const CategoryView = ({ index, length, category }) => {
         <div className={"Horizontal-Flex-Container"}>
           <div className={`${styles.dot} ${category.color}`}></div>
           <div className={"Title"}>{category.title}</div>
-        </div>
-        <div>
-          <IconButton
-            onClick={() =>
-              miniPagesContext.dispatch({
-                type: "ADD_PAGE",
-                payload: { type: "new-category", id: category._id },
-              })
-            }
-          >
-            <TbEdit />
-          </IconButton>
-          <IconButton onClick={handleDeleteButton}>
-            <TbTrash />
-          </IconButton>
         </div>
       </section>
       <CollapsibleContainer hasBorder={false} isVisible={deletePromptVisible}>
