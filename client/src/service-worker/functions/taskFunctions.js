@@ -25,11 +25,14 @@ export const getTasksFromDB = async () => {
   const existingEntries = [];
 
   filteredTasks.forEach((task) => {
-    let todayEntry = entries.find(
-      (entry) =>
-        entry.taskId === task._id &&
-        (task?.repeats ? entry.date === today.toISOString() : true),
-    );
+    const searchParameter = task?.repeats
+      ? (entry) => entry.taskId === task._id
+      : (entry) =>
+          entry.taskId === task._id && entry.date === today.toISOString();
+
+    let todayEntry = entries.find(searchParameter);
+
+    console.log(todayEntry);
 
     if (!todayEntry) {
       todayEntry = {
