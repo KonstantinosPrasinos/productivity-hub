@@ -34,9 +34,9 @@ export const getTasksFromDB = async () => {
       searchParameter = searchParameter = (entry) => entry.taskId === task._id;
     }
 
-    let todayEntry = entries.find(searchParameter);
+    let todayEntry = entries.filter(searchParameter);
 
-    console.log(todayEntry);
+    console.log(task, todayEntry);
 
     if (!todayEntry) {
       todayEntry = {
@@ -52,15 +52,12 @@ export const getTasksFromDB = async () => {
         isNew: true,
       };
 
-      console.log(task, todayEntry);
-
       newEntries.push(todayEntry);
     } else {
       existingEntries.push(todayEntry);
     }
 
     task.currentEntryId = todayEntry._id;
-    console.log(task);
   });
 
   // Add all the new entries to the db
