@@ -244,6 +244,14 @@ export const setEntriesInDatabase = async (tempEntries = []) => {
   const transaction = db.transaction(["entries"], "readwrite");
   const entryStore = transaction.objectStore("entries");
 
+  const entries = await entryStore.getAll();
+
+  for (const entry of entries) {
+    if (!entry?.mustSync) {
+      await entryStore.delete(entry._id);
+    }
+  }
+
   for (const entry of tempEntries) {
     await entryStore.put({ ...entry, mustSync: false });
   }
