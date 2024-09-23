@@ -34,9 +34,7 @@ export const getTasksFromDB = async () => {
       searchParameter = searchParameter = (entry) => entry.taskId === task._id;
     }
 
-    let todayEntry = entries.filter(searchParameter);
-
-    console.log(task, todayEntry);
+    let todayEntry = entries.find(searchParameter);
 
     if (!todayEntry) {
       todayEntry = {
