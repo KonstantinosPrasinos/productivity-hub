@@ -125,7 +125,7 @@ const NewTask = ({ index, length, id }) => {
       if (task.type === "Number") {
         setIsNumberTask(true);
         setStep(task.step);
-        if (task?.goal?.type) {
+        if (task?.goal?.limit) {
           setHasGoal(true);
           setGoalLimit(task.goal.type);
           setGoalNumber(task.goal.number);
