@@ -32,6 +32,7 @@ const CategoryChips = ({
   categoryFilter,
   setCategoryFilter,
   expandDirection = "vertical",
+  toggleSearchVisibility = () => {},
 }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
@@ -91,6 +92,7 @@ const CategoryChips = ({
 
   const handleContextMenu = (event, category) => {
     event.preventDefault();
+    toggleSearchVisibility();
     miniPagesContext.dispatch({
       type: "ADD_PAGE",
       payload: { type: "category-view", id: category._id },
@@ -382,6 +384,7 @@ const SearchScreen = ({
                 categoryFilter={categoryFilter}
                 setCategoryFilter={setCategoryFilter}
                 expandDirection={"horizontal"}
+                toggleSearchVisibility={toggleVisibility}
               />
               <Button
                 onClick={handleNewClick}
