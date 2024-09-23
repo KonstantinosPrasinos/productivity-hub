@@ -37,15 +37,33 @@
       border: 1px solid var(--border-primary-color);
     }
 
-    &:focus + .descriptionLengthCounter {
+    &:focus + .lengthCounter {
       opacity: v.$opacity-low;
     }
 }
 
-.descriptionLengthCounter {
+.lengthCounter {
   position: absolute;
   bottom: -0.75em;
   right: 10px;
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
+}
+
+.titleContainer {
+  position: relative;
+}
+
+.titleInput {
+  @extend .Title-Large;
+  width: 100%;
+
+  & + .lengthCounter {
+    bottom: calc(-1em - 10px);
+    right: 0;
+  }
+
+  &:focus + .lengthCounter {
+    opacity: v.$opacity-low;
+  }
 }

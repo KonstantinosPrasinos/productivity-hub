@@ -375,15 +375,19 @@ const NewTask = ({ index, length, id }) => {
         length={length}
         collapsedFocusedElement={titleRef}
       >
-        <input
-          type="text"
-          className="Title-Large"
-          placeholder="Add task title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          ref={titleRef}
-        />
+        <div className={styles.titleContainer}>
+          <input
+            type="text"
+            className={styles.titleInput}
+            placeholder="Add task title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            ref={titleRef}
+            maxLength={100}
+          />
+          <div className={styles.lengthCounter}>{title.length} / 100</div>
+        </div>
         <InputWrapper label="Description">
           <textarea
             className={styles.descriptionTextArea}
@@ -395,9 +399,7 @@ const NewTask = ({ index, length, id }) => {
             placeholder="Add task description"
             ref={descriptionRef}
           />
-          <div className={styles.descriptionLengthCounter}>
-            {description.length} / 500
-          </div>
+          <div className={styles.lengthCounter}>{description.length} / 500</div>
         </InputWrapper>
         <InputWrapper label="Priority">
           <TextBoxInput
