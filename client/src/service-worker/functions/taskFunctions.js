@@ -45,12 +45,15 @@ export const getTasksFromDB = async () => {
         isNew: true,
       };
 
+      console.log(task, todayEntry);
+
       newEntries.push(todayEntry);
     } else {
       existingEntries.push(todayEntry);
     }
 
     task.currentEntryId = todayEntry._id;
+    console.log(task);
   });
 
   // Add all the new entries to the db
