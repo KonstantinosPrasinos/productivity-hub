@@ -577,13 +577,13 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
       setTitle(category.title);
       setColor(category.color);
+      setPriority(category.priority);
 
       if (category?.repeatRate?.number) {
         setRepeats(true);
 
         setTimePeriodNumber(category.repeatRate.number);
         setTimePeriod(category.repeatRate.bigTimePeriod);
-        setPriority(category.priority);
       }
 
       if (category?.goal?.number) {
