@@ -183,7 +183,6 @@ self.addEventListener("fetch", async (event) => {
                   });
                   handleSync();
                 } else {
-                  console.log("Adding task");
                   addTaskToServer(event, savedData, self);
                 }
 

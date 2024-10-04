@@ -257,6 +257,14 @@ export const setEntriesInDatabase = async (tempEntries = []) => {
   }
 };
 
+export const clearDatabase = async () => {
+  const objectStores = ["tasks", "entries", "categories", "groups", "settings"];
+
+  for (const objectStore of objectStores) {
+    await clearDatabase(objectStore);
+  }
+};
+
 export const clearObjectStore = async (objectStore = "") => {
   const db = await openDatabase();
 

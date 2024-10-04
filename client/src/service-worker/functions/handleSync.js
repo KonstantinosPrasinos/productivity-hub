@@ -555,7 +555,6 @@ const handleRemainingRequests = async () => {
       } else {
         switch (requestUrl) {
           case "/task/create":
-            console.log("adding task to server");
             await addTaskToServer(eventObj, eventObj.savedData, self);
             break;
           case "/category/create":
@@ -606,9 +605,6 @@ export const handleSync = async () => {
     await handleCleanup();
 
     const syncData = await prepareSyncData();
-
-    console.log(syncData);
-
     if (!syncData.shouldSync) {
       self.mustSync = false;
       self.isSyncing = false;
