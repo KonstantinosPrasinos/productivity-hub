@@ -260,9 +260,15 @@ export const setEntriesInDatabase = async (tempEntries = []) => {
 export const clearDatabase = async () => {
   const objectStores = ["tasks", "entries", "categories", "groups", "settings"];
 
-  for (const objectStore of objectStores) {
-    await clearDatabase(objectStore);
-  }
+  const db = await openDatabase();
+
+  const transaction = db.transaction(objectStores, "readwrite");
+
+  await transaction.objectStore("tasks").clear();
+  await transaction.objectStore("entries").clear();
+  await transaction.objectStore("categories").clear();
+  await transaction.objectStore("groups").clear();
+  await transaction.objectStore("settings").clear();
 };
 
 export const clearObjectStore = async (objectStore = "") => {
