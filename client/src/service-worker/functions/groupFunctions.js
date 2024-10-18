@@ -65,6 +65,9 @@ export const handleGroupGetRequest = async (request, sw) => {
   });
 
   if (!groupResponse.ok) {
+    if (groupResponse.code === 401) {
+      await messageClient(sw, "UNAUTHORIZED");
+    }
     self.mustSync = true;
     self.requestEventQueue.push(request);
 

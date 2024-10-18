@@ -33,7 +33,7 @@ import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 import { MiniPagesContext } from "@/context/MiniPagesContext.jsx";
 import { useQueryClient } from "react-query";
-import { openDatabase } from "./functions/openDatabase";
+import { clearDatabase, openDatabase } from "./functions/openDatabase";
 import { ReactQueryDevtools } from "react-query/devtools";
 
 const syncTasks = async (queryClient) => {
@@ -134,6 +134,14 @@ const syncTaskEntries = async (queryClient, taskId) => {
   });
 };
 
+const localLogout = async (queryClient, userContext) => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("settings");
+  userContext.dispatch({ type: "REMOVE_USER" });
+  queryClient.removeQueries();
+  await clearDatabase();
+};
+
 const NavLayout = () => {
   // Server state
   const { isLoading: settingsLoading } = useGetSettings();
@@ -143,6 +151,7 @@ const NavLayout = () => {
   const queryClient = useQueryClient();
 
   const miniPagesContext = useContext(MiniPagesContext);
+  const userContext = useContext(UserContext);
 
   const eventListenerExits = useRef(false);
   const serviceWorkerListenerExists = useRef(false);
@@ -213,6 +222,9 @@ const NavLayout = () => {
                 syncCategories(queryClient);
                 syncGroups(queryClient);
                 syncTasks(queryClient);
+                break;
+              case "UNAUTHORIZED":
+                localLogout(queryClient, userContext);
                 break;
               default:
                 if (/UPDATE_ENTRIES_*/.test(type)) {

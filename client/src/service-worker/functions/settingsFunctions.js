@@ -41,6 +41,9 @@ export const handleSettingsGetRequest = async (request, sw) => {
   });
 
   if (!settingsResponse.ok) {
+    if (settingsResponse.code === 401) {
+      await messageClient(sw, "UNAUTHORIZED");
+    }
     self.mustSync = true;
     self.requestEventQueue.push(request);
 

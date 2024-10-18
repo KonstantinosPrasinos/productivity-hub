@@ -71,6 +71,9 @@ export const handleCategoryGetRequest = async (request, sw) => {
   });
 
   if (!categoryResponse.ok) {
+    if (categoryResponse.code === 401) {
+      await messageClient(sw, "UNAUTHORIZED");
+    }
     self.mustSync = true;
     self.requestEventQueue.push(request);
 

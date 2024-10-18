@@ -215,6 +215,10 @@ export const handleTaskGetRequest = async (request, sw) => {
   });
 
   if (!response.ok) {
+    if (response.code === 401) {
+      await messageClient(sw, "UNAUTHORIZED");
+    }
+
     self.mustSync = true;
     self.requestEventQueue.push(request);
 
