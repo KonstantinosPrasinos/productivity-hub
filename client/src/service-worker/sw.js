@@ -55,19 +55,6 @@ const resetState = () => {
   self.timeoutExists = false;
 };
 
-const executeSyncIn5Minutes = () => {
-  if (!self.timeoutExists) {
-    self.timeoutExists = true;
-    setTimeout(
-      () => {
-        self.timeoutExists = false;
-        handleSync();
-      },
-      5 * 60 * 1000,
-    );
-  }
-};
-
 // self.addEventListener("periodicsync", handleSync);
 
 self.addEventListener("install", () => void self.skipWaiting());

@@ -52,6 +52,7 @@ const corsOptions = {
   origin: [
     "https://productivity-hub-website.vercel.app",
     "http://localhost:5173",
+      "https://taskflow.kprasinos.com"
   ],
   methods: ["POST", "GET"],
   credentials: true,
