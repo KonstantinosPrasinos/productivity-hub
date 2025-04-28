@@ -1,53 +1,6 @@
 @use "@/styles/variables" as v;
 @use "@/styles/index";
 
-@media (max-width: v.$phone-breakpoint) {
-  .categoryChipContainer {
-    flex-direction: row;
-    padding: 4px 0;
-    overflow-x: auto;
-    max-width: calc(100% - 20px);
-    margin: 0 10px;
-    box-sizing: border-box;
-
-    & > :first-child {
-      margin-left: 4px;
-    }
-  
-    & > :last-child {
-      margin-right: 4px;
-    }
-  }
-
-  .container {
-    flex-direction: column-reverse;
-    // width: calc(22.15em + 20px);
-    // min-width: calc(22.15em + 20px);
-    width: 100%;
-  }
-
-  .leftSide {
-    width: 100%;
-    padding: 0.5em 10px 0.5em 10px;
-  }
-}
-
-@media (min-width: v.$phone-breakpoint) {
-  .categoryChipContainer {
-    padding: 4px;
-    overflow: hidden;
-    max-width: 15rem;
-    max-height: 100%;
-  }
-
-  .leftSide {
-    height: 100%;
-    width: 25em;
-    min-width: 25em;
-    padding: 0 10px 0.5em 10px;
-  }
-}
-
 .container {
   @extend .Horizontal-Flex-Container;
   overflow: hidden;
@@ -315,4 +268,71 @@
   font-size: inherit;
 
   animation: appearAnimation 0.2s ease-out;
+}
+
+@media (max-width: v.$phone-breakpoint) {
+  .categoryChipContainer {
+    flex-direction: row;
+    padding: 4px 0;
+    overflow-x: auto;
+    max-width: calc(100% - 20px);
+    margin: 0 10px;
+    box-sizing: border-box;
+
+    & > :first-child {
+      margin-left: 4px;
+    }
+
+    & > :last-child {
+      margin-right: 4px;
+    }
+  }
+
+  .container {
+    flex-direction: column-reverse;
+    // width: calc(22.15em + 20px);
+    // min-width: calc(22.15em + 20px);
+    width: 100%;
+  }
+
+  .leftSide {
+    width: 100%;
+    padding: 0.5em 10px 0.5em 10px;
+  }
+
+  .categoryFilters {
+    box-sizing: border-box;
+    height: 100%;
+    flex-wrap: nowrap;
+    padding-bottom: 0;
+    overflow-y: auto;
+
+    & > :last-child {
+      margin-bottom: calc(1em + 60px);
+    }
+
+    & > * {
+      flex-shrink: 0;
+    }
+  }
+
+  .searchBar {
+    background: linear-gradient(to bottom, transparent, var(--background-color));
+  }
+}
+
+@media (min-width: v.$phone-breakpoint) {
+  .categoryChipContainer {
+    padding: 4px;
+    overflow: hidden;
+    max-width: 15rem;
+    max-height: 100%;
+  }
+
+  .leftSide {
+    height: 100%;
+    width: 25em;
+    min-width: 25em;
+    padding: 0 10px 0.5em 10px;
+  }
 }
