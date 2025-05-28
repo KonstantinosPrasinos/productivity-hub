@@ -2,10 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "set NODE_ENV=dev && node server.js",
-    "dev": "nodemon server.js",
+    "start": "set NODE_ENV=dev && node index.js",
+    "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --testTimeout=20000"
   },
   "keywords": [],

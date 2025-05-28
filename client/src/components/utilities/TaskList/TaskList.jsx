@@ -220,21 +220,21 @@ const CategoryChips = ({
 };
 
 const BigScreenFilters = ({
-  categories,
-  subCategories,
-  categoryFilter,
-  setCategoryFilter,
-  searchFilter,
-  setSearchFilter,
-  showNonCurrentTasks,
-  setShowNonCurrentTasks,
-}) => {
+                            categories,
+                            subCategories,
+                            categoryFilter,
+                            setCategoryFilter,
+                            searchFilter,
+                            setSearchFilter,
+                            showNonCurrentTasks,
+                            setShowNonCurrentTasks,
+                          }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
   const toggleNoCategory = () => {
     if (categoryFilter.find((category) => category._id === "-1")) {
       setCategoryFilter(
-        categoryFilter.filter((tempCategory) => tempCategory._id != "-1"),
+          categoryFilter.filter((tempCategory) => tempCategory._id != "-1"),
       );
     } else {
       setCategoryFilter([
@@ -252,54 +252,54 @@ const BigScreenFilters = ({
   };
 
   return (
-    <>
-      <div className={styles.categoryChipContainer}>
-        <SearchBar
-          isStandalone={true}
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-        />
-        <Chip
-          value={true}
-          hasShadow={true}
-          size={"small"}
-          selected={showNonCurrentTasks}
-          setSelected={() => setShowNonCurrentTasks(!showNonCurrentTasks)}
-        >
-          Show non-current tasks
-        </Chip>
-        <Chip
-          value={-1}
-          setSelected={() => toggleNoCategory()}
-          selected={
-            categoryFilter.find((category) => category._id === "-1") ? -1 : null
-          }
-          hasShadow={true}
-          size={"small"}
-        >
-          No category
-        </Chip>
-        <div className={styles.filterLabel}>Categories:</div>
-        <CategoryChips
-          categories={categories}
-          subCategories={subCategories}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-        />
-        <Button
-          onClick={handleNewClick}
-          filled={false}
-          type={"square"}
-          hasShadow={true}
-          size="small"
-        >
+      <>
+        <div className={styles.categoryChipContainer}>
+          <SearchBar
+              isStandalone={true}
+              searchFilter={searchFilter}
+              setSearchFilter={setSearchFilter}
+          />
+          <Chip
+              value={true}
+              hasShadow={true}
+              size={"small"}
+              selected={showNonCurrentTasks}
+              setSelected={() => setShowNonCurrentTasks(!showNonCurrentTasks)}
+          >
+            Show non-current tasks
+          </Chip>
+          <Chip
+              value={-1}
+              setSelected={() => toggleNoCategory()}
+              selected={
+                categoryFilter.find((category) => category._id === "-1") ? -1 : null
+              }
+              hasShadow={true}
+              size={"small"}
+          >
+            No category
+          </Chip>
+          <div className={styles.filterLabel}>Categories:</div>
+          <CategoryChips
+              categories={categories}
+              subCategories={subCategories}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+          />
+          <Button
+              onClick={handleNewClick}
+              filled={false}
+              type={"square"}
+              hasShadow={true}
+              size="small"
+          >
           <span className="Horizontal-Flex-Container">
             Add new
             <TbPlus />
           </span>
-        </Button>
-      </div>
-    </>
+          </Button>
+        </div>
+      </>
   );
 };
 
@@ -340,7 +340,6 @@ const SearchScreen = ({
   subCategories,
   toggleVisibility,
   searchFilter,
-  setSearchFilter,
   showNonCurrentTasks,
   setShowNonCurrentTasks,
 }) => {
@@ -365,14 +364,6 @@ const SearchScreen = ({
       type: "ADD_PAGE",
       payload: { type: "new-category" },
     });
-  };
-
-  const handleSearchVarButtonClick = () => {
-    if (searchFilter.length === 0) {
-      toggleVisibility();
-    } else {
-      setSearchFilter("");
-    }
   };
   return (
     <>
@@ -428,23 +419,6 @@ const SearchScreen = ({
           </div>
         </motion.div>
       )}
-      <motion.div
-        className={styles.searchBar}
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 100 }}
-      >
-        <SearchBar
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-        />
-        <button
-          className={styles.closeSearchBarButton}
-          onClick={handleSearchVarButtonClick}
-        >
-          {searchFilter.length === 0 ? <TbX /> : <TbEraser />}
-        </button>
-      </motion.div>
     </>
   );
 };
@@ -459,11 +433,17 @@ const TaskList = ({
   const { data: subCategories } = useGetGroups();
   const leftRef = useRef();
   const { screenSize } = useScreenSize();
-  const [searchFilter, setSearchFilter] = useState("");
 
   const componentCommunicationContext = useContext(
     ComponentCommunicationContext,
   );
+
+  const setSearchFilter = (value) => {
+    componentCommunicationContext.dispatch({
+      type: "SET_SEARCH_QUERY",
+      payload: value,
+    });
+  }
 
   const setCategoryFilter = (value) => {
     componentCommunicationContext.dispatch({
@@ -475,7 +455,7 @@ const TaskList = ({
   const filteredTasks = useMemo(() => {
     if (
       componentCommunicationContext.state.filters.length == 0 &&
-      searchFilter.length === 0
+      componentCommunicationContext.state.searchQuery.length === 0
     )
       return tasks;
 
@@ -497,7 +477,7 @@ const TaskList = ({
         if (matchesSubcategory && matchesCategory) {
           let taskFilteredBySearch;
 
-          if (searchFilter.length === 0) {
+          if (componentCommunicationContext.state.searchQuery.length === 0) {
             taskFilteredBySearch = currentTask;
           } else {
             taskFilteredBySearch = {
@@ -505,7 +485,7 @@ const TaskList = ({
               tasks: currentTask.tasks.filter((tempTask) =>
                 tempTask.title
                   .toLowerCase()
-                  .includes(searchFilter.toLowerCase()),
+                  .includes(componentCommunicationContext.state.searchQuery.toLowerCase()),
               ),
             };
           }
@@ -522,15 +502,15 @@ const TaskList = ({
           );
 
         const matchesSearch =
-          searchFilter.length === 0 ||
-          currentTask.title.toLowerCase().includes(searchFilter.toLowerCase());
+          componentCommunicationContext.state.searchQuery.length === 0 ||
+          currentTask.title.toLowerCase().includes(componentCommunicationContext.state.searchQuery.toLowerCase());
 
         if (showNoCategory && matchesSearch) reducedTasks.push(currentTask);
       }
 
       return reducedTasks;
     }, []);
-  }, [componentCommunicationContext.state.filters, tasks, searchFilter]);
+  }, [componentCommunicationContext.state.filters, tasks, componentCommunicationContext.state.searchQuery]);
 
   const toggleSearchVisibility = () => {
     componentCommunicationContext.dispatch({
@@ -556,8 +536,7 @@ const TaskList = ({
               categories={categories}
               subCategories={subCategories}
               toggleVisibility={toggleSearchVisibility}
-              searchFilter={searchFilter}
-              setSearchFilter={setSearchFilter}
+              searchFilter={componentCommunicationContext.state.searchQuery}
               showNonCurrentTasks={showNonCurrentTasks}
               setShowNonCurrentTasks={setShowNonCurrentTasks}
             />
@@ -608,9 +587,9 @@ const TaskList = ({
           setCategoryFilter={setCategoryFilter}
           categories={categories}
           subCategories={subCategories}
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
           showNonCurrentTasks={showNonCurrentTasks}
+          searchFilter={componentCommunicationContext.state.searchQuery}
+          setSearchFilter={setSearchFilter}
           setShowNonCurrentTasks={setShowNonCurrentTasks}
         />
       )}

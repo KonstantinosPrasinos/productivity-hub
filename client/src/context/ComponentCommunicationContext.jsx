@@ -8,6 +8,8 @@ export const componentCommunicationReducer = (state, action) => {
       return { ...state, searchScreenVisible: action.payload };
     case "SET_TASK_FILTERS":
       return { ...state, filters: action.payload };
+    case "SET_SEARCH_QUERY":
+      return {...state, searchQuery: action.payload};
     default:
       return state;
   }
@@ -17,6 +19,7 @@ const ComponentCommunicationContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(componentCommunicationReducer, {
     searchScreenVisible: false,
     filters: [],
+    searchQuery: "",
   });
 
   return (

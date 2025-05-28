@@ -40,8 +40,8 @@ app.use(
     proxy: true,
     name: "ProductivityHubCookie",
     cookie: {
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       httpOnly: false,
       maxAge: 30 * 24 * 60 * 60 * 1000, // One month
     },
@@ -52,7 +52,7 @@ const corsOptions = {
   origin: [
     "https://productivity-hub-website.vercel.app",
     "http://localhost:5173",
-      "https://taskflow.kprasinos.com"
+    "https://taskflow.kprasinos.com"
   ],
   methods: ["POST", "GET"],
   credentials: true,

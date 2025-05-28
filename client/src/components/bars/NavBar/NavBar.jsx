@@ -1,27 +1,100 @@
-import { useContext, useEffect, useState } from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import styles from "./NavBar.module.scss";
-import IconButton from "../../buttons/IconButton/IconButton";
-import Button from "../../buttons/Button/Button";
-import { TbHome, TbPlus, TbSearch, TbSettings } from "react-icons/tb";
+import {TbHome, TbPlus, TbSearch, TbSettings, TbZoomCheck} from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MiniPagesContext } from "../../../context/MiniPagesContext";
-import { motion } from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import ConnectionBadges from "@/components/utilities/ConnectionBadges/ConnectionBadges";
 import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext.jsx";
+
+const mobileVariants = {
+  initial: {
+    y : "3em",
+    scale: 0,
+  },
+  animate: {
+    y: 0,
+    scale: 1,
+  },
+};
+
+const navBarVariants = {
+  initial: {
+    width: 132,
+    gap: "30px"
+  },
+  search: {
+    width: "calc(100% - 110px)",
+    gap: "10px"
+  }
+};
+
+const addButtonVariants = {
+  initial: {
+    rotate: 0,
+    borderRadius: "10px"
+  },
+  search: {
+    rotate: 45,
+    borderRadius: "50%",
+  }
+}
+
+const NavigationButton = ({onClick = () => {}, selected = false, children}) => {
+  return <button className={`${styles.navButton} ${selected ? styles.selected : ""}`} onClick={onClick}>
+    {children}
+  </button>
+}
 
 const NavBar = () => {
   const navigate = useNavigate();
-
   const location = useLocation();
-
-  const [selected, setSelected] = useState(null);
+  const { screenSize } = useScreenSize();
 
   const miniPagesContext = useContext(MiniPagesContext);
   const componentCommunicationContext = useContext(
     ComponentCommunicationContext,
   );
+
+  const [selected, setSelected] = useState(null);
+
+  const handleNavigation = useCallback((route) => {
+    setSelected(route.substring(1));
+    navigate(route, { replace: true })
+  }, [navigate]);
+
+  const handleSearchClick = useCallback(() => {
+    setSelected("search");
+
+    componentCommunicationContext.dispatch({
+      type: "SET_SEARCH_SCREEN_VISIBLE",
+      payload: true,
+    })
+  }, [componentCommunicationContext]);
+
+  const handleCreateClick = useCallback(() => {
+    if (selected === "search") {
+      // When the search bar is open the add button acts like the close button
+      setSelected("home");
+      componentCommunicationContext.dispatch({
+        type: "SET_SEARCH_SCREEN_VISIBLE",
+        payload: false,
+      })
+    } else {
+      miniPagesContext.dispatch({
+        type: "ADD_PAGE",
+        payload: { type: "new-task" },
+      })
+    }
+  }, [selected]);
+
+  const handleChange = useCallback((input) => {
+    componentCommunicationContext.dispatch({
+      type: "SET_SEARCH_QUERY",
+      payload: input.target.value,
+    })
+  }, [componentCommunicationContext]);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -40,89 +113,74 @@ const NavBar = () => {
     }
   }, [location]);
 
-  const { screenSize } = useScreenSize();
-
-  const variants = {
-    initial: screenSize === "small" ? { y: "3em" } : { x: "-3em" },
-    animate: screenSize === "small" ? { y: 0 } : { x: 0 },
-  };
-
-  return (
-    <motion.div
-      className={styles.container}
+  return <motion.div
+      className={styles.newContainer}
+      transition={{duration: 0.4, type: "spring"}}
       initial={"initial"}
       animate={"animate"}
-      variants={variants}
-    >
-      <div className={`${styles.navBar}`}>
-        <div className={styles.item}>
-          <IconButton
-            onClick={() => navigate("/", { replace: true })}
-            selected={selected === "home"}
-            // setSelected={() => setSelected('home')}
-          >
-            <TbHome />
-          </IconButton>
-          {selected === "home" && (
-            <motion.div className={styles.selectedBar} layoutId={"underline"} />
-          )}
-        </div>
-        {screenSize === "small" && (
-          <div className={styles.item}>
-            <IconButton
-              onClick={() =>
-                componentCommunicationContext.dispatch({
-                  type: "SET_SEARCH_SCREEN_VISIBLE",
-                  payload: true,
-                })
-              }
-              selected={selected === "search"}
-            >
-              <TbSearch />
-            </IconButton>
-            {componentCommunicationContext.state.filters.length > 0 && (
-              <div
-                className={styles.filterCounter}
-                style={{
-                  right:
-                    -(
-                      componentCommunicationContext.state.filters.length.toString()
-                        .length - 1
-                    ) * 2,
-                }}
-              >
-                {componentCommunicationContext.state.filters.length}
-              </div>
-            )}
-          </div>
-        )}
-        <div className={styles.item}>
-          <IconButton
-            onClick={() => navigate("/settings", { replace: true })}
-            selected={selected === "settings"}
-          >
-            <TbSettings />
-          </IconButton>
-          {selected === "settings" && (
-            <motion.div className={styles.selectedBar} layoutId={"underline"} />
-          )}
-        </div>
-        <Button
-          type="square"
-          symmetrical={true}
-          onClick={() =>
-            miniPagesContext.dispatch({
-              type: "ADD_PAGE",
-              payload: { type: "new-task" },
-            })
-          }
+      variants={mobileVariants}
+  >
+    <motion.div className={styles.newNavBar} animate={selected === "search" ? "search" : "initial"} variants={navBarVariants}>
+      <AnimatePresence mode={"popLayout"}>
+        {selected !== "search" && <motion.div
+            className={styles.item}
+            key={"home-button"}
+            animate={{scale: 1}}
+            exit={{scale: 0}}
         >
-          <TbPlus />
-        </Button>
-        <ConnectionBadges />
-      </div>
+          <NavigationButton
+              onClick={() => handleNavigation("/home")}
+              selected={selected === "home"}
+          >
+            <TbHome/>
+          </NavigationButton>
+        </motion.div>}
+        {screenSize === "small" && (
+            <div className={styles.item}>
+              <NavigationButton
+                  onClick={handleSearchClick}
+                  selected={selected === "search"}
+              >
+                {componentCommunicationContext.state.searchQuery !== "" || componentCommunicationContext.state.filters.length > 0 ? <TbZoomCheck /> : <TbSearch/>}
+              </NavigationButton>
+            </div>
+        )}
+        {
+          selected === "search" && <div className={styles.searchBar} key={"search-bar"}>
+              <motion.input
+                  initial={{opacity: 0}}
+                  animate={{opacity: 1}}
+                  className={styles.searchInput}
+                  placeholder="Search"
+                  onChange={handleChange}
+                  value={componentCommunicationContext.state.searchQuery}
+              ></motion.input>
+          </div>
+        }
+        {selected !== "search" && <motion.div
+            className={styles.item}
+            key={"settings-button"}
+            animate={{scale: 1}}
+            exit={{scale: 0}}
+        >
+          <NavigationButton
+              onClick={() => handleNavigation("/settings")}
+              selected={selected === "settings"}
+          >
+            <TbSettings/>
+          </NavigationButton>
+        </motion.div>}
+      </AnimatePresence>
     </motion.div>
-  );
+    <motion.button
+        className={styles.createButton}
+        onClick={handleCreateClick}
+        animate={selected === "search" ? "search" : "initial"}
+        variants={addButtonVariants}
+    >
+      <TbPlus />
+    </motion.button>
+  </motion.div>
 };
 
 export default NavBar;

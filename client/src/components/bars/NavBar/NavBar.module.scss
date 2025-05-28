@@ -1,20 +1,28 @@
 @use "@/styles/variables" as v;
+@use "@/styles/index";
 
 @media (max-width: v.$phone-breakpoint) {
   .container {
     order: 3;
+    border-radius: v.$button-border-radius;
+    display: flex;
+    gap: 10px;
   }
 
   .navBar {
-    height: 3em;
+    height: 1.75em;
     background-color: var(--surface-color);
     display: flex;
     align-items: center;
-    padding: v.$base-padding v.$base-padding 0;
+    padding: v.$base-padding;
     justify-content: space-around;
     border-top: v.$base-border;
     z-index: 3;
     flex-direction: row;
+    border-radius: v.$button-border-radius;
+    background: red;
+    width: min-content;
+    gap: 10px;
   }
   .item {
     height: 100%;
@@ -83,10 +91,90 @@
 .filterCounter {
   opacity: v.$opacity-very-low;
   position: absolute;
-  top: 2em;
+  top: 0;
   font-size: 12px;
 
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+@media (max-width: v.$phone-breakpoint) {
+  .newContainer {
+    width: 100%;
+    bottom: 0;
+
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+
+    padding-bottom: 10px;
+
+    & > * {
+      flex-grow: 0;
+    }
+  }
+
+  .newNavBar {
+    background-color: var(--surface-color);
+    border-radius: v.$button-border-radius;
+    box-shadow: v.$elevation-1;
+
+    display: flex;
+    gap: 30px;
+    align-items: center;
+
+    padding: 12px;
+  }
+}
+
+.newContainer {
+  z-index: 40;
+  position: fixed;
+}
+
+.navButton {
+  font-size: v.$font-xxl;
+  height: 1em;
+  opacity: v.$opacity-very-low;
+  transition: opacity 0.2s ease-out;
+  color: var(--primary-color);
+
+  &.selected {
+    opacity: 1;
+  }
+}
+
+.createButton {
+  font-size: v.$font-xxl;
+  transition: opacity 0.2s ease-out;
+
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+  border-radius: v.$base-border-radius;
+  box-shadow: v.$elevation-1;
+
+  display: flex;
+  align-items: center;
+}
+
+.searchBar {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.searchInput {
+  flex-grow: 1;
+  background-color: var(--surface-color);
+  font-size: v.$font-m;
+  opacity: v.$opacity-medium;
+}
+
+.standardButtons {
+  display: flex;
+  gap: 30px;
+  align-items: center;
 }

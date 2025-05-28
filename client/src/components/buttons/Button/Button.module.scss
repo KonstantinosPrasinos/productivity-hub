@@ -9,6 +9,7 @@
     color: var(--on-primary-color);
     transition: 0.2s box-shadow, 0.2s transform;
     font-size: v.$font-l;
+    height: min-content;
 
     &.square {
         border-radius: v.$base-border-radius;

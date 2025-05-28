@@ -8,7 +8,7 @@ import { useScreenSize } from "../../../hooks/useScreenSize";
 import { TbX } from "react-icons/tb";
 
 const animationVariants = {
-  mobileExtended: { y: 0 },
+  mobileExtended: { y: "5%" },
   mobileCollapsed: { y: "100%" },
   desktopCollapsed: { x: "100%" },
   desktopExtended: { x: 0 },
@@ -51,7 +51,7 @@ const MiniPageContainer = ({
 
   const makeFullHeight = () => {
     animationControls.set({ height: containerRef.current.offsetHeight });
-    animationControls.start({ height: `calc(100% - 4.5em)` });
+    animationControls.start({ height: `calc(95% - 4.5em)` });
     isCollapsed.current = false;
   };
 
