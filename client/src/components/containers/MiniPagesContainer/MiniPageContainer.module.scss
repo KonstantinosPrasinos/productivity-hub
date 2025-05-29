@@ -5,9 +5,9 @@
   .container {
     border-top: v.$base-border;
     width: 100%;
-    height: calc(100% - 4.5em);
-    bottom: 4.5em;
-    max-height: calc(100% - 4.5em);
+    height: 100%;
+    bottom: 0;
+    max-height: 100%;
     border-radius: 10px 10px 0 0;
   }
 }

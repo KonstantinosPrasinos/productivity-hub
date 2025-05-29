@@ -68,10 +68,10 @@
     display: flex;
     gap: 20px;
     justify-content: center;
-
     padding-bottom: 10px;
-
     position: fixed;
+
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--surface-color) 100%);
 
     & > * {
       flex-grow: 0;

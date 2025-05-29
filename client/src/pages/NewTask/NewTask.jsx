@@ -375,7 +375,7 @@ const NewTask = ({ index, length, id }) => {
         length={length}
         collapsedFocusedElement={titleRef}
       >
-        <div className={styles.titleContainer}>
+        <div className={styles.titleContainer} ref={titleRef}>
           <input
             type="text"
             className={styles.titleInput}
@@ -383,7 +383,6 @@ const NewTask = ({ index, length, id }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
-            ref={titleRef}
             maxLength={100}
           />
           <div className={styles.lengthCounter}>{title.length} / 100</div>

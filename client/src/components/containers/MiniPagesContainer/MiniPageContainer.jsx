@@ -51,7 +51,7 @@ const MiniPageContainer = ({
 
   const makeFullHeight = () => {
     animationControls.set({ height: containerRef.current.offsetHeight });
-    animationControls.start({ height: `calc(95% - 4.5em)` });
+    animationControls.start({ height: `95%` });
     isCollapsed.current = false;
   };
 
@@ -72,11 +72,12 @@ const MiniPageContainer = ({
           handleHeight +
           focusedElementHeight +
           parseFloat(marginTop) +
-          parseFloat(marginBottom)
+          parseFloat(marginBottom) +
+          58 // this is for the height of the nav bar
         }px`,
       });
     } else {
-      animationControls.start({ height: `calc(50% - 4.53em)` });
+      animationControls.start({ height: `50%` });
     }
 
     isCollapsed.current = true;
