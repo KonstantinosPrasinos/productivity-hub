@@ -519,6 +519,7 @@ const TaskList = ({
     });
   };
 
+  console.log(componentCommunicationContext.state);
   return (
     <motion.div
       variants={variants}

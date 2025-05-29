@@ -87,13 +87,19 @@ const NavBar = () => {
   }, [navigate]);
 
   const handleSearchClick = useCallback(() => {
+    if (selected !== "home") {
+      setTimeout(() => {
+        navigate("/home", { replace: true });
+      }, 200) // todo fix the lag of tasklist and remove this timout
+    }
+
     setSelected("search");
 
     componentCommunicationContext.dispatch({
       type: "SET_SEARCH_SCREEN_VISIBLE",
       payload: true,
     })
-  }, [componentCommunicationContext]);
+  }, [componentCommunicationContext, selected]);
 
   const handleCreateClick = useCallback(() => {
     if (selected === "search") {
@@ -119,6 +125,11 @@ const NavBar = () => {
   }, [componentCommunicationContext]);
 
   useEffect(() => {
+    console.log(selected)
+  }, [selected]);
+
+  useEffect(() => {
+    if (selected === "search") return;
     switch (location.pathname) {
       case "/":
       case "/home":
