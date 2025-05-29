@@ -31,6 +31,7 @@ export function useChangeEntryValue() {
         },
         onError: (err, data) => {
             // If the mutation fails reset the client state to the previous value and send an alert
+            console.log(data);
             queryClient.setQueryData(["task-entries", data.taskId, data.entryId], (oldData) => {
                 alertsContext.dispatch({type: "ADD_ALERT", payload: {type: "error", title: "Failed Change Entry", message: err.message}});
 
@@ -51,6 +52,7 @@ export function useChangeEntryValue() {
 
     const debounceMutate = ({taskId, entryId, value}) => {
         // Set current data to value optimistically
+        console.log(taskId, entryId);
         queryClient.setQueryData(["task-entries", taskId, entryId], (oldData) => {
             // Keep record of server value to rollback in case of error
             if (currentServerValue.current === undefined) {
