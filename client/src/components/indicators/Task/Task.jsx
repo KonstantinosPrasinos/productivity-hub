@@ -103,17 +103,15 @@ const Task = memo(
     const [isExpanded, setIsExpanded] = useState(true);
     const { screenSize } = useScreenSize();
 
-    console.log(screenSize);
-
     const variants = useMemo(() => {
       return {
-        hidden: { opacity: 0, y: 50 /*scale: 0.8, */ }, // todo move this logic to the tasklist component
         expanded: { opacity: 1, y: 0, /*scale: 1, */ height: "auto" },
         collapsed: {
           opacity: 1,
           y: 0,
           /*scale: 1, */ height:
             screenSize === "small" ? 16 * 1.2 + 10 + 20 : 14 * 1.2 + 8 + 20,
+          backgroundColor: "red"
         },
         exit: {
           opacity: 0,
@@ -134,13 +132,12 @@ const Task = memo(
     }, []);
 
     const animateValue = useMemo(() => {
-      return !tasks[0].category || isExpanded ? "expanded" : "collapsed";
-    }, [isExpanded, tasks]);
+      return isExpanded ? "expanded" : "collapsed";
+    }, [isExpanded]);
 
     return (
       <motion.div
         className={styles.container}
-        initial={"hidden"}
         animate={animateValue}
         exit={"exit"}
         variants={variants}

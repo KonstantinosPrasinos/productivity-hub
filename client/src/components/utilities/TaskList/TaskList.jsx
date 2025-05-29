@@ -1,10 +1,10 @@
-import React, { useContext, useMemo, useRef, useState } from "react";
+import React, { useContext, useMemo, useRef} from "react";
 import styles from "./TaskList.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import Task from "@/components/indicators/Task/Task.jsx";
 import Chip from "@/components/buttons/Chip/Chip";
 import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
-import { TbEraser, TbPlus, TbSearch, TbX } from "react-icons/tb";
+import { TbEraser, TbPlus, TbSearch} from "react-icons/tb";
 import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
@@ -12,10 +12,10 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext.jsx";
 
 const variants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 25 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.05 },
+    y: 0
   },
   exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } },
 };
