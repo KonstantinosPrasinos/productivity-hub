@@ -107,7 +107,7 @@ const Task = memo(
 
     const variants = useMemo(() => {
       return {
-        hidden: { opacity: 0, y: 50 /*scale: 0.8, */ },
+        hidden: { opacity: 0, y: 50 /*scale: 0.8, */ }, // todo move this logic to the tasklist component
         expanded: { opacity: 1, y: 0, /*scale: 1, */ height: "auto" },
         collapsed: {
           opacity: 1,

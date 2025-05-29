@@ -352,7 +352,11 @@ const Settings = () => {
   ]);
 
   return (
-    <div className={styles.container}>
+    <motion.div
+        className={styles.container}
+        initial={{opacity: 0, y: 25}}
+        animate={{opacity: 1, y: 0}}
+    >
       <div className={styles.settingsGroup}>
         <span className={styles.tileGroupTitle}>Account</span>
         <div className={styles.tileGroup}>
@@ -582,7 +586,7 @@ const Settings = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
