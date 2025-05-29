@@ -10,6 +10,10 @@
     max-height: 100%;
     border-radius: 10px 10px 0 0;
   }
+
+  .childrenContainer > :last-child {
+    margin-bottom: 120px;
+  }
 }
 
 @media (min-width: v.$phone-breakpoint) {

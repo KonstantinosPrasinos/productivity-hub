@@ -298,6 +298,10 @@
   .leftSide {
     width: 100%;
     padding: 0.5em 10px 0.5em 10px;
+
+    & > :last-child {
+      margin-bottom: 62px;
+    }
   }
 
   .categoryFilters {
