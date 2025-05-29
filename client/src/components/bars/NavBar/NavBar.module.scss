@@ -1,84 +1,9 @@
 @use "@/styles/variables" as v;
 @use "@/styles/index";
 
-@media (max-width: v.$phone-breakpoint) {
-  .container {
-    order: 3;
-    border-radius: v.$button-border-radius;
-    display: flex;
-    gap: 10px;
-  }
-
-  .navBar {
-    height: 1.75em;
-    background-color: var(--surface-color);
-    display: flex;
-    align-items: center;
-    padding: v.$base-padding;
-    justify-content: space-around;
-    border-top: v.$base-border;
-    z-index: 3;
-    flex-direction: row;
-    border-radius: v.$button-border-radius;
-    background: red;
-    width: min-content;
-    gap: 10px;
-  }
-  .item {
-    height: 100%;
-  }
-  .selectedBar {
-    width: 1.5em;
-    height: 6px;
-    bottom: 0;
-    left: 0;
-    border-radius: 6px 6px 0 0;
-  }
-}
-
-@media (min-width: v.$phone-breakpoint) {
-  .container {
-    height: 100%;
-    width: 4em;
-  }
-
-  .navBar {
-    position: fixed;
-    width: 3em;
-    height: 100%;
-    background: var(--surface-color);
-    padding: 40px 0 40px 0;
-    gap: 2em !important;
-    border-right: v.$base-border;
-    flex-direction: column;
-  }
-
-  .item {
-    width: 100%;
-  }
-
-  .selectedBar {
-    width: 6px;
-    height: 1.5em;
-    top: 0;
-    left: 0;
-    border-radius: 0 6px 6px 0;
-  }
-}
-
-.navBar {
+.newNavBar {
   display: flex;
   align-items: center;
-  font-size: v.$font-xxl;
-}
-
-.container {
-  z-index: 4;
-}
-
-.selectedBar {
-  position: absolute;
-  background-color: var(--primary-color);
 }
 
 .item {
@@ -88,49 +13,8 @@
   justify-content: center;
 }
 
-.filterCounter {
-  opacity: v.$opacity-very-low;
-  position: absolute;
-  top: 0;
-  font-size: 12px;
-
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-@media (max-width: v.$phone-breakpoint) {
-  .newContainer {
-    width: 100%;
-    bottom: 0;
-
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-
-    padding-bottom: 10px;
-
-    & > * {
-      flex-grow: 0;
-    }
-  }
-
-  .newNavBar {
-    background-color: var(--surface-color);
-    border-radius: v.$button-border-radius;
-    box-shadow: v.$elevation-1;
-
-    display: flex;
-    gap: 30px;
-    align-items: center;
-
-    padding: 12px;
-  }
-}
-
 .newContainer {
-  z-index: 40;
-  position: fixed;
+  z-index: 8;
 }
 
 .navButton {
@@ -146,10 +30,7 @@
 }
 
 .createButton {
-  font-size: v.$font-xxl;
   transition: opacity 0.2s ease-out;
-
-  padding: 12px;
   background-color: var(--primary-color);
   color: var(--on-primary-color);
   border-radius: v.$base-border-radius;
@@ -177,4 +58,66 @@
   display: flex;
   gap: 30px;
   align-items: center;
+}
+
+@media (max-width: v.$phone-breakpoint) {
+  .newContainer {
+    width: 100%;
+    bottom: 0;
+
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+
+    padding-bottom: 10px;
+
+    position: fixed;
+
+    & > * {
+      flex-grow: 0;
+    }
+  }
+
+  .newNavBar {
+    border-radius: v.$button-border-radius;
+    background-color: var(--surface-color);
+    box-shadow: v.$elevation-1;
+
+    gap: 30px;
+    padding: 12px;
+  }
+
+  .createButton {
+    font-size: v.$font-xxl;
+    padding: 12px;
+  }
+}
+
+@media (min-width: v.$phone-breakpoint) {
+  .newContainer {
+    width: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+
+    background-color: var(--surface-color);
+    box-shadow: v.$elevation-1;
+    padding-bottom: 10px;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .newNavBar {
+    gap: 50px;
+    flex-direction: column;
+
+    padding: 16px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .createButton {
+    font-size: v.$font-xl;
+    padding: 10px;
+  }
 }

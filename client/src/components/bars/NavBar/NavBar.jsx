@@ -8,6 +8,17 @@ import {AnimatePresence, motion} from "framer-motion";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext.jsx";
 
+const desktopVariants = {
+  initial: {
+    x : "-3em",
+    scale: 0,
+  },
+  animate: {
+    x: 0,
+    scale: 1,
+  },
+};
+
 const mobileVariants = {
   initial: {
     y : "3em",
@@ -18,6 +29,17 @@ const mobileVariants = {
     scale: 1,
   },
 };
+
+const navBarDesktopVariants = {
+  initial: {
+    width: "auto",
+    gap: "50px"
+  },
+  search: {
+    width: "auto",
+    gap: "50px"
+  },
+}
 
 const navBarVariants = {
   initial: {
@@ -118,9 +140,13 @@ const NavBar = () => {
       transition={{duration: 0.4, type: "spring"}}
       initial={"initial"}
       animate={"animate"}
-      variants={mobileVariants}
+      variants={screenSize === "small" ? mobileVariants : desktopVariants}
   >
-    <motion.div className={styles.newNavBar} animate={selected === "search" ? "search" : "initial"} variants={navBarVariants}>
+    <motion.div
+        className={styles.newNavBar}
+        animate={selected === "search" ? "search" : "initial"}
+        variants={screenSize === "small" ? navBarVariants : navBarDesktopVariants}
+    >
       <AnimatePresence mode={"popLayout"}>
         {selected !== "search" && <motion.div
             className={styles.item}
