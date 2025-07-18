@@ -484,7 +484,7 @@ button {
         box-sizing: border-box;
         width: calc(100% - 300px - 8em);
         height: 100%;
-        padding: 2em;
+        padding: 0 2em;
     }
 }
 
@@ -507,4 +507,28 @@ button {
 .icon {
     position: absolute;
     top: -0.5em;
+}
+
+.titlebar {
+    height: 30px;
+    background: #329ea3;
+    user-select: none;
+    display: flex;
+    justify-content: flex-end;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+.titlebar-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.titlebar-button:hover {
+    background: #5bbec3;
 }
