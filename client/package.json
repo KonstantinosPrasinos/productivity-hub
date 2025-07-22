@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^2.16.0",
-    "@tauri-apps/api": "^2.5.0",
-    "@tauri-apps/cli": "^2.5.0",
+    "@fabianlars/tauri-plugin-oauth": "^2.0.0",
+    "@tauri-apps/api": "^2.7.0",
+    "@tauri-apps/cli": "^2.7.0",
+    "@tauri-apps/plugin-deep-link": "^2.4.0",
     "@tauri-apps/plugin-os": "^2.2.1",
     "@tauri-apps/plugin-positioner": "^2.3.0",
     "@vitejs/plugin-react": "^3.1.0",
@@ -31,7 +33,8 @@
     "start": "vite --host",
     "build": "vite build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "tauri": "cargo tauri"
   },
   "eslintConfig": {
     "extends": [
