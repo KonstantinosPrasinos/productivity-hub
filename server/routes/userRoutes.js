@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const {
-    signupUser, logoutUser, deleteUser, resetUser
+    signupUser, logoutUser, deleteUser, resetUser, googleLoginDesktop
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -57,6 +57,9 @@ router.post('/google', function (req, res, next) {
         return res.status(200).json({user: {...user, googleLinked: true, active: undefined}});
     }
 );
+
+// In your Express routes file
+router.post('/google/desktop', googleLoginDesktop);
 
 router.post('/signup', signupUser);
 router.post('/logout', logoutUser);

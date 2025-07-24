@@ -8,6 +8,7 @@ export const TauriWindowControls = () => {
   const tauriListenerRef = useRef(null);
   const [showTitleBar, setShowTitleBar] = useState(true);
   const os = useMemo(() => {
+    if (!window.isTauri) return null;
     return platform();
   }, [])
 

@@ -68,6 +68,90 @@ const loginUser = new LocalStrategy(
   }
 );
 
+const googleLoginDesktop = async (req, res) => {
+  const { code, port } = req.body; // Or req.query if you send it as query param
+
+  // You'll need to manually perform the code exchange here
+  // because your Tauri app is already handling the initial redirect.
+  // passport-google-oauth20 typically handles this when it sets up the redirect route.
+  // Since you're getting the 'code' directly from Tauri, you'll use Google's Node.js client library
+  // or a direct HTTPS request to exchange the code for tokens.
+
+  const { OAuth2Client } = require('google-auth-library');
+
+  const client = new OAuth2Client(
+      process.env.DESKTOP_GOOGLE_CLIENT_ID,
+      process.env.DESKTOP_GOOGLE_CLIENT_SECRET,
+      `http://localhost:${port}`
+  );
+
+  try {
+    const { tokens } = await client.getToken(code);
+
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.DESKTOP_GOOGLE_CLIENT_ID,
+    });
+
+    console.log('ID Token:', tokens.id_token);
+    const payload = ticket.getPayload();
+    console.log('Payload:', payload);
+
+    const googleAccountId = payload['sub'];
+    const googleAccountEmail = payload['email'];
+
+    // Check if the user already exists
+    let user;
+
+    try {
+      user = await User.findOne({ googleId: googleAccountId });
+    } catch (err) {
+      console.log("error1")
+      res.status(500).json({ success: false, message: 'Authentication failed' });
+    }
+
+    if (!user) {
+      let emailUser;
+
+      try {
+        emailUser = await User.findOne({
+          "local.email": googleAccountEmail,
+        });
+      } catch (err) {
+        console.log("error2")
+        res.status(500).json({ success: false, message: 'Authentication failed' });
+      }
+
+      if (emailUser)
+        return res.status(400).json({ success: false, message: 'User already exists with this email' });
+
+      try {
+        user = await createUser({
+          googleId: googleAccountId,
+          local: { email: googleAccountEmail },
+          active: true,
+        });
+      } catch (err) {
+        console.log("error3")
+        res.status(500).json({ success: false, message: 'Authentication failed' });
+      }
+    }
+
+    // Log in user to passport (uses passport.serializeUser)
+    req.logIn({ _id: user._id, }, async (loginErr) => {
+      if (loginErr) {
+        console.error('Passport login error:', loginErr);
+        return res.status(500).json({ success: false, message: 'Failed to log in user.' });
+      }
+
+      return res.status(200).json({user: {_id: user._id, local: {email: googleAccountEmail}, googleLinked: true, active: undefined}});
+    });
+  } catch (error) {
+    console.error('Error exchanging code or verifying ID token:', error);
+    res.status(500).json({ success: false, message: 'Authentication failed' });
+  }
+}
+
 const googleLogin = new GoogleOneTapStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -198,4 +282,5 @@ module.exports = {
   deleteUser,
   resetUser,
   googleLogin,
+  googleLoginDesktop
 };
