@@ -23,6 +23,13 @@
     &.transparent {
       background-color: rgba(#000000, 0.35);
     }
+
+    &:not(.transparent) {
+      & > .surface {
+        padding: 10px;
+        border: none;
+      }
+    }
   }
 
   .surface {

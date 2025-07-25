@@ -1,8 +1,8 @@
 import React, {
+  lazy, Suspense,
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import styles from "./LogIn.module.scss";
@@ -19,98 +19,29 @@ import { UserContext } from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
-import {openUrl} from "@tauri-apps/plugin-opener";
-import { start, onUrl } from "@fabianlars/tauri-plugin-oauth";
-import {TbBrandGoogleFilled} from "react-icons/tb";
+import GoogleSignInWeb from "@/pages/Auth/LogIn/GoogleSignInWeb/GoogleSignInWeb.jsx";
+import logo from "@/assets/logo.svg";
+
+const isTauriBuild = import.meta.env.VITE_APP_TAURI_BUILD === 'true';
+
+const TauriSpecificFeatures = lazy(() => {
+  if (isTauriBuild) {
+    return import("@/pages/Auth/LogIn/GoogleSignInDesktop/GoogleSignInDesktop.jsx");
+  } else {
+    return Promise.reject(new Error('Not a Tauri build environment.'));
+  }
+});
 
 const GoogleSignInButton = ({ googleLoading, setGoogleLoading }) => {
-  const divRef = useRef();
-  const unlistenUrl = useRef(null);
-  const { loginGoogle, isLoading, loginGoogleDesktop } = useAuth();
-
-
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
-
-  useEffect(() => {
-    if (isLoading !== googleLoading) {
-      setGoogleLoading(isLoading);
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    const handleCredentialResponse = async (response) => {
-      console.log(response);
-      await loginGoogle(response);
-    };
-
-    const attemptRenderGoogle = () => {
-      if (window?.google) {
-        setIsGoogleLoaded(true);
-
-        window?.google?.accounts?.id?.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          callback: handleCredentialResponse,
-        });
-
-        window.google.accounts.id.renderButton(divRef.current, {
-          theme: "outline",
-          size: "large",
-          shape: "pill",
-        });
-
-        window.google.accounts.id.prompt();
-      } else {
-        // Sometimes it doesn't load instantly for some reason so try again after 200ms
-        setTimeout(attemptRenderGoogle, 200);
-      }
-    };
-
-    attemptRenderGoogle();
-
-    return () => {
-      clearTimeout(attemptRenderGoogle)
-      if (unlistenUrl.current) unlistenUrl.current();
-    }; // Clear the timeout on unmount
-  }, []);
-
-  const handleGoogleLogin = async () => {
-    // If the app is running in a desktop environment, use the desktop login flow
-    // First create a localhost with an assigned port that acts as the redirect URI
-    const port = await start();
-
-    // Listen for redirects to this url
-    unlistenUrl.current = await onUrl((url) => {
-      const parsedURL = new URL(url);
-      const params = new URLSearchParams(parsedURL.search);
-
-      // Get the code from the URL parameters and pass it to the login function
-      const code = params.get('code');
-      loginGoogleDesktop({code, port})
-    });
-
-    // Open the Google OAuth URL in the default browser
-    openUrl(`https://accounts.google.com/o/oauth2/v2/auth?scope=email%20profile&response_type=code&state=security_token%3D138r5719ru3e1%26url%3Dhttps%3A%2F%2Foauth2.example.com%2Ftoken&redirect_uri=http://localhost:${port}&client_id=${import.meta.env.VITE_DESKTOP_GOOGLE_CLIENT_ID}`);
-  };
-
-  if (window.isTauri)
-    return <div className={"Stack-Container Centered Big-Gap"}>
-      <span>or</span>
-      <button className={styles.googleButtonDesktop} onClick={handleGoogleLogin}>
-        <TbBrandGoogleFilled />
-        Sign in with Google
-      </button>
-    </div>
+  if (isTauriBuild) return (
+    <Suspense fallback={<></>}>
+      <TauriSpecificFeatures googleLoading={googleLoading} setGoogleLoading={setGoogleLoading} />
+    </Suspense>
+  );
 
   return (
-    <div
-      className={`${styles.googleContainer} ${
-        isGoogleLoaded ? styles.googleVisible : ""
-      }`}
-    >
-      or
-      <div ref={divRef}></div>
-    </div>
-  );
+      <GoogleSignInWeb googleLoading={googleLoading} setGoogleLoading={setGoogleLoading} />
+  )
 };
 
 const LogIn = () => {
@@ -240,7 +171,8 @@ const LogIn = () => {
     <Modal isPortal={false}>
       <SwitchContainer selectedTab={selectedTab}>
         <div className={styles.container}>
-          <div className={"Display"}>Welcome to Productivity Hub</div>
+          <img src={logo} alt="Taskflow logo" className={styles.logo} />
+          <div className={"Display"}>Welcome to Taskflow</div>
           <TextBoxInput
             type={"email"}
             width={"max"}

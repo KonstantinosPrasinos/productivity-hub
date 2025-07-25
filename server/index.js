@@ -48,16 +48,18 @@ app.use(
   }),
 );
 
-const corsOptions = {
-  origin: [
-    "https://productivity-hub-website.vercel.app",
-    "http://localhost:5173",
-    "https://taskflow.kprasinos.com",
-    "http://tauri.localhost"
-  ],
-  methods: ["POST", "GET"],
-  credentials: true,
-};
+const corsOptions = process.env.NODE_ENV === "dev"
+    ? { origin: true, credentials: true }
+    : {
+      origin: [
+        "https://productivity-hub-website.vercel.app",
+        "http://localhost:5173",
+        "https://taskflow.kprasinos.com",
+        "http://tauri.localhost"
+      ],
+      methods: ["POST", "GET"],
+      credentials: true,
+    };
 
 app.use(cors(corsOptions));
 
@@ -72,12 +74,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function (user, done) {
-    console.log("Serializing user with ID:", user._id);
   done(null, user._id);
 });
 
 passport.deserializeUser(function (user, done) {
-  console.log("Deserializing user with ID:", user);
   User.findById(user, (err, user) => {
     done(null, user);
   });

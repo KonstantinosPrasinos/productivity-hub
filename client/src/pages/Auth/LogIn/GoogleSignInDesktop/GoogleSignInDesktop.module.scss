@@ -1,0 +1,10 @@
+@use "@/styles/index" as i;
+@use "@/styles/variables" as v;
+
+.googleButtonDesktop {
+  @extend .Horizontal-Flex-Container, .Rounded-Container;
+  font-size: v.$font-xl;
+  align-items: center;
+  border-color: var(--primary-color);
+  border-radius: v.$button-border-radius;
+}

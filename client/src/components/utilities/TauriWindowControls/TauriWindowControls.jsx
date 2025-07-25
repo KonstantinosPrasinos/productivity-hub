@@ -4,7 +4,7 @@ import styles from './TauriWindowControls.module.scss';
 import {listen} from "@tauri-apps/api/event";
 import {platform} from "@tauri-apps/plugin-os";
 
-export const TauriWindowControls = () => {
+const TauriWindowControls = () => {
   const tauriListenerRef = useRef(null);
   const [showTitleBar, setShowTitleBar] = useState(true);
   const os = useMemo(() => {
@@ -43,3 +43,5 @@ export const TauriWindowControls = () => {
       </div>
   );
 };
+
+export default TauriWindowControls;

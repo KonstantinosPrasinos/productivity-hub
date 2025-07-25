@@ -52,8 +52,6 @@ router.post('/google', function (req, res, next) {
             delete user.local.password;
         }
 
-        console.log("things");
-
         return res.status(200).json({user: {...user, googleLinked: true, active: undefined}});
     }
 );

@@ -9,7 +9,7 @@ import {
 import NavBar from "./components/bars/NavBar/NavBar";
 import Settings from "./pages/Settings/Settings";
 import LogIn from "./pages/Auth/LogIn/LogIn";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 
 import "./styles/index.scss";
 import Playground from "./pages/Playground/Playground";
@@ -32,7 +32,16 @@ import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIn
 import { MiniPagesContext } from "@/context/MiniPagesContext.jsx";
 import { useQueryClient } from "react-query";
 import { clearDatabase, openDatabase } from "./functions/openDatabase";
-import {TauriWindowControls} from "@/components/utilities/TauriWindowControls/TauriWindowControls.jsx";
+
+const isTauriBuild = import.meta.env.VITE_APP_TAURI_BUILD === 'true';
+
+const TauriSpecificFeatures = lazy(() => {
+  if (isTauriBuild) {
+    return import("@/components/utilities/TauriWindowControls/TauriWindowControls.jsx");
+  } else {
+    return Promise.reject(new Error('Not a Tauri build environment.'));
+  }
+});
 
 const syncTasks = async (queryClient) => {
   const db = await openDatabase();
@@ -357,7 +366,12 @@ function App() {
 
   return (
       <div className={`App ${theme}`} id={"app"}>
-        <TauriWindowControls />
+        {isTauriBuild ? (
+            <Suspense fallback={<></>}>
+              <TauriSpecificFeatures />
+            </Suspense>
+        ) : <> </>
+        }
         <AlertHandler/>
         <Routes>
           <Route element={<ProtectedLayout/>}>

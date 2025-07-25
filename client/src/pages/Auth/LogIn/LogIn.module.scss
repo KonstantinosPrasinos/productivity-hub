@@ -1,5 +1,4 @@
 @use "@/styles/index" as i;
-@use "@/styles/variables" as v;
 
 .container {
   box-sizing: border-box;
@@ -17,21 +16,7 @@
   width: 100%;
 }
 
-.googleContainer {
-  @extend .Stack-Container;
-  align-items: center;
-  height: 5em;
-  opacity: 0;
-
-  &.googleVisible {
-    opacity: 1;
-  }
-}
-
-.googleButtonDesktop {
-  @extend .Horizontal-Flex-Container, .Rounded-Container;
-  font-size: v.$font-xl;
-  align-items: center;
-  border-color: var(--primary-color);
-  border-radius: v.$button-border-radius;
+.logo {
+  width: 30%;
+  margin: 0 0 20px;
 }
