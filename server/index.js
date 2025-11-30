@@ -30,6 +30,7 @@ const sessionStore = new MongoDBStore({
 });
 
 const isDev = process.env.NODE_ENV === "dev"
+app.set("trust proxy", 1);
 
 // Middleware
 app.use(express.json());
