@@ -115,6 +115,49 @@ export function useAuth() {
     setIsLoading(false);
   };
 
+  const loginGoogleDesktop = async (data) => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+          `${import.meta.env.VITE_BACK_END_IP}/api/user/google/desktop`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            credentials: "include",
+          },
+      );
+
+      console.log("Response from Google Desktop login:", response.ok);
+
+      if (!response.ok) {
+        alertsContext.dispatch({
+          type: "ADD_ALERT",
+          payload: {
+            type: "error",
+            title: "Failed to log in",
+            message: (await response.json()).message,
+          },
+        });
+      } else {
+        await handleLogin(response, dispatch);
+      }
+    } catch (error) {
+      console.log(error);
+      alertsContext.dispatch({
+        type: "ADD_ALERT",
+        payload: {
+          type: "error",
+          title: "Failed to log in",
+          message: "Connection to server couldn't be made",
+        },
+      });
+    }
+
+    setIsLoading(false);
+  };
+
   const register = async (email, password) => {
     setIsLoading(true);
 
@@ -231,5 +274,5 @@ export function useAuth() {
     await clearDatabase();
   };
 
-  return { login, logout, register, isLoading, resetAccount, loginGoogle };
+  return { login, logout, register, isLoading, resetAccount, loginGoogle, loginGoogleDesktop };
 }

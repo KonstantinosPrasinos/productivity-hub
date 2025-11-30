@@ -1,5 +1,5 @@
 import styles from "./MiniPageContainer.module.scss";
-import { useCallback, useContext, useEffect, useRef } from "react";
+import {useCallback, useContext, useEffect, useMemo, useRef} from "react";
 import { motion, useAnimation } from "framer-motion";
 import Button from "../../buttons/Button/Button";
 import IconButton from "../../buttons/IconButton/IconButton";
@@ -48,6 +48,10 @@ const MiniPageContainer = ({
       }px - 3.7em + 4px )`;
     }
   };
+
+  const addTauriPadding = useMemo(() => {
+    return window.isTauri && screenSize !== "small";
+  }, [screenSize])
 
   const makeFullHeight = () => {
     animationControls.set({ height: containerRef.current.offsetHeight });
@@ -162,7 +166,7 @@ const MiniPageContainer = ({
       transition={{ type: "tween" }}
     >
       <div
-        className={styles.staticElements}
+        className={addTauriPadding ? styles.tauriPadding : ""}
         onTouchMove={handleMove}
         onTouchEnd={handleEnd}
         ref={handleRef}

@@ -54,7 +54,8 @@ const corsOptions = {
   origin: [
     "https://productivity-hub-website.vercel.app",
     "http://localhost:5173",
-    "https://taskflow.kprasinos.com"
+    "https://taskflow.kprasinos.com",
+    "http://tauri.localhost"
   ],
   methods: ["POST", "GET"],
   credentials: true,
@@ -73,10 +74,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function (user, done) {
+    console.log("Serializing user with ID:", user._id);
   done(null, user._id);
 });
 
 passport.deserializeUser(function (user, done) {
+  console.log("Deserializing user with ID:", user);
   User.findById(user, (err, user) => {
     done(null, user);
   });

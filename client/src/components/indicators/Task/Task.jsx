@@ -111,7 +111,6 @@ const Task = memo(
           y: 0,
           /*scale: 1, */ height:
             screenSize === "small" ? 16 * 1.2 + 10 + 20 : 14 * 1.2 + 8 + 20,
-          backgroundColor: "red"
         },
         exit: {
           opacity: 0,

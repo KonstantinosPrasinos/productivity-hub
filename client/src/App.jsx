@@ -32,7 +32,7 @@ import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIn
 import { MiniPagesContext } from "@/context/MiniPagesContext.jsx";
 import { useQueryClient } from "react-query";
 import { clearDatabase, openDatabase } from "./functions/openDatabase";
-import { ReactQueryDevtools } from "react-query/devtools";
+import {TauriWindowControls} from "@/components/utilities/TauriWindowControls/TauriWindowControls.jsx";
 
 const syncTasks = async (queryClient) => {
   const db = await openDatabase();
@@ -356,30 +356,31 @@ function App() {
   const theme = useMemo(getTheme, [settings?.theme, defaultThemeChanged]);
 
   return (
-    <div className={`App ${theme}`} id={"app"}>
-      <AlertHandler />
-      <Routes>
-        <Route element={<ProtectedLayout />}>
-          <Route element={<NavLayout />}>
-            <Route exact path="/" element={<Home />} />
-            <Route exact path="/home" element={<Navigate to="/" />} />
-            <Route path="/list" element={<ListView />} />
-            <Route path="/settings" element={<Settings />} />
+      <div className={`App ${theme}`} id={"app"}>
+        <TauriWindowControls />
+        <AlertHandler/>
+        <Routes>
+          <Route element={<ProtectedLayout/>}>
+            <Route element={<NavLayout/>}>
+              <Route exact path="/" element={<Home/>}/>
+              <Route exact path="/home" element={<Navigate to="/"/>}/>
+              <Route path="/list" element={<ListView/>}/>
+              <Route path="/settings" element={<Settings/>}/>
+            </Route>
           </Route>
-        </Route>
-        <Route exact path="/change-email" element={<ChangeEmail />} />
-        <Route
-          exact
-          path="/log-in"
-          element={!user.state?.id ? <LogIn /> : <Navigate to="/" />}
-        />
-        <Route exact path="/reset-password" element={<ResetPassword />} />
-        <Route path="/playground" element={<Playground />} />
-        <Route path="*" element={<Navigate to={"/not-found"} />} />
-        <Route path="/not-found" element={<NotFound />} />
-      </Routes>
-      {/*<ReactQueryDevtools />*/}
-    </div>
+          <Route exact path="/change-email" element={<ChangeEmail/>}/>
+          <Route
+              exact
+              path="/log-in"
+              element={!user.state?.id ? <LogIn/> : <Navigate to="/"/>}
+          />
+          <Route exact path="/reset-password" element={<ResetPassword/>}/>
+          <Route path="/playground" element={<Playground/>}/>
+          <Route path="*" element={<Navigate to={"/not-found"}/>}/>
+          <Route path="/not-found" element={<NotFound/>}/>
+        </Routes>
+        {/*<ReactQueryDevtools />*/}
+      </div>
   );
 }
 

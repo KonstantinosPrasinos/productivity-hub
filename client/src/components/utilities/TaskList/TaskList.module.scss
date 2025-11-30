@@ -329,8 +329,10 @@
   .categoryChipContainer {
     padding: 4px;
     overflow: hidden;
-    max-width: 15rem;
+    max-width: 17rem;
     max-height: 100%;
+
+    margin-top: 20px;
   }
 
   .leftSide {
@@ -338,5 +340,9 @@
     width: 25em;
     min-width: 25em;
     padding: 0 10px 0.5em 10px;
+
+    & > :first-child {
+      margin-top: 20px;
+    }
   }
 }
