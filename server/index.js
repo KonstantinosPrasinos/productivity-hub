@@ -29,6 +29,8 @@ const sessionStore = new MongoDBStore({
   collection: "sessions",
 });
 
+const isDev = process.env.NODE_ENV === "dev"
+
 // Middleware
 app.use(express.json());
 app.use(
@@ -40,8 +42,8 @@ app.use(
     proxy: true,
     name: "ProductivityHubCookie",
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: !isDev,
+      sameSite: !isDev ? "none" : "lax",
       httpOnly: false,
       maxAge: 30 * 24 * 60 * 60 * 1000, // One month
     },
@@ -103,6 +105,8 @@ app.use((err, req, res, next) => {
 if (!process.env.MONGODB_URI) {
   throw new Error("Please provide a MONGODB_URI in the .env file");
 }
+
+console.log(isDev)
 
 // Connect to database
 mongoose
