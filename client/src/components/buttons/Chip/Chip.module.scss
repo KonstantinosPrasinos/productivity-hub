@@ -17,7 +17,6 @@
     border: v.$base-border;
 
     padding: 0 !important;
-    gap: 0 !important;
 
     &.widthLimited {
         max-width: 100%;
@@ -44,11 +43,11 @@
     }
 
     &:not(.small) {
-        & > .children:only-child {
+        & > *:only-child {
             padding: 10px 24px;
         }
 
-        & > .children:not(:only-child) {
+        & > *:not(:only-child) {
             padding: 10px 5px 10px 24px;
 
             & ~ button {
@@ -57,9 +56,19 @@
         }
     }
 
-    &.small > .children {
+    &.small > * {
         @extend .Label-Large;
         padding: v.$small-button-padding;
+
+        &:not(:only-child):first-child {
+            padding-right: 0;
+        }
+        &:not(:only-child):last-child {
+            padding-left: 0;
+        }
+        &:not(:only-child):not(:first-child):not(:last-child) {
+            padding: 0;
+        }
     }
 
     &.big {

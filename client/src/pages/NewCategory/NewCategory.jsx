@@ -56,7 +56,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
   const [creatingTimeGroup, setCreatingTimeGroup] = useState(false);
-  const currentEditedGroup = useRef();
+  const [currentEditedGroup, setCurrentEditedGroup] = useState(null);
 
   // Inputs for both category types
   const [title, setTitle] = useState("");
@@ -383,7 +383,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
     // Unique title (in category)
     if (
-      timeGroupTitle !== currentEditedGroup.current?.title &&
+      timeGroupTitle !== currentEditedGroup?.title &&
       timeGroups.find(
         (group) => group.title === timeGroupTitle && !group?.deleted,
       )
@@ -400,7 +400,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
       return;
     }
 
-    const newId = currentEditedGroup.current?._id ?? getGroupId();
+    const newId = currentEditedGroup?._id ?? getGroupId();
 
     const timeGroup = {
       _id: newId,
@@ -412,7 +412,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
               startingDate: findStartingDates(timePeriod, timePeriod2),
             }
           : undefined,
-      initial: currentEditedGroup.current?.initial,
+      initial: currentEditedGroup?.initial,
     };
 
     if (repeats && hasTime) {
@@ -439,7 +439,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
       }
     }
 
-    if (currentEditedGroup.current?._id !== undefined) {
+    if (currentEditedGroup?._id !== undefined) {
       // For editing
       setTimeGroups(
         timeGroups.map((group) => {
@@ -458,7 +458,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
     }
 
     resetTimeGroupInputs();
-    currentEditedGroup.current = null;
+    setCurrentEditedGroup(null);
     setCreatingTimeGroup(false);
   };
 
@@ -495,7 +495,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
         setEndMinute("59");
       }
 
-      currentEditedGroup.current = group;
+      setCurrentEditedGroup(group);
     },
     [
       setCreatingTimeGroup,
@@ -523,9 +523,9 @@ const NewCategory = ({ index, length, id, groupId }) => {
   );
 
   const handleDelete = (group) => {
-    if (group._id === currentEditedGroup.current?._id) {
+    if (group._id === currentEditedGroup?._id) {
       resetTimeGroupInputs();
-      currentEditedGroup.current = null;
+      setCurrentEditedGroup(null);
       setCreatingTimeGroup(false);
     }
 
@@ -547,7 +547,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
 
   const handleCancel = useCallback(() => {
     resetTimeGroupInputs();
-    currentEditedGroup.current = null;
+    setCurrentEditedGroup(null);
     setCreatingTimeGroup(false);
   }, [resetTimeGroupInputs, setCreatingTimeGroup]);
 
@@ -765,13 +765,15 @@ const NewCategory = ({ index, length, id, groupId }) => {
                           exit={{ scale: 0.8, opacity: 0 }}
                         >
                           <Chip
-                            type={"icon"}
+                            type={"select"}
                             onClick={(e) => {
                               handleGroupClick(e, group);
                             }}
                             hasDeleteButton={true}
                             deleteFunction={() => handleDelete(group)}
                             size={"small"}
+                            value={group}
+                            selected={currentEditedGroup}
                           >
                             {group.title}
                           </Chip>

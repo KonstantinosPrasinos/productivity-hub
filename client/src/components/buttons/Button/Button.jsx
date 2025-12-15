@@ -58,8 +58,7 @@ const Button = ({
 
 Button.propTypes = {
   size: PropTypes.oneOf(['small', 'medium', 'large']),
-  style: PropTypes.oneOf(['squared', 'rounded', "outlined"]),
-  type: PropTypes.oneOf(['select', 'icon']),
+  type: PropTypes.oneOf(['square', 'rounded', "outlined"]),
   width: PropTypes.oneOf(['max']),
 };
 

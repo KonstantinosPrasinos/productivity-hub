@@ -39,25 +39,20 @@ const Chip = ({
   return (
     <div className={classes.join(' ')}>
       <button
-        className={styles.children}
         onContextMenu={onContextMenu}
         onClick={(e) => {
           if (!disabled) {
-            switch (type) {
-              case "select":
-                if (setSelected) setSelected(value);
-                break;
-              case "icon":
-                if (onClick) onClick(e);
-                break;
-            }
+            if (onClick) onClick(e);
+            if (setSelected) setSelected(value);
           }
         }}
       >
         {children}
       </button>
       {deleteFunction && (
-        <IconButton onClick={deleteFunction}>
+        <IconButton
+        onClick={deleteFunction}
+        >
           <TbX />
         </IconButton>
       )}
