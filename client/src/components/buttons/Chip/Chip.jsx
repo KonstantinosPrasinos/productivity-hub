@@ -2,6 +2,7 @@ import styles from "./Chip.module.scss";
 import { TbX } from "react-icons/tb";
 import IconButton from "@/components/buttons/IconButton/IconButton";
 import React from "react";
+import PropTypes from "prop-types";
 
 const Chip = ({
   children,
@@ -17,16 +18,26 @@ const Chip = ({
   hasShadow = false,
   onContextMenu = () => {},
 }) => {
+  const classes = [styles.container, styles.widthLimited, 'Button', styles[style]];
+
+  if (type === 'select' && value === selected) {
+    classes.push(styles.filled);
+  }
+
+  if (size) {
+    classes.push(styles[size]);
+  }
+
+  if (disabled) {
+    classes.push(styles.disabled);
+  }
+
+  if (hasShadow) {
+    classes.push('Has-Shadow');
+  }
+
   return (
-    <div
-      className={`${styles.container} ${styles.widthLimited} Button ${
-        styles[style]
-      } ${type === "select" && value === selected ? styles.filled : ""} ${
-        type === "icon"
-      } ${styles[size]} ${disabled ? styles.disabled : ""} ${
-        hasShadow ? "Has-Shadow" : ""
-      }`}
-    >
+    <div className={classes.join(' ')}>
       <button
         className={styles.children}
         onContextMenu={onContextMenu}
@@ -52,6 +63,12 @@ const Chip = ({
       )}
     </div>
   );
+};
+
+Chip.propTypes = {
+  size: PropTypes.oneOf(['small', 'medium']),
+  style: PropTypes.oneOf(['squared', 'rounded']),
+  type: PropTypes.oneOf(['select', 'icon']),
 };
 
 export default Chip;

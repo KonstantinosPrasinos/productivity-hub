@@ -517,7 +517,7 @@ const NewCategory = ({ index, length, id, groupId }) => {
         return;
       }
 
-      focusGroup();
+      focusGroup(group);
     },
     [focusGroup],
   );
@@ -612,6 +612,14 @@ const NewCategory = ({ index, length, id, groupId }) => {
       titleRef.current?.focus();
     }
   }, [categoriesLoading, groupsLoading]);
+
+  useEffect(() => {
+    if (!id && settings) {
+      setPriority(settings.defaults.priority);
+      setTimePeriodNumber(settings.defaults.priority);
+      setLongGoalNumber(settings.defaults.goal);
+    }
+  }, [settings, id]);
 
   return (
     <>
@@ -740,7 +748,6 @@ const NewCategory = ({ index, length, id, groupId }) => {
                 >
                   <Button
                     filled={true}
-                    symmetrical={true}
                     onClick={handleAddTimeGroup}
                     size={"small"}
                   >

@@ -1,5 +1,6 @@
 import styles from "./Button.module.scss";
 import { motion } from "framer-motion";
+import PropTypes from "prop-types";
 
 const Button = ({
   onClick,
@@ -17,19 +18,32 @@ const Button = ({
   symmetrical = false,
   hasShadow = false,
 }) => {
+  const classes = [styles.container, styles[size], styles[width]];
+
+  if (type !== "round") {
+    classes.push(styles.square);
+  }
+
+  if (!filled) {
+    classes.push(styles.outlined);
+  }
+
+  if (isWarning) {
+    classes.push(styles.isWarning);
+  }
+
+  if (symmetrical) {
+    classes.push(styles.symmetrical);
+  }
+
+  if (hasShadow) {
+    classes.push("Has-Shadow");
+  }
+
   return (
     <motion.button
       onClick={onClick}
-      className={`
-                ${styles.container}
-                  ${styles[size]}
-                  ${type === "round" ? "" : styles.square}
-                  ${filled ? "" : styles.outlined}
-                  ${styles[width]}
-                  ${isWarning ? styles.isWarning : ""}
-                  ${symmetrical ? styles.symmetrical : ""}
-                  ${hasShadow ? "Has-Shadow" : ""}
-            `}
+      className={classes.join(' ')}
       disabled={disabled}
       initial={initial}
       animate={animate}
@@ -40,6 +54,13 @@ const Button = ({
       {children}
     </motion.button>
   );
+};
+
+Button.propTypes = {
+  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  style: PropTypes.oneOf(['squared', 'rounded', "outlined"]),
+  type: PropTypes.oneOf(['select', 'icon']),
+  width: PropTypes.oneOf(['max']),
 };
 
 export default Button;

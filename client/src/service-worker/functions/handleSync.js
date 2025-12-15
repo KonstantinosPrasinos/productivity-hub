@@ -531,6 +531,8 @@ const handleRemainingRequests = async () => {
   while (self.requestEventQueue.length > 0) {
     const eventObj = self.requestEventQueue.shift();
 
+    if (eventObj === undefined || eventObj?.request) continue;
+
     const requestUrl = eventObj.request.url.substring(
       eventObj.request.url.indexOf("/api/") + 4,
     );

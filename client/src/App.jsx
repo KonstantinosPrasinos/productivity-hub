@@ -33,6 +33,7 @@ import { MiniPagesContext } from "@/context/MiniPagesContext.jsx";
 import { useQueryClient } from "react-query";
 import { clearDatabase, openDatabase } from "./functions/openDatabase";
 import {TauriWindowControls} from "@/components/utilities/TauriWindowControls/TauriWindowControls.jsx";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 const syncTasks = async (queryClient) => {
   const db = await openDatabase();
@@ -379,7 +380,7 @@ function App() {
           <Route path="*" element={<Navigate to={"/not-found"}/>}/>
           <Route path="/not-found" element={<NotFound/>}/>
         </Routes>
-        {/*<ReactQueryDevtools />*/}
+        <ReactQueryDevtools initialIsOpen={false} />
       </div>
   );
 }

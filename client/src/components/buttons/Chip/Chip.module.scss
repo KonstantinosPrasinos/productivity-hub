@@ -1,4 +1,5 @@
 @use "@/styles/variables" as v;
+@use "@/styles/index.scss";
 
 @media (min-width: v.$phone-breakpoint) {
     .container:hover:not(.disabled) {
@@ -8,6 +9,7 @@
 }
 
 .container {
+    @extend .Button;
     background-color: var(--surface-color);
     color: var(--on-surface-color);
     border-radius: v.$base-border-radius;
@@ -56,19 +58,8 @@
     }
 
     &.small > .children {
-        font-size: v.$font-s;
-
-        &:only-child {
-            padding: v.$small-button-padding;
-        }
-
-        &:not(:only-child) {
-            padding: 8px 5px 8px 19px;
-
-            & ~ button {
-                padding: 8px 10px 8px 5px;
-            }
-        }
+        @extend .Label-Large;
+        padding: v.$small-button-padding;
     }
 
     &.big {

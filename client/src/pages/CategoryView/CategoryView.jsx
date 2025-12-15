@@ -576,6 +576,7 @@ const CategoryView = ({ index, length, category }) => {
             selected={selectedGroup}
             value={"All"}
             setSelected={setSelectedGroup}
+            size={"small"}
           >
             All
           </Chip>
@@ -585,6 +586,7 @@ const CategoryView = ({ index, length, category }) => {
               value={group}
               selected={selectedGroup}
               setSelected={() => setSelectedGroup(group)}
+              size={"small"}
             >
               {group.title}
             </Chip>

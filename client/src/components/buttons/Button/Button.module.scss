@@ -22,7 +22,7 @@
     }
 
     &.small {
-        font-size: v.$font-s;
+        @extend .Label-Large;
         padding: v.$small-button-padding;
     }
 

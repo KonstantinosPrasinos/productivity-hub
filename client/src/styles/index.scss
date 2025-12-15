@@ -69,7 +69,7 @@ a {
     align-items: center;
     gap: v.$base-gap;
     cursor: pointer;
-    padding: 10px 24px;
+    padding: v.$button-padding;
     width: max-content;
     white-space: nowrap;
     
@@ -203,6 +203,10 @@ a {
 
 .Label-Medium {
     @include m.Label-Medium;
+}
+
+.Label-Large {
+    @include m.Label-Large;
 }
 
 .Label-Small {

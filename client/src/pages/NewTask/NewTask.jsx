@@ -587,6 +587,7 @@ const NewTask = ({ index, length, id }) => {
                 value={item}
                 selected={repeatType}
                 setSelected={setRepeatType}
+                size={"small"}
               >
                 {item}
               </Chip>
