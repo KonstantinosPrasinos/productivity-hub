@@ -8,6 +8,10 @@
     }
 }
 
+.chipButton {
+    overflow: hidden;
+}
+
 .container {
     @extend .Button;
     background-color: var(--surface-color);

@@ -39,6 +39,7 @@ const Chip = ({
   return (
     <div className={classes.join(' ')}>
       <button
+        className={styles.chipButton}
         onContextMenu={onContextMenu}
         onClick={(e) => {
           if (!disabled) {

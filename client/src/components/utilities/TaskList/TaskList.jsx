@@ -21,8 +21,8 @@ const variants = {
 };
 
 const childVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.8 },
-  visible: { opacity: 1, y: 0, scale: 1 },
+  hidden: { opacity: 0, y: 50, scale: 0.8, marginTop: 20 },
+  visible: { opacity: 1, y: 0, scale: 1, marginTop: 20 },
   exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } },
 };
 
