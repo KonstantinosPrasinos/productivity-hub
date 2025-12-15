@@ -125,10 +125,6 @@ const NavBar = () => {
   }, [componentCommunicationContext]);
 
   useEffect(() => {
-    console.log(selected)
-  }, [selected]);
-
-  useEffect(() => {
     if (selected === "search") return;
     switch (location.pathname) {
       case "/":

@@ -199,6 +199,9 @@
   box-shadow: v.$elevation-1;
   font-size: v.$font-xl;
 
+  position: absolute;
+  top: 20px; // Align with first task
+
   width: 100%;
 
   & > :first-child {
@@ -328,11 +331,14 @@
 @media (min-width: v.$phone-breakpoint) {
   .categoryChipContainer {
     padding: 4px;
-    overflow: hidden;
+    overflow-y: auto;
     max-width: 17rem;
     max-height: 100%;
+    box-sizing: border-box;
 
-    margin-top: 20px;
+    & > .filterChip{
+      margin-top: 75px; // (1em (16px) + 20px (padding) + 2px (border) + 20px (top offset)) of search bar + 20px
+    }
   }
 
   .leftSide {

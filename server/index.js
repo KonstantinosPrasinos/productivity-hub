@@ -113,20 +113,25 @@ if (!process.env.MONGODB_URI) {
 console.log(isDev)
 
 // Connect to database
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    if (process.env.NODE_ENV !== "test") {
-      app.listen(process.env.PORT, () => {
-        console.log(
-          "connected to database and listening to port: ",
-          process.env.PORT,
-        );
-      });
-    }
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+if (mongoose.connection.readyState === 0) {
+  mongoose
+    .connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000, // Reduce timeout to 5 seconds
+    })
+    .then(() => {
+      if (process.env.NODE_ENV !== "test") {
+        app.listen(process.env.PORT, () => {
+          console.log(
+            "connected to database and listening to port: ",
+            process.env.PORT,
+          );
+        });
+      }
+      console.log("Connected to database");
+    })
+    .catch((error) => {
+      console.log("Database connection error:", error);
+    });
+}
 
 module.exports = app;

@@ -259,15 +259,17 @@ const BigScreenFilters = ({
               searchFilter={searchFilter}
               setSearchFilter={setSearchFilter}
           />
-          <Chip
+          <div className={styles.filterChip}>
+            <Chip
               value={true}
               hasShadow={true}
               size={"small"}
               selected={showNonCurrentTasks}
               setSelected={() => setShowNonCurrentTasks(!showNonCurrentTasks)}
-          >
-            Show non-current tasks
-          </Chip>
+            >
+              Show non-current tasks
+            </Chip>
+          </div>
           <Chip
               value={-1}
               setSelected={() => toggleNoCategory()}
@@ -519,7 +521,6 @@ const TaskList = ({
     });
   };
 
-  console.log(componentCommunicationContext.state);
   return (
     <motion.div
       variants={variants}
