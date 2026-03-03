@@ -201,9 +201,9 @@ self.addEventListener("fetch", async (event) => {
                 const savedGroups =
                   requestBody.groups.length > 0
                     ? await addGroupsToDB(
-                        requestBody.groups,
-                        savedCategory.newCategory._id,
-                      )
+                      requestBody.groups,
+                      savedCategory.newCategory._id,
+                    )
                     : { newGroups: [] };
 
                 const savedData = { ...savedCategory, ...savedGroups };

@@ -323,6 +323,7 @@ const makeSyncRequest = async (requestData) => {
   });
 
   if (!response.ok) {
+    console.log("sync ", response.status)
     if (response.status === 401) {
       await messageClient(self, "UNAUTHORIZED");
     }

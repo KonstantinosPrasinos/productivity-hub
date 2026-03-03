@@ -41,6 +41,7 @@ export const handleSettingsGetRequest = async (request, sw) => {
   });
 
   if (!settingsResponse.ok) {
+    console.log("settings ", response.status)
     if (settingsResponse.code === 401) {
       await messageClient(sw, "UNAUTHORIZED");
     }

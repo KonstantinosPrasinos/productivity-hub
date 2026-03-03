@@ -148,6 +148,7 @@ export const handleAllEntriesGetRequest = async (request, sw) => {
   });
 
   if (!response.ok) {
+    console.log("entry ", response.status)
     if (response.status === 401) {
       await messageClient(sw, "UNAUTHORIZED");
     }

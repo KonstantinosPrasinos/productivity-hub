@@ -200,6 +200,7 @@ const NavLayout = () => {
         navigator.serviceWorker.ready.then(() => {
           navigator.serviceWorker.addEventListener("message", (event) => {
             const { type } = event.data;
+            console.log(event.data);
 
             switch (type) {
               case "SYNC_COMPLETED":

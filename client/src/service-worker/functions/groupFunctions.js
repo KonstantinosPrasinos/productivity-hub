@@ -65,6 +65,7 @@ export const handleGroupGetRequest = async (request, sw) => {
   });
 
   if (!groupResponse.ok) {
+    console.log("group ", response.status)
     if (groupResponse.code === 401) {
       await messageClient(sw, "UNAUTHORIZED");
     }

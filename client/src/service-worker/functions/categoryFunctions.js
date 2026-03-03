@@ -71,6 +71,7 @@ export const handleCategoryGetRequest = async (request, sw) => {
   });
 
   if (!categoryResponse.ok) {
+    console.log("category ", response.status)
     if (categoryResponse.code === 401) {
       await messageClient(sw, "UNAUTHORIZED");
     }
