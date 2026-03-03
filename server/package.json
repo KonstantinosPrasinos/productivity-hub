@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "set NODE_ENV=dev && node index.js",
+    "start": "cross-env NODE_ENV=dev node index.js",
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --testTimeout=20000"
   },
@@ -27,7 +27,7 @@
     "nodemon": "^2.0.19",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-google-one-tap": "^1.0.0",
+    "passport-google-one-tap": "^1.0.1",
     "passport-local": "^1.0.0",
     "validator": "^13.7.0"
   },
@@ -41,5 +41,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]
+  },
+  "overrides": {
+    "jwa": "^2.0.0"
   }
 }

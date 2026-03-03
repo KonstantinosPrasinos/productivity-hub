@@ -19,9 +19,9 @@ import { UserContext } from "../../../context/UserContext";
 import Modal from "../../../components/containers/Modal/Modal";
 import LoadingIndicator from "@/components/indicators/LoadingIndicator/LoadingIndicator.jsx";
 import PasswordStrengthBar from "@/components/indicators/PasswordStrengthBar/PasswordStrengthBar.jsx";
-import {openUrl} from "@tauri-apps/plugin-opener";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { start, onUrl } from "@fabianlars/tauri-plugin-oauth";
-import {TbBrandGoogleFilled} from "react-icons/tb";
+import { TbBrandGoogleFilled } from "react-icons/tb";
 
 const GoogleSignInButton = ({ googleLoading, setGoogleLoading }) => {
   const divRef = useRef();
@@ -39,7 +39,6 @@ const GoogleSignInButton = ({ googleLoading, setGoogleLoading }) => {
 
   useEffect(() => {
     const handleCredentialResponse = async (response) => {
-      console.log(response);
       await loginGoogle(response);
     };
 
@@ -85,7 +84,7 @@ const GoogleSignInButton = ({ googleLoading, setGoogleLoading }) => {
 
       // Get the code from the URL parameters and pass it to the login function
       const code = params.get('code');
-      loginGoogleDesktop({code, port})
+      loginGoogleDesktop({ code, port })
     });
 
     // Open the Google OAuth URL in the default browser
@@ -103,9 +102,8 @@ const GoogleSignInButton = ({ googleLoading, setGoogleLoading }) => {
 
   return (
     <div
-      className={`${styles.googleContainer} ${
-        isGoogleLoaded ? styles.googleVisible : ""
-      }`}
+      className={`${styles.googleContainer} ${isGoogleLoaded ? styles.googleVisible : ""
+        }`}
     >
       or
       <div ref={divRef}></div>

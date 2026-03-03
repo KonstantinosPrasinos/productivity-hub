@@ -18,6 +18,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const securityRoutes = require("./routes/securityRoutes");
 const taskHistoryRoutes = require("./routes/entryRoutes");
 const syncRoutes = require("./routes/syncRoutes");
+const dbConnect = require("./functions/db");
 // const {Strategy: GoogleStrategy} = require("passport-google-oauth20");
 
 // Express app
@@ -29,11 +30,28 @@ const sessionStore = new MongoDBStore({
   collection: "sessions",
 });
 
+console.log(process.env.NODE_ENV)
 const isDev = process.env.NODE_ENV === "dev"
 app.set("trust proxy", 1);
 
 // Middleware
 app.use(express.json());
+
+const corsOptions = {
+  origin: [
+    "https://productivity-hub-website.vercel.app",
+    "http://localhost:5173",
+    "https://taskflow.kprasinos.com",
+    "http://tauri.localhost"
+  ],
+  methods: ["POST", "GET"],
+  credentials: true,
+};
+
+// CORS must be first so headers are present even on error responses
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(
   session({
     store: sessionStore,
@@ -51,20 +69,14 @@ app.use(
   }),
 );
 
-const corsOptions = {
-  origin: [
-    "https://productivity-hub-website.vercel.app",
-    "http://localhost:5173",
-    "https://taskflow.kprasinos.com",
-    "http://tauri.localhost"
-  ],
-  methods: ["POST", "GET"],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-app.options("*", cors(corsOptions));
+app.use(async (req, res, next) => {
+  try {
+    await dbConnect();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
 
 app.get("/", (req, res) => {
   res.json("Hello there");
@@ -75,7 +87,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function (user, done) {
-    console.log("Serializing user with ID:", user._id);
+  console.log("Serializing user with ID:", user._id);
   done(null, user._id);
 });
 
@@ -100,10 +112,12 @@ app.use("/api/entry", taskHistoryRoutes);
 app.use("/api/sync", syncRoutes);
 
 app.use((err, req, res, next) => {
-  if (err.message) {
-    return res.status(400).json({ message: err.message });
-  }
-  next();
+  cors(corsOptions)(req, res, () => {
+    if (err.message) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
 });
 
 if (!process.env.MONGODB_URI) {

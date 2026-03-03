@@ -531,7 +531,7 @@ const handleRemainingRequests = async () => {
   while (self.requestEventQueue.length > 0) {
     const eventObj = self.requestEventQueue.shift();
 
-    if (eventObj === undefined || eventObj?.request) continue;
+    if (!eventObj || !eventObj.request) continue;
 
     const requestUrl = eventObj.request.url.substring(
       eventObj.request.url.indexOf("/api/") + 4,
@@ -556,39 +556,6 @@ const handleRemainingRequests = async () => {
             if (/\/entry\/all\/*/.test(requestUrl)) {
               await handleAllEntriesGetRequest(eventObj.request, self);
             }
-        }
-      } else {
-        switch (requestUrl) {
-          case "/task/create":
-            await addTaskToServer(eventObj, eventObj.savedData, self);
-            break;
-          case "/category/create":
-            await addCategoryToServer(eventObj, eventObj.savedData);
-            break;
-          case "/settings/update":
-            await addSettingsToServer(eventObj);
-            break;
-          case "/task/set":
-            await editTaskInServer(eventObj);
-            break;
-          case "/task/delete":
-            await deleteTaskInServer(eventObj);
-            break;
-          case "/entry/create":
-            await addEntryToDB(eventObj);
-            break;
-          case "/entry/set-value":
-            await setEntryValueInServer(eventObj);
-            break;
-          case "/entry/set":
-            await setEntryInServer(eventObj);
-            break;
-          case "/category/delete":
-            await deleteCategoryInServer(eventObj);
-            break;
-          case "/entry/delete-single":
-            await deleteEntryInServer(eventObj);
-            break;
         }
       }
     } catch (error) {
