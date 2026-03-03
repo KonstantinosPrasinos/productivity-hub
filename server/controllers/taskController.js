@@ -182,39 +182,44 @@ const getTasksWithHistory = async (tasks, userId) => {
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0);
 
-  // Add current entry to tasks
-  // If task repeats then look for an entry with a specific date
-  // If no entry is found then create one
-  const tasksWithCurrentEntry = [];
-  const currentEntries = [];
+  const repeatingIds = tasks.filter((t) => t.repeats).map((t) => t._id);
+  const nonRepeatingIds = tasks.filter((t) => !t.repeats).map((t) => t._id);
 
-  for (const task of tasks) {
-    let currentEntry;
-    if (task.repeats) {
-      currentEntry = await Entry.findOne({
-        userId: userId,
-        taskId: task._id,
-        date: currentDate,
-      });
-    } else {
-      currentEntry = await Entry.findOne({ userId: userId, taskId: task._id });
-    }
+  // Single bulk query: fetch all current entries in one round-trip
+  const existingEntries = await Entry.find({
+    userId,
+    $or: [
+      ...(repeatingIds.length ? [{ taskId: { $in: repeatingIds }, date: currentDate }] : []),
+      ...(nonRepeatingIds.length ? [{ taskId: { $in: nonRepeatingIds } }] : []),
+    ],
+  });
 
-    if (!currentEntry) {
-      currentEntry = await Entry.create({ userId: userId, taskId: task._id });
-    }
+  // Build a taskId -> entry map for O(1) lookup
+  const entryByTaskId = new Map(
+    existingEntries.map((e) => [e.taskId.toString(), e])
+  );
 
-    currentEntries.push(currentEntry);
-    tasksWithCurrentEntry.push({
-      ...task._doc,
-      currentEntryId: currentEntry._id,
-      forDeletion: undefined,
-      hidden: false,
-    }); // Remove the for deletion property, add the hidden property
-  }
+  // Create missing entries in parallel
+  const createPromises = tasks
+    .filter((t) => !entryByTaskId.has(t._id.toString()))
+    .map((t) => Entry.create({ userId, taskId: t._id }));
+
+  const newEntries = await Promise.all(createPromises);
+  newEntries.forEach((e) => entryByTaskId.set(e.taskId.toString(), e));
+
+  const currentEntries = tasks.map((t) => entryByTaskId.get(t._id.toString()));
+
+  const tasksWithCurrentEntry = tasks.map((task, i) => ({
+    ...task._doc,
+    currentEntryId: currentEntries[i]._id,
+    forDeletion: undefined,
+    hidden: false,
+  }));
 
   return { tasksWithCurrentEntry, currentEntries };
 };
+
+
 
 const getTasks = async (req, res) => {
   if (req.user) {

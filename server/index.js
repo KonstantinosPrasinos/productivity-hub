@@ -87,12 +87,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function (user, done) {
-  console.log("Serializing user with ID:", user._id);
   done(null, user._id);
 });
 
 passport.deserializeUser(function (user, done) {
-  console.log("Deserializing user with ID:", user);
   User.findById(user, (err, user) => {
     done(null, user);
   });
@@ -123,8 +121,6 @@ app.use((err, req, res, next) => {
 if (!process.env.MONGODB_URI) {
   throw new Error("Please provide a MONGODB_URI in the .env file");
 }
-
-console.log(isDev)
 
 // Connect to database
 if (mongoose.connection.readyState === 0) {
