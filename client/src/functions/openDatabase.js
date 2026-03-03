@@ -213,6 +213,27 @@ export const getSettingsFromDB = async () => {
     .objectStore("settings")
     .getAll();
 
+  if (settings.length === 0) {
+    return new Response(JSON.stringify({
+      "defaults": {
+        "step": 1,
+        "goal": 1,
+        "priority": 1,
+        "deleteGroupAction": "Keep their repeat details"
+      },
+      "theme": "Device",
+      "confirmDelete": false,
+      "priorityBounds": {
+        "low": 1,
+        "high": 1
+      },
+      "mustSync": false
+    }),
+      {
+        headers: { "Content-Type": "application/json" },
+      });
+  }
+
   return new Response(JSON.stringify(settings[0]), {
     headers: { "Content-Type": "application/json" },
   });
