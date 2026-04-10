@@ -93,7 +93,7 @@ export function useTaskList(tasks: Task[] = []) {
 
             return reducedTasks;
         }, []);
-    }, [componentCommunicationContext.state.filters, tasks, componentCommunicationContext.state.searchQuery]);
+    }, [componentCommunicationContext, tasks]);
 
     return {
         filteredTasks,

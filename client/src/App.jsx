@@ -200,7 +200,6 @@ const NavLayout = () => {
         navigator.serviceWorker.ready.then(() => {
           navigator.serviceWorker.addEventListener("message", (event) => {
             const { type } = event.data;
-            console.log(event.data);
 
             switch (type) {
               case "SYNC_COMPLETED":
@@ -384,7 +383,7 @@ function App() {
         <Route path="*" element={<Navigate to={"/not-found"} />} />
         <Route path="/not-found" element={<NotFound />} />
       </Routes>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </div>
   );
 }

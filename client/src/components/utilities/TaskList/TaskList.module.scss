@@ -27,7 +27,7 @@
     background-color: var(--border-primary-color);
   }
 
-  & > :last-child {
+  &> :last-child {
     margin-bottom: 4px;
   }
 }
@@ -37,7 +37,7 @@
   height: min-content;
   flex-shrink: 0;
 
-  & > *:first-child {
+  &>*:first-child {
     margin-bottom: 4px;
   }
 
@@ -59,7 +59,8 @@
 
 .categoryContents {
   @extend .Horizontal-Flex-Container;
-  & > span {
+
+  &>span {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow-x: hidden;
@@ -151,7 +152,7 @@
     background-color: transparent;
     transition: background-color 0.2s ease-in-out;
 
-    & > .categoryFilters {
+    &>.categoryFilters {
       opacity: 0;
       pointer-events: none;
     }
@@ -162,7 +163,7 @@
   @extend .Horizontal-Flex-Container;
   font-size: v.$font-xl;
   width: 100%;
-  
+
   height: min-content;
 
   background-color: var(--background-color);
@@ -204,12 +205,12 @@
 
   width: 100%;
 
-  & > :first-child {
+  &> :first-child {
     opacity: v.$opacity-very-low;
     flex-shrink: 0;
   }
 
-  & > input {
+  &>input {
     font-size: v.$font-m;
     flex-grow: 1;
     opacity: v.$opacity-medium;
@@ -256,11 +257,16 @@
 }
 
 @keyframes appearAnimation {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
-.searchTextInput:placeholder-shown + .searchEraser {
+.searchTextInput:placeholder-shown+.searchEraser {
   opacity: 0;
   pointer-events: none;
   width: 0;
@@ -282,11 +288,11 @@
     margin: 0 10px;
     box-sizing: border-box;
 
-    & > :first-child {
+    &> :first-child {
       margin-left: 4px;
     }
 
-    & > :last-child {
+    &> :last-child {
       margin-right: 4px;
     }
   }
@@ -302,7 +308,7 @@
     width: 100%;
     padding: 0.5em 10px 0.5em 10px;
 
-    & > :last-child {
+    &> :last-child {
       margin-bottom: 62px;
     }
   }
@@ -314,11 +320,11 @@
     padding-bottom: 0;
     overflow-y: auto;
 
-    & > :last-child {
+    &> :last-child {
       margin-bottom: calc(1em + 60px);
     }
 
-    & > * {
+    &>* {
       flex-shrink: 0;
     }
   }
@@ -336,18 +342,18 @@
     max-height: 100%;
     box-sizing: border-box;
 
-    & > .filterChip{
+    &>.filterChip {
       margin-top: 75px; // (1em (16px) + 20px (padding) + 2px (border) + 20px (top offset)) of search bar + 20px
     }
   }
 
   .leftSide {
     height: 100%;
-    width: 25em;
-    min-width: 25em;
+    width: 30em;
+    min-width: 30em;
     padding: 0 10px 0.5em 10px;
 
-    & > :first-child {
+    &> :first-child {
       margin-top: 20px;
     }
   }

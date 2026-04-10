@@ -1,125 +1,125 @@
 @use "@/styles/variables" as v;
 @use "@/styles/index";
 
-.newNavBar {
-  display: flex;
-  align-items: center;
-}
-
-.item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.newContainer {
-  z-index: 8;
-}
-
-.navButton {
-  font-size: v.$font-xxl;
-  height: 1em;
-  opacity: v.$opacity-very-low;
-  transition: opacity 0.2s ease-out;
-  color: var(--primary-color);
-
-  &.selected {
-    opacity: 1;
-  }
-}
-
-.createButton {
-  transition: opacity 0.2s ease-out;
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
-  border-radius: v.$base-border-radius;
-  box-shadow: v.$elevation-1;
-
-  display: flex;
-  align-items: center;
-}
-
-.searchBar {
-  width: 100%;
-  display: flex;
-  gap: 10px;
-  z-index: 2;
-}
-
-.searchInput {
-  flex-grow: 1;
+.container {
+  @extend .Rounded-Container;
+  @extend .Stack-Container;
+  width: 200px;
+  height: 100%;
   background-color: var(--surface-color);
-  font-size: v.$font-m;
-  opacity: v.$opacity-medium;
+
+  border-radius: 0;
+  padding: 10px;
+  overflow-x: hidden;
 }
 
-.standardButtons {
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-primary-color);
+}
+
+.categoriesContainer {
+  @extend .Stack-Container;
+  overflow-x: hidden;
+}
+
+.categoryContainer {
+  @extend .Stack-Container;
+  @extend .Body-Large;
+
+  gap: 0px;
+
+  transition: 0.2s ease-out background-color;
+}
+
+.categoryButton {
+  @extend .Horizontal-Flex-Container;
+  @extend .Body-Large;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  padding: 2px 6px;
+  width: 100%;
+
+  cursor: pointer;
+
+  transition: 0.2s ease-out background-color;
+}
+
+.categorySelected {
+  border-radius: v.$base-border-radius;
+  background-color: var(--background-color);
+}
+
+.categoryTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryDot {
+  flex-shrink: 0;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.subCategoryButton {
+  @extend .Horizontal-Flex-Container;
+  @extend .Body-Medium;
+
+  color: var(--secondary-color);
+  text-align: left;
+
+  overflow: hidden;
+
+  padding: 2px 6px 2px 4px;
+  gap: 6px;
+  margin-top: 4px;
+  width: 100%;
+
+  border-radius: v.$base-border-radius;
+  transition: 0.2s ease-out background-color;
+}
+
+.subCategoryTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.allSelected {
+  @extend .Horizontal-Flex-Container;
+  @extend .Body-Large;
+
+  padding: 2px 6px;
+}
+
+.settingsContainer {
   display: flex;
-  gap: 30px;
+  justify-content: end;
+}
+
+.settingsButton {
+  @extend .Rounded-Container;
+  height: 100%;
+  aspect-ratio: 1/1;
+  border-radius: v.$button-border-radius;
+  box-sizing: border-box;
+  padding: 0.5em;
+  color: var(--secondary-color);
+
+  display: flex;
+  justify-content: center;
   align-items: center;
-}
 
-@media (max-width: v.$phone-breakpoint) {
-  .newContainer {
-    width: 100%;
-    bottom: 0;
-
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    padding-bottom: 10px;
-    position: fixed;
-
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--surface-color) 100%);
-
-    & > * {
-      flex-grow: 0;
-    }
-  }
-
-  .newNavBar {
-    border-radius: v.$button-border-radius;
-    background-color: var(--surface-color);
-    box-shadow: v.$elevation-1;
-
-    box-sizing: content-box;
-
-    gap: 30px;
-    padding: 12px;
-  }
-
-  .createButton {
-    font-size: v.$font-xxl;
-    padding: 12px;
-  }
-}
-
-@media (min-width: v.$phone-breakpoint) {
-  .newContainer {
-    width: auto;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 34px;
-
-    background-color: var(--surface-color);
-    box-shadow: v.$elevation-1;
-    padding-bottom: 10px;
-    border-radius: 0 10px 10px 0;
-  }
-
-  .newNavBar {
-    gap: 50px;
-    flex-direction: column;
-
-    padding: 2rem 1.5rem;
-    border-bottom-right-radius: 12px;
-  }
-
-  .createButton {
-    font-size: v.$font-xl;
-    padding: 10px;
-  }
+  font-size: 1.25em;
 }
