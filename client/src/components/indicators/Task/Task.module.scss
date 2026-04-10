@@ -34,12 +34,11 @@
 }
 
 .titleContainer {
-  font-size: v.$font-m;
+  @extend .Body-Medium;
   text-overflow: ellipsis;
   overflow: hidden;
   text-wrap: wrap;
   white-space: pre-wrap;
-  line-height: 1.25em;
   opacity: 0.9;
 
   @media (max-width: v.$phone-breakpoint) {
@@ -70,18 +69,19 @@
 
   justify-content: space-between;
   width: 100%;
+  padding: 6px;
+  padding-right: 0;
 
-  &:not(:last-child) {
-    padding: 10px 0;
-    //border-bottom: v.$base-border;
+  &:last-child {
+    padding-bottom: 0;
   }
 
-  &:last-child:not(:only-child)  {
-    padding-top: 10px;
+  &:first-child {
+    padding-top: 0;
   }
 
   &.taskCompleted {
-    & > * {
+    &>* {
       opacity: v.$opacity-very-low !important;
     }
   }
@@ -97,7 +97,8 @@
 .repeatDetails {
   @extend .Horizontal-Flex-Container;
   @include m.Label-Medium;
-  & > div {
+
+  &>div {
     @extend.Horizontal-Flex-Container;
     gap: 6px;
   }
@@ -105,7 +106,7 @@
   width: 100%;
   gap: 0.5em;
 
-  & > div {
+  &>div {
     text-overflow: ellipsis;
     overflow-x: hidden;
     white-space: nowrap;
@@ -122,7 +123,7 @@
 
 .tasksContainer {
   @extend .Stack-Container;
-  
+
   gap: 0;
 }
 

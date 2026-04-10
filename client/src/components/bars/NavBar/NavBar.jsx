@@ -1,16 +1,16 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import styles from "./NavBar.module.scss";
-import {TbHome, TbPlus, TbSearch, TbSettings, TbZoomCheck} from "react-icons/tb";
+import { TbHome, TbPlus, TbSearch, TbSettings, TbZoomCheck } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MiniPagesContext } from "../../../context/MiniPagesContext";
-import {AnimatePresence, motion} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext.jsx";
+import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext";
 
 const desktopVariants = {
   initial: {
-    x : "-3em",
+    x: "-3em",
     scale: 0,
   },
   animate: {
@@ -21,7 +21,7 @@ const desktopVariants = {
 
 const mobileVariants = {
   initial: {
-    y : "3em",
+    y: "3em",
     scale: 0,
   },
   animate: {
@@ -63,7 +63,7 @@ const addButtonVariants = {
   }
 }
 
-const NavigationButton = ({onClick = () => {}, selected = false, children}) => {
+const NavigationButton = ({ onClick = () => { }, selected = false, children }) => {
   return <button className={`${styles.navButton} ${selected ? styles.selected : ""}`} onClick={onClick}>
     {children}
   </button>
@@ -143,73 +143,73 @@ const NavBar = () => {
   }, [location]);
 
   return <motion.div
-      className={styles.newContainer}
-      transition={{duration: 0.4, type: "spring"}}
-      initial={"initial"}
-      animate={"animate"}
-      variants={screenSize === "small" ? mobileVariants : desktopVariants}
+    className={styles.newContainer}
+    transition={{ duration: 0.4, type: "spring" }}
+    initial={"initial"}
+    animate={"animate"}
+    variants={screenSize === "small" ? mobileVariants : desktopVariants}
   >
     <motion.div
-        className={styles.newNavBar}
-        animate={selected === "search" ? "search" : "initial"}
-        variants={screenSize === "small" ? navBarVariants : navBarDesktopVariants}
+      className={styles.newNavBar}
+      animate={selected === "search" ? "search" : "initial"}
+      variants={screenSize === "small" ? navBarVariants : navBarDesktopVariants}
     >
       <AnimatePresence mode={"popLayout"}>
         {selected !== "search" && <motion.div
-            className={styles.item}
-            key={"home-button"}
-            animate={{scale: 1}}
-            exit={{scale: 0}}
+          className={styles.item}
+          key={"home-button"}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0 }}
         >
           <NavigationButton
-              onClick={() => handleNavigation("/home")}
-              selected={selected === "home"}
+            onClick={() => handleNavigation("/home")}
+            selected={selected === "home"}
           >
-            <TbHome/>
+            <TbHome />
           </NavigationButton>
         </motion.div>}
         {screenSize === "small" && (
-            <div className={styles.item}>
-              <NavigationButton
-                  onClick={handleSearchClick}
-                  selected={selected === "search"}
-              >
-                {componentCommunicationContext.state.searchQuery !== "" || componentCommunicationContext.state.filters.length > 0 ? <TbZoomCheck /> : <TbSearch/>}
-              </NavigationButton>
-            </div>
+          <div className={styles.item}>
+            <NavigationButton
+              onClick={handleSearchClick}
+              selected={selected === "search"}
+            >
+              {componentCommunicationContext.state.searchQuery !== "" || componentCommunicationContext.state.filters.length > 0 ? <TbZoomCheck /> : <TbSearch />}
+            </NavigationButton>
+          </div>
         )}
         {
           selected === "search" && <div className={styles.searchBar} key={"search-bar"}>
-              <motion.input
-                  initial={{opacity: 0}}
-                  animate={{opacity: 1}}
-                  className={styles.searchInput}
-                  placeholder="Search"
-                  onChange={handleChange}
-                  value={componentCommunicationContext.state.searchQuery}
-              ></motion.input>
+            <motion.input
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={styles.searchInput}
+              placeholder="Search"
+              onChange={handleChange}
+              value={componentCommunicationContext.state.searchQuery}
+            ></motion.input>
           </div>
         }
         {selected !== "search" && <motion.div
-            className={styles.item}
-            key={"settings-button"}
-            animate={{scale: 1}}
-            exit={{scale: 0}}
+          className={styles.item}
+          key={"settings-button"}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0 }}
         >
           <NavigationButton
-              onClick={() => handleNavigation("/settings")}
-              selected={selected === "settings"}
+            onClick={() => handleNavigation("/settings")}
+            selected={selected === "settings"}
           >
-            <TbSettings/>
+            <TbSettings />
           </NavigationButton>
         </motion.div>}
       </AnimatePresence>
     </motion.div>
     <motion.button
-        className={styles.createButton}
-        onClick={handleCreateClick}
-        animate={selected === "search" ? "search" : "initial"}
-        variants={addButtonVariants}
+      className={styles.createButton}
+      onClick={handleCreateClick}
+      animate={selected === "search" ? "search" : "initial"}
+      variants={addButtonVariants}
     >
       <TbPlus />
     </motion.button>

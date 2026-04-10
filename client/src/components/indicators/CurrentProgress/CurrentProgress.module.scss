@@ -3,12 +3,11 @@
 
 .container {
     font-size: v.$font-m;
-    height: 1.3 * v.$font-m;
-    width: 1.3 * v.$font-m;
-    border: 2px solid var(--on-surface-color);
+    height: 1.4 * v.$font-m;
+    width: 1.4 * v.$font-m;
+    border: 2px solid var(--border-primary-color);
     border-radius: v.$font-xl;
-    color: var(--on-surface-color);
-    opacity: 0.4;
+    color: var(--border-primary-color);
 
     display: flex;
     justify-content: center;
@@ -41,14 +40,14 @@
     align-items: flex-start;
     height: 100%;
 
-    & > div {
+    &>div {
         position: relative;
         width: 0;
         display: flex;
         justify-content: center;
         align-items: flex-start;
 
-        & > div {
+        &>div {
             position: absolute;
             top: -1.25em;
         }
@@ -60,19 +59,19 @@
     color: var(--success-color);
 }
 
-.boxIsNotChecked {
-    
-}
+.boxIsNotChecked {}
 
 @keyframes getChecked {
     0% {
         stroke-dashoffset: 1;
         color: var(--success-color);
     }
+
     75% {
         stroke-dashoffset: 0.25;
         color: var(--success-color);
     }
+
     100% {
         stroke-dashoffset: 0;
         color: var(--on-surface-color);

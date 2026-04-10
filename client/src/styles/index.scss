@@ -1,6 +1,6 @@
 @use '@/styles/mixins' as m;
 @use "variables" as v;
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     --overlay-color: rgba(0, 0, 0, 0.4);
@@ -17,9 +17,11 @@
     display: flex;
     flex-direction: row;
     gap: 0;
+
     &.Light {
         @include v.getTheme('light');
     }
+
     &.Dark {
         @include v.getTheme('dark');
     }
@@ -34,8 +36,9 @@ body {
     overflow-y: hidden;
     position: fixed;
     height: 100%;
-    font-family: 'Roboto', sans-serif;
-    > * {
+    font-family: 'Inter', sans-serif;
+
+    >* {
         -webkit-tap-highlight-color: transparent;
     }
 }
@@ -52,12 +55,15 @@ a {
     &:link {
         color: var(--on-surface-color);
     }
+
     &:visited {
         color: var(--on-surface-color);
     }
+
     &:hover {
         text-decoration: none;
     }
+
     &:active {
         color: var(--on-surface-color);
     }
@@ -72,7 +78,7 @@ a {
     padding: v.$button-padding;
     width: max-content;
     white-space: nowrap;
-    
+
     &.disabled {
         cursor: not-allowed;
     }
@@ -147,10 +153,10 @@ a {
     grid-template-rows: calc(50% - 5px) calc(50% - 5px);
     gap: 10px 10px;
     grid-template-areas:
-    ". ."
-    ". .";
+        ". ."
+        ". .";
 
-    & > * {
+    &>* {
         height: 72.8px;
     }
 }
@@ -217,6 +223,10 @@ a {
     @include m.Body-Small;
 }
 
+.Body-Medium {
+    @include m.Body-Medium;
+}
+
 
 .Headline {
     font-size: v.$font-xl;
@@ -254,7 +264,7 @@ a {
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    
+
     &.Clickable {
         cursor: pointer;
     }
@@ -324,7 +334,7 @@ input {
     border: none;
     background: none;
     color: var(--primary-color);
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
 
     &:focus {
         outline: none;
@@ -339,14 +349,14 @@ input {
         &:focus {
             box-shadow: 0 2px 0 0 var(--on-surface-color);
         }
-    } 
+    }
 }
 
 table {
     border-spacing: 0;
     width: 100%;
 
-    tr > td {
+    tr>td {
         height: 40px;
         box-sizing: border-box;
     }
@@ -362,12 +372,13 @@ table {
         &:first-child:not(:last-child) {
             border-right: none !important;
         }
+
         &:nth-child(3):not(:first-child) {
             border-left: none !important;
         }
     }
 
-    tr > th {
+    tr>th {
         border: solid var(--border-primary-color);
         border-width: 1px 0;
 
@@ -385,15 +396,17 @@ table {
         th:first-child {
             border-top-left-radius: v.$base-border-radius;
         }
+
         th:last-child {
             border-top-right-radius: v.$base-border-radius;
         }
     }
 
-    &> *:last-child > tr:last-of-type {
+    &>*:last-child>tr:last-of-type {
         td:first-child {
             border-bottom-left-radius: v.$base-border-radius;
         }
+
         td:last-child {
             border-bottom-right-radius: v.$base-border-radius;
         }
@@ -429,7 +442,7 @@ button {
     border: none;
     cursor: pointer;
     color: inherit;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     padding: 0;
 }
 
@@ -454,8 +467,7 @@ button {
 }
 
 /* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-}
+::-webkit-scrollbar-thumb:hover {}
 
 // App.jsx
 @media (max-width: v.$phone-breakpoint) {
@@ -465,6 +477,7 @@ button {
         flex-grow: 1;
         overflow: auto;
     }
+
     .Page {
         box-sizing: border-box;
         border: none !important;
@@ -473,9 +486,11 @@ button {
         height: 100%;
         overflow-y: auto;
     }
+
     .App {
         flex-direction: column;
     }
+
     .Rounded-Container {
         &.To-Edge {
             border-radius: 0;
@@ -524,6 +539,7 @@ button {
     left: 0;
     right: 0;
 }
+
 .titlebar-button {
     display: inline-flex;
     justify-content: center;
@@ -533,6 +549,7 @@ button {
     user-select: none;
     -webkit-user-select: none;
 }
+
 .titlebar-button:hover {
     background: #5bbec3;
 }

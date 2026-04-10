@@ -4,6 +4,21 @@ import IconButton from "@/components/buttons/IconButton/IconButton";
 import React from "react";
 import PropTypes from "prop-types";
 
+/**
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ * @param {any} props.value
+ * @param {any} [props.selected]
+ * @param {(value: any) => void} [props.setSelected]
+ * @param {string} [props.type]
+ * @param {React.MouseEventHandler<HTMLButtonElement>} [props.onClick]
+ * @param {string} [props.style]
+ * @param {string} [props.size]
+ * @param {boolean} [props.disabled]
+ * @param {React.MouseEventHandler<HTMLButtonElement>} [props.deleteFunction]
+ * @param {boolean} [props.hasShadow]
+ * @param {React.MouseEventHandler<HTMLButtonElement>} [props.onContextMenu]
+ */
 const Chip = ({
   children,
   value,
@@ -16,7 +31,7 @@ const Chip = ({
   disabled,
   deleteFunction,
   hasShadow = false,
-  onContextMenu = () => {},
+  onContextMenu = () => { },
 }) => {
   const classes = [styles.container, styles.widthLimited, 'Button', styles[style]];
 
@@ -52,19 +67,13 @@ const Chip = ({
       </button>
       {deleteFunction && (
         <IconButton
-        onClick={deleteFunction}
+          onClick={deleteFunction}
         >
           <TbX />
         </IconButton>
       )}
     </div>
   );
-};
-
-Chip.propTypes = {
-  size: PropTypes.oneOf(['small', 'medium']),
-  style: PropTypes.oneOf(['squared', 'rounded']),
-  type: PropTypes.oneOf(['select', 'icon']),
 };
 
 export default Chip;

@@ -6,7 +6,7 @@ import UserContextProvider from "./context/UserContext";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { createRoot } from "react-dom/client";
-import ComponentCommunicationContextProvider from "@/context/ComponentCommunicationContext.jsx";
+import ComponentCommunicationContextProvider from "@/context/ComponentCommunicationContext";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { networkMode: "offlineFirst" } },

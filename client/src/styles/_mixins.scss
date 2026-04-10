@@ -59,3 +59,10 @@
   line-height: 16px;
   letter-spacing: 0.4px;
 }
+
+@mixin Body-Medium {
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.25px;
+  line-height: 20px;
+}

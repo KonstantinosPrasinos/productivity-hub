@@ -1,15 +1,13 @@
-import React, { useContext, useMemo, useRef} from "react";
+import { useContext } from "react";
 import styles from "./TaskList.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import Task from "@/components/indicators/Task/Task.jsx";
 import Chip from "@/components/buttons/Chip/Chip";
-import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
-import { TbEraser, TbPlus, TbSearch} from "react-icons/tb";
+import { TbEraser, TbPlus, TbSearch } from "react-icons/tb";
 import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
-import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
-import { useScreenSize } from "@/hooks/useScreenSize";
-import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext.jsx";
+
+import { useTaskList } from "./useTaskList";
 
 const variants = {
   hidden: { opacity: 0, y: 25 },
@@ -26,215 +24,33 @@ const childVariants = {
   exit: { opacity: 0, scale: 0.5, transition: { duration: 0.2 } },
 };
 
-const CategoryChips = ({
+/**
+ * @param {Object} props
+ * @param {any[]} props.categories
+ * @param {any[]} props.subCategories
+ * @param {any[]} props.categoryFilter
+ * @param {Function} props.setCategoryFilter
+ * @param {string} props.searchFilter
+ * @param {Function} props.setSearchFilter
+ * @param {boolean} props.showNonCurrentTasks
+ * @param {Function} props.setShowNonCurrentTasks
+ */
+const BigScreenFilters = ({
   categories,
   subCategories,
   categoryFilter,
   setCategoryFilter,
-  expandDirection = "vertical",
-  toggleSearchVisibility = () => {},
+  searchFilter,
+  setSearchFilter,
+  showNonCurrentTasks,
+  setShowNonCurrentTasks,
 }) => {
-  const miniPagesContext = useContext(MiniPagesContext);
-
-  const toggleSelected = (category) => {
-    if (
-      categoryFilter
-        .map((tempCategory) => tempCategory._id)
-        .includes(category._id)
-    ) {
-      setCategoryFilter(
-        categoryFilter.filter(
-          (tempCategory) => tempCategory._id != category._id,
-        ),
-      );
-    } else {
-      setCategoryFilter([
-        ...categoryFilter,
-        { ...category, selectedSubcategories: [] },
-      ]);
-    }
-  };
-
-  const toggleSubcategorySelected = (subcategory) => {
-    const subcategoryParent = categoryFilter.find(
-      (tempSubcategory) => tempSubcategory._id === subcategory.parent,
-    );
-
-    if (subcategoryParent.selectedSubcategories.includes(subcategory)) {
-      setCategoryFilter(
-        categoryFilter.map((tempCategory) =>
-          tempCategory._id != subcategoryParent._id
-            ? tempCategory
-            : {
-                ...tempCategory,
-                selectedSubcategories:
-                  tempCategory.selectedSubcategories.filter(
-                    (tempSubcategory) =>
-                      tempSubcategory._id !== subcategory._id,
-                  ),
-              },
-        ),
-      );
-    } else {
-      setCategoryFilter(
-        categoryFilter.map((tempCategory) =>
-          tempCategory._id != subcategoryParent._id
-            ? tempCategory
-            : {
-                ...tempCategory,
-                selectedSubcategories: [
-                  ...tempCategory.selectedSubcategories,
-                  subcategory,
-                ],
-              },
-        ),
-      );
-    }
-  };
-
-  const handleContextMenu = (event, category) => {
-    event.preventDefault();
-    toggleSearchVisibility();
-    miniPagesContext.dispatch({
-      type: "ADD_PAGE",
-      payload: { type: "category-view", id: category._id },
-    });
-  };
-
-  return (
-    <>
-      {categories.map((category) => {
-        const categorySubcategories = subCategories.filter(
-          (subCategory) => subCategory.parent === category._id,
-        );
-
-        return (
-          <div
-            key={category._id}
-            className={
-              expandDirection === "vertical"
-                ? ""
-                : styles.categoryChipsContainer
-            }
-          >
-            <Chip
-              size={"small"}
-              selected={
-                categoryFilter
-                  .map((tempCategory) => tempCategory._id)
-                  .includes(category._id)
-                  ? category
-                  : null
-              }
-              value={category}
-              setSelected={() => toggleSelected(category)}
-              hasShadow={expandDirection === "vertical"}
-              onContextMenu={(event) => handleContextMenu(event, category)}
-            >
-              <div className={styles.categoryContents}>
-                <div
-                  className={`${styles.categoryChipColor} ${category.color}`}
-                ></div>
-                <span>{category.title}</span>
-              </div>
-            </Chip>
-            <AnimatePresence>
-              {expandDirection !== "vertical" &&
-                categorySubcategories.length > 0 &&
-                categoryFilter
-                  .map((tempCategory) => tempCategory._id)
-                  .includes(category._id) && (
-                  <motion.div
-                    exit={{ opacity: 0 }}
-                    className={styles.divider}
-                  ></motion.div>
-                )}
-            </AnimatePresence>
-            <div
-              className={
-                expandDirection === "vertical"
-                  ? styles.subcategoryChipsHidden
-                  : styles.subcategoryChips
-              }
-            >
-              <AnimatePresence>
-                {categoryFilter
-                  .map((tempCategory) => tempCategory._id)
-                  .includes(category._id) &&
-                  categorySubcategories.map((subCategory) => (
-                    <motion.div
-                      key={subCategory._id}
-                      className={`${styles.subCategoryContainer} ${
-                        expandDirection === "vertical"
-                          ? styles.subCategoryContainerVertical
-                          : ""
-                      }`}
-                      initial={{
-                        height: expandDirection === "vertical" ? 0 : "auto",
-                        marginTop: 0,
-                        opacity: 0,
-                      }}
-                      animate={{
-                        height: "auto",
-                        marginTop: expandDirection === "vertical" ? 10 : 0,
-                        opacity: 1,
-                      }}
-                      transition={{ duration: 0.2 }}
-                      exit={{
-                        height: expandDirection === "vertical" ? 0 : "auto",
-                        marginTop: 0,
-                        overflow:
-                          expandDirection === "vertical" ? "hidden" : null,
-                        opacity: 0,
-                      }}
-                    >
-                      <Chip
-                        value={subCategory}
-                        selected={
-                          categoryFilter
-                            .find(
-                              (tempCategory) =>
-                                tempCategory._id === category._id,
-                            )
-                            .selectedSubcategories.includes(subCategory)
-                            ? subCategory
-                            : null
-                        }
-                        size={"small"}
-                        hasShadow={expandDirection === "vertical"}
-                        setSelected={() =>
-                          toggleSubcategorySelected(subCategory)
-                        }
-                      >
-                        {subCategory.title}
-                      </Chip>
-                    </motion.div>
-                  ))}
-              </AnimatePresence>
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-const BigScreenFilters = ({
-                            categories,
-                            subCategories,
-                            categoryFilter,
-                            setCategoryFilter,
-                            searchFilter,
-                            setSearchFilter,
-                            showNonCurrentTasks,
-                            setShowNonCurrentTasks,
-                          }) => {
   const miniPagesContext = useContext(MiniPagesContext);
 
   const toggleNoCategory = () => {
     if (categoryFilter.find((category) => category._id === "-1")) {
       setCategoryFilter(
-          categoryFilter.filter((tempCategory) => tempCategory._id != "-1"),
+        categoryFilter.filter((tempCategory) => tempCategory._id != "-1"),
       );
     } else {
       setCategoryFilter([
@@ -252,69 +68,68 @@ const BigScreenFilters = ({
   };
 
   return (
-      <>
-        <div className={styles.categoryChipContainer}>
-          <SearchBar
-              isStandalone={true}
-              searchFilter={searchFilter}
-              setSearchFilter={setSearchFilter}
-          />
-          <div className={styles.filterChip}>
-            <Chip
-              value={true}
-              hasShadow={true}
-              size={"small"}
-              selected={showNonCurrentTasks}
-              setSelected={() => setShowNonCurrentTasks(!showNonCurrentTasks)}
-            >
-              Show non-current tasks
-            </Chip>
-          </div>
+    <>
+      <div className={styles.categoryChipContainer}>
+        <SearchBar
+          isStandalone={true}
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
+        />
+        <div className={styles.filterChip}>
           <Chip
-              value={-1}
-              setSelected={() => toggleNoCategory()}
-              selected={
-                categoryFilter.find((category) => category._id === "-1") ? -1 : null
-              }
-              hasShadow={true}
-              size={"small"}
+            value={true}
+            hasShadow={true}
+            size={"small"}
+            selected={showNonCurrentTasks}
+            setSelected={() => setShowNonCurrentTasks(!showNonCurrentTasks)}
           >
-            No category
+            Show non-current tasks
           </Chip>
-          <div className={styles.filterLabel}>Categories:</div>
-          <CategoryChips
-              categories={categories}
-              subCategories={subCategories}
-              categoryFilter={categoryFilter}
-              setCategoryFilter={setCategoryFilter}
-          />
-          <Button
-              onClick={handleNewClick}
-              filled={false}
-              type={"square"}
-              hasShadow={true}
-              size="small"
-          >
+        </div>
+        <Chip
+          value={-1}
+          setSelected={() => toggleNoCategory()}
+          selected={
+            categoryFilter.find((category) => category._id === "-1") ? -1 : null
+          }
+          hasShadow={true}
+          size={"small"}
+        >
+          No category
+        </Chip>
+        <div className={styles.filterLabel}>Categories:</div>
+        <Button
+          onClick={handleNewClick}
+          filled={false}
+          type={"square"}
+          hasShadow={true}
+          size="small"
+        >
           <span className="Horizontal-Flex-Container">
             Add new
             <TbPlus />
           </span>
-          </Button>
-        </div>
-      </>
+        </Button>
+      </div>
+    </>
   );
 };
 
+/**
+ * @param {Object} props
+ * @param {boolean} [props.isStandalone]
+ * @param {string} props.searchFilter
+ * @param {Function} props.setSearchFilter
+ */
 const SearchBar = ({ isStandalone = false, searchFilter, setSearchFilter }) => {
-  const handleChange = (event) => {
+  const handleChange = (/** @type {{ target: { value: any; }; }} */ event) => {
     setSearchFilter(event.target.value);
   };
 
   return (
     <div
-      className={`${styles.searchInput} ${
-        isStandalone ? styles.standalone : ""
-      }`}
+      className={`${styles.searchInput} ${isStandalone ? styles.standalone : ""
+        }`}
     >
       <TbSearch />
       <input
@@ -335,6 +150,17 @@ const SearchBar = ({ isStandalone = false, searchFilter, setSearchFilter }) => {
   );
 };
 
+/**
+ * @param {Object} props
+ * @param {any[]} props.categoryFilter
+ * @param {Function} props.setCategoryFilter
+ * @param {any[]} props.categories
+ * @param {any[]} props.subCategories
+ * @param {Function} props.toggleVisibility
+ * @param {string} props.searchFilter
+ * @param {boolean} props.showNonCurrentTasks
+ * @param {Function} props.setShowNonCurrentTasks
+ */
 const SearchScreen = ({
   categoryFilter,
   setCategoryFilter,
@@ -399,14 +225,6 @@ const SearchScreen = ({
               No category
             </Chip>
             <div className={styles.filterLabel}>Categories:</div>
-            <CategoryChips
-              categories={categories}
-              subCategories={subCategories}
-              categoryFilter={categoryFilter}
-              setCategoryFilter={setCategoryFilter}
-              expandDirection={"horizontal"}
-              toggleSearchVisibility={toggleVisibility}
-            />
             <Button
               onClick={handleNewClick}
               filled={false}
@@ -425,101 +243,31 @@ const SearchScreen = ({
   );
 };
 
+/**
+ * @param {Object} props
+ * @param {any[]} [props.tasks]
+ * @param {boolean} [props.usesTime]
+ * @param {boolean} [props.showNonCurrentTasks]
+ * @param {Function} [props.setShowNonCurrentTasks]
+ */
 const TaskList = ({
   tasks = [],
   usesTime = false,
   showNonCurrentTasks = false,
-  setShowNonCurrentTasks = () => {},
+  setShowNonCurrentTasks = () => { },
 }) => {
-  const { data: categories } = useGetCategories();
-  const { data: subCategories } = useGetGroups();
-  const leftRef = useRef();
-  const { screenSize } = useScreenSize();
-
-  const componentCommunicationContext = useContext(
-    ComponentCommunicationContext,
-  );
-
-  const setSearchFilter = (value) => {
-    componentCommunicationContext.dispatch({
-      type: "SET_SEARCH_QUERY",
-      payload: value,
-    });
-  }
-
-  const setCategoryFilter = (value) => {
-    componentCommunicationContext.dispatch({
-      type: "SET_TASK_FILTERS",
-      payload: value,
-    });
-  };
-
-  const filteredTasks = useMemo(() => {
-    if (
-      componentCommunicationContext.state.filters.length == 0 &&
-      componentCommunicationContext.state.searchQuery.length === 0
-    )
-      return tasks;
-
-    return tasks.reduce((reducedTasks, currentTask) => {
-      if (currentTask.hasOwnProperty("tasks")) {
-        const matchesCategory =
-          componentCommunicationContext.state.filters.length === 0 ||
-          componentCommunicationContext.state.filters.find(
-            (tempFilter) => tempFilter._id === currentTask.tasks[0].category,
-          );
-
-        const matchesSubcategory =
-          matchesCategory === true ||
-          matchesCategory?.selectedSubcategories?.length === 0 ||
-          matchesCategory?.selectedSubcategories
-            .map((tempFilter) => tempFilter._id)
-            .includes(currentTask.tasks[0].group);
-
-        if (matchesSubcategory && matchesCategory) {
-          let taskFilteredBySearch;
-
-          if (componentCommunicationContext.state.searchQuery.length === 0) {
-            taskFilteredBySearch = currentTask;
-          } else {
-            taskFilteredBySearch = {
-              ...currentTask,
-              tasks: currentTask.tasks.filter((tempTask) =>
-                tempTask.title
-                  .toLowerCase()
-                  .includes(componentCommunicationContext.state.searchQuery.toLowerCase()),
-              ),
-            };
-          }
-
-          if (taskFilteredBySearch.tasks.length !== 0)
-            reducedTasks.push(taskFilteredBySearch);
-        }
-      } else {
-        // _id of -1 is for when the "no category" option is selected. Then show all tasks with no category
-        const showNoCategory =
-          componentCommunicationContext.state.filters.length === 0 ||
-          componentCommunicationContext.state.filters.some(
-            (category) => category._id === "-1",
-          );
-
-        const matchesSearch =
-          componentCommunicationContext.state.searchQuery.length === 0 ||
-          currentTask.title.toLowerCase().includes(componentCommunicationContext.state.searchQuery.toLowerCase());
-
-        if (showNoCategory && matchesSearch) reducedTasks.push(currentTask);
-      }
-
-      return reducedTasks;
-    }, []);
-  }, [componentCommunicationContext.state.filters, tasks, componentCommunicationContext.state.searchQuery]);
-
-  const toggleSearchVisibility = () => {
-    componentCommunicationContext.dispatch({
-      type: "SET_SEARCH_SCREEN_VISIBLE",
-      payload: !componentCommunicationContext.state.searchScreenVisible,
-    });
-  };
+  const {
+    filteredTasks,
+    categories,
+    subCategories,
+    setCategoryFilter,
+    setSearchFilter,
+    toggleSearchVisibility,
+    screenSize,
+    searchScreenVisible,
+    categoryFilter,
+    searchQuery,
+  } = useTaskList(tasks);
 
   return (
     <motion.div
@@ -531,14 +279,14 @@ const TaskList = ({
     >
       {screenSize === "small" && (
         <AnimatePresence>
-          {componentCommunicationContext.state.searchScreenVisible && (
+          {searchScreenVisible && (
             <SearchScreen
-              categoryFilter={componentCommunicationContext.state.filters}
+              categoryFilter={categoryFilter}
               setCategoryFilter={setCategoryFilter}
               categories={categories}
               subCategories={subCategories}
               toggleVisibility={toggleSearchVisibility}
-              searchFilter={componentCommunicationContext.state.searchQuery}
+              searchFilter={searchQuery}
               showNonCurrentTasks={showNonCurrentTasks}
               setShowNonCurrentTasks={setShowNonCurrentTasks}
             />
@@ -547,7 +295,6 @@ const TaskList = ({
       )}
       <motion.div
         className={`Stack-Container ${styles.leftSide}`}
-        ref={leftRef}
       >
         {/*
                 Animate Presence is needed here to set initial to true.
@@ -572,9 +319,9 @@ const TaskList = ({
               ) : (
                 <Task
                   key={
-                    task.tasks[0].group
+                    task?.tasks?.[0]?.group
                       ? `${task.tasks[0].category}-${task.tasks[0].group}`
-                      : task.tasks[0].category
+                      : task?.tasks?.[0]?.category
                   }
                   tasks={task.tasks}
                   usesTime={usesTime}
@@ -585,12 +332,12 @@ const TaskList = ({
       </motion.div>
       {screenSize !== "small" && (
         <BigScreenFilters
-          categoryFilter={componentCommunicationContext.state.filters}
+          categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
           categories={categories}
           subCategories={subCategories}
           showNonCurrentTasks={showNonCurrentTasks}
-          searchFilter={componentCommunicationContext.state.searchQuery}
+          searchFilter={searchQuery}
           setSearchFilter={setSearchFilter}
           setShowNonCurrentTasks={setShowNonCurrentTasks}
         />
