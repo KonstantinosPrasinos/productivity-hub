@@ -5,7 +5,7 @@ $theme: 'light';
     @if $theme =='light' {
         $theme: 'light';
 
-        --background-color: #F9FBFC;
+        --background-color: #F4F4F4;
         --on-background-color: #222222;
         --surface-color: #ffffff;
         --on-surface-color: #000000;
@@ -21,6 +21,7 @@ $theme: 'light';
         --on-info-color: #ffffff;
         --border-primary-color: #E2E6EB;
         --border-secondary-color: #79747E;
+        --secondary-color: #7C828F;
 
         --red-color: #FC5C65;
         --orange-color: #FD9644;

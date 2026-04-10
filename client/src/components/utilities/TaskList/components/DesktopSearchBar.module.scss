@@ -1,0 +1,42 @@
+@use "@/styles/variables" as v;
+@use "@/styles/index";
+
+.container {
+    @extend .Horizontal-Flex-Container;
+    @extend .Body-Large;
+    gap: 1rem;
+    color: var(--secondary-color);
+}
+
+.searchContainer {
+    @extend .Rounded-Container;
+    @extend .Horizontal-Flex-Container;
+    padding: 0.5rem;
+    flex: 1;
+    border-radius: v.$button-border-radius;
+    gap: 0.5rem;
+}
+
+.searchTextInput {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    width: 100%;
+    height: 1.5em;
+    color: inherit;
+}
+
+.createButton {
+    @extend .Rounded-Container;
+    height: 100%;
+    aspect-ratio: 1/1;
+    border-radius: v.$button-border-radius;
+    box-sizing: border-box;
+    padding: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 1.25em;
+}

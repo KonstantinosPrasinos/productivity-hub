@@ -227,6 +227,10 @@ a {
     @include m.Body-Medium;
 }
 
+.Body-Large {
+    @include m.Body-Large;
+}
+
 
 .Headline {
     font-size: v.$font-xl;

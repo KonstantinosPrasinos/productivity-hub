@@ -8,6 +8,7 @@ import Button from "@/components/buttons/Button/Button";
 import { MiniPagesContext } from "@/context/MiniPagesContext";
 
 import { useTaskList } from "./useTaskList";
+import DesktopSearchBar from "./components/DesktopSearchBar";
 
 const variants = {
   hidden: { opacity: 0, y: 25 },
@@ -277,7 +278,7 @@ const TaskList = ({
       exit={"exit"}
       className={styles.container}
     >
-      {screenSize === "small" && (
+      {/* {screenSize === "small" && (
         <AnimatePresence>
           {searchScreenVisible && (
             <SearchScreen
@@ -292,10 +293,13 @@ const TaskList = ({
             />
           )}
         </AnimatePresence>
-      )}
+      )} */}
       <motion.div
         className={`Stack-Container ${styles.leftSide}`}
       >
+        {screenSize !== "small" && (
+          <DesktopSearchBar searchFilter={searchQuery} setSearchFilter={setSearchFilter} />
+        )}
         {/*
                 Animate Presence is needed here to set initial to true.
                 Otherwise, the stagger doesn't work on list view because of the switch container.
@@ -330,7 +334,7 @@ const TaskList = ({
             )}
         </AnimatePresence>
       </motion.div>
-      {screenSize !== "small" && (
+      {/* {screenSize !== "small" && (
         <BigScreenFilters
           categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
@@ -341,7 +345,7 @@ const TaskList = ({
           setSearchFilter={setSearchFilter}
           setShowNonCurrentTasks={setShowNonCurrentTasks}
         />
-      )}
+      )} */}
     </motion.div>
   );
 };
