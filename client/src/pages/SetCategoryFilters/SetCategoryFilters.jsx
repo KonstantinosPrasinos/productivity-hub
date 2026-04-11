@@ -24,6 +24,7 @@ const SetCategoryFilters = ({ index, length, id }) => {
       index={index}
       length={length}
       collapsedFocusedElement={headerRef}
+      showSaveButton={false}
     >
       <div className={styles.header} ref={headerRef}>
         Set category filters
