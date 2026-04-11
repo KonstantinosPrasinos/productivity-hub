@@ -48,7 +48,7 @@ const MobileNavBar = () => {
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 1.0 }}
                                     initial={{ width: 0, height: 0, padding: 0, scale: 0, margin: 0 }}
-                                    animate={{ width: 32, height: 32, padding: 6, scale: 1, margin: 5 }}
+                                    animate={{ width: 34, height: 34, padding: 6, scale: 1, margin: 5 }}
                                     exit={{ width: 0, height: 0, padding: 0, scale: 0, margin: 0 }}
                                     transition={{ duration: 0.2 }}
                                     style={{ overflow: "hidden" }}
