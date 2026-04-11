@@ -1,0 +1,36 @@
+@use "@/styles/variables" as v;
+@use "@/styles/index";
+
+.header {
+    @extend .Title-Large;
+}
+
+.menu {
+    @extend .Stack-Container;
+    background-color: var(--surface-color);
+    overflow-y: auto;
+
+    gap: 20px;
+}
+
+.allSelected {
+    @extend .Horizontal-Flex-Container;
+
+    padding: 2px 6px;
+
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    border: 1px solid var(--border-primary-color);
+    border-radius: v.$big-border-radius;
+    padding: 10px 14px;
+
+    &.categorySelected {
+        background-color: var(--background-color);
+    }
+}
+
+.bottomPadding {
+    height: 20px;
+    flex-shrink: 0;
+}

@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import NewCategory from "../../../pages/NewCategory/NewCategory";
 import TaskView from "../../../pages/TaskView/TaskView";
 import CategoryView from "../../../pages/CategoryView/CategoryView";
+import SetCategoryFilters from "../../../pages/SetCategoryFilters/SetCategoryFilters";
 import { useGetTasks } from "../../../hooks/get-hooks/useGetTasks";
 import { useGetCategories } from "../../../hooks/get-hooks/useGetCategories";
 
@@ -51,6 +52,15 @@ const MiniPagesHandler = () => {
             index={index}
             length={miniPagesContext.state.length}
             category={categories.find((category) => category._id === page.id)}
+          />
+        );
+      case "set-category-filters":
+        return (
+          <SetCategoryFilters
+            key={index}
+            index={index}
+            length={miniPagesContext.state.length}
+            id={page.id}
           />
         );
       default:

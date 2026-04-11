@@ -1,0 +1,85 @@
+@use "@/styles/variables" as v;
+@use "@/styles/index";
+
+.categoryContainer {
+    @extend .Stack-Container;
+
+    gap: 0px;
+
+    transition: 0.2s ease-out background-color;
+
+    &.mobileCategoryContainer {
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        border: 1px solid var(--border-primary-color);
+        border-radius: v.$big-border-radius;
+        padding: 8px;
+
+        & .subCategoryButton {
+            margin-top: 8px;
+            padding: 4px 6px 4px 4px;
+        }
+    }
+}
+
+.categoryButton {
+    @extend .Horizontal-Flex-Container;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    padding: 2px 6px;
+    width: 100%;
+
+    cursor: pointer;
+
+    transition: 0.2s ease-out background-color;
+}
+
+.categorySelected {
+    background-color: var(--background-color);
+}
+
+.categoryTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.categoryDot {
+    flex-shrink: 0;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.subCategoryButton {
+    @extend .Horizontal-Flex-Container;
+    @extend .Body-Medium;
+
+    color: var(--secondary-color);
+    text-align: left;
+
+    overflow: hidden;
+
+    padding: 2px 6px 2px 4px;
+    gap: 6px;
+    margin-top: 4px;
+    width: 100%;
+
+    border-radius: v.$base-border-radius;
+    transition: 0.2s ease-out background-color;
+}
+
+.subCategoryTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.spacer {
+    flex-grow: 1;
+}
