@@ -47,9 +47,9 @@ const MobileNavBar = () => {
                                     onClick={settingsClicked}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 1.0 }}
-                                    initial={{ scale: 0, margin: 0 }}
-                                    animate={{ scale: 1, margin: 5 }}
-                                    exit={{ scale: 0, margin: 0 }}
+                                    initial={{ width: 0, height: 0, padding: 0, scale: 0, margin: 0 }}
+                                    animate={{ width: 32, height: 32, padding: 6, scale: 1, margin: 5 }}
+                                    exit={{ width: 0, height: 0, padding: 0, scale: 0, margin: 0 }}
                                     transition={{ duration: 0.2 }}
                                     style={{ overflow: "hidden" }}
                                     className={styles.menuButton}
@@ -83,15 +83,24 @@ const MobileNavBar = () => {
                             }
                         </AnimatePresence>
                     </motion.button>
-                    <motion.button
-                        layout
-                        className={styles.addButton}
-                        onClick={handleCreateClick}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 1.0 }}
-                    >
-                        <TbPlus />
-                    </motion.button>
+                    <AnimatePresence>
+                        {!navBarExpanded && (
+                            <motion.button
+                                layout
+                                className={styles.addButton}
+                                onClick={handleCreateClick}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 1.0 }}
+                                initial={{ scale: 0, height: 0, width: 0, padding: 0 }}
+                                animate={{ scale: 1, height: 44, width: 44, padding: 8 }}
+                                exit={{ scale: 0, height: 0, width: 0, padding: 0 }}
+                                transition={{ duration: 0.2 }}
+                                style={{ overflow: "hidden" }}
+                            >
+                                <TbPlus />
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </motion.div>
 
             </motion.div>
