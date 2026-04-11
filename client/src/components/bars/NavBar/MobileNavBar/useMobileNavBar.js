@@ -43,7 +43,10 @@ export const useMobileNavBar = () => {
     }, [miniPagesContext]);
 
     const settingsClicked = () => {
-
+        miniPagesContext.dispatch({
+            type: "ADD_PAGE",
+            payload: { type: "settings" },
+        });
     };
 
     return {

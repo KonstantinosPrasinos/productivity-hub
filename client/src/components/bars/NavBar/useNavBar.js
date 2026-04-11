@@ -1,15 +1,15 @@
 
 import { ComponentCommunicationContext } from "@/context/ComponentCommunicationContext"
+import { MiniPagesContext } from "@/context/MiniPagesContext";
 import { useGetCategories } from "@/hooks/get-hooks/useGetCategories";
 import { useGetGroups } from "@/hooks/get-hooks/useGetGroups";
-import { useScreenSize } from "@/hooks/useScreenSize";
 import { useCallback, useContext } from "react";
 
 export const useNavBar = () => {
-    const { screenSize } = useScreenSize();
     const componentCommunicationContext = useContext(
         ComponentCommunicationContext
     );
+    const miniPagesContext = useContext(MiniPagesContext)
 
     const { data: categories } = useGetCategories();
     const { data: subCategories } = useGetGroups();
@@ -71,7 +71,10 @@ export const useNavBar = () => {
     }, [componentCommunicationContext]);
 
     const settingsClicked = () => {
-        // TODO: create settings minipage
+        miniPagesContext.dispatch({
+            type: "ADD_PAGE",
+            payload: { type: "settings" },
+        });
     }
 
     return {

@@ -6,6 +6,7 @@ import NewCategory from "../../../pages/NewCategory/NewCategory";
 import TaskView from "../../../pages/TaskView/TaskView";
 import CategoryView from "../../../pages/CategoryView/CategoryView";
 import SetCategoryFilters from "../../../pages/SetCategoryFilters/SetCategoryFilters";
+import Settings from "../../../pages/Settings/Settings";
 import { useGetTasks } from "../../../hooks/get-hooks/useGetTasks";
 import { useGetCategories } from "../../../hooks/get-hooks/useGetCategories";
 
@@ -57,6 +58,15 @@ const MiniPagesHandler = () => {
       case "set-category-filters":
         return (
           <SetCategoryFilters
+            key={index}
+            index={index}
+            length={miniPagesContext.state.length}
+            id={page.id}
+          />
+        );
+      case "settings":
+        return (
+          <Settings
             key={index}
             index={index}
             length={miniPagesContext.state.length}

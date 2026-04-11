@@ -8,6 +8,8 @@
 
     transition: 0.2s ease-out background-color;
 
+    border-radius: v.$base-border-radius;
+
     &.mobileCategoryContainer {
         font-weight: 400;
         font-size: 18px;

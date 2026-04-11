@@ -1,5 +1,5 @@
 import styles from "./Settings.module.scss";
-import React, { memo, useCallback, useContext, useState, useMemo } from "react";
+import React, { memo, useCallback, useContext, useState, useMemo, useRef } from "react";
 import TextBoxInput from "../../components/inputs/TextBoxInput/TextBoxInput";
 import Button from "../../components/buttons/Button/Button";
 import { UserContext } from "../../context/UserContext";
@@ -11,6 +11,8 @@ import { useResetAccount } from "../../hooks/auth-hooks/useResetAccount";
 import { useDeleteAccount } from "../../hooks/auth-hooks/useDeleteAccount";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/containers/Modal/Modal";
+import MiniPageContainer from "../../components/containers/MiniPagesContainer/MiniPageContainer";
+import { MiniPagesContext } from "../../context/MiniPagesContext";
 import {
   TbBrandGithub,
   TbBrandLinkedin,
@@ -21,34 +23,39 @@ import {
 import ToggleButton from "../../components/buttons/ToggleButton/ToggleButton";
 import DropDownInput from "@/components/inputs/DropDownInput/DropDownInput";
 
-const SettingsTile = memo(
-  ({ onClick, title, description, children, isWarning = false }) => {
-    if (onClick)
-      return (
-        <button
-          onClick={onClick}
-          className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}
-        >
-          <div className={styles.tileText}>
-            <span className={styles.tileTitle}>{title}</span>
-            <span className={styles.tileDescription}>{description}</span>
-          </div>
-          <div className={styles.tileAction}>{children}</div>
-        </button>
-      );
+/**
+ * @param {{onClick?: (event?: any) => void, title: string, description?: string, children?: any, isWarning?: boolean}} props
+ */
+const SettingsTileComponent = ({ onClick, title, description, children, isWarning = false }) => {
+  if (onClick)
     return (
-      <div className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}>
+      <button
+        onClick={onClick}
+        className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}
+      >
         <div className={styles.tileText}>
           <span className={styles.tileTitle}>{title}</span>
           <span className={styles.tileDescription}>{description}</span>
         </div>
         <div className={styles.tileAction}>{children}</div>
-      </div>
+      </button>
     );
-  }
-);
+  return (
+    <div className={`${styles.tile} ${isWarning ? styles.isWarning : ""}`}>
+      <div className={styles.tileText}>
+        <span className={styles.tileTitle}>{title}</span>
+        <span className={styles.tileDescription}>{description}</span>
+      </div>
+      <div className={styles.tileAction}>{children}</div>
+    </div>
+  );
+};
+const SettingsTile = memo(SettingsTileComponent);
 
-const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
+/**
+ * @param {{selectedTheme: string, setSelectedTheme: Function}} props
+ */
+const ThemeTileComponent = ({ selectedTheme, setSelectedTheme }) => {
   const setLightTheme = useCallback(() => {
     setSelectedTheme("Light");
   }, [setSelectedTheme]);
@@ -83,9 +90,8 @@ const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
           </div>
         </div>
         <div
-          className={`${styles.themeButtonLabel} ${
-            selectedTheme === "Device" ? styles.selected : ""
-          }`}
+          className={`${styles.themeButtonLabel} ${selectedTheme === "Device" ? styles.selected : ""
+            }`}
         >
           Device
         </div>
@@ -98,9 +104,8 @@ const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
           </div>
         </div>
         <div
-          className={`${styles.themeButtonLabel} ${
-            selectedTheme === "Light" ? styles.selected : ""
-          }`}
+          className={`${styles.themeButtonLabel} ${selectedTheme === "Light" ? styles.selected : ""
+            }`}
         >
           Light
         </div>
@@ -113,23 +118,30 @@ const ThemeTile = memo(({ selectedTheme, setSelectedTheme }) => {
           </div>
         </div>
         <div
-          className={`${styles.themeButtonLabel} ${
-            selectedTheme === "Dark" ? styles.selected : ""
-          }`}
+          className={`${styles.themeButtonLabel} ${selectedTheme === "Dark" ? styles.selected : ""
+            }`}
         >
           Dark
         </div>
       </button>
     </div>
   );
-});
+};
+const ThemeTile = memo(ThemeTileComponent);
 
 const deleteTimeGroupActions = [
   { display: "Keep tasks", actual: "Keep their repeat details" },
   { display: "Delete tasks", actual: "Delete them" },
 ];
 
-const Settings = () => {
+/**
+ * @param {{index: number, length: number, id: string}} props
+ */
+
+const Settings = ({ index, length, id }) => {
+  const miniPagesContext = useContext(MiniPagesContext);
+  const headerRef = useRef(null);
+
   const { data: settings } = useGetSettings();
 
   const deleteActionDefault = useMemo(() => {
@@ -352,241 +364,234 @@ const Settings = () => {
   ]);
 
   return (
-    <motion.div
-        className={styles.container}
-        initial={{opacity: 0, y: 25}}
-        animate={{opacity: 1, y: 0}}
+    <MiniPageContainer
+      onClickSave={handleSaveChanges}
+      index={index}
+      length={length}
+      collapsedFocusedElement={headerRef}
+      showSaveButton={Object.keys(settingsChanges).length > 0}
     >
-      <div className={styles.settingsGroup}>
-        <span className={styles.tileGroupTitle}>Account</span>
-        <div className={styles.tileGroup}>
-          <SettingsTile title={"Logout"} onClick={logout}>
-            <TbLogout />
-          </SettingsTile>
-          {!googleLinked && (
-            <>
-              <SettingsTile
-                title={"Change email"}
-                description={email}
-                onClick={handleChangeEmail}
-              >
-                <TbChevronRight />
-              </SettingsTile>
-              <SettingsTile
-                title={"Change password"}
-                onClick={handleChangePasswordClick}
-              >
-                <TbChevronRight />
-              </SettingsTile>
-            </>
-          )}
-          {googleLinked && (
-            <SettingsTile
-              title={"Google account email"}
-              description={email}
-            ></SettingsTile>
-          )}
-        </div>
-        <div className={styles.tileGroup}>
-          <SettingsTile
-            title={"Reset account"}
-            isWarning={true}
-            onClick={toggleResetAccountModal}
-          >
-            <TbChevronRight />
-          </SettingsTile>
-          <SettingsTile
-            title={"Delete account"}
-            isWarning={true}
-            onClick={toggleDeleteAccountModal}
-          >
-            <TbChevronRight />
-          </SettingsTile>
-        </div>
+      <div className={styles.header} ref={headerRef} style={{ fontSize: '24px', fontWeight: 'bold', padding: '10px 0' }}>
+        Settings
       </div>
-      <div className={styles.settingsGroup}>
-        <span className={styles.tileGroupTitle}>General</span>
-        <div className={styles.tileGroup}>
-          <ThemeTile
-            selectedTheme={selectedTheme}
-            setSelectedTheme={handleSetTheme}
-          />
-        </div>
-        <div className={styles.tileGroup}>
-          <SettingsTile title={"Confirm delete"}>
-            <ToggleButton
-              isToggled={confirmDelete}
-              setIsToggled={handleSetConfirmDelete}
-            />
-          </SettingsTile>
-          <SettingsTile title={"Category delete action"}>
-            <DropDownInput
-              placeholder={"Keep repeat"}
-              selected={deleteAction.display}
-            >
-              {deleteTimeGroupActions.map((action) => (
-                <button
-                  key={action.display}
-                  className={"DropDownOption"}
-                  onClick={() => handleSetDeleteAction(action)}
+      <div className={styles.container}>
+        <div className={styles.settingsGroup}>
+          <span className={styles.tileGroupTitle}>Account</span>
+          <div className={styles.tileGroup}>
+            <SettingsTile title={"Logout"} onClick={logout}>
+              <TbLogout />
+            </SettingsTile>
+            {!googleLinked && (
+              <>
+                <SettingsTile
+                  title={"Change email"}
+                  description={email}
+                  onClick={handleChangeEmail}
                 >
-                  {action.display}
-                </button>
-              ))}
-            </DropDownInput>
-          </SettingsTile>
-        </div>
-        <div className={styles.tileGroup}>
-          <SettingsTile title={"Priority default value"}>
-            <TextBoxInput
-              type={"number"}
-              value={priority}
-              setValue={handleSetPriority}
-            />
-          </SettingsTile>
-          <SettingsTile title={"Number task default step"}>
-            <TextBoxInput
-              type={"number"}
-              value={step}
-              setValue={handleSetStep}
-            />
-          </SettingsTile>
-          <SettingsTile title={"Default goal value"}>
-            <TextBoxInput
-              type={"number"}
-              value={goal}
-              setValue={handleSetGoal}
-            />
-          </SettingsTile>
-        </div>
-      </div>
-      <div className={styles.settingsGroup}>
-        <span className={styles.tileGroupTitle}>Keyboard shortcuts</span>
-        <div className={styles.tileGroup}>
-          <SettingsTile title={"Create new task"}>
-            <div className={"Horizontal-Flex-Container Small-Gap"}>
-              <div className={styles.emptyChip}>Ctrl</div>
-              <div className={styles.emptyChip}>Enter</div>
-            </div>
-          </SettingsTile>
-          <SettingsTile title={"Create new category"}>
-            <div className={"Horizontal-Flex-Container Small-Gap"}>
-              <div className={styles.emptyChip}>Ctrl</div>
-              <div className={styles.emptyChip}>\</div>
-            </div>
-          </SettingsTile>
-          <SettingsTile title={"Close all pages"}>
-            <div className={styles.emptyChip}>Esc</div>
-          </SettingsTile>
-        </div>
-      </div>
-      <div className={styles.settingsGroup}>
-        <span className={styles.tileGroupTitle}>About</span>
-        <div className={styles.tileGroup}>
-          <SettingsTile title={"App version"}>1.0</SettingsTile>
-          <SettingsTile title={"View the source code for this app on GitHub"}>
-            <a
-              href={"https://github.com/KonstantinosPrasinos/productivity-hub"}
-              target="_blank"
-              className={styles.githubLink}
+                  <TbChevronRight />
+                </SettingsTile>
+                <SettingsTile
+                  title={"Change password"}
+                  onClick={handleChangePasswordClick}
+                >
+                  <TbChevronRight />
+                </SettingsTile>
+              </>
+            )}
+            {googleLinked && (
+              <SettingsTile
+                title={"Google account email"}
+                description={email}
+              ></SettingsTile>
+            )}
+          </div>
+          <div className={styles.tileGroup}>
+            <SettingsTile
+              title={"Reset account"}
+              isWarning={true}
+              onClick={toggleResetAccountModal}
             >
-              <TbBrandGithub />
-            </a>
-          </SettingsTile>
-          <SettingsTile title={"Created by Konstantinos Prasinos"}>
-            <a
-              href={"https://github.com/KonstantinosPrasinos/"}
-              target="_blank"
-              className={styles.githubLink}
+              <TbChevronRight />
+            </SettingsTile>
+            <SettingsTile
+              title={"Delete account"}
+              isWarning={true}
+              onClick={toggleDeleteAccountModal}
             >
-              <TbBrandLinkedin />
-            </a>
-          </SettingsTile>
+              <TbChevronRight />
+            </SettingsTile>
+          </div>
         </div>
-      </div>
-      {deleteModalVisible && (
-        <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
-          <div className={"Stack-Container Big-Gap"}>
-            <div className={"Display"}>Confirm your password</div>
-            <div className={"label"}>
-              In order to delete your account you need to confirm your password.
-            </div>
-            <TextBoxInput
-              type={"password"}
-              width={"max"}
-              size={"large"}
-              placeholder={"Password"}
-              value={currentPassword}
-              setValue={setCurrentPassword}
+        <div className={styles.settingsGroup}>
+          <span className={styles.tileGroupTitle}>General</span>
+          <div className={styles.tileGroup}>
+            <ThemeTile
+              selectedTheme={selectedTheme}
+              setSelectedTheme={handleSetTheme}
             />
           </div>
-          <div
-            className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
-          >
-            <Button size={"large"} filled={false} onClick={handleDeleteCancel}>
-              Cancel
-            </Button>
-            <Button
-              size={"large"}
-              filled={!(currentPassword.length <= 0)}
-              onClick={handleDeleteContinue}
-              disabled={currentPassword.length <= 0}
-            >
-              Continue
-            </Button>
+          <div className={styles.tileGroup}>
+            <SettingsTile title={"Confirm delete"}>
+              <ToggleButton
+                isToggled={confirmDelete}
+                setIsToggled={handleSetConfirmDelete}
+              />
+            </SettingsTile>
+            <SettingsTile title={"Category delete action"}>
+              <DropDownInput
+                placeholder={"Keep repeat"}
+                selected={deleteAction.display}
+              >
+                {deleteTimeGroupActions.map((action) => (
+                  <button
+                    key={action.display}
+                    className={"DropDownOption"}
+                    onClick={() => handleSetDeleteAction(action)}
+                  >
+                    {action.display}
+                  </button>
+                ))}
+              </DropDownInput>
+            </SettingsTile>
           </div>
-        </Modal>
-      )}
-
-      {/* Modal for password confirmation in order to reset account*/}
-      {resetModalVisible && (
-        <Modal isOverlay={true} dismountFunction={handleResetCancel}>
-          <div className={"Stack-Container"}>
-            <div className={"Display"}>Confirm your password</div>
-            <div className={"label"}>
-              In order to reset your account you need to confirm your password.
+          <div className={styles.tileGroup}>
+            <SettingsTile title={"Priority default value"}>
+              <TextBoxInput
+                type={"number"}
+                value={priority}
+                setValue={handleSetPriority}
+              />
+            </SettingsTile>
+            <SettingsTile title={"Number task default step"}>
+              <TextBoxInput
+                type={"number"}
+                value={step}
+                setValue={handleSetStep}
+              />
+            </SettingsTile>
+            <SettingsTile title={"Default goal value"}>
+              <TextBoxInput
+                type={"number"}
+                value={goal}
+                setValue={handleSetGoal}
+              />
+            </SettingsTile>
+          </div>
+        </div>
+        <div className={styles.settingsGroup}>
+          <span className={styles.tileGroupTitle}>Keyboard shortcuts</span>
+          <div className={styles.tileGroup}>
+            <SettingsTile title={"Create new task"}>
+              <div className={"Horizontal-Flex-Container Small-Gap"}>
+                <div className={styles.emptyChip}>Ctrl</div>
+                <div className={styles.emptyChip}>Enter</div>
+              </div>
+            </SettingsTile>
+            <SettingsTile title={"Create new category"}>
+              <div className={"Horizontal-Flex-Container Small-Gap"}>
+                <div className={styles.emptyChip}>Ctrl</div>
+                <div className={styles.emptyChip}>\</div>
+              </div>
+            </SettingsTile>
+            <SettingsTile title={"Close all pages"}>
+              <div className={styles.emptyChip}>Esc</div>
+            </SettingsTile>
+          </div>
+        </div>
+        <div className={styles.settingsGroup}>
+          <span className={styles.tileGroupTitle}>About</span>
+          <div className={styles.tileGroup}>
+            <SettingsTile title={"App version"}>1.0</SettingsTile>
+            <SettingsTile title={"View the source code for this app on GitHub"}>
+              <a
+                href={"https://github.com/KonstantinosPrasinos/productivity-hub"}
+                target="_blank"
+                className={styles.githubLink}
+              >
+                <TbBrandGithub />
+              </a>
+            </SettingsTile>
+            <SettingsTile title={"Created by Konstantinos Prasinos"}>
+              <a
+                href={"https://github.com/KonstantinosPrasinos/"}
+                target="_blank"
+                className={styles.githubLink}
+              >
+                <TbBrandLinkedin />
+              </a>
+            </SettingsTile>
+          </div>
+        </div>
+        {deleteModalVisible && (
+          <Modal isOverlay={true} dismountFunction={handleDeleteCancel}>
+            <div className={"Stack-Container Big-Gap"}>
+              <div className={"Display"}>Confirm your password</div>
+              <div className={"label"}>
+                In order to delete your account you need to confirm your password.
+              </div>
+              <TextBoxInput
+                type={"password"}
+                width={"max"}
+                size={"large"}
+                placeholder={"Password"}
+                value={currentPassword}
+                setValue={setCurrentPassword}
+              />
             </div>
-            <TextBoxInput
-              type={"password"}
-              width={"max"}
-              size={"large"}
-              placeholder={"Password"}
-              value={currentPassword}
-              setValue={setCurrentPassword}
-            />
-          </div>
-          <div
-            className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
-          >
-            <Button size={"large"} filled={false} onClick={handleResetCancel}>
-              Cancel
-            </Button>
-            <Button
-              size={"large"}
-              filled={!(currentPassword.length <= 0)}
-              onClick={handleResetContinue}
-              disabled={currentPassword.length <= 0}
+            <div
+              className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
             >
-              Continue
-            </Button>
-          </div>
-        </Modal>
-      )}
-      <AnimatePresence>
-        {Object.keys(settingsChanges).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={styles.saveSettingsContainer}
-          >
-            <Button onClick={handleSaveChanges} symmetrical>
-              <TbDeviceFloppy />
-            </Button>
-          </motion.div>
+              <Button size={"large"} filled={false} onClick={handleDeleteCancel}>
+                Cancel
+              </Button>
+              <Button
+                size={"large"}
+                filled={!(currentPassword.length <= 0)}
+                onClick={handleDeleteContinue}
+                disabled={currentPassword.length <= 0}
+              >
+                Continue
+              </Button>
+            </div>
+          </Modal>
         )}
-      </AnimatePresence>
-    </motion.div>
+
+        {/* Modal for password confirmation in order to reset account*/}
+        {resetModalVisible && (
+          <Modal isOverlay={true} dismountFunction={handleResetCancel}>
+            <div className={"Stack-Container"}>
+              <div className={"Display"}>Confirm your password</div>
+              <div className={"label"}>
+                In order to reset your account you need to confirm your password.
+              </div>
+              <TextBoxInput
+                type={"password"}
+                width={"max"}
+                size={"large"}
+                placeholder={"Password"}
+                value={currentPassword}
+                setValue={setCurrentPassword}
+              />
+            </div>
+            <div
+              className={`Horizontal-Flex-Container Space-Between Flex-Wrap Big-Gap ${styles.inputsBody}`}
+            >
+              <Button size={"large"} filled={false} onClick={handleResetCancel}>
+                Cancel
+              </Button>
+              <Button
+                size={"large"}
+                filled={!(currentPassword.length <= 0)}
+                onClick={handleResetContinue}
+                disabled={currentPassword.length <= 0}
+              >
+                Continue
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </div>
+    </MiniPageContainer>
   );
 };
 
