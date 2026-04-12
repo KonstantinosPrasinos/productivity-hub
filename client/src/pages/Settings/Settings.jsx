@@ -496,6 +496,13 @@ const Settings = ({ index, length, id }) => {
             <SettingsTile title={"Close all pages"}>
               <div className={styles.emptyChip}>Esc</div>
             </SettingsTile>
+            <SettingsTile title={"Search"}>
+              <div className={"Horizontal-Flex-Container Small-Gap"}>
+                <div className={styles.emptyChip}>Ctrl</div>
+                <div className={styles.emptyChip}>Shift</div>
+                <div className={styles.emptyChip}>F</div>
+              </div>
+            </SettingsTile>
           </div>
         </div>
         <div className={styles.settingsGroup}>

@@ -2,22 +2,8 @@
 @use '@/styles/mixins' as m;
 @use '@/styles/index';
 
-@media (min-width: v.$phone-breakpoint) {
-    .container {
-        width: 600px;
-    }
-    .saveSettingsContainer {
-        left: calc(3rem + 600px);
-    }
-}
-
-@media (max-width: v.$phone-breakpoint) {
-    .container {
-        width: 100%;
-    }
-    .saveSettingsContainer {
-        right: 1em;
-    }
+.container {
+    width: 100%;
 }
 
 .emptyChip {
