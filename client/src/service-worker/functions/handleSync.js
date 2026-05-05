@@ -437,7 +437,7 @@ const handleResponse = async (response, oldIds) => {
     await groupStore.delete(group._id);
   }
 
-  // Todo remove mustSync from editedTask
+  await transaction.done;
 };
 
 const handleCleanup = async () => {

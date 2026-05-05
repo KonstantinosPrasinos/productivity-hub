@@ -136,6 +136,8 @@ export const addTaskToDB = async (task) => {
   tempTask.currentEntryId = taskId;
   tempTask._id = taskId;
 
+  await db.put("tasks", tempTask);
+
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0);
 

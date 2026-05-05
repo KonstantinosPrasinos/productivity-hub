@@ -257,6 +257,8 @@ export const setTasksInDatabase = async (tempTasks = []) => {
   for (const task of tempTasks) {
     await taskStore.put({ ...task, mustSync: false });
   }
+
+  await transaction.done;
 };
 
 export const setEntriesInDatabase = async (tempEntries = []) => {
@@ -276,6 +278,8 @@ export const setEntriesInDatabase = async (tempEntries = []) => {
   for (const entry of tempEntries) {
     await entryStore.put({ ...entry, mustSync: false });
   }
+
+  await transaction.done;
 };
 
 export const clearDatabase = async () => {

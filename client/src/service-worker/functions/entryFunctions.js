@@ -137,7 +137,7 @@ export const getAllEntriesFromDB = async (taskId) => {
     .getAll();
 
   const entriesThatMatchTaskId = entries.filter(
-    (entry) => entry.taskId.toString() === taskId,
+    (entry) => entry.taskId?.toString() === taskId,
   );
 
   const today = new Date();

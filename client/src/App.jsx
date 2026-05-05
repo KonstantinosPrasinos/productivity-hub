@@ -51,12 +51,14 @@ const syncTasks = async (queryClient) => {
       (entry) => entry._id === task.currentEntryId,
     );
 
-    queryClient.setQueryData(
-      ["task-entries", taskEntry.taskId, taskEntry._id],
-      () => {
-        return { entry: taskEntry };
-      },
-    );
+    if (taskEntry) {
+      queryClient.setQueryData(
+        ["task-entries", taskEntry.taskId, taskEntry._id],
+        () => {
+          return { entry: taskEntry };
+        },
+      );
+    }
   }
 
   queryClient.setQueryData(["tasks"], () => {
@@ -120,7 +122,7 @@ const syncTaskEntries = async (queryClient, taskId) => {
     .getAll();
 
   const entriesThatMatchTaskId = entries.filter(
-    (entry) => entry.taskId.toString() === taskId,
+    (entry) => entry.taskId?.toString() === taskId,
   );
 
   const today = new Date();
