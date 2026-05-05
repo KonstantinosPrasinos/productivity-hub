@@ -34,7 +34,7 @@ import {
   addEntryToServer,
   deleteEntryInDB,
   deleteEntryInServer,
-  getAllEntriesFromDB,
+  getAllEntriesFromDB, getEntryFromDB,
   handleAllEntriesGetRequest,
   setEntryInDB,
   setEntryInServer,
