@@ -148,8 +148,8 @@ self.addEventListener("fetch", async (event) => {
               await handleAllEntriesGetRequest(event.request, self);
             }
           } else if (/\/entry\/*/.test(requestUrl)) {
-            // todo fix this
-            event.respondWith(getSettingsFromDB());
+            const entryId = requestUrl.split("/entry/")[1];
+            event.respondWith(getEntryFromDB(entryId));
           }
       }
     } else if (event.request.method === "POST") {

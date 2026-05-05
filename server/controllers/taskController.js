@@ -376,5 +376,6 @@ module.exports = {
   assembleEntryHistory,
   getDateAddDetails,
   findMostRecentDate,
+  getTasksWithHistory,
   taskSchema,
 };

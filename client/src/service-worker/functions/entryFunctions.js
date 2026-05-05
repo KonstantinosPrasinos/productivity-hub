@@ -116,6 +116,18 @@ export const setEntryInServer = async (event) => {
   await messageClient(self, `UPDATE_ENTRIES_${data.taskId}`);
 };
 
+export const getEntryFromDB = async (entryId) => {
+  const db = await openDatabase();
+  const entry = await db
+    .transaction("entries")
+    .objectStore("entries")
+    .get(entryId);
+
+  return new Response(JSON.stringify({ entry }), {
+    headers: { "Content-Type": "application/json" },
+  });
+};
+
 export const getAllEntriesFromDB = async (taskId) => {
   const db = await openDatabase();
 

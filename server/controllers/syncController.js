@@ -1,6 +1,6 @@
 const Task = require("../models/taskSchema");
 const Entry = require("../models/entrySchema");
-const { taskSchema } = require("./taskController");
+const { taskSchema, getTasksWithHistory } = require("./taskController");
 const {
   categorySchema,
   handleCreateCategory,
@@ -71,7 +71,41 @@ const handleSync = async (req, res) => {
           { returnDocument: "after" },
         );
 
-        tasksResponse.push(newTask);
+        let currentEntry;
+        if (newTask.repeats) {
+          currentEntry = await Entry.findOne({
+            userId: req.user._id,
+            taskId: newTask._id,
+            date: currentDate,
+          });
+        } else {
+          currentEntry = await Entry.findOne({
+            userId: req.user._id,
+            taskId: newTask._id,
+          });
+        }
+
+        if (!currentEntry) {
+          currentEntry = await Entry.create({
+            userId: req.user._id,
+            taskId: newTask._id,
+          });
+        }
+
+        tasksResponse.push({
+          ...newTask._doc,
+          currentEntryId: currentEntry._id,
+          forDeletion: undefined,
+          hidden: false,
+        });
+
+        if (
+          !entriesResponse.find(
+            (e) => e._id.toString() === currentEntry._id.toString(),
+          )
+        ) {
+          entriesResponse.push(currentEntry);
+        }
       } catch (error) {
         errors.taskEditErrors.push(error.message);
       }
